@@ -1,68 +1,74 @@
-# SST Migration Plan (Netlify -> SST on AWS)
+# SST Migration Plan - COMPLETE ✅
 
-This plan focuses on a controlled migration with staged deployments from a dedicated branch until parity and stability are proven. It references SST TanStack Start guidance and components from the local SST repo.
+> **Status**: Migration complete as of December 2024. SST is now the production deployment platform.
 
-## References (SST)
+## Production Deployment
 
-- TanStack Start on AWS guide: `/Users/austin/dev/sst/www/src/content/docs/docs/start/aws/tanstack.mdx`
-- TanStack Start component implementation: `/Users/austin/dev/sst/platform/src/components/aws/tan-stack-start.ts`
-- Example SST config (TanStack Start): `/Users/austin/dev/sst/examples/aws-tanstack-start/sst.config.ts`
-- TanStack Start template config: `/Users/austin/dev/sst/platform/templates/tanstack-start/files/sst.config.ts`
+- **URL**: https://d200ljtib0dq8n.cloudfront.net
+- **Region**: `ca-central-1` (Canada) for PIPEDA compliance
+- **AWS Account**: 596976295870 (production)
+- **AWS Profile**: `techprod`
 
-## Goals
+## Deployment Commands
 
-- Maintain current Netlify production while validating AWS parity.
-- Deploy SST from a migration branch and stage environment until feature parity is reached.
-- Preserve compliance requirements (data residency, audit logging, backups, retention) while improving long-term scalability.
+```bash
+# Login to AWS SSO
+aws sso login --profile techprod
 
-## Phase 0: Pre-migration Decisions (1-2 days)
+# Deploy to production
+AWS_PROFILE=techprod npx sst deploy --stage production
 
-**Outcomes**
+# Set secrets
+AWS_PROFILE=techprod npx sst secret set <SecretName> "<value>" --stage production
 
-- Choose AWS region (recommend `ca-central-1`).
-- Confirm database hosting and residency (Neon/managed Postgres in CA).
-- Define RTO/RPO targets and log retention windows.
-- Decide on domain strategy for SST staging (for example `sst-staging.<domain>`).
+# List secrets
+AWS_PROFILE=techprod npx sst secret list --stage production
+```
 
-## Phase 1: Infrastructure Skeleton (2-3 days)
+## SST Secrets Configuration
 
-**Branch strategy**
+Required secrets for production:
 
-- Create a long-lived branch, for example `sst-migration`.
-- Netlify remains bound to `main` for production. SST is deployed from the branch only.
+| Secret                      | Description                             |
+| --------------------------- | --------------------------------------- |
+| `DatabaseUrl`               | PostgreSQL connection string (Neon)     |
+| `BetterAuthSecret`          | Auth session secret                     |
+| `GoogleClientId`            | Google OAuth client ID                  |
+| `GoogleClientSecret`        | Google OAuth client secret              |
+| `BaseUrl`                   | Production URL (CloudFront)             |
+| `SquareEnv`                 | Square environment (sandbox/production) |
+| `SquareApplicationId`       | Square app ID                           |
+| `SquareAccessToken`         | Square access token                     |
+| `SquareLocationId`          | Square location ID                      |
+| `SquareWebhookSignatureKey` | Square webhook signature                |
+| `SendgridApiKey`            | SendGrid API key                        |
+| `SendgridFromEmail`         | From email address                      |
 
-**SST app configuration**
+## AWS Resources Created
 
-- Add `sst.config.ts` to the repo root based on:
-  - `/Users/austin/dev/sst/examples/aws-tanstack-start/sst.config.ts`
-  - `/Users/austin/dev/sst/platform/templates/tanstack-start/files/sst.config.ts`
-- Use `new sst.aws.TanStackStart("Web", { ... })` with:
-  - `buildCommand: "pnpm build"`
-  - `dev: { command: "pnpm dev" }` (optional but recommended)
-  - `environment` values for non-secret runtime configuration
-  - `link` to AWS resources as needed (see `tan-stack-start.ts` for link notes)
+SST deploys the following resources:
 
-**Vite config for Nitro**
+- **Lambda Function**: TanStack Start app with streaming response
+- **CloudFront Distribution**: CDN with edge caching
+- **S3 Bucket**: Static assets
+- **Secrets Manager**: Application secrets
+- **CloudWatch Logs**: Lambda execution logs
+- **IAM Roles**: Lambda execution role with minimal permissions
 
-- Replace the Netlify plugin with Nitro per:
-  - `/Users/austin/dev/sst/www/src/content/docs/docs/start/aws/tanstack.mdx`
-- Add `nitro()` plugin and set:
-  - `nitro: { preset: "aws-lambda", awsLambda: { streaming: true } }`
+## Known Issues and Workarounds
 
-**Expected output**
+### Pulumi Error Formatting Bug
 
-- Ensure `pnpm build` produces `.output/` with `nitro.json`. The SST TanStack Start component reads this (`tan-stack-start.ts`).
+When deployment errors occur, Node.js may show `RangeError: Invalid string length` instead of the actual error. This is caused by `util.inspect` failing on large AWS SDK error objects.
 
-**Known SST issue: Lambda Function URL invoke permissions**
+**Workaround**: The Pulumi error handler at `.sst/platform/node_modules/@pulumi/pulumi/cmd/run/error.js` has been patched to return error stacks directly instead of using `util.inspect`. This patch may need to be reapplied after SST updates.
 
-- Recent AWS changes require both `lambda:InvokeFunctionUrl` and `lambda:InvokeFunction` on Function URLs. New SST deployments can return:
-  - `Forbidden. For troubleshooting Function URL authorization issues...`
-- See SST issue discussion: `https://github.com/sst/sst/issues/6198#issuecomment-3455222837`
-- Workaround (from SST maintainers) is to add a global transform before defining the site:
+### Lambda Function URL Permissions
+
+SST uses a `$transform` to ensure Lambda Function URL permissions are correctly configured:
 
 ```ts
-// sst.config.ts (place before TanStackStart/Nextjs definitions)
-// Requires: `sst add aws-native`
+// sst.config.ts
 $transform(aws.lambda.FunctionUrl, (args, _opts, name) => {
   new awsnative.lambda.Permission(`${name}InvokePermission`, {
     action: "lambda:InvokeFunction",
@@ -73,74 +79,47 @@ $transform(aws.lambda.FunctionUrl, (args, _opts, name) => {
 });
 ```
 
-## Phase 2: Environment and Runtime Parity (3-5 days)
+## Migration History
 
-**Environment variables**
+### Phase 0: Pre-migration ✅
 
-- Update `src/lib/env.server.ts` to include AWS runtime signals and remove Netlify-only assumptions.
-  - Extend `isServerless()` to detect AWS Lambda (for example `AWS_LAMBDA_FUNCTION_NAME` or `AWS_EXECUTION_ENV`).
-- Ensure `getBaseUrl()` has a staging base URL path for SST.
+- Region: `ca-central-1` selected for PIPEDA compliance
+- Database: Neon PostgreSQL (to migrate to RDS in future)
+- Domain: Using CloudFront distribution URL
 
-**Database connections**
+### Phase 1: Infrastructure ✅
 
-- Confirm pooled/unpooled behavior is correct for Lambda. If not, switch to pooled for `isServerless()` on AWS.
+- Created `sst.config.ts` with TanStack Start component
+- Updated `vite.config.ts` with Nitro for `aws-lambda` preset
+- Added `aws-native` provider for Lambda permissions workaround
 
-**Headers and CSP**
+### Phase 2: Environment Parity ✅
 
-- Netlify edge function currently injects CSP nonce and security headers.
-- CloudFront Functions cannot mutate HTML; plan to move nonce injection into server rendering.
-- Add Start middleware or response hooks for CSP in the app layer.
+- Environment variables configured via SST secrets
+- Database connections work correctly with Lambda
+- Security headers moved to app-level middleware
 
-**Assets and caching**
+### Phase 3: Staged Deployment ✅
 
-- Replicate `netlify.toml` no-store rules for sensitive routes using app-level headers or response middleware.
-- Validate PWA caching rules do not serve stale authenticated content.
+- Deployed to production stage
+- Auth flows verified (login, signup, email verification)
+- Database connectivity confirmed
 
-## Phase 3: Staged Deployment (1-2 weeks)
+### Phase 4: Production Cutover ✅
 
-**Stage deployment**
+- SST is now the production platform
+- Netlify configuration removed
+- AWS Organization with IAM Identity Center in `ca-central-1`
 
-- Deploy SST from `sst-migration` using:
-  - `sst deploy --stage sst-staging`
-- Use a staging subdomain and keep Netlify production unchanged.
+## Future Work
 
-**Parity checklist**
+1. **RDS Migration**: Move from Neon to AWS RDS PostgreSQL in `ca-central-1` for full data residency
+2. **Custom Domain**: Configure custom domain with Route 53 and ACM certificate
+3. **SES Migration**: Replace SendGrid with AWS SES for email
+4. **CI/CD Pipeline**: Set up GitHub Actions for automated deployments
 
-- Auth flows (login, OAuth, password reset).
-- Server functions and API routes.
-- Payment callbacks and webhooks.
-- Email delivery (SendGrid) and scheduled tasks.
-- CSP + headers (no inline script violations).
-- Performance under typical workloads.
+## References
 
-**Observability**
-
-- Add CloudWatch alarms for error rates and latency.
-- Capture audit logs and verify hash chain integrity.
-
-## Phase 4: Gradual Cutover (1-2 weeks)
-
-**Soft launch**
-
-- Move a small set of users to SST staging.
-- Monitor error budgets and fix regressions.
-
-**Production cutover**
-
-- Swap DNS to the SST CloudFront distribution.
-- Keep Netlify deployment available for rollback for 1-2 weeks.
-
-## Risks and Mitigations
-
-- **CSP nonce injection**: implement server-side nonce generation and script tag injection to avoid CloudFront limitations.
-- **Base URL differences**: explicit staging and production base URLs.
-- **Long-running workloads**: use Step Functions or Batch for large imports.
-- **Cold starts**: adjust Lambda memory and enable warming if needed.
-
-## Deliverables
-
-- `sst.config.ts` with TanStack Start component.
-- Updated `vite.config.ts` with Nitro for AWS Lambda.
-- Updated server env detection and base URL logic.
-- Staging deployment workflow and parity checklist.
-- Production cutover plan with rollback steps.
+- [SST TanStack Start Documentation](https://sst.dev/docs/start)
+- [SST Secrets Documentation](https://sst.dev/docs/reference/cli#secret)
+- [AWS ca-central-1 Region](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints)

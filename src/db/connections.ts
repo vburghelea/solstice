@@ -14,12 +14,11 @@ let sqlInstance: ReturnType<typeof postgres> | null = null;
 /**
  * Pooled database connection using Neon's serverless driver.
  *
- * Uses DATABASE_URL (pooled) or NETLIFY_DATABASE_URL for serverless functions.
- * This connection goes through Neon's connection pooler for efficient
- * concurrent request handling.
+ * Uses DATABASE_URL for Lambda functions. This connection goes through
+ * Neon's connection pooler for efficient concurrent request handling.
  *
  * Use this for:
- * - API routes and serverless functions
+ * - API routes and Lambda functions
  * - Short-lived queries
  * - High-concurrency scenarios
  */
@@ -52,9 +51,9 @@ export const pooledDb = createServerOnlyFn(async () => {
 /**
  * Unpooled (direct) database connection using standard postgres driver.
  *
- * Uses DATABASE_URL_UNPOOLED or NETLIFY_DATABASE_URL_UNPOOLED for
- * migrations and long operations. This creates a direct connection
- * to the database without going through the pooler.
+ * Uses DATABASE_URL_UNPOOLED for migrations and long operations.
+ * This creates a direct connection to the database without going
+ * through the pooler.
  *
  * Use this for:
  * - Database migrations
@@ -90,8 +89,8 @@ export const unpooledDb = createServerOnlyFn(async () => {
 /**
  * Returns the appropriate database connection based on the environment.
  *
- * - In serverless environments (Netlify/Vercel): Uses pooled connection
- * - In development or traditional servers: Uses unpooled connection
+ * - In AWS Lambda: Uses pooled connection
+ * - In development: Uses unpooled connection
  *
  * This is the recommended export for most use cases as it automatically
  * selects the optimal connection type.
@@ -99,10 +98,10 @@ export const unpooledDb = createServerOnlyFn(async () => {
 export const getDb = createServerOnlyFn(async () => {
   const { isServerless } = await import("../lib/env.server");
   if (isServerless()) {
-    console.log("Using pooled connection for serverless environment");
+    console.log("Using pooled connection for Lambda");
     return await pooledDb();
   } else {
-    console.log("Using unpooled connection for traditional environment");
+    console.log("Using unpooled connection for local dev");
     return await unpooledDb();
   }
 });

@@ -35,7 +35,7 @@ export const myServerFn = createServerFn({ method: "POST" })
 ### TanStack Start v1 RC (November 2025)
 
 - **Package renamed**: Use `@tanstack/react-start` (not `@tanstack/start`)
-- **Netlify**: Official deployment partner with first-class support
+- **Deployment**: AWS Lambda via SST (Serverless Stack) in `ca-central-1`
 - **RSC**: Coming as non-breaking v1.x addition (not yet supported)
 
 ### Square Payments Checklist
@@ -143,8 +143,8 @@ npx repomix@latest \
 
 ## Development Commands
 
-- `pnpm dev` - Start development server (Vite on port 5173, default to use)
-- `netlify dev` - Start Netlify Dev server (port 8888, proxies Vite and includes edge functions)
+- `pnpm dev` - Start development server (Vite on port 5173)
+- `npx sst dev` - Start SST dev mode with live Lambda (for testing AWS integration)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
@@ -181,7 +181,7 @@ All checks must pass before the commit is allowed. The pre-commit hook matches w
 
 ## Architecture Overview
 
-This is **Solstice**, a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
+This is **Solstice**, a sports league management platform built with TanStack Start (full-stack React framework) and deployed to AWS via SST (Serverless Stack). The application uses:
 
 - **TanStack Router** for file-based routing with type safety
 - **Better Auth** for authentication (email/password + OAuth via GitHub/Google)
@@ -227,34 +227,42 @@ This is **Solstice**, a sports league management platform built with TanStack St
 
 ### Environment Requirements
 
+**Local Development** (`.env` file):
+
 - `DATABASE_URL` - PostgreSQL connection string (pooled URL for serverless)
 - `DATABASE_URL_UNPOOLED` - Direct connection URL for migrations (optional)
-- `VITE_BASE_URL` - Application base URL (only required in development - use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
-- `GITHUB_CLIENT_ID/SECRET` - GitHub OAuth (required for OAuth login)
+- `VITE_BASE_URL` - Application base URL (use http://localhost:5173 for local dev)
 - `GOOGLE_CLIENT_ID/SECRET` - Google OAuth (required for OAuth login)
 - `BETTER_AUTH_SECRET` - Secret key for Better Auth sessions
 
-Netlify automatically provides:
+**Production** (SST Secrets in AWS):
+SST manages secrets via AWS Secrets Manager. Set secrets with:
 
-- `URL` - The main URL of your site in production
-- `SITE_URL` - The site's primary URL
-- `DEPLOY_URL` - The specific deploy URL
-- `NETLIFY_DATABASE_URL` - Pooled Neon database URL
-- `NETLIFY_DATABASE_URL_UNPOOLED` - Direct Neon database URL
+```bash
+npx sst secret set <SecretName> "<value>" --stage production
+```
+
+Required SST secrets:
+
+- `DatabaseUrl` - PostgreSQL connection string
+- `BetterAuthSecret` - Auth session secret
+- `GoogleClientId` / `GoogleClientSecret` - Google OAuth
+- `BaseUrl` - Production URL (CloudFront distribution)
+- `SquareEnv`, `SquareApplicationId`, `SquareAccessToken`, `SquareLocationId`, `SquareWebhookSignatureKey` - Square payments
+- `SendgridApiKey`, `SendgridFromEmail` - Email service
 
 ### Local Development Setup
 
 1. **Environment Files**:
    - `.env` - Main environment file
    - `.env.local` - Local overrides (git-ignored)
-   - Netlify Dev will inject values from Netlify project settings
 
 2. **OAuth Setup**:
    - OAuth credentials must be valid (not placeholders) for routes to work
 
 3. **Development Servers**:
-   - `pnpm dev` - Vite dev server only (port 5173, what to usually use)
-   - `netlify dev` - Full Netlify environment with edge functions (port 8888)
+   - `pnpm dev` - Vite dev server (port 5173) - primary development mode
+   - `npx sst dev` - SST dev mode with live Lambda for AWS integration testing
 
 ### Database Connections
 
@@ -293,7 +301,8 @@ Common debugging queries:
 - **Secure Cookies**: HTTPS-only, HttpOnly, SameSite protection in production
 - **Rate Limiting**: Configurable rate limits for auth and API endpoints
 - **Password Validation**: Strong password requirements enforced
-- **Security Headers**: Full suite via Netlify Edge Functions
+- **Security Headers**: Full suite via application middleware
+- **Data Residency**: All production data in AWS `ca-central-1` (Canada) for PIPEDA compliance
 
 ### Testing Infrastructure
 
@@ -306,7 +315,7 @@ Common debugging queries:
 ### CI/CD Pipeline
 
 - **GitHub Actions**: Automated testing, linting, and type checking
-- **Netlify Deploy Previews**: Automatic preview deployments for PRs
+- **SST Deployments**: Deploy via `npx sst deploy --stage <stage>`
 - **Pre-commit Hooks**: Husky + lint-staged for code quality
 - **Multi-version Testing**: Tests run on Node.js 18 and 20
 
@@ -316,11 +325,15 @@ Common debugging queries:
 # GitHub Actions CI status
 gh run list --limit 5
 
-# Netlify deploy history (site_id: c06791db-dd70-43de-a581-e92ae4232c1f)
-netlify api listSiteDeploys --data '{"site_id": "c06791db-dd70-43de-a581-e92ae4232c1f"}' | jq '.[] | {state, title, error_message}' | head -30
+# SST deployment status
+npx sst state --stage production
 
-# Check if code is actually deployed
-curl -s "https://snazzy-twilight-39e1e9.netlify.app/assets/main-<hash>.js" | grep -o "search_term"
+# List AWS resources
+AWS_PROFILE=techprod aws lambda list-functions --region ca-central-1
+AWS_PROFILE=techprod aws cloudfront list-distributions
+
+# Check deployment URL
+curl -s https://d200ljtib0dq8n.cloudfront.net/api/health
 ```
 
 ### Code Organization Patterns
@@ -805,17 +818,22 @@ export const Route = createFileRoute("/dashboard")({
   3. Use types: "auth" (5/15min), "api" (100/1min), "search" (10/10s), "mutation" (20/1min)
   4. See `docs/rate-limiting-with-pacer.md` for full guide
 
-### User added context:
+### AWS CLI Profiles
 
-You can see the netlify production variables via `netlify env:list`
-Which include:
-| DATABASE_URL | \***\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
-| GOOGLE_CLIENT_ID | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\* \***\* | All |
-| GOOGLE_CLIENT_SECRET | **\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
-| NETLIFY_DATABASE_URL | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\* \***\* | All |
-| NETLIFY_DATABASE_URL_UNPOOLED | **\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
-| NODE_ENV | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\*\*
-\*\*\*\* | Builds, Post processing |
+For deploying to AWS, configure your AWS CLI with SSO profiles:
+
+```bash
+# Login to AWS SSO
+aws sso login --profile techprod
+
+# Deploy to production
+AWS_PROFILE=techprod npx sst deploy --stage production
+
+# Set secrets
+AWS_PROFILE=techprod npx sst secret set DatabaseUrl "..." --stage production
+```
+
+See `~/.aws/config` for profile configuration.
 
 ---
 
@@ -1006,7 +1024,7 @@ Tree as of July 6, 2025
 
 ## Tool available
 
-Always use your playwright tool to navigate to localhost:5173 or 8888 to test changes before finishing
+Always use your playwright tool to navigate to localhost:5173 to test changes before finishing
 
 ## Before using Playwright MCP
 
@@ -1020,7 +1038,7 @@ Always use Playwright MCP to manually verify the expected behavior before runnin
 
 ## Dev server
 
-Assume the dev server is running on 5173 or 8888 for every session, and check via playwright or curl
+Assume the dev server is running on port 5173 for every session, and check via playwright or curl
 
 ## Rules
 Always read .cursor/rules/*

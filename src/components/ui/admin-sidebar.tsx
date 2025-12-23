@@ -6,9 +6,14 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { authQueryKey } from "~/features/auth/auth.queries";
 import { ADMIN_PRIMARY_NAV, ADMIN_SECONDARY_NAV } from "~/features/layouts/admin-nav";
 import { userHasRole } from "~/features/roles/permission.service";
+import { recordSecurityEvent } from "~/features/security/security.mutations";
 import { auth } from "~/lib/auth-client";
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  onNavigation?: () => void;
+}
+
+export function AdminSidebar({ onNavigation }: AdminSidebarProps = {}) {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
@@ -38,6 +43,9 @@ export function AdminSidebar() {
     setIsLoggingOut(true);
 
     try {
+      if (user?.id) {
+        void recordSecurityEvent({ data: { eventType: "logout", userId: user.id } });
+      }
       await auth.signOut({
         fetchOptions: {
           onResponse: async () => {
@@ -73,6 +81,7 @@ export function AdminSidebar() {
               key={item.to}
               to={item.to}
               className="nav-item"
+              onClick={onNavigation}
               {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
               activeProps={{
                 className: "nav-item-active",
@@ -94,6 +103,7 @@ export function AdminSidebar() {
               key={item.to}
               to={item.to}
               className="nav-item"
+              onClick={onNavigation}
               {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
               activeProps={{
                 className: "nav-item-active",

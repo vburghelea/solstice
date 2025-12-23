@@ -23,15 +23,18 @@ export function AdminLayout() {
             className="fixed inset-0 bg-black/50"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-white">
-            <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-              <h2 className="text-lg font-bold">Menu</h2>
-              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+          <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(false)}
+              className="absolute top-4 right-2 z-10"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </Button>
             <div className="flex-1 overflow-y-auto">
-              <AdminSidebar />
+              <AdminSidebar onNavigation={() => setSidebarOpen(false)} />
             </div>
           </div>
         </div>

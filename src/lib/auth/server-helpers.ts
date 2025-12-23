@@ -4,6 +4,7 @@
  */
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { twoFactor } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 // Lazy-loaded auth instance
@@ -22,9 +23,8 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
   // Import server modules when auth is created
   const { db } = await import("~/db");
   const schema = await import("~/db/schema");
-  const { env, getAuthSecret, getBaseUrl, isProduction } = await import(
-    "~/lib/env.server"
-  );
+  const { env, getAuthSecret, getBaseUrl, isProduction } =
+    await import("~/lib/env.server");
 
   const baseUrl = getBaseUrl();
   const isHttpsDeployment = baseUrl?.startsWith("https://") ?? false;
@@ -53,12 +53,14 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
   const dbConnection = await db();
 
   return betterAuth({
+    appName: "viaSport SIN",
     baseURL: baseUrl,
     secret: getAuthSecret(),
     trustedOrigins: isProduction()
       ? [baseUrl]
       : [
           baseUrl,
+          "http://localhost:3001",
           "http://localhost:5173",
           "http://localhost:5174",
           "http://localhost:8888",
@@ -70,13 +72,14 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
         session: schema.session,
         account: schema.account,
         verification: schema.verification,
+        twoFactor: schema.twoFactor,
       },
     }),
 
     // Session configuration with security settings
     session: {
-      expiresIn: 60 * 60 * 24 * 30, // 30 days
-      updateAge: 60 * 60 * 24, // 1 day
+      expiresIn: 60 * 60 * 8, // 8 hours
+      updateAge: 60 * 30, // 30 minutes
       // NOTE: cookieCache is disabled due to a known bug with tanstackStartCookies
       // that prevents session_token cookie from being set. See:
       // https://github.com/better-auth/better-auth/issues/5639
@@ -154,7 +157,20 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [tanstackStartCookies()], // MUST be the last plugin
+    plugins: [
+      twoFactor({
+        issuer: "viaSport SIN",
+        totpOptions: {
+          digits: 6,
+          period: 30,
+        },
+        backupCodeOptions: {
+          amount: 10,
+          length: 8,
+        },
+      }),
+      tanstackStartCookies(), // MUST be the last plugin
+    ],
   });
 };
 

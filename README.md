@@ -6,7 +6,7 @@
 
 ## Sports Registration Platform
 
-Solstice is a **modern web platform for managing memberships, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on [Netlify](https://www.netlify.com/).
+Solstice is a **modern web platform for managing memberships, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on AWS via [SST](https://sst.dev/).
 
 ## Tech Stack
 
@@ -17,7 +17,7 @@ Solstice is a **modern web platform for managing memberships, teams, and events*
 - **Build Tool**: [Vite 7](https://vite.dev/)
 - **Environment Validation**: [@t3-oss/env-core](https://env.t3.gg/) with [Zod](https://zod.dev/)
 - **Testing**: [Vitest](https://vitest.dev/) with coverage
-- **Deployment**: [Netlify](https://www.netlify.com/)
+- **Deployment**: [SST](https://sst.dev/) on AWS (Lambda + CloudFront)
 
 ## Prerequisites
 
@@ -101,7 +101,7 @@ VITE_SENTRY_DSN=your_sentry_dsn
 
 ### Development
 
-- `pnpm dev` - Start development server with Netlify Dev
+- `pnpm dev` - Start development server
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 
@@ -148,17 +148,27 @@ Taze automatically detects your package manager and provides a safe, interactive
 
 ## Deployment
 
-The application is automatically deployed to Netlify:
+The application is deployed to AWS via SST:
 
-- **Production**: Pushes to `main` branch trigger production deployments
-- **Preview**: Pull requests get automatic preview deployments
+```bash
+# Login to AWS SSO
+aws sso login --profile techprod
+
+# Deploy to production
+AWS_PROFILE=techprod npx sst deploy --stage production
+```
+
+- **Production URL**: https://d200ljtib0dq8n.cloudfront.net
+- **Region**: `ca-central-1` (Canada) for PIPEDA compliance
+- **Infrastructure**: Lambda + CloudFront + S3
+
+See [SST Migration Plan](./docs/sin-rfp/sst-migration-plan.md) for deployment details and secrets configuration.
 
 ## CI/CD
 
 GitHub Actions workflows handle:
 
 - **Continuous Integration**: Linting, type checking, and testing on Node.js 20
-- **Deploy Previews**: Automatic Netlify preview deployments for pull requests
 - **Code Coverage**: Test coverage reports uploaded to Codecov
 
 ### Required GitHub Secrets
@@ -166,13 +176,8 @@ GitHub Actions workflows handle:
 Configure these secrets in your GitHub repository settings:
 
 - `DATABASE_URL` - PostgreSQL connection string for CI tests
-- `VITE_BASE_URL` - Base URL for the application (not needed in production - Netlify provides URL automatically)
 - `BETTER_AUTH_SECRET` - Auth secret key (generate with `pnpm auth:secret` locally)
-- `NETLIFY_AUTH_TOKEN` - Netlify authentication token
-- `NETLIFY_SITE_ID` - Netlify site ID
 - `CODECOV_TOKEN` - Codecov upload token (optional)
-- `GITHUB_CLIENT_ID` - GitHub OAuth client ID
-- `GITHUB_CLIENT_SECRET` - GitHub OAuth client secret
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 

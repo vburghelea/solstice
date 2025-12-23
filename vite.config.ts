@@ -1,7 +1,7 @@
-import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
@@ -48,8 +48,8 @@ export default defineConfig(({ mode }) => {
         },
       }),
 
-      // Netlify adapter for TanStack Start (SSR, server routes/functions)
-      netlify(),
+      // Nitro adapter for AWS Lambda deployment via SST
+      nitro(),
 
       viteReact({
         // https://react.dev/learn/react-compiler
@@ -157,6 +157,13 @@ export default defineConfig(({ mode }) => {
       ],
       // Don't prebundle these to avoid server code leaking
       exclude: ["@tanstack/start-storage-context", "node:async_hooks"],
+    },
+    // Nitro configuration for AWS Lambda deployment
+    nitro: {
+      preset: "aws-lambda",
+      awsLambda: {
+        streaming: true,
+      },
     },
   };
 });

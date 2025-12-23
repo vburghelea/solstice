@@ -22,10 +22,6 @@ export const env = createEnv({
     // Database
     DATABASE_URL: z.url(),
     DATABASE_URL_UNPOOLED: z.url().optional(),
-    DATABASE_POOLED_URL: z.url().optional(),
-    DATABASE_UNPOOLED_URL: z.url().optional(),
-    NETLIFY_DATABASE_URL: z.url().optional(),
-    NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
 
     // Auth - Secret must be set explicitly, no fallbacks
     // Generate with: node scripts/generate-auth-secret.js
@@ -70,18 +66,14 @@ export const env = createEnv({
     // Other
     COOKIE_DOMAIN: z.string().optional(),
     NODE_ENV: z.enum(["development", "production", "test"]).prefault("development"),
-    NETLIFY: z.string().optional(),
-    VERCEL_ENV: z.string().optional(),
 
-    // Client vars are also available on server
-    // In production, Netlify provides URL env var
+    // SST/AWS Lambda
+    SST_STAGE: z.string().optional(),
+    AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
+    AWS_EXECUTION_ENV: z.string().optional(),
+
+    // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
     VITE_BASE_URL: z.url().optional(),
-
-    // Netlify automatically provides these
-    URL: z.url().optional(), // The main URL of the site
-    SITE_URL: z.url().optional(), // The site's URL
-    DEPLOY_URL: z.url().optional(), // The specific deploy URL
-    DEPLOY_PRIME_URL: z.url().optional(), // The prime URL for the deploy
   },
   // Use process.env since we've just loaded .env
   runtimeEnv: process.env,
@@ -91,39 +83,36 @@ export const env = createEnv({
 // Helper functions
 export const getDbUrl = () => env.DATABASE_URL;
 
-export const getPooledDbUrl = () =>
-  env.DATABASE_POOLED_URL || env.NETLIFY_DATABASE_URL || env.DATABASE_URL;
+export const getPooledDbUrl = () => env.DATABASE_URL;
 
-export const getUnpooledDbUrl = () =>
-  env.DATABASE_UNPOOLED_URL ||
-  env.DATABASE_URL_UNPOOLED ||
-  env.NETLIFY_DATABASE_URL_UNPOOLED ||
-  env.DATABASE_URL;
+export const getUnpooledDbUrl = () => env.DATABASE_URL_UNPOOLED || env.DATABASE_URL;
 
 export const getBaseUrl = () => {
+  // SST sets BASE_URL via secrets in production
+  const sst = process.env["BASE_URL"];
   const explicit = env.VITE_BASE_URL;
-  const netlifyUrl = env.URL || env.SITE_URL || env.DEPLOY_PRIME_URL || env.DEPLOY_URL;
-  const vercelCandidate = process.env["NEXT_PUBLIC_VERCEL_URL"];
-  const vercelUrl = vercelCandidate
-    ? vercelCandidate.startsWith("http")
-      ? vercelCandidate
-      : `https://${vercelCandidate}`
-    : undefined;
 
-  const candidate = explicit || netlifyUrl || vercelUrl;
+  const candidate = sst || explicit;
 
   if (!candidate) {
     throw new Error(
-      "Base URL is unknown. Set VITE_BASE_URL or rely on Netlify/Vercel provided URLs.",
+      "Base URL is unknown. Set BASE_URL (SST) or VITE_BASE_URL (local dev).",
     );
   }
 
   return candidate;
 };
+
 export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 
 export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";
 export const isTest = () => env.NODE_ENV === "test";
+
 export const isServerless = () =>
-  !!(env.NETLIFY || env.VERCEL_ENV || process.env["VERCEL"] === "1");
+  !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);
+
+export const isAWSLambda = () =>
+  !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);
+
+export const getSSTStage = () => process.env["SST_STAGE"];

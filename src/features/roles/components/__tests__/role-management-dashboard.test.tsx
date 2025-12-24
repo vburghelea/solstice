@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { StepUpProvider } from "~/features/auth/step-up";
 import type { RoleManagementData } from "~/features/roles/roles.types";
 
 vi.mock("~/features/roles/roles.queries", () => ({
@@ -20,6 +21,16 @@ vi.mock("sonner", () => ({
   },
 }));
 
+vi.mock("~/lib/auth-client", () => ({
+  auth: {
+    getSession: vi
+      .fn()
+      .mockResolvedValue({ data: { user: { email: "test@example.com" } } }),
+    signIn: { email: vi.fn() },
+    twoFactor: { verifyTotp: vi.fn() },
+  },
+}));
+
 const { RoleManagementDashboard } = await import("../role-management-dashboard");
 const { getRoleManagementData } = await import("~/features/roles/roles.queries");
 
@@ -36,7 +47,9 @@ function renderDashboard() {
 
   return render(
     <QueryClientProvider client={client}>
-      <RoleManagementDashboard />
+      <StepUpProvider>
+        <RoleManagementDashboard />
+      </StepUpProvider>
     </QueryClientProvider>,
   );
 }
@@ -55,6 +68,7 @@ describe("RoleManagementDashboard", () => {
           description: "Platform administrator",
           permissions: { "system:*": true },
           assignmentCount: 2,
+          requiresMfa: true,
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-02"),
         },
@@ -89,8 +103,8 @@ describe("RoleManagementDashboard", () => {
     });
 
     expect(screen.getAllByText("Platform administrator").length).toBeGreaterThan(0);
-    expect(screen.getByText("Admin User")).toBeInTheDocument();
-    expect(screen.getByText("admin@example.com")).toBeInTheDocument();
+    expect(screen.getAllByText("Admin User").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("admin@example.com").length).toBeGreaterThan(0);
     expect(screen.getByText("2 assigned")).toBeInTheDocument();
   });
 

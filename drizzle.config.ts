@@ -1,5 +1,5 @@
 import type { Config } from "drizzle-kit";
-import { Resource } from "sst";
+import { createRequire } from "node:module";
 
 type LinkedDatabase = {
   host: string;
@@ -9,9 +9,17 @@ type LinkedDatabase = {
   database: string;
 };
 
+const require = createRequire(import.meta.url);
+
 const getLinkedDatabase = (): LinkedDatabase | undefined => {
-  const resource = Resource as typeof Resource & { Database?: LinkedDatabase };
-  return resource.Database;
+  try {
+    const { Resource } = require("sst") as {
+      Resource?: { Database?: LinkedDatabase };
+    };
+    return Resource?.Database;
+  } catch {
+    return undefined;
+  }
 };
 
 // Use unpooled connection for migrations

@@ -9,6 +9,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use the Playwright MCP browser tool to open local or external sites when manual
   verification or UI capture is needed; it is available in this repo's toolchain.
 
+Avoid `@tanstack/react-start/server` in cron/shared/client imports; virtual modules.
+Only import Start server helpers inside `.server()`/handlers or server entry files.
+
 ### Server Functions - Always Use Zod Validation
 
 ```typescript
@@ -573,7 +576,7 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
      .handler(async ({ data }) => {
        const user = await getCurrentUser();
        if (!user) {
-         throw redirect({ to: "/login" });
+         throw redirect({ to: "/auth/login" });
        }
        const item = await db.items.find(data.id);
        if (!item) {
@@ -609,7 +612,7 @@ const authMiddleware = createMiddleware({ type: "function" })
   .server(async ({ next, context }) => {
     const user = await getSession();
     if (!user) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/auth/login" });
     }
     // Pass user to downstream handlers via context
     return next({ context: { user } });
@@ -822,6 +825,8 @@ export const Route = createFileRoute("/dashboard")({
      - If browser already in use, close it first: `mcp__playwright__browser_close`
    - Use MCP to verify UI behavior before writing/updating E2E tests
    - This ensures tests match actual application behavior
+   - Login is at /auth/login
+   - Username and password is in .env.e2e; one user: admin@example.com, password: testpassword123
 
 5. **Best Practices**:
    - Use Playwright's recommended locators: `getByRole`, `getByLabel`, `getByText`

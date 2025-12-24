@@ -19,6 +19,7 @@ import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
 import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
+import { Route as DashboardPrivacyRouteImport } from "./routes/dashboard/privacy";
 import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
 import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members";
 import { Route as DashboardForbiddenRouteImport } from "./routes/dashboard/forbidden";
@@ -37,6 +38,7 @@ import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/tea
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 import { Route as DashboardEventsSlugRouteImport } from "./routes/dashboard/events/$slug";
+import { Route as DashboardAdminSinRouteImport } from "./routes/dashboard/admin/sin";
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as ApiWebhooksSquareRouteImport } from "./routes/api/webhooks/square";
 import { Route as ApiTestCleanupRouteImport } from "./routes/api/test/cleanup";
@@ -98,6 +100,11 @@ const DashboardReportsRoute = DashboardReportsRouteImport.update({
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: "/profile",
   path: "/profile",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardPrivacyRoute = DashboardPrivacyRouteImport.update({
+  id: "/privacy",
+  path: "/privacy",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
@@ -190,6 +197,11 @@ const DashboardEventsSlugRoute = DashboardEventsSlugRouteImport.update({
   path: "/$slug",
   getParentRoute: () => DashboardEventsRoute,
 } as any);
+const DashboardAdminSinRoute = DashboardAdminSinRouteImport.update({
+  id: "/sin",
+  path: "/sin",
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any);
 const DashboardAdminRolesRoute = DashboardAdminRolesRouteImport.update({
   id: "/roles",
   path: "/roles",
@@ -274,6 +286,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
@@ -284,6 +297,7 @@ export interface FileRoutesByFullPath {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
@@ -313,6 +327,7 @@ export interface FileRoutesByTo {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
@@ -322,6 +337,7 @@ export interface FileRoutesByTo {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -353,6 +369,7 @@ export interface FileRoutesById {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
@@ -363,6 +380,7 @@ export interface FileRoutesById {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
@@ -397,6 +415,7 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
@@ -407,6 +426,7 @@ export interface FileRouteTypes {
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
+    | "/dashboard/admin/sin"
     | "/dashboard/events/$slug"
     | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
@@ -436,6 +456,7 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
@@ -445,6 +466,7 @@ export interface FileRouteTypes {
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
+    | "/dashboard/admin/sin"
     | "/dashboard/events/create"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -475,6 +497,7 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
@@ -485,6 +508,7 @@ export interface FileRouteTypes {
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
+    | "/dashboard/admin/sin"
     | "/dashboard/events/$slug"
     | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
@@ -588,6 +612,13 @@ declare module "@tanstack/react-router" {
       path: "/profile";
       fullPath: "/dashboard/profile";
       preLoaderRoute: typeof DashboardProfileRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/privacy": {
+      id: "/dashboard/privacy";
+      path: "/privacy";
+      fullPath: "/dashboard/privacy";
+      preLoaderRoute: typeof DashboardPrivacyRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/dashboard/membership": {
@@ -716,6 +747,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsSlugRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+    "/dashboard/admin/sin": {
+      id: "/dashboard/admin/sin";
+      path: "/sin";
+      fullPath: "/dashboard/admin/sin";
+      preLoaderRoute: typeof DashboardAdminSinRouteImport;
+      parentRoute: typeof DashboardAdminRouteRoute;
+    };
     "/dashboard/admin/roles": {
       id: "/dashboard/admin/roles";
       path: "/roles";
@@ -819,10 +857,12 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface DashboardAdminRouteRouteChildren {
   DashboardAdminRolesRoute: typeof DashboardAdminRolesRoute;
+  DashboardAdminSinRoute: typeof DashboardAdminSinRoute;
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminRolesRoute: DashboardAdminRolesRoute,
+  DashboardAdminSinRoute: DashboardAdminSinRoute,
 };
 
 const DashboardAdminRouteRouteWithChildren =
@@ -898,6 +938,7 @@ interface DashboardRouteRouteChildren {
   DashboardForbiddenRoute: typeof DashboardForbiddenRoute;
   DashboardMembersRoute: typeof DashboardMembersRoute;
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
+  DashboardPrivacyRoute: typeof DashboardPrivacyRoute;
   DashboardProfileRoute: typeof DashboardProfileRoute;
   DashboardReportsRoute: typeof DashboardReportsRoute;
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
@@ -911,6 +952,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardForbiddenRoute: DashboardForbiddenRoute,
   DashboardMembersRoute: DashboardMembersRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardPrivacyRoute: DashboardPrivacyRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
@@ -954,10 +996,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 
 import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
+import type { startInstance } from "./start.ts";
 declare module "@tanstack/react-start" {
   interface Register {
     ssr: true;
     router: Awaited<ReturnType<typeof getRouter>>;
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>;
   }
 }

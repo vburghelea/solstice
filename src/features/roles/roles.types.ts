@@ -21,6 +21,7 @@ export interface RoleSummary {
   description: string | null;
   permissions: Record<string, boolean>;
   assignmentCount: number;
+  requiresMfa: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -14,8 +14,8 @@ function EventsPage() {
     <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Events</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Events</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Browse and manage Quadball events across Canada
           </p>
         </div>

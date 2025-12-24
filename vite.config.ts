@@ -6,16 +6,24 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
 
-// Browser-safe alias for node:async_hooks to prevent client-side crashes
-const aliasNodeAsyncHooksForClient = (): Plugin => ({
-  name: "alias-node-async_hooks-browser",
+// Browser-safe aliases for Node-only modules referenced by server bundles.
+const aliasNodeModulesForClient = (): Plugin => ({
+  name: "alias-node-modules-browser",
   enforce: "pre",
   resolveId(source, _importer, options) {
-    if (source === "node:async_hooks" && !options?.ssr) {
-      // Map only client-side imports to the shim
+    if (options?.ssr) return null;
+
+    if (source === "node:async_hooks") {
       return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url)
         .pathname;
     }
+    if (source === "node:stream") {
+      return new URL("./src/shims/stream.browser.ts", import.meta.url).pathname;
+    }
+    if (source === "node:stream/web") {
+      return new URL("./src/shims/stream-web.browser.ts", import.meta.url).pathname;
+    }
+
     return null;
   },
 });
@@ -31,7 +39,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       // Browser shim for node:async_hooks - prevents client crashes
-      aliasNodeAsyncHooksForClient(),
+      aliasNodeModulesForClient(),
 
       // Keep path aliasing & tailwind first
       tsConfigPaths({
@@ -134,6 +142,9 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    server: {
+      port: 5173,
+    },
     optimizeDeps: {
       include: [
         "react",
@@ -159,8 +170,32 @@ export default defineConfig(({ mode }) => {
       exclude: ["@tanstack/start-storage-context", "node:async_hooks"],
     },
     // Nitro configuration for AWS Lambda deployment
+    // See docs/lambda-timeout-approaches.md for full analysis
+    //
+    // Two entry files are available:
+    // - aws-lambda-streaming.mjs: Non-streaming (buffered), works with VPC
+    // - aws-lambda-response-streaming.mjs: Streaming, requires testing without VPC
+    //
+    // IMPORTANT: awsLambda.streaming controls TWO things via SST:
+    // 1. The Function URL invokeMode (BUFFERED vs RESPONSE_STREAM)
+    // 2. Whether SST enables streaming on the Lambda function
+    //
+    // VPC CAVEAT: AWS docs state "Lambda function URLs do not support response
+    // streaming within a VPC environment." Since our Lambda is in a VPC for
+    // RDS access, streaming may not work. Test by deploying and checking response.
     nitro: {
       preset: "aws-lambda",
+      // Custom entries that fix Nitro 3.0.1-alpha.1 streaming bug + add callbackWaitsForEmptyEventLoop
+      // See docs/lambda-timeout-approaches.md for full analysis
+      //
+      // Nitro appends "-streaming" to entry when awsLambda.streaming=true, so:
+      // - Entry: src/nitro/aws-lambda-response (no extension)
+      // - streaming=false: resolves to src/nitro/aws-lambda-response.mjs
+      // - streaming=true: resolves to src/nitro/aws-lambda-response-streaming.mjs
+      //
+      // VPC CAVEAT: AWS docs say Function URLs don't support streaming in VPC.
+      // If streaming fails, set streaming: false
+      entry: "src/nitro/aws-lambda-response",
       awsLambda: {
         streaming: true,
       },

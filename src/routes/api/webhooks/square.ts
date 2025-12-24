@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { json } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import {
   eventPaymentSessions,
@@ -359,7 +358,7 @@ export const Route = createFileRoute("/api/webhooks/square")({
 
           if (!signature) {
             console.error("Missing Square webhook signature");
-            return json({ error: "Missing signature" }, { status: 401 });
+            return Response.json({ error: "Missing signature" }, { status: 401 });
           }
 
           // Parse the body
@@ -368,7 +367,7 @@ export const Route = createFileRoute("/api/webhooks/square")({
             payload = JSON.parse(body);
           } catch (error) {
             console.error("Invalid webhook payload:", error);
-            return json({ error: "Invalid payload" }, { status: 400 });
+            return Response.json({ error: "Invalid payload" }, { status: 400 });
           }
 
           // Get the payment service and verify the webhook
@@ -380,12 +379,15 @@ export const Route = createFileRoute("/api/webhooks/square")({
 
           if (!valid) {
             console.error("Webhook verification failed:", error);
-            return json({ error: error || "Verification failed" }, { status: 401 });
+            return Response.json(
+              { error: error || "Verification failed" },
+              { status: 401 },
+            );
           }
 
           if (!event) {
             console.error("No event parsed from webhook");
-            return json({ error: "No event parsed" }, { status: 400 });
+            return Response.json({ error: "No event parsed" }, { status: 400 });
           }
 
           // Handle normalized event types
@@ -445,10 +447,10 @@ export const Route = createFileRoute("/api/webhooks/square")({
           }
 
           // Return success
-          return json({ received: true });
+          return Response.json({ received: true });
         } catch (error) {
           console.error("Webhook handler error:", error);
-          return json({ error: "Internal server error" }, { status: 500 });
+          return Response.json({ error: "Internal server error" }, { status: 500 });
         }
       },
     },

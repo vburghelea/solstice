@@ -64,6 +64,20 @@
       "when": 1766345466324,
       "tag": "0008_demonic_groot",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1766514827183,
+      "tag": "0009_magical_alex_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1766515192121,
+      "tag": "0010_audit_immutable",
+      "breakpoints": true
     }
   ]
 }

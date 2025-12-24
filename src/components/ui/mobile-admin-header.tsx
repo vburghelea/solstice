@@ -1,4 +1,5 @@
 import { Menu } from "lucide-react";
+import { NotificationBell } from "~/features/notifications/components/notification-bell";
 import { Button } from "./button";
 
 interface MobileAdminHeaderProps {
@@ -18,6 +19,7 @@ export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
             <p className="text-admin-text-secondary text-xs">Admin Panel</p>
           </div>
         </div>
+        <NotificationBell />
       </div>
     </header>
   );

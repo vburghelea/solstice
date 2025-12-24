@@ -1,7 +1,7 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, ShieldCheck, UsersRound, XCircle } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
@@ -32,6 +32,11 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  MobileDataCard,
+  MobileDataCardsList,
+  ResponsiveDataView,
+} from "~/components/ui/mobile-data-cards";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import {
   Table,
@@ -42,6 +47,7 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Textarea } from "~/components/ui/textarea";
+import { getStepUpErrorMessage, useStepUpPrompt } from "~/features/auth/step-up";
 import { assignRoleToUser, removeRoleAssignment } from "~/features/roles/roles.mutations";
 import {
   getRoleManagementData,
@@ -85,6 +91,7 @@ function useRoleManagementData() {
 function useRoleAssignmentForm(
   roles: RoleSummary[],
   onSuccess: (assignment: RoleAssignmentRow) => void,
+  onStepUpError: (error: unknown) => boolean,
 ) {
   const form = useForm({
     defaultValues: {
@@ -118,6 +125,7 @@ function useRoleAssignmentForm(
         form.reset();
         toast.success("Role assigned successfully");
       } catch (error) {
+        if (onStepUpError(error)) return;
         const message = error instanceof Error ? error.message : "Failed to assign role";
         toast.error(message);
       }
@@ -139,6 +147,16 @@ function useRoleAssignmentForm(
 
 export function RoleManagementDashboard() {
   const queryClient = useQueryClient();
+  const { requestStepUp } = useStepUpPrompt();
+  const handleStepUpError = useCallback(
+    (error: unknown) => {
+      const message = getStepUpErrorMessage(error);
+      if (!message) return false;
+      requestStepUp(message);
+      return true;
+    },
+    [requestStepUp],
+  );
   const { data, isLoading, isError, error } = useRoleManagementData();
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState("");
@@ -161,6 +179,7 @@ export function RoleManagementDashboard() {
       queryClient.invalidateQueries({ queryKey: ["role-management"] });
     },
     onError: (mutationError) => {
+      if (handleStepUpError(mutationError)) return;
       const message =
         mutationError instanceof Error
           ? mutationError.message
@@ -172,13 +191,17 @@ export function RoleManagementDashboard() {
     },
   });
 
-  const { form, scopeType } = useRoleAssignmentForm(data?.roles ?? [], () => {
-    queryClient.invalidateQueries({ queryKey: ["role-management"] });
-    setAssignDialogOpen(false);
-    setUserSearchTerm("");
-    setUserResults([]);
-    setUserSearchOpen(false);
-  });
+  const { form, scopeType, selectedRole } = useRoleAssignmentForm(
+    data?.roles ?? [],
+    () => {
+      queryClient.invalidateQueries({ queryKey: ["role-management"] });
+      setAssignDialogOpen(false);
+      setUserSearchTerm("");
+      setUserResults([]);
+      setUserSearchOpen(false);
+    },
+    handleStepUpError,
+  );
 
   const handleDialogOpenChange = (open: boolean) => {
     setAssignDialogOpen(open);
@@ -264,14 +287,19 @@ export function RoleManagementDashboard() {
   }
 
   const assignments = data.assignments;
+  const mfaRequiredRoles = data.roles
+    .filter((role) => role.requiresMfa)
+    .map((role) => role.name);
 
   return (
     <div className="space-y-8">
       <section>
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Role Management</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Role Management
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               Assign and revoke administrator access across Solstice and teams.
             </p>
           </div>
@@ -290,6 +318,15 @@ export function RoleManagementDashboard() {
                   team or event context.
                 </DialogDescription>
               </DialogHeader>
+              {selectedRole?.requiresMfa ? (
+                <Alert>
+                  <AlertTitle>MFA required for this role</AlertTitle>
+                  <AlertDescription>
+                    Assigning {selectedRole.name} will require the user to enroll in
+                    multi-factor authentication before accessing admin features.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
 
               <form
                 className="space-y-5"
@@ -495,6 +532,15 @@ export function RoleManagementDashboard() {
             </DialogContent>
           </Dialog>
         </div>
+        {mfaRequiredRoles.length > 0 ? (
+          <Alert>
+            <AlertTitle>Admin MFA enforced</AlertTitle>
+            <AlertDescription>
+              {mfaRequiredRoles.join(", ")} roles require MFA enrollment. Users will be
+              prompted to enroll before they can access admin areas.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         <RoleSummaryGrid roles={data.roles} />
       </section>
@@ -507,140 +553,125 @@ export function RoleManagementDashboard() {
               Audit log of who has access, when it was granted, and by whom.
             </CardDescription>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
+          <CardContent>
             {assignments.length === 0 ? (
               <div className="text-muted-foreground flex items-center gap-2 rounded-md border border-dashed p-6 text-sm">
                 <UsersRound className="h-4 w-4" />
-                No role assignments yet. Use “Assign Role” to get started.
+                No role assignments yet. Use "Assign Role" to get started.
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Scope</TableHead>
-                    <TableHead>Assigned By</TableHead>
-                    <TableHead>Assigned At</TableHead>
-                    <TableHead>Expires</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead className="w-[120px] text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {assignments.map((assignment) => (
-                    <TableRow key={assignment.id}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{assignment.userName}</span>
-                          <span className="text-muted-foreground text-xs">
-                            {assignment.userEmail}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{assignment.roleName}</Badge>
-                        {assignment.roleDescription && (
-                          <p className="text-muted-foreground mt-1 text-xs">
-                            {assignment.roleDescription}
-                          </p>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {assignment.teamId ? (
-                          <Badge variant="outline">Team: {assignment.teamId}</Badge>
-                        ) : assignment.eventId ? (
-                          <Badge variant="outline">Event: {assignment.eventId}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">Global</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {assignment.assignedByName ? (
-                          <div className="flex flex-col">
-                            <span>{assignment.assignedByName}</span>
-                            <span className="text-muted-foreground text-xs">
-                              {assignment.assignedByEmail}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">System</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <time dateTime={assignment.assignedAt.toISOString()}>
-                          {new Date(assignment.assignedAt).toLocaleString()}
-                        </time>
-                      </TableCell>
-                      <TableCell>
-                        {assignment.expiresAt ? (
-                          <time dateTime={assignment.expiresAt.toISOString()}>
-                            {new Date(assignment.expiresAt).toLocaleString()}
-                          </time>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">
-                            No expiration
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="max-w-xs text-sm whitespace-pre-line">
-                        {assignment.notes || (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Dialog
-                          open={assignmentToRemove?.id === assignment.id}
-                          onOpenChange={(open) =>
-                            open
-                              ? setAssignmentToRemove(assignment)
-                              : setAssignmentToRemove(null)
-                          }
-                        >
-                          <DialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Remove
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Remove role assignment</DialogTitle>
-                              <DialogDescription>
-                                This will revoke “{assignment.roleName}” from{" "}
-                                {assignment.userName}. This action cannot be undone.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => setAssignmentToRemove(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                disabled={removeMutation.isPending}
-                                onClick={() => {
-                                  setAssignmentToRemove(assignment);
-                                  removeMutation.mutate({
-                                    data: { assignmentId: assignment.id },
-                                  });
-                                }}
-                              >
-                                {removeMutation.isPending && (
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                Remove access
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <ResponsiveDataView
+                table={
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Scope</TableHead>
+                          <TableHead>Assigned By</TableHead>
+                          <TableHead>Assigned At</TableHead>
+                          <TableHead>Expires</TableHead>
+                          <TableHead>Notes</TableHead>
+                          <TableHead className="w-[120px] text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {assignments.map((assignment) => (
+                          <TableRow key={assignment.id}>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{assignment.userName}</span>
+                                <span className="text-muted-foreground text-xs">
+                                  {assignment.userEmail}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{assignment.roleName}</Badge>
+                              {assignment.roleDescription && (
+                                <p className="text-muted-foreground mt-1 text-xs">
+                                  {assignment.roleDescription}
+                                </p>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {assignment.teamId ? (
+                                <Badge variant="outline">Team: {assignment.teamId}</Badge>
+                              ) : assignment.eventId ? (
+                                <Badge variant="outline">
+                                  Event: {assignment.eventId}
+                                </Badge>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">
+                                  Global
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {assignment.assignedByName ? (
+                                <div className="flex flex-col">
+                                  <span>{assignment.assignedByName}</span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {assignment.assignedByEmail}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">
+                                  System
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <time dateTime={assignment.assignedAt.toISOString()}>
+                                {new Date(assignment.assignedAt).toLocaleString()}
+                              </time>
+                            </TableCell>
+                            <TableCell>
+                              {assignment.expiresAt ? (
+                                <time dateTime={assignment.expiresAt.toISOString()}>
+                                  {new Date(assignment.expiresAt).toLocaleString()}
+                                </time>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">
+                                  No expiration
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell className="max-w-xs text-sm whitespace-pre-line">
+                              {assignment.notes || (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <RemoveRoleButton
+                                assignment={assignment}
+                                assignmentToRemove={assignmentToRemove}
+                                setAssignmentToRemove={setAssignmentToRemove}
+                                onRemove={(id) =>
+                                  removeMutation.mutate({ data: { assignmentId: id } })
+                                }
+                                isRemoving={removeMutation.isPending}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                }
+                cards={
+                  <RoleAssignmentsMobileCards
+                    assignments={assignments}
+                    assignmentToRemove={assignmentToRemove}
+                    setAssignmentToRemove={setAssignmentToRemove}
+                    onRemove={(id) =>
+                      removeMutation.mutate({ data: { assignmentId: id } })
+                    }
+                    isRemoving={removeMutation.isPending}
+                  />
+                }
+              />
             )}
           </CardContent>
         </Card>
@@ -658,7 +689,12 @@ function RoleSummaryGrid({ roles }: { roles: RoleSummary[] }) {
         <Card key={role.id}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{role.name}</CardTitle>
-            <Badge variant="outline">{role.assignmentCount} assigned</Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline">{role.assignmentCount} assigned</Badge>
+              {role.requiresMfa ? (
+                <Badge variant="destructive">MFA required</Badge>
+              ) : null}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="text-muted-foreground text-sm">
@@ -731,5 +767,133 @@ function CommandListWithResults({
         ))}
       </CommandGroup>
     </CommandList>
+  );
+}
+
+interface RemoveRoleButtonProps {
+  assignment: RoleAssignmentRow;
+  assignmentToRemove: RoleAssignmentRow | null;
+  setAssignmentToRemove: (assignment: RoleAssignmentRow | null) => void;
+  onRemove: (assignmentId: string) => void;
+  isRemoving: boolean;
+}
+
+function RemoveRoleButton({
+  assignment,
+  assignmentToRemove,
+  setAssignmentToRemove,
+  onRemove,
+  isRemoving,
+}: RemoveRoleButtonProps) {
+  const isThisRemoving = isRemoving && assignmentToRemove?.id === assignment.id;
+
+  return (
+    <Dialog
+      open={assignmentToRemove?.id === assignment.id}
+      onOpenChange={(open) => {
+        if (!open) setAssignmentToRemove(null);
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-destructive hover:text-destructive"
+          onClick={() => setAssignmentToRemove(assignment)}
+        >
+          <XCircle className="mr-1 h-4 w-4" />
+          Remove
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm Role Removal</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to remove the <strong>{assignment.roleName}</strong>{" "}
+            role from <strong>{assignment.userName}</strong>?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setAssignmentToRemove(null)}
+            disabled={isThisRemoving}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => onRemove(assignment.id)}
+            disabled={isThisRemoving}
+          >
+            {isThisRemoving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Remove Role
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface RoleAssignmentsMobileCardsProps {
+  assignments: RoleAssignmentRow[];
+  assignmentToRemove: RoleAssignmentRow | null;
+  setAssignmentToRemove: (assignment: RoleAssignmentRow | null) => void;
+  onRemove: (assignmentId: string) => void;
+  isRemoving: boolean;
+}
+
+function RoleAssignmentsMobileCards({
+  assignments,
+  assignmentToRemove,
+  setAssignmentToRemove,
+  onRemove,
+  isRemoving,
+}: RoleAssignmentsMobileCardsProps) {
+  return (
+    <MobileDataCardsList>
+      {assignments.map((assignment) => {
+        const scopeLabel = assignment.teamId
+          ? `Team: ${assignment.teamId}`
+          : assignment.eventId
+            ? `Event: ${assignment.eventId}`
+            : "Global";
+
+        return (
+          <MobileDataCard
+            key={assignment.id}
+            title={assignment.userName}
+            subtitle={assignment.userEmail}
+            badge={<Badge variant="secondary">{assignment.roleName}</Badge>}
+            fields={[
+              { label: "Scope", value: scopeLabel },
+              {
+                label: "Assigned By",
+                value: assignment.assignedByName || "System",
+              },
+              {
+                label: "Assigned At",
+                value: new Date(assignment.assignedAt).toLocaleDateString(),
+              },
+              {
+                label: "Expires",
+                value: assignment.expiresAt
+                  ? new Date(assignment.expiresAt).toLocaleDateString()
+                  : "Never",
+              },
+            ]}
+            action={
+              <RemoveRoleButton
+                assignment={assignment}
+                assignmentToRemove={assignmentToRemove}
+                setAssignmentToRemove={setAssignmentToRemove}
+                onRemove={onRemove}
+                isRemoving={isRemoving}
+              />
+            }
+          />
+        );
+      })}
+    </MobileDataCardsList>
   );
 }

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
+import { StepUpProvider } from "~/features/auth/step-up";
 
 interface ProvidersProps {
   readonly children: ReactNode;
@@ -20,5 +21,9 @@ export function Providers({ children, queryClient }: ProvidersProps) {
       }),
   );
 
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={client}>
+      <StepUpProvider>{children}</StepUpProvider>
+    </QueryClientProvider>
+  );
 }

@@ -58,10 +58,11 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
         };
       }
 
-      const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } = await import(
-        "~/lib/auth/utils/admin-check"
-      );
+      const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } =
+        await import("~/lib/auth/utils/admin-check");
       await requireAdmin(session.user.id);
+      const { requireRecentAuth } = await import("~/lib/auth/guards/step-up");
+      await requireRecentAuth(session.user.id, session);
 
       const db = await getDb();
       const { roles, user, userRoles } = await import("~/db/schema");
@@ -244,6 +245,27 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
         };
       }
 
+      if (GLOBAL_ADMIN_ROLE_NAMES.includes(roleRecord.name)) {
+        await db
+          .update(user)
+          .set({ mfaRequired: true })
+          .where(eq(user.id, targetUser.id));
+      }
+
+      const { logAdminAction } = await import("~/lib/audit");
+      await logAdminAction({
+        action: "ROLE_ASSIGN",
+        actorUserId: session.user.id,
+        targetType: "user_role",
+        targetId: created.id,
+        metadata: {
+          roleId: roleRecord.id,
+          userId: targetUser.id,
+          teamId,
+          eventId,
+        },
+      });
+
       return {
         success: true,
         data: created,
@@ -301,13 +323,16 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
         };
       }
 
-      const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+      const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } =
+        await import("~/lib/auth/utils/admin-check");
       await requireAdmin(session.user.id);
+      const { requireRecentAuth } = await import("~/lib/auth/guards/step-up");
+      await requireRecentAuth(session.user.id, session);
 
       const db = await getDb();
       const { roles, userRoles, user } = await import("~/db/schema");
       const { alias } = await import("drizzle-orm/pg-core");
-      const { eq } = await import("drizzle-orm");
+      const { and, eq, inArray } = await import("drizzle-orm");
 
       const assignerUser = alias(user, "assigner_user");
 
@@ -349,6 +374,41 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
       }
 
       await db.delete(userRoles).where(eq(userRoles.id, data.assignmentId));
+
+      if (GLOBAL_ADMIN_ROLE_NAMES.includes(existingAssignment.roleName)) {
+        const [remaining] = await db
+          .select({ id: userRoles.id })
+          .from(userRoles)
+          .innerJoin(roles, eq(userRoles.roleId, roles.id))
+          .where(
+            and(
+              eq(userRoles.userId, existingAssignment.userId),
+              inArray(roles.name, GLOBAL_ADMIN_ROLE_NAMES),
+            ),
+          )
+          .limit(1);
+
+        if (!remaining) {
+          await db
+            .update(user)
+            .set({ mfaRequired: false })
+            .where(eq(user.id, existingAssignment.userId));
+        }
+      }
+
+      const { logAdminAction } = await import("~/lib/audit");
+      await logAdminAction({
+        action: "ROLE_REMOVE",
+        actorUserId: session.user.id,
+        targetType: "user_role",
+        targetId: existingAssignment.id,
+        metadata: {
+          roleId: existingAssignment.roleId,
+          userId: existingAssignment.userId,
+          teamId: existingAssignment.teamId,
+          eventId: existingAssignment.eventId,
+        },
+      });
 
       return {
         success: true,

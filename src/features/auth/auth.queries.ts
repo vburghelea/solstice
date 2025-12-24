@@ -52,6 +52,9 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
       privacySettings: dbUser[0].privacySettings,
       profileVersion: dbUser[0].profileVersion,
       profileUpdatedAt: dbUser[0].profileUpdatedAt,
+      mfaRequired: dbUser[0].mfaRequired,
+      mfaEnrolledAt: dbUser[0].mfaEnrolledAt,
+      twoFactorEnabled: dbUser[0].twoFactorEnabled,
       roles: userRoles,
     };
   },

@@ -1,0 +1,6 @@
+contact_id,org_id,first_name,last_name,email,phone,role,status,created_at,last_login_at
+C-1000,ORG-0001,Alex,Rivera,alex@viasport.ca,604-555-0200,admin,active,2012-06-01,2025-11-20
+C-1100,ORG-0100,Jamie,Chen,jamie@quadball.ca,604-555-0111,admin,active,2014-04-10,2025-10-15
+C-1200,ORG-0200,Pat,Lee,pat@nsquadball.ca,604-555-0122,reporter,active,2017-09-01,2025-09-20
+C-1300,ORG-0200,Sky,Nguyen,sky@nsquadball.ca,604-555-0123,viewer,active,2019-03-12,2025-08-10
+C-1400,ORG-0300,Taylor,Smith,taylor@islandquadball.ca,250-555-0102,reporter,pending,2023-02-01,

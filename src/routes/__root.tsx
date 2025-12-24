@@ -4,6 +4,7 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
+  redirect,
   ScriptOnce,
   Scripts,
 } from "@tanstack/react-router";
@@ -14,6 +15,11 @@ import {
   getCurrentUser,
   type AuthQueryResult,
 } from "~/features/auth/auth.queries";
+import { StepUpProvider } from "~/features/auth/step-up";
+import {
+  getLatestPolicyDocument,
+  listUserPolicyAcceptances,
+} from "~/features/privacy/privacy.queries";
 import appCss from "~/styles.css?url";
 
 // Lazy load devtools only in development to exclude from production bundles
@@ -40,16 +46,41 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthQueryResult;
 }>()({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     try {
       // Check if we're on the server or client
       if (typeof window === "undefined") {
         // Server: use the server function
         const user = await getCurrentUser();
+        if (user && location.pathname.startsWith("/dashboard")) {
+          const policy = await getLatestPolicyDocument({ data: "privacy_policy" });
+          if (policy) {
+            const acceptances = await listUserPolicyAcceptances();
+            const hasAccepted = acceptances.some(
+              (acceptance) => acceptance.policyId === policy.id,
+            );
+            if (!hasAccepted && location.pathname !== "/dashboard/privacy") {
+              throw redirect({ to: "/dashboard/privacy" });
+            }
+          }
+        }
+
         return { user };
       } else {
         // Client: fetch the full user data
         const user = await context.queryClient.fetchQuery(authQueryOptions());
+        if (user && location.pathname.startsWith("/dashboard")) {
+          const policy = await getLatestPolicyDocument({ data: "privacy_policy" });
+          if (policy) {
+            const acceptances = await listUserPolicyAcceptances();
+            const hasAccepted = acceptances.some(
+              (acceptance) => acceptance.policyId === policy.id,
+            );
+            if (!hasAccepted && location.pathname !== "/dashboard/privacy") {
+              throw redirect({ to: "/dashboard/privacy" });
+            }
+          }
+        }
         return { user };
       }
     } catch (error) {
@@ -83,7 +114,9 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <StepUpProvider>
+        <Outlet />
+      </StepUpProvider>
     </RootDocument>
   );
 }

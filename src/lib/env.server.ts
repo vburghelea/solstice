@@ -5,11 +5,16 @@
 
 // This module should only be imported in server-side code
 
-// Load dotenv synchronously before createEnv is called
+// Load dotenv synchronously before createEnv is called.
+// Vite injects import.meta.env; SST/esbuild cron/Lambdas do not.
 import dotenv from "dotenv";
-if (import.meta.env.SSR && import.meta.env.DEV) {
+const isAwsLambdaRuntime =
+  process.env["AWS_LAMBDA_FUNCTION_NAME"] !== undefined ||
+  process.env["AWS_EXECUTION_ENV"]?.includes("AWS_Lambda") === true;
+const isViteRuntime = typeof import.meta.env !== "undefined";
+
+if (!isAwsLambdaRuntime && !isViteRuntime) {
   dotenv.config();
-  dotenv.config({ path: ".env", override: true });
 }
 
 import { createEnv } from "@t3-oss/env-core";
@@ -27,11 +32,7 @@ export const env = createEnv({
     NETLIFY_DATABASE_URL: z.url().optional(),
     NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
 
-    // Auth - Secret must be set explicitly, no fallbacks
-    // Generate with: node scripts/generate-auth-secret.js
-    BETTER_AUTH_SECRET: z
-      .string()
-      .min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
+    // Auth secret is validated lazily in getAuthSecret().
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     OAUTH_ALLOWED_DOMAINS: z
@@ -75,6 +76,7 @@ export const env = createEnv({
     SST_STAGE: z.string().optional(),
     AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
     AWS_EXECUTION_ENV: z.string().optional(),
+    SIN_ARTIFACTS_BUCKET: z.string().optional(),
 
     // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
     VITE_BASE_URL: z.url().optional(),
@@ -125,7 +127,27 @@ export const getBaseUrl = () => {
   return candidate;
 };
 
-export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
+let cachedAuthSecret: string | undefined;
+const authSecretSchema = z
+  .string()
+  .min(32, "BETTER_AUTH_SECRET must be at least 32 characters");
+
+export const getAuthSecret = () => {
+  if (cachedAuthSecret) return cachedAuthSecret;
+
+  const raw = process.env["BETTER_AUTH_SECRET"];
+  const parsed = authSecretSchema.safeParse(raw);
+
+  if (!parsed.success) {
+    const message =
+      parsed.error.issues.map((issue) => issue.message).join("; ") ||
+      "Invalid BETTER_AUTH_SECRET";
+    throw new Error(message);
+  }
+
+  cachedAuthSecret = parsed.data;
+  return cachedAuthSecret;
+};
 
 export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";

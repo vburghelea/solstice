@@ -1,8 +1,17 @@
+import { twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { getBaseUrl } from "./env.client";
 
 // Create a lazy-loaded auth client
-let authClientInstance: ReturnType<typeof createAuthClient> | null = null;
+const createClient = (baseURL: string) =>
+  createAuthClient({
+    baseURL,
+    plugins: [twoFactorClient()],
+  });
+
+type AuthClient = ReturnType<typeof createClient>;
+
+let authClientInstance: AuthClient | null = null;
 
 function getAuthClient() {
   if (!authClientInstance) {
@@ -11,7 +20,7 @@ function getAuthClient() {
     if (import.meta.env.DEV) {
       console.log("Auth client created with baseURL:", baseURL);
     }
-    authClientInstance = createAuthClient({ baseURL });
+    authClientInstance = createClient(baseURL);
   }
   return authClientInstance;
 }
@@ -54,6 +63,9 @@ export const auth = {
   },
   get verifyEmail() {
     return getAuthClient().verifyEmail;
+  },
+  get twoFactor() {
+    return getAuthClient().twoFactor;
   },
   get $client() {
     return getAuthClient();

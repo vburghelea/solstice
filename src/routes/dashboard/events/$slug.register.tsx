@@ -89,7 +89,7 @@ function EventRegistrationPage() {
     "individual",
   );
 
-  const [selectedTeamId, setSelectedTeamId] = useState<string>("");
+  const [selectedTeamId, setSelectedTeamId] = useState<string>("__select__");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [emergencyContact, setEmergencyContact] = useState<EmergencyContact>({
     name: "",
@@ -270,7 +270,10 @@ function EventRegistrationPage() {
       return;
     }
 
-    if (effectiveRegistrationType === "team" && !selectedTeamId) {
+    if (
+      effectiveRegistrationType === "team" &&
+      (!selectedTeamId || selectedTeamId === "__select__")
+    ) {
       toast.error("Please select a team");
       return;
     }
@@ -286,7 +289,11 @@ function EventRegistrationPage() {
       paymentMethod: effectivePaymentMethod,
     };
 
-    if (effectiveRegistrationType === "team" && selectedTeamId) {
+    if (
+      effectiveRegistrationType === "team" &&
+      selectedTeamId &&
+      selectedTeamId !== "__select__"
+    ) {
       payload.teamId = selectedTeamId;
     }
 
@@ -416,7 +423,7 @@ function EventRegistrationPage() {
                         <SelectValue placeholder="Select a team" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Select a team</SelectItem>
+                        <SelectItem value="__select__">Select a team</SelectItem>
                         {userTeams.map((entry) => (
                           <SelectItem key={entry.team.id} value={entry.team.id}>
                             {entry.team.name}

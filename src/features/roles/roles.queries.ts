@@ -41,7 +41,8 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
         };
       }
 
-      const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+      const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } =
+        await import("~/lib/auth/utils/admin-check");
       await requireAdmin(session.user.id);
 
       const db = await getDb();
@@ -70,6 +71,11 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
           roles.updatedAt,
         )
         .orderBy(asc(roles.name));
+
+      const rolesWithMfa = roleSummaries.map((role) => ({
+        ...role,
+        requiresMfa: GLOBAL_ADMIN_ROLE_NAMES.includes(role.name),
+      }));
 
       const assignerUser = alias(user, "assigner_user");
 
@@ -100,7 +106,7 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
       return {
         success: true,
         data: {
-          roles: roleSummaries,
+          roles: rolesWithMfa,
           assignments,
         },
       };

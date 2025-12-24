@@ -71,6 +71,14 @@ vi.mock("~/components/ui/SafeLink", () => ({
   ),
 }));
 
+vi.mock("~/features/security/security.mutations", () => ({
+  recordSecurityEvent: vi.fn(),
+}));
+
+vi.mock("~/features/security/security.queries", () => ({
+  getAccountLockStatus: vi.fn().mockResolvedValue(null),
+}));
+
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>();
   return {

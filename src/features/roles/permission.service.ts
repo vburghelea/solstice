@@ -1,6 +1,8 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { roles, userRoles } from "~/db/schema";
 
+const GLOBAL_ADMIN_ROLE_NAMES = ["Solstice Admin", "Quadball Canada Admin"];
+
 export class PermissionService {
   /**
    * Check if a user has global admin permissions
@@ -13,14 +15,23 @@ export class PermissionService {
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .where(
-        and(
-          eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
-        ),
+        and(eq(userRoles.userId, userId), inArray(roles.name, GLOBAL_ADMIN_ROLE_NAMES)),
       )
       .limit(1);
 
     return !!row;
+  }
+
+  static async getGlobalAdminUserIds(): Promise<string[]> {
+    const { db } = await import("~/db");
+    const database = await db();
+    const rows = await database
+      .select({ userId: userRoles.userId })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(inArray(roles.name, GLOBAL_ADMIN_ROLE_NAMES));
+
+    return Array.from(new Set(rows.map((row) => row.userId)));
   }
 
   /**

@@ -106,6 +106,9 @@ export const Route = createFileRoute("/api/test/cleanup")({
                       emergencyContact: null,
                       privacySettings: null,
                       profileUpdatedAt: null,
+                      mfaRequired: false,
+                      mfaEnrolledAt: null,
+                      twoFactorEnabled: false,
                     })
                     .where(eq(user.id, targetUserId));
                 }

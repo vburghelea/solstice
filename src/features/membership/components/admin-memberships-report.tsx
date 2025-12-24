@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
+import {
+  MobileDataCard,
+  MobileDataCardsList,
+  ResponsiveDataView,
+} from "~/components/ui/mobile-data-cards";
 import { exportToCSV, formatCurrency, formatDate } from "~/lib/utils/csv-export";
 import { getAllMemberships, type MembershipReportRow } from "../membership.admin-queries";
 
@@ -130,14 +136,16 @@ export function AdminMembershipsReport() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Memberships Report</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
+            Memberships Report
+          </h2>
+          <p className="text-muted-foreground text-sm sm:text-base">
             View and export all membership data across the platform
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <select
             value={statusFilter}
             onChange={(e) =>
@@ -152,15 +160,83 @@ export function AdminMembershipsReport() {
             <option value="expired">Expired</option>
             <option value="cancelled">Cancelled</option>
           </select>
+          <Button variant="outline" onClick={handleExport} className="lg:hidden">
+            Export CSV
+          </Button>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data.data || []}
-        pageSize={20}
-        onExport={handleExport}
+      <ResponsiveDataView
+        table={
+          <DataTable
+            columns={columns}
+            data={data.data || []}
+            pageSize={20}
+            onExport={handleExport}
+          />
+        }
+        cards={<MembershipsMobileCards memberships={data.data || []} />}
       />
     </div>
+  );
+}
+
+interface MembershipsMobileCardsProps {
+  memberships: MembershipReportRow[];
+}
+
+function MembershipsMobileCards({ memberships }: MembershipsMobileCardsProps) {
+  if (memberships.length === 0) {
+    return (
+      <div className="text-muted-foreground rounded-md border border-dashed p-6 text-center text-sm">
+        No memberships found.
+      </div>
+    );
+  }
+
+  return (
+    <MobileDataCardsList>
+      {memberships.map((membership) => {
+        const statusClass =
+          membership.status === "active"
+            ? "bg-green-100 text-green-800"
+            : membership.status === "expired"
+              ? "bg-gray-100 text-gray-800"
+              : "bg-red-100 text-red-800";
+
+        return (
+          <MobileDataCard
+            key={membership.id}
+            title={membership.userName}
+            subtitle={membership.userEmail}
+            badge={
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusClass}`}
+              >
+                {membership.status}
+              </span>
+            }
+            fields={[
+              {
+                label: "Membership",
+                value: membership.membershipType,
+              },
+              {
+                label: "Price",
+                value: formatCurrency(membership.priceCents),
+              },
+              {
+                label: "Start Date",
+                value: formatDate(membership.startDate),
+              },
+              {
+                label: "End Date",
+                value: formatDate(membership.endDate),
+              },
+            ]}
+          />
+        );
+      })}
+    </MobileDataCardsList>
   );
 }

@@ -89,3 +89,9 @@ Application restore:
 
 - `docs/sin-rfp/sst-migration-plan.md`
 - `docs/sin-rfp/phase-0/audit-retention-policy.md`
+
+## Appendix A: Backup Restore Test Results (Template)
+
+| Test Date | Environment | Restore Type | RPO Achieved | RTO Achieved | Notes |
+| --------- | ----------- | ------------ | ------------ | ------------ | ----- |
+|           |             |              |              |              |       |

@@ -53,6 +53,11 @@ export interface User extends BetterAuthUser {
   profileVersion: number;
   profileUpdatedAt?: Date | null;
 
+  // MFA status
+  mfaRequired: boolean;
+  mfaEnrolledAt?: Date | null;
+  twoFactorEnabled: boolean;
+
   // Roles and permissions
   roles?: UserRole[];
 

@@ -1,0 +1,5 @@
+member_id,org_id,first_name,last_name,dob,gender,email,phone,postal_code,membership_type,membership_start,membership_end,nccp_level,consent_pipeda
+M-0001,ORG-0200,Jordan,Patel,2004-06-12,F,jordan@nsquadball.ca,604-555-0301,V7J2L3,annual,2024-01-01,2024-12-31,Competition-Intro,true
+M-0002,ORG-0200,Casey,Wong,2001-09-05,M,casey@nsquadball.ca,604-555-0302,V7J2L3,annual,2024-01-01,2024-12-31,Comp-Dev,true
+M-0003,ORG-0100,Riley,Scott,1998-11-20,U,riley@quadball.ca,604-555-0310,V5K0A1,associate,2024-02-01,2024-12-31,Fundamentals,true
+M-0004,ORG-0300,Sam,Garcia,2008-03-14,F,sam@islandquadball.ca,250-555-0311,V8W1A1,trial,2024-03-01,2024-05-31,,false

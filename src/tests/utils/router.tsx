@@ -53,6 +53,9 @@ export const mockUser: User = {
   }),
   profileVersion: 1,
   profileUpdatedAt: new Date("2024-01-01"),
+  mfaRequired: false,
+  mfaEnrolledAt: null,
+  twoFactorEnabled: false,
 };
 
 // Create test routes

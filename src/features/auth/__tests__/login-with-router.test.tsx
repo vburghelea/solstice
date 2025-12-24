@@ -14,6 +14,14 @@ vi.mock("~/lib/auth-client", () => ({
   },
 }));
 
+vi.mock("~/features/security/security.mutations", () => ({
+  recordSecurityEvent: vi.fn(),
+}));
+
+vi.mock("~/features/security/security.queries", () => ({
+  getAccountLockStatus: vi.fn().mockResolvedValue(null),
+}));
+
 describe("LoginForm with TanStack Router", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -81,6 +89,9 @@ describe("LoginForm with TanStack Router", () => {
       }),
       profileVersion: 1,
       profileUpdatedAt: new Date(),
+      mfaRequired: false,
+      mfaEnrolledAt: null,
+      twoFactorEnabled: false,
     };
 
     await renderWithRouter(<LoginForm />, { user: customUser });

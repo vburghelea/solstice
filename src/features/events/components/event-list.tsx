@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, UsersIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ChevronDownIcon,
+  ClockIcon,
+  FilterIcon,
+  MapPinIcon,
+  TagIcon,
+  UsersIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -59,6 +67,7 @@ export function EventList({
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortBy>("startDate");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const { data, isLoading, error } = useQuery<EventListResult, Error>({
     queryKey: ["events", filters, page, pageSize, sortBy, sortOrder],
@@ -94,142 +103,183 @@ export function EventList({
   const statusFilterValue = typeof filters.status === "string" ? filters.status : "all";
   const provinceFilterValue = filters.province ?? "all";
 
+  // Count active filters for badge
+  const activeFilterCount = [
+    filters.type,
+    filters.status,
+    filters.city,
+    filters.province,
+  ].filter(Boolean).length;
+
+  const filterFields = (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-2">
+        <Label htmlFor="type">Event Type</Label>
+        <Select
+          value={typeFilterValue}
+          onValueChange={(value) =>
+            handleFilterChange(
+              "type",
+              value === "all" ? undefined : (value as EventFilters["type"]),
+            )
+          }
+        >
+          <SelectTrigger id="type">
+            <SelectValue placeholder="All types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All types</SelectItem>
+            <SelectItem value="tournament">Tournament</SelectItem>
+            <SelectItem value="league">League</SelectItem>
+            <SelectItem value="camp">Camp</SelectItem>
+            <SelectItem value="clinic">Clinic</SelectItem>
+            <SelectItem value="social">Social</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
+          value={statusFilterValue}
+          onValueChange={(value) =>
+            handleFilterChange(
+              "status",
+              value === "all" ? undefined : (value as EventFilters["status"]),
+            )
+          }
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+            <SelectItem value="registration_open">Registration Open</SelectItem>
+            <SelectItem value="registration_closed">Registration Closed</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="city">City</Label>
+        <Input
+          id="city"
+          placeholder="Filter by city"
+          value={filters.city ?? ""}
+          onChange={(event) =>
+            handleFilterChange("city", event.target.value || undefined)
+          }
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="province">Province</Label>
+        <Select
+          value={provinceFilterValue}
+          onValueChange={(value) =>
+            handleFilterChange(
+              "province",
+              value === "all" ? undefined : (value as EventFilters["province"]),
+            )
+          }
+        >
+          <SelectTrigger id="province">
+            <SelectValue placeholder="All provinces" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All provinces</SelectItem>
+            <SelectItem value="AB">Alberta</SelectItem>
+            <SelectItem value="BC">British Columbia</SelectItem>
+            <SelectItem value="MB">Manitoba</SelectItem>
+            <SelectItem value="NB">New Brunswick</SelectItem>
+            <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
+            <SelectItem value="NS">Nova Scotia</SelectItem>
+            <SelectItem value="ON">Ontario</SelectItem>
+            <SelectItem value="PE">Prince Edward Island</SelectItem>
+            <SelectItem value="QC">Quebec</SelectItem>
+            <SelectItem value="SK">Saskatchewan</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="sortBy">Sort By</Label>
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+          <SelectTrigger id="sortBy">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="sortOrder">Sort Order</Label>
+        <Select
+          value={sortOrder}
+          onValueChange={(value) => setSortOrder(value as SortOrder)}
+        >
+          <SelectTrigger id="sortOrder">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_ORDER_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+
   const filterSection = showFilters ? (
     <Card>
-      <CardHeader>
+      {/* Mobile: Collapsible header */}
+      <CardHeader className="lg:hidden">
+        <button
+          type="button"
+          onClick={() => setFiltersExpanded(!filtersExpanded)}
+          className="flex w-full items-center justify-between"
+        >
+          <div className="flex items-center gap-2">
+            <FilterIcon className="h-4 w-4" />
+            <CardTitle className="text-base">Filters & Sort</CardTitle>
+            {activeFilterCount > 0 && (
+              <Badge variant="secondary" className="ml-1">
+                {activeFilterCount}
+              </Badge>
+            )}
+          </div>
+          <ChevronDownIcon
+            className={cn(
+              "h-5 w-5 transition-transform",
+              filtersExpanded && "rotate-180",
+            )}
+          />
+        </button>
+      </CardHeader>
+
+      {/* Mobile: Collapsible content */}
+      <CardContent className={cn("lg:hidden", filtersExpanded ? "block" : "hidden")}>
+        {filterFields}
+      </CardContent>
+
+      {/* Desktop: Always visible */}
+      <CardHeader className="hidden lg:block">
         <CardTitle>Filter Events</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
-            <Label htmlFor="type">Event Type</Label>
-            <Select
-              value={typeFilterValue}
-              onValueChange={(value) =>
-                handleFilterChange(
-                  "type",
-                  value === "all" ? undefined : (value as EventFilters["type"]),
-                )
-              }
-            >
-              <SelectTrigger id="type">
-                <SelectValue placeholder="All types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All types</SelectItem>
-                <SelectItem value="tournament">Tournament</SelectItem>
-                <SelectItem value="league">League</SelectItem>
-                <SelectItem value="camp">Camp</SelectItem>
-                <SelectItem value="clinic">Clinic</SelectItem>
-                <SelectItem value="social">Social</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={statusFilterValue}
-              onValueChange={(value) =>
-                handleFilterChange(
-                  "status",
-                  value === "all" ? undefined : (value as EventFilters["status"]),
-                )
-              }
-            >
-              <SelectTrigger id="status">
-                <SelectValue placeholder="All statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="registration_open">Registration Open</SelectItem>
-                <SelectItem value="registration_closed">Registration Closed</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              placeholder="Filter by city"
-              value={filters.city ?? ""}
-              onChange={(event) =>
-                handleFilterChange("city", event.target.value || undefined)
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="province">Province</Label>
-            <Select
-              value={provinceFilterValue}
-              onValueChange={(value) =>
-                handleFilterChange(
-                  "province",
-                  value === "all" ? undefined : (value as EventFilters["province"]),
-                )
-              }
-            >
-              <SelectTrigger id="province">
-                <SelectValue placeholder="All provinces" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All provinces</SelectItem>
-                <SelectItem value="AB">Alberta</SelectItem>
-                <SelectItem value="BC">British Columbia</SelectItem>
-                <SelectItem value="MB">Manitoba</SelectItem>
-                <SelectItem value="NB">New Brunswick</SelectItem>
-                <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                <SelectItem value="NS">Nova Scotia</SelectItem>
-                <SelectItem value="ON">Ontario</SelectItem>
-                <SelectItem value="PE">Prince Edward Island</SelectItem>
-                <SelectItem value="QC">Quebec</SelectItem>
-                <SelectItem value="SK">Saskatchewan</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sortBy">Sort By</Label>
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
-              <SelectTrigger id="sortBy">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sortOrder">Sort Order</Label>
-            <Select
-              value={sortOrder}
-              onValueChange={(value) => setSortOrder(value as SortOrder)}
-            >
-              <SelectTrigger id="sortOrder">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_ORDER_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardContent>
+      <CardContent className="hidden lg:block">{filterFields}</CardContent>
     </Card>
   ) : null;
 
@@ -335,14 +385,14 @@ function EventCard({ event }: { event: EventWithDetails }) {
   return (
     <Card className="group transition-all hover:shadow-lg">
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
             <Link
               to="/dashboard/events/$slug"
               params={{ slug: event.slug }}
               className="group-hover:underline"
             >
-              <CardTitle className="line-clamp-2">
+              <CardTitle className="line-clamp-2 break-words">
                 <span className="mr-2">{typeIcon}</span>
                 {event.name}
               </CardTitle>
@@ -350,7 +400,7 @@ function EventCard({ event }: { event: EventWithDetails }) {
           </div>
           <Badge
             variant={badgeAppearance.variant}
-            className={cn("ml-2 capitalize", badgeAppearance.className)}
+            className={cn("w-fit shrink-0 capitalize", badgeAppearance.className)}
           >
             {event.status.replace("_", " ")}
           </Badge>

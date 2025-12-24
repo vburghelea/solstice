@@ -1,0 +1,4 @@
+report_id,org_id,reporting_period,period_start,period_end,status,submitted_at,program_count,participant_total,coach_total,volunteer_total,funding_amount,notes
+RPT-2024-Q1-0100,ORG-0100,2024-Q1,2024-01-01,2024-03-31,submitted,2024-04-10,6,980,45,120,150000,Quarterly program summary
+RPT-2024-Q1-0200,ORG-0200,2024-Q1,2024-01-01,2024-03-31,submitted,2024-04-05,3,220,12,38,25000,Club activities for Q1
+RPT-2024-Q1-0300,ORG-0300,2024-Q1,2024-01-01,2024-03-31,draft,,2,80,5,14,5000,Pending board approval

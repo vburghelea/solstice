@@ -100,8 +100,9 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
         scopes: account.scopes ?? [],
       }));
 
-      const hasPassword = normalizedAccounts.some(
-        (account) => account.providerId.toLowerCase() === "email",
+      const passwordProviders = new Set(["email", "credential", "credentials"]);
+      const hasPassword = normalizedAccounts.some((account) =>
+        passwordProviders.has(account.providerId.toLowerCase()),
       );
 
       return {

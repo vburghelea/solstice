@@ -1,0 +1,6 @@
+row_id,report_id,program_name,participant_gender,participant_age,participant_indigenous,participant_disability,participant_newcomer,session_count,volunteer_hours,coach_cert_level
+ROW-0001,RPT-2024-Q1-0100,Youth Development,F,15,false,false,true,12,60,Comp-Dev
+ROW-0002,RPT-2024-Q1-0100,Adult League,M,28,false,false,false,8,42,Competition-Intro
+ROW-0003,RPT-2024-Q1-0200,Community Intro,U,12,true,false,true,6,15,Fundamentals
+ROW-0004,RPT-2024-Q1-0200,Coach Clinic,X,35,false,false,false,2,6,Comp-Dev
+ROW-0005,RPT-2024-Q1-0300,Regional Tryout,F,19,false,true,false,3,10,Competition-Intro

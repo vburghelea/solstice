@@ -42,9 +42,13 @@ vi.mock("~/lib/env.server", () => ({
     NODE_ENV: "test",
     DATABASE_URL: "postgresql://test",
     DATABASE_URL_UNPOOLED: "postgresql://test",
-    BETTER_AUTH_SECRET: "test-secret",
     VITE_BASE_URL: "http://localhost:3000",
   },
+  getAuthSecret: () => "test-secret",
+  getBaseUrl: () => "http://localhost:3000",
+  isProduction: () => false,
+  isDevelopment: () => false,
+  isTest: () => true,
   isServerless: () => false,
 }));
 

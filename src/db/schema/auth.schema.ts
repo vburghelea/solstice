@@ -36,6 +36,17 @@ export const user = pgTable("user", {
     .$defaultFn(() => 1)
     .notNull(),
   profileUpdatedAt: timestamp("profile_updated_at").$defaultFn(() => new Date()),
+
+  // MFA enforcement
+  mfaRequired: boolean("mfa_required")
+    .$defaultFn(() => false)
+    .notNull(),
+  mfaEnrolledAt: timestamp("mfa_enrolled_at"),
+
+  // Better Auth 2FA plugin flag
+  twoFactorEnabled: boolean("two_factor_enabled")
+    .$defaultFn(() => false)
+    .notNull(),
 });
 
 export const session = pgTable("session", {
@@ -76,4 +87,13 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(() => /* @__PURE__ */ new Date()),
   updatedAt: timestamp("updated_at").$defaultFn(() => /* @__PURE__ */ new Date()),
+});
+
+export const twoFactor = pgTable("twoFactor", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
 });

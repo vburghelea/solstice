@@ -57,6 +57,9 @@ describe("AdminLayout with Router", () => {
       }),
       profileVersion: 1,
       profileUpdatedAt: new Date(),
+      mfaRequired: false,
+      mfaEnrolledAt: null,
+      twoFactorEnabled: false,
     };
 
     await renderWithRouter(<AdminLayout />, { user: customUser });

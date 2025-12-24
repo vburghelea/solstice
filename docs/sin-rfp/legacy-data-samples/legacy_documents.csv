@@ -1,0 +1,4 @@
+document_id,org_id,report_id,file_name,mime_type,size_bytes,checksum,legacy_storage_path,uploaded_by,uploaded_at
+DOC-1000,ORG-0100,RPT-2024-Q1-0100,2024-q1-budget.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,182344,sha256:aa11bb22cc33,\\legacy\\docs\\2024\\q1\\budget.xlsx,C-1100,2024-04-10
+DOC-1100,ORG-0200,RPT-2024-Q1-0200,participant-roster.csv,text/csv,54211,sha256:dd44ee55ff66,\\legacy\\docs\\2024\\q1\\roster.csv,C-1200,2024-04-05
+DOC-1200,ORG-0300,RPT-2024-Q1-0300,facility-agreement.pdf,application/pdf,893210,sha256:112233aabbcc,\\legacy\\docs\\2024\\q1\\facility.pdf,C-1400,2024-03-29

@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
+  Building2,
   Calendar,
   Home,
   Settings,
@@ -34,6 +35,12 @@ export const ADMIN_PRIMARY_NAV: AdminNavItem[] = [
     icon: ShieldCheck,
     label: "Roles",
     to: "/dashboard/admin/roles",
+    roles: GLOBAL_ADMIN_ROLE_NAMES,
+  },
+  {
+    icon: Building2,
+    label: "SIN Admin",
+    to: "/dashboard/admin/sin",
     roles: GLOBAL_ADMIN_ROLE_NAMES,
   },
 ];

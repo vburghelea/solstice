@@ -24,6 +24,11 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import {
+  MobileDataCard,
+  MobileDataCardsList,
+  ResponsiveDataView,
+} from "~/components/ui/mobile-data-cards";
+import {
   listMembers,
   type MemberDirectoryMember,
   type MemberDirectoryResponse,
@@ -234,8 +239,10 @@ function MembersPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Members Directory</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Members Directory
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           Browse Quadball Canada members, check membership status, and find players open
           to team invitations.
         </p>
@@ -305,11 +312,21 @@ function MembersPage() {
               <span>Refreshing directory…</span>
             </div>
           )}
-          <DataTable
-            columns={columns}
-            data={data?.members ?? []}
-            pageSize={10}
-            enableColumnToggle={false}
+          <ResponsiveDataView
+            table={
+              <DataTable
+                columns={columns}
+                data={data?.members ?? []}
+                pageSize={10}
+                enableColumnToggle={false}
+              />
+            }
+            cards={
+              <MembersMobileCards
+                members={data?.members ?? []}
+                onSelectMember={setSelectedMember}
+              />
+            }
           />
           {data?.members?.length === 0 && (
             <div className="border-border bg-muted/30 text-muted-foreground flex flex-col items-center gap-2 rounded-md border p-8 text-center">
@@ -325,6 +342,82 @@ function MembersPage() {
         onClose={() => setSelectedMember(null)}
       />
     </div>
+  );
+}
+
+interface MembersMobileCardsProps {
+  members: MemberDirectoryMember[];
+  onSelectMember: (member: MemberDirectoryMember) => void;
+}
+
+function MembersMobileCards({ members, onSelectMember }: MembersMobileCardsProps) {
+  if (members.length === 0) return null;
+
+  return (
+    <MobileDataCardsList>
+      {members.map((member) => {
+        const statusBadgeClass = member.hasActiveMembership
+          ? "bg-green-100 text-green-800"
+          : member.membershipStatus === "expired"
+            ? "bg-amber-100 text-amber-800"
+            : member.membershipStatus === "cancelled"
+              ? "bg-red-100 text-red-800"
+              : "bg-gray-200 text-gray-700";
+
+        const statusLabel = member.hasActiveMembership
+          ? "Active"
+          : member.membershipStatus === "none"
+            ? "No membership"
+            : member.membershipStatus.charAt(0).toUpperCase() +
+              member.membershipStatus.slice(1);
+
+        return (
+          <MobileDataCard
+            key={member.id}
+            title={member.name}
+            subtitle={member.pronouns || "Pronouns not set"}
+            badge={
+              <Badge
+                variant="secondary"
+                className={`text-xs font-medium ${statusBadgeClass}`}
+              >
+                {statusLabel}
+              </Badge>
+            }
+            fields={[
+              {
+                label: "Teams",
+                value:
+                  member.teams.length > 0 ? member.teams.join(", ") : "No active team",
+              },
+              {
+                label: "Email",
+                value:
+                  member.emailVisible && member.email ? (
+                    <span className="text-primary block truncate">{member.email}</span>
+                  ) : (
+                    <span className="text-muted-foreground">Hidden</span>
+                  ),
+              },
+              {
+                label: "Membership Type",
+                value: member.membershipType || "—",
+              },
+              {
+                label: "Phone",
+                value:
+                  member.phoneVisible && member.phone ? (
+                    member.phone
+                  ) : (
+                    <span className="text-muted-foreground">Hidden</span>
+                  ),
+              },
+            ]}
+            onClick={() => onSelectMember(member)}
+          />
+        );
+      })}
+    </MobileDataCardsList>
   );
 }
 
@@ -451,27 +544,52 @@ function MemberDetailDialog({ member, onClose }: MemberDetailDialogProps) {
               <h3 className="text-lg font-semibold">Membership history</h3>
               {member.membershipHistory.length ? (
                 <div className="rounded-md border">
-                  <div className="bg-muted/40 text-muted-foreground grid grid-cols-3 gap-2 border-b p-3 text-xs font-semibold uppercase">
-                    <span>Status</span>
-                    <span>Membership Type</span>
-                    <span>Valid Dates</span>
+                  {/* Desktop: Table layout */}
+                  <div className="hidden sm:block">
+                    <div className="bg-muted/40 text-muted-foreground grid grid-cols-3 gap-2 border-b p-3 text-xs font-semibold uppercase">
+                      <span>Status</span>
+                      <span>Membership Type</span>
+                      <span>Valid Dates</span>
+                    </div>
+                    <div className="divide-y text-sm">
+                      {member.membershipHistory.map((entry, index) => (
+                        <div
+                          key={`${entry.status}-${entry.endDate ?? index}`}
+                          className="grid grid-cols-3 gap-2 p-3"
+                        >
+                          <span className="font-medium">
+                            {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {entry.membershipType || "—"}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {entry.startDate ? formatDate(entry.startDate) : "—"} –{" "}
+                            {entry.endDate ? formatDate(entry.endDate) : "—"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="divide-y text-sm">
+                  {/* Mobile: Stacked card layout */}
+                  <div className="divide-y sm:hidden">
                     {member.membershipHistory.map((entry, index) => (
                       <div
-                        key={`${entry.status}-${entry.endDate ?? index}`}
-                        className="grid grid-cols-3 gap-2 p-3"
+                        key={`mobile-${entry.status}-${entry.endDate ?? index}`}
+                        className="space-y-1 p-3 text-sm"
                       >
-                        <span className="font-medium">
-                          {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {entry.membershipType || "—"}
-                        </span>
-                        <span className="text-muted-foreground">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">
+                            {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            {entry.membershipType || "—"}
+                          </span>
+                        </div>
+                        <div className="text-muted-foreground text-xs">
                           {entry.startDate ? formatDate(entry.startDate) : "—"} –{" "}
                           {entry.endDate ? formatDate(entry.endDate) : "—"}
-                        </span>
+                        </div>
                       </div>
                     ))}
                   </div>

@@ -1,0 +1,5 @@
+org_id,org_name,org_type,parent_org_id,status,address_line1,address_line2,city,province,postal_code,contact_name,contact_email,contact_phone,created_at,updated_at
+ORG-0001,viaSport BC,governing_body,,active,409 Granville St #1351,,Vancouver,BC,V6C1T2,Operations Team,info@viasport.ca,604-555-0100,2010-01-15,2025-11-30
+ORG-0100,British Columbia Quadball,pso,ORG-0001,active,123 Sport Way,,Vancouver,BC,V5K0A1,Jamie Chen,jamie@quadball.ca,604-555-0111,2014-04-10,2025-10-01
+ORG-0200,North Shore Quadball Club,club,ORG-0100,active,12 Mountain Rd,,North Vancouver,BC,V7J2L3,Pat Lee,pat@nsquadball.ca,604-555-0122,2017-09-01,2025-09-15
+ORG-0300,Island Quadball Affiliate,affiliate,ORG-0100,pending,88 Island Ave,,Victoria,BC,V8W1A1,Taylor Smith,taylor@islandquadball.ca,250-555-0102,2023-02-01,2025-11-01

@@ -6,7 +6,7 @@
 
 import { hashPassword } from "better-auth/crypto";
 import dotenv from "dotenv";
-import { like } from "drizzle-orm";
+import { eq, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -14,8 +14,12 @@ import {
   eventAnnouncements,
   eventRegistrations,
   events,
+  forms,
+  formVersions,
   memberships,
   membershipTypes,
+  organizationMembers,
+  organizations,
   roles,
   session,
   teamMembers,
@@ -52,6 +56,9 @@ async function seed() {
   const individualEventId = "00000000-0000-0000-0000-00000000e201";
   const teamEventId = "00000000-0000-0000-0000-00000000e202";
   const individualRegistrationId = "00000000-0000-0000-0000-00000000e211";
+  const e2eOrgId = "00000000-0000-0000-0000-00000000e301";
+  const e2eFormId = "00000000-0000-0000-0000-00000000e401";
+  const e2eFormVersionId = "00000000-0000-0000-0000-00000000e402";
 
   try {
     // Clear existing test data in correct order due to foreign key constraints
@@ -407,6 +414,79 @@ async function seed() {
       },
     ]);
     console.log("✅ Assigned global admin role to admin@example.com");
+
+    console.log("Seeding SIN org + form fixtures...");
+    await db.delete(formVersions).where(eq(formVersions.formId, e2eFormId));
+    await db.delete(forms).where(eq(forms.id, e2eFormId));
+    await db
+      .delete(organizationMembers)
+      .where(eq(organizationMembers.organizationId, e2eOrgId));
+    await db.delete(organizations).where(eq(organizations.id, e2eOrgId));
+
+    await db.insert(organizations).values({
+      id: e2eOrgId,
+      name: "E2E SIN Test Org",
+      slug: "e2e-sin-org",
+      type: "club",
+      status: "active",
+      settings: {},
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await db.insert(organizationMembers).values({
+      userId: adminUserId,
+      organizationId: e2eOrgId,
+      role: "owner",
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await db.insert(forms).values({
+      id: e2eFormId,
+      organizationId: e2eOrgId,
+      name: "E2E SIN Upload Form",
+      slug: "e2e-sin-upload",
+      description: "Seeded form for file validation tests",
+      status: "published",
+      createdBy: adminUserId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const formDefinition = {
+      fields: [
+        {
+          key: "supporting_document",
+          type: "file",
+          label: "Supporting document",
+          required: true,
+          fileConfig: {
+            allowedTypes: ["application/pdf"],
+            maxSizeBytes: 1024,
+            maxFiles: 1,
+          },
+        },
+      ],
+      settings: {
+        allowDraft: true,
+        requireApproval: false,
+        notifyOnSubmit: [],
+      },
+    };
+
+    await db.insert(formVersions).values({
+      id: e2eFormVersionId,
+      formId: e2eFormId,
+      versionNumber: 1,
+      definition: formDefinition,
+      publishedAt: new Date(),
+      publishedBy: adminUserId,
+      createdAt: new Date(),
+    });
+    console.log("✅ Seeded SIN org + form fixtures");
 
     // Create test teams
     console.log("Creating test teams...");

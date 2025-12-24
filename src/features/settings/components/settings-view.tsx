@@ -33,6 +33,9 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { MfaEnrollmentCard } from "~/features/auth/mfa/mfa-enrollment";
+import { MfaRecoveryCard } from "~/features/auth/mfa/mfa-recovery";
+import { NotificationPreferencesCard } from "~/features/notifications/components/notification-preferences-card";
 import type {
   ChangePasswordInput,
   LinkedAccountsOverview,
@@ -370,6 +373,23 @@ export function SettingsView() {
               )}
             </CardContent>
           </Card>
+
+          {accountOverview?.hasPassword ? (
+            <>
+              <MfaEnrollmentCard />
+              <MfaRecoveryCard />
+            </>
+          ) : (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Multi-factor authentication unavailable</AlertTitle>
+              <AlertDescription>
+                MFA requires a password-based account. Add a password to enable MFA.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <NotificationPreferencesCard />
 
           <Card>
             <CardHeader>

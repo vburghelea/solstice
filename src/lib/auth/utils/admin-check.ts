@@ -26,6 +26,24 @@ export async function requireAdmin(userId: string | undefined | null): Promise<v
   if (!(await isAdmin(userId))) {
     throw new Error("Unauthorized: Admin access required");
   }
+
+  if (!userId) {
+    throw new Error("Unauthorized: Admin access required");
+  }
+
+  const { getDb } = await import("~/db/server-helpers");
+  const { user } = await import("~/db/schema");
+  const { eq } = await import("drizzle-orm");
+  const db = await getDb();
+  const [record] = await db
+    .select({ mfaRequired: user.mfaRequired, twoFactorEnabled: user.twoFactorEnabled })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+
+  if (record?.mfaRequired && !record.twoFactorEnabled) {
+    throw new Error("Multi-factor authentication required");
+  }
 }
 
 export function isAdminClient(user: AuthUser): boolean {

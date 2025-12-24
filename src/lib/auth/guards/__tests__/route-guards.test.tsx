@@ -36,6 +36,9 @@ describe("Route Guards", () => {
     }),
     profileVersion: 1,
     profileUpdatedAt: new Date(),
+    mfaRequired: false,
+    mfaEnrolledAt: null,
+    twoFactorEnabled: false,
   };
 
   describe("requireAuth", () => {

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StepUpProvider } from "~/features/auth/step-up";
 import type { RoleManagementData } from "~/features/roles/roles.types";
+import { getBrand, getTenantConfig } from "~/tenant";
 
 vi.mock("~/features/roles/roles.queries", () => ({
   getRoleManagementData: vi.fn(),
@@ -35,6 +36,9 @@ const { RoleManagementDashboard } = await import("../role-management-dashboard")
 const { getRoleManagementData } = await import("~/features/roles/roles.queries");
 
 const getRoleManagementDataMock = vi.mocked(getRoleManagementData);
+const tenantConfig = getTenantConfig();
+const platformRoleName = tenantConfig.admin.globalRoleNames[0];
+const brand = getBrand();
 
 function renderDashboard() {
   const client = new QueryClient({
@@ -64,7 +68,7 @@ describe("RoleManagementDashboard", () => {
       roles: [
         {
           id: "solstice-admin",
-          name: "Solstice Admin",
+          name: platformRoleName,
           description: "Platform administrator",
           permissions: { "system:*": true },
           assignmentCount: 2,
@@ -77,7 +81,7 @@ describe("RoleManagementDashboard", () => {
         {
           id: "assignment-1",
           roleId: "solstice-admin",
-          roleName: "Solstice Admin",
+          roleName: platformRoleName,
           roleDescription: "Platform administrator",
           userId: "user-1",
           userName: "Admin User",
@@ -99,9 +103,14 @@ describe("RoleManagementDashboard", () => {
     renderDashboard();
 
     await waitFor(() => {
-      expect(screen.getAllByText("Solstice Admin").length).toBeGreaterThan(0);
+      expect(screen.getAllByText(platformRoleName).length).toBeGreaterThan(0);
     });
 
+    expect(
+      screen.getByText(
+        `Assign and revoke administrator access across ${brand.name} and teams.`,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Platform administrator").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Admin User").length).toBeGreaterThan(0);
     expect(screen.getAllByText("admin@example.com").length).toBeGreaterThan(0);

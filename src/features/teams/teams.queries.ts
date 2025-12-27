@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   getTeamBySlugSchema,
   getTeamMembersSchema,
@@ -15,6 +16,7 @@ import {
 export const getTeam = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teams, teamMembers } = await import("~/db/schema");
@@ -45,6 +47,7 @@ export const getTeam = createServerFn({ method: "GET" })
 export const getTeamBySlug = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamBySlugSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teams, teamMembers } = await import("~/db/schema");
@@ -75,6 +78,7 @@ export const getTeamBySlug = createServerFn({ method: "GET" })
 export const listTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teams, teamMembers, user } = await import("~/db/schema");
@@ -113,6 +117,7 @@ export const listTeams = createServerFn({ method: "GET" })
 export const getUserTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }] = await Promise.all([
       import("~/features/auth/auth.queries"),
@@ -170,6 +175,7 @@ export const getUserTeams = createServerFn({ method: "GET" })
 export const getTeamMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamMembersSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teamMembers, user } = await import("~/db/schema");
@@ -230,6 +236,7 @@ export const getTeamMembers = createServerFn({ method: "GET" })
 
 export const getPendingTeamInvites = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("qc_teams");
     const [{ getCurrentUser }, { getDb }, { and, eq, sql }] = await Promise.all([
       import("~/features/auth/auth.queries"),
       import("~/db/server-helpers"),
@@ -283,6 +290,7 @@ export const getPendingTeamInvites = createServerFn({ method: "GET" }).handler(
 export const isTeamMember = createServerFn({ method: "GET" })
   .inputValidator(zod$(isTeamMemberSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teamMembers } = await import("~/db/schema");
@@ -312,6 +320,7 @@ export const isTeamMember = createServerFn({ method: "GET" })
 export const searchTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(searchTeamsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teams, teamMembers } = await import("~/db/schema");

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createReportingCycleSchema,
   createReportingTaskSchema,
@@ -36,6 +37,7 @@ const requireGlobalAdmin = async (userId: string) => {
 export const createReportingCycle = createServerFn({ method: "POST" })
   .inputValidator(zod$(createReportingCycleSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_reporting");
     const session = await requireSession();
     const actorUserId = session.user.id;
     await requireGlobalAdmin(actorUserId);
@@ -74,6 +76,7 @@ export const createReportingCycle = createServerFn({ method: "POST" })
 export const createReportingTask = createServerFn({ method: "POST" })
   .inputValidator(zod$(createReportingTaskSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_reporting");
     const session = await requireSession();
     const actorUserId = session.user.id;
     await requireGlobalAdmin(actorUserId);
@@ -225,6 +228,7 @@ export const createReportingTask = createServerFn({ method: "POST" })
 export const updateReportingSubmission = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateReportingSubmissionSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_reporting");
     const session = await requireSession();
     const actorUserId = session.user.id;
     const { getDb } = await import("~/db/server-helpers");
@@ -252,7 +256,7 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
     const isGlobalAdmin = await PermissionService.isGlobalAdmin(actorUserId);
 
     if (!isGlobalAdmin) {
-      const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
+      const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
         await import("~/lib/auth/guards/org-guard");
 
       const reviewStatuses = new Set([
@@ -264,12 +268,12 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
       const adminOnlyStatuses = new Set(["overdue", ...reviewStatuses]);
 
       if (adminOnlyStatuses.has(data.status)) {
-        await requireOrganizationMembership(
+        await requireOrganizationAccess(
           { userId: actorUserId, organizationId: existing.organizationId },
           { roles: ORG_ADMIN_ROLES },
         );
       } else {
-        await requireOrganizationMembership(
+        await requireOrganizationAccess(
           { userId: actorUserId, organizationId: existing.organizationId },
           { roles: ["owner", "admin", "reporter"] },
         );

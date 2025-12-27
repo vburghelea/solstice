@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { accountLockStatusSchema } from "./security.schemas";
 
 const getSessionUserId = async () => {
@@ -22,6 +23,7 @@ const listSecurityEventsSchema = z
 export const listSecurityEvents = createServerFn({ method: "GET" })
   .inputValidator(zod$(listSecurityEventsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_security");
     const sessionUserId = await getSessionUserId();
     const { unauthorized, forbidden } = await import("~/lib/server/errors");
     if (!sessionUserId) {
@@ -103,6 +105,7 @@ export const listSecurityEvents = createServerFn({ method: "GET" })
   });
 
 export const listAccountLocks = createServerFn({ method: "GET" }).handler(async () => {
+  await assertFeatureEnabled("sin_admin_security");
   const sessionUserId = await getSessionUserId();
   const { unauthorized, forbidden } = await import("~/lib/server/errors");
   if (!sessionUserId) {
@@ -156,6 +159,7 @@ export const listAccountLocks = createServerFn({ method: "GET" }).handler(async 
 export const getAccountLockStatus = createServerFn({ method: "GET" })
   .inputValidator(zod$(accountLockStatusSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("security_core");
     const sessionUserId = await getSessionUserId();
     const { unauthorized, forbidden } = await import("~/lib/server/errors");
     if (!sessionUserId) {

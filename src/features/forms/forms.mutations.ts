@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { JsonRecord, JsonValue } from "~/shared/lib/json";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createFormSchema,
   createFormUploadSchema,
@@ -47,8 +48,8 @@ const requireOrgAccess = async (
     return null;
   }
 
-  const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-  return requireOrganizationMembership({ userId, organizationId }, options);
+  const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+  return requireOrganizationAccess({ userId, organizationId }, options);
 };
 
 const loadFormWithAccess = async (
@@ -144,6 +145,7 @@ const insertSubmissionFiles = async (
 export const createForm = createServerFn({ method: "POST" })
   .inputValidator(zod$(createFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_forms");
     const { getDb } = await import("~/db/server-helpers");
     const { forms } = await import("~/db/schema");
     const actorUserId = await requireSessionUserId();
@@ -181,6 +183,7 @@ export const createForm = createServerFn({ method: "POST" })
 export const updateForm = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_forms");
     const { getDb } = await import("~/db/server-helpers");
     const { forms } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
@@ -231,6 +234,7 @@ export const updateForm = createServerFn({ method: "POST" })
 export const publishForm = createServerFn({ method: "POST" })
   .inputValidator(zod$(publishFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_forms");
     const { getDb } = await import("~/db/server-helpers");
     const { formVersions, forms } = await import("~/db/schema");
     const { desc, eq } = await import("drizzle-orm");
@@ -280,6 +284,7 @@ export const publishForm = createServerFn({ method: "POST" })
 export const submitForm = createServerFn({ method: "POST" })
   .inputValidator(zod$(submitFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const { getDb } = await import("~/db/server-helpers");
     const { forms, formSubmissionVersions, formSubmissions, formVersions } =
       await import("~/db/schema");
@@ -372,6 +377,7 @@ export const submitForm = createServerFn({ method: "POST" })
 export const createFormUpload = createServerFn({ method: "POST" })
   .inputValidator(zod$(createFormUploadSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const actorUserId = await requireSessionUserId();
     const form = await loadFormWithAccess(data.formId, actorUserId);
 
@@ -449,6 +455,7 @@ export const createFormUpload = createServerFn({ method: "POST" })
 export const updateFormSubmission = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateFormSubmissionSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissionVersions, formSubmissions, formVersions } =
@@ -533,6 +540,7 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
 export const reviewFormSubmission = createServerFn({ method: "POST" })
   .inputValidator(zod$(reviewFormSubmissionSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_forms");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissions } = await import("~/db/schema");

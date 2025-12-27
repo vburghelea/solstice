@@ -11,6 +11,7 @@ import { createEventInputSchema } from "~/db/schema/events.schema";
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import type { EventPaymentMetadata } from "./events.db-types";
 import {
   cancelEntireEventSchema,
@@ -50,6 +51,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
   .inputValidator(zod$(cancelEntireEventSchema))
   .handler(
     async ({ data, context }): Promise<EventOperationResult<CancelEventResult>> => {
+      await assertFeatureEnabled("qc_events");
       const clock = getClockFromContext(context);
       const now = currentTimestamp(clock);
       const nowIso = isoTimestamp(clock);
@@ -305,9 +307,8 @@ export const cancelEvent = createServerFn({ method: "POST" })
 
         if (data.notify !== false) {
           try {
-            const { sendEventCancellationNotifications } = await import(
-              "~/lib/server/notifications/events/cancellation"
-            );
+            const { sendEventCancellationNotifications } =
+              await import("~/lib/server/notifications/events/cancellation");
             await sendEventCancellationNotifications({
               db,
               event: eventRecord,
@@ -344,6 +345,7 @@ export const createEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(createEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
+    await assertFeatureEnabled("qc_events");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -435,6 +437,7 @@ export const updateEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(updateEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
+    await assertFeatureEnabled("qc_events");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -548,9 +551,8 @@ export const updateEvent = createServerFn({ method: "POST" })
   });
 
 const getSquarePaymentService = async () => {
-  const { getSquarePaymentService: loadSquareService } = await import(
-    "~/lib/payments/square"
-  );
+  const { getSquarePaymentService: loadSquareService } =
+    await import("~/lib/payments/square");
   return loadSquareService();
 };
 
@@ -565,6 +567,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationResultPayload>> => {
+      await assertFeatureEnabled("qc_events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -949,6 +952,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      await assertFeatureEnabled("qc_events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -1061,6 +1065,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      await assertFeatureEnabled("qc_events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -1171,6 +1176,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      await assertFeatureEnabled("qc_events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 

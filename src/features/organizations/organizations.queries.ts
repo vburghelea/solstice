@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   getOrganizationSchema,
   listDelegatedAccessSchema,
@@ -8,6 +10,7 @@ import {
   searchOrganizationsSchema,
 } from "./organizations.schemas";
 import type {
+  AccessibleOrganization,
   DelegatedAccessRow,
   OrganizationMemberRow,
   OrganizationSummary,
@@ -23,9 +26,12 @@ const getSessionUserId = async () => {
   return session?.user?.id ?? null;
 };
 
+const listAccessibleOrganizationsSchema = z.void().nullish();
+
 export const getOrganization = createServerFn({ method: "GET" })
   .inputValidator(zod$(getOrganizationSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_portal");
     const { getDb } = await import("~/db/server-helpers");
     const { organizations } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
@@ -43,6 +49,7 @@ export const getOrganization = createServerFn({ method: "GET" })
 export const listOrganizations = createServerFn({ method: "GET" })
   .inputValidator(zod$(listOrganizationsSchema))
   .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+    await assertFeatureEnabled("sin_portal");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -73,9 +80,21 @@ export const listOrganizations = createServerFn({ method: "GET" })
     return rows;
   });
 
+export const listAccessibleOrganizations = createServerFn({ method: "GET" })
+  .inputValidator(zod$(listAccessibleOrganizationsSchema))
+  .handler(async (): Promise<AccessibleOrganization[]> => {
+    await assertFeatureEnabled("sin_portal");
+    const userId = await getSessionUserId();
+    if (!userId) return [];
+
+    const { listAccessibleOrganizationsForUser } = await import("./organizations.access");
+    return listAccessibleOrganizationsForUser(userId);
+  });
+
 export const searchOrganizations = createServerFn({ method: "GET" })
   .inputValidator(zod$(searchOrganizationsSchema))
   .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+    await assertFeatureEnabled("sin_admin_orgs");
     const { getDb } = await import("~/db/server-helpers");
     const { organizations } = await import("~/db/schema");
     const { ilike } = await import("drizzle-orm");
@@ -99,9 +118,45 @@ export const searchOrganizations = createServerFn({ method: "GET" })
     return rows;
   });
 
+/**
+ * Admin-only query to list all organizations (not filtered by membership).
+ * Requires sin_admin_orgs feature flag.
+ */
+export const listAllOrganizations = createServerFn({ method: "GET" })
+  .inputValidator(zod$(listOrganizationsSchema))
+  .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+    await assertFeatureEnabled("sin_admin_orgs");
+
+    const { getDb } = await import("~/db/server-helpers");
+    const { organizations } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const conditions = data?.includeArchived
+      ? undefined
+      : eq(organizations.status, "active");
+
+    const rows = await db
+      .select({
+        id: organizations.id,
+        name: organizations.name,
+        slug: organizations.slug,
+        type: organizations.type,
+        status: organizations.status,
+        parentOrgId: organizations.parentOrgId,
+        createdAt: organizations.createdAt,
+        updatedAt: organizations.updatedAt,
+      })
+      .from(organizations)
+      .where(conditions);
+
+    return rows;
+  });
+
 export const listOrganizationMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(listOrganizationMembersSchema))
   .handler(async ({ data }): Promise<OrganizationMemberRow[]> => {
+    await assertFeatureEnabled("sin_admin_orgs");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -149,6 +204,7 @@ export const listOrganizationMembers = createServerFn({ method: "GET" })
 export const listDelegatedAccess = createServerFn({ method: "GET" })
   .inputValidator(zod$(listDelegatedAccessSchema))
   .handler(async ({ data }): Promise<DelegatedAccessRow[]> => {
+    await assertFeatureEnabled("sin_admin_orgs");
     const userId = await getSessionUserId();
     if (!userId) return [];
 

@@ -14,6 +14,7 @@ export const env = createEnv({
     VITE_ENABLE_SENTRY: z.coerce.boolean().prefault(false),
     VITE_POSTHOG_KEY: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
+    VITE_TENANT_KEY: z.enum(["qc", "viasport"]).optional(),
   },
   runtimeEnv: import.meta.env,
   emptyStringAsUndefined: true,

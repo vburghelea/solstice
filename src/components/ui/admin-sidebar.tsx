@@ -4,10 +4,11 @@ import { LogOut } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { authQueryKey } from "~/features/auth/auth.queries";
-import { ADMIN_PRIMARY_NAV, ADMIN_SECONDARY_NAV } from "~/features/layouts/admin-nav";
-import { userHasRole } from "~/features/roles/permission.service";
+import { getAdminNav } from "~/features/layouts/admin-nav";
 import { recordSecurityEvent } from "~/features/security/security.mutations";
 import { auth } from "~/lib/auth-client";
+import { getBrand } from "~/tenant";
+import { filterNavItems } from "~/tenant/feature-gates";
 
 interface AdminSidebarProps {
   onNavigation?: () => void;
@@ -20,23 +21,9 @@ export function AdminSidebar({ onNavigation }: AdminSidebarProps = {}) {
   const navigate = useNavigate();
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
+  const brand = getBrand();
 
-  // Filter sidebar items based on user roles
-  const sidebarItems = useMemo(
-    () =>
-      ADMIN_PRIMARY_NAV.filter((item) => {
-        if (!item.roles || item.roles.length === 0) {
-          return true;
-        }
-        if (!user) {
-          return false;
-        }
-        return item.roles.some((roleName) => userHasRole(user, roleName));
-      }),
-    [user],
-  );
-
-  const secondaryItems = ADMIN_SECONDARY_NAV;
+  const sidebarItems = useMemo(() => filterNavItems(getAdminNav(), { user }), [user]);
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -69,8 +56,8 @@ export function AdminSidebar({ onNavigation }: AdminSidebarProps = {}) {
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
         <Link to="/" className="transition-opacity hover:opacity-80">
-          <h1 className="text-admin-text-primary text-xl font-bold">Quadball Canada</h1>
-          <p className="text-admin-text-secondary text-sm">Dashboard</p>
+          <h1 className="text-admin-text-primary text-xl font-bold">{brand.name}</h1>
+          <p className="text-admin-text-secondary text-sm">{brand.adminSubtitle}</p>
         </Link>
       </div>
       <nav className="flex-1 space-y-2 px-4 py-2">
@@ -96,26 +83,6 @@ export function AdminSidebar({ onNavigation }: AdminSidebarProps = {}) {
         })}
       </nav>
       <div className="space-y-2 border-t border-gray-200 px-4 py-4">
-        {secondaryItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="nav-item"
-              onClick={onNavigation}
-              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
-              activeProps={{
-                className: "nav-item-active",
-                "aria-current": "page",
-                "data-status": "active",
-              }}
-            >
-              <Icon className="pointer-events-none h-5 w-5" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
         <button
           type="button"
           onClick={handleLogout}

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getTenantConfig } from "~/tenant";
 import { isAnyAdmin, PermissionService, userHasRole } from "../permission.service";
 
 // Mock the database
@@ -13,6 +14,11 @@ const mockDbInstance = {
 vi.mock("~/db", () => ({
   db: vi.fn(() => mockDbInstance),
 }));
+
+const tenantConfig = getTenantConfig();
+const platformRoleName = tenantConfig.admin.globalRoleNames[0];
+const tenantRoleName =
+  tenantConfig.admin.globalRoleNames[1] ?? tenantConfig.admin.globalRoleNames[0];
 
 describe("PermissionService", () => {
   beforeEach(() => {
@@ -30,16 +36,16 @@ describe("PermissionService", () => {
   });
 
   describe("isGlobalAdmin", () => {
-    it("should return true for Solstice Admin", async () => {
-      const mockResult = [{ id: "role-1", name: "Solstice Admin" }];
+    it("should return true for platform admin role", async () => {
+      const mockResult = [{ id: "role-1", name: platformRoleName }];
       mockDbInstance.limit.mockResolvedValueOnce(mockResult);
 
       const result = await PermissionService.isGlobalAdmin("user-123");
       expect(result).toBe(true);
     });
 
-    it("should return true for Quadball Canada Admin", async () => {
-      const mockResult = [{ id: "role-2", name: "Quadball Canada Admin" }];
+    it("should return true for tenant admin role", async () => {
+      const mockResult = [{ id: "role-2", name: tenantRoleName }];
       mockDbInstance.limit.mockResolvedValueOnce(mockResult);
 
       const result = await PermissionService.isGlobalAdmin("user-123");
@@ -99,7 +105,7 @@ describe("PermissionService", () => {
           notes: null,
           role: {
             id: "role-1",
-            name: "Solstice Admin",
+            name: platformRoleName,
             description: "Platform admin",
             permissions: { "*": true },
           },
@@ -120,7 +126,7 @@ describe("Client-side helpers", () => {
     const mockUser = {
       roles: [
         {
-          role: { name: "Solstice Admin" },
+          role: { name: platformRoleName },
           teamId: null,
           eventId: null,
         },
@@ -133,7 +139,7 @@ describe("Client-side helpers", () => {
     };
 
     it("should return true when user has global role", () => {
-      expect(userHasRole(mockUser, "Solstice Admin")).toBe(true);
+      expect(userHasRole(mockUser, platformRoleName)).toBe(true);
     });
 
     it("should return true when user has team-specific role", () => {
@@ -149,8 +155,8 @@ describe("Client-side helpers", () => {
     });
 
     it("should return false when user has no roles", () => {
-      expect(userHasRole({ roles: [] }, "Solstice Admin")).toBe(false);
-      expect(userHasRole({}, "Solstice Admin")).toBe(false);
+      expect(userHasRole({ roles: [] }, platformRoleName)).toBe(false);
+      expect(userHasRole({}, platformRoleName)).toBe(false);
     });
   });
 

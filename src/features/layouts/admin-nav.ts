@@ -1,51 +1,25 @@
-import type { LucideIcon } from "lucide-react";
-import {
-  BarChart3,
-  Building2,
-  Calendar,
-  Home,
-  Settings,
-  ShieldCheck,
-  User,
-  UserCheck,
-  Users,
-} from "lucide-react";
-import { GLOBAL_ADMIN_ROLE_NAMES } from "~/lib/auth/utils/admin-check";
+import { Building2, Home, ShieldCheck } from "lucide-react";
+import type { NavItem } from "./nav.types";
 
-export type AdminNavItem = {
-  label: string;
-  to: string;
-  icon: LucideIcon;
-  exact?: boolean;
-  roles?: string[];
-};
-
-export const ADMIN_PRIMARY_NAV: AdminNavItem[] = [
-  { icon: Home, label: "Dashboard", to: "/dashboard", exact: true },
-  { icon: Users, label: "Teams", to: "/dashboard/teams" },
-  { icon: Calendar, label: "Events", to: "/dashboard/events" },
-  { icon: UserCheck, label: "Members", to: "/dashboard/members" },
+export const getAdminNav = (): NavItem[] => [
   {
-    icon: BarChart3,
-    label: "Reports",
-    to: "/dashboard/reports",
-    roles: GLOBAL_ADMIN_ROLE_NAMES,
+    icon: Home,
+    label: "Admin Home",
+    to: "/dashboard/admin",
+    exact: true,
+    requiresGlobalAdmin: true,
   },
   {
     icon: ShieldCheck,
     label: "Roles",
     to: "/dashboard/admin/roles",
-    roles: GLOBAL_ADMIN_ROLE_NAMES,
+    requiresGlobalAdmin: true,
   },
   {
     icon: Building2,
     label: "SIN Admin",
     to: "/dashboard/admin/sin",
-    roles: GLOBAL_ADMIN_ROLE_NAMES,
+    requiresGlobalAdmin: true,
+    feature: "sin_admin",
   },
-];
-
-export const ADMIN_SECONDARY_NAV: AdminNavItem[] = [
-  { icon: User, label: "Profile", to: "/dashboard/profile", exact: true },
-  { icon: Settings, label: "Settings", to: "/dashboard/settings", exact: true },
 ];

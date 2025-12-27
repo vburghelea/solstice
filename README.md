@@ -154,8 +154,9 @@ The application is deployed to AWS via SST:
 # Login to AWS SSO
 aws sso login --profile techprod
 
-# Deploy to production
-AWS_PROFILE=techprod npx sst deploy --stage production
+# Deploy to production (canonical stages)
+AWS_PROFILE=techprod npx sst deploy --stage qc-prod
+AWS_PROFILE=techprod npx sst deploy --stage sin-prod
 ```
 
 - **Production URL**: https://d200ljtib0dq8n.cloudfront.net

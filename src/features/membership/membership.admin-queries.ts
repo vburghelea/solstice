@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import type { MembershipOperationResult } from "./membership.types";
 
 const getAllMembershipsSchema = z.object({
@@ -29,6 +30,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
   .inputValidator(zod$(getAllMembershipsSchema))
   .handler(
     async ({ data }): Promise<MembershipOperationResult<MembershipReportRow[]>> => {
+      await assertFeatureEnabled("qc_membership");
       try {
         // Import server-only modules inside the handler
         const [{ getDb }, { getAuth }] = await Promise.all([

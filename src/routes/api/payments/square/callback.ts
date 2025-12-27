@@ -8,11 +8,13 @@ import {
   membershipTypes,
 } from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/api/payments/square/callback")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        await assertFeatureEnabled("qc_payments_square");
         try {
           const url = new URL(request.url);
           const params = url.searchParams;
@@ -388,9 +390,8 @@ export const Route = createFileRoute("/api/payments/square/callback")({
             });
           }
 
-          const { finalizeMembershipForSession } = await import(
-            "~/features/membership/membership.finalize"
-          );
+          const { finalizeMembershipForSession } =
+            await import("~/features/membership/membership.finalize");
 
           const finalizeTimestamp = new Date();
           const finalizeResult = await finalizeMembershipForSession({
@@ -416,9 +417,8 @@ export const Route = createFileRoute("/api/payments/square/callback")({
 
             if (membershipUser?.email) {
               try {
-                const { sendMembershipPurchaseReceipt } = await import(
-                  "~/lib/email/sendgrid"
-                );
+                const { sendMembershipPurchaseReceipt } =
+                  await import("~/lib/email/sendgrid");
 
                 await sendMembershipPurchaseReceipt({
                   to: {

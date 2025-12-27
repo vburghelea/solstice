@@ -11,6 +11,7 @@ import {
 import { user } from "~/db/schema/auth.schema";
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getSquarePaymentService } from "~/lib/payments/square";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 async function finalizeMembershipFromWebhook({
   paymentId,
@@ -349,6 +350,7 @@ export const Route = createFileRoute("/api/webhooks/square")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        await assertFeatureEnabled("qc_payments_square");
         try {
           // Get the raw body for signature verification
           const body = await request.text();

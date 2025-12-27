@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { getMembershipTypeSchema } from "./membership.schemas";
 import type {
   MembershipOperationResult,
@@ -14,6 +15,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
   async (): Promise<
     MembershipOperationResult<import("./membership.types").MembershipType[]>
   > => {
+    await assertFeatureEnabled("qc_membership");
     try {
       // Import server-only modules inside the handler
       const { getDb } = await import("~/db/server-helpers");
@@ -60,6 +62,7 @@ export const getMembershipType = createServerFn({ method: "GET" })
     }): Promise<
       MembershipOperationResult<import("./membership.types").MembershipType>
     > => {
+      await assertFeatureEnabled("qc_membership");
       try {
         // Import server-only modules inside the handler
         const { getDb } = await import("~/db/server-helpers");
@@ -112,6 +115,7 @@ export const getMembershipType = createServerFn({ method: "GET" })
  */
 export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<MembershipOperationResult<MembershipStatus>> => {
+    await assertFeatureEnabled("qc_membership");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([

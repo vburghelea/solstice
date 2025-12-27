@@ -2,6 +2,7 @@ import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 const getDb = createServerOnlyFn(async () => {
   const { getDb } = await import("~/db/server-helpers");
@@ -15,6 +16,7 @@ const clearUserTeamsSchema = z.object({
 export const clearUserTeamsForTesting = createServerFn({ method: "POST" })
   .inputValidator(zod$(clearUserTeamsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("qc_teams");
     // Only allow in test environments
     if (process.env["NODE_ENV"] === "production" && !process.env["E2E_TEST_EMAIL"]) {
       throw new Error("This function is only available in test environments");

@@ -4,6 +4,7 @@ import { membershipPaymentSessions, memberships, membershipTypes } from "~/db/sc
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import type { MembershipMetadata } from "./membership.db-types";
 import {
   confirmMembershipPurchaseSchema,
@@ -52,6 +53,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
+      await assertFeatureEnabled("qc_membership");
       try {
         // Import server-only modules inside the handler
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -180,6 +182,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(confirmMembershipPurchaseSchema))
   .handler(async ({ data, context }): Promise<MembershipOperationResult<Membership>> => {
+    await assertFeatureEnabled("qc_membership");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);

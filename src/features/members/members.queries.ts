@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { listMembersSchema } from "./members.schemas";
 import type {
   MemberDirectoryMember,
@@ -63,6 +64,7 @@ function parsePrivacySettings(
 export const listMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(listMembersSchema))
   .handler(async ({ data }): Promise<ListMembersResult> => {
+    await assertFeatureEnabled("qc_members_directory");
     try {
       const searchTerm = data.search?.trim();
       const limit = Math.min(100, Math.max(1, data.limit ?? 50));
@@ -87,9 +89,8 @@ export const listMembers = createServerFn({ method: "GET" })
         };
       }
 
-      const { user, teamMembers, teams, memberships, membershipTypes } = await import(
-        "~/db/schema"
-      );
+      const { user, teamMembers, teams, memberships, membershipTypes } =
+        await import("~/db/schema");
       const { defaultPrivacySettings } = await import("~/features/profile/profile.types");
       const { and, eq, inArray, sql } = await import("drizzle-orm");
 

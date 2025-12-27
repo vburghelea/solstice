@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createNotificationSchema,
   createNotificationTemplateSchema,
@@ -24,6 +25,7 @@ const getSessionUserId = async () => {
 export const markNotificationRead = createServerFn({ method: "POST" })
   .inputValidator(zod$(markNotificationReadSchema))
   .handler(async ({ data }): Promise<NotificationRow | null> => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -46,6 +48,7 @@ export const markNotificationRead = createServerFn({ method: "POST" })
 export const dismissNotification = createServerFn({ method: "POST" })
   .inputValidator(zod$(dismissNotificationSchema))
   .handler(async ({ data }): Promise<NotificationRow | null> => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -68,6 +71,7 @@ export const dismissNotification = createServerFn({ method: "POST" })
 export const updateNotificationPreferences = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateNotificationPreferencesSchema))
   .handler(async ({ data }): Promise<NotificationPreferenceRow | null> => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -118,6 +122,7 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
 export const createNotification = createServerFn({ method: "POST" })
   .inputValidator(zod$(createNotificationSchema))
   .handler(async ({ data }): Promise<NotificationRow | null> => {
+    await assertFeatureEnabled("notifications_core");
     const { getDb } = await import("~/db/server-helpers");
     const { notifications } = await import("~/db/schema");
     const db = await getDb();
@@ -154,6 +159,7 @@ export const createNotification = createServerFn({ method: "POST" })
 export const createNotificationTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(createNotificationTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_notifications");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -189,6 +195,7 @@ export const createNotificationTemplate = createServerFn({ method: "POST" })
 export const updateNotificationTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateNotificationTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_notifications");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -218,6 +225,7 @@ export const updateNotificationTemplate = createServerFn({ method: "POST" })
 export const deleteNotificationTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(deleteNotificationTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_notifications");
     const userId = await getSessionUserId();
     if (!userId) return null;
 
@@ -240,6 +248,7 @@ export const deleteNotificationTemplate = createServerFn({ method: "POST" })
 export const scheduleNotification = createServerFn({ method: "POST" })
   .inputValidator(zod$(scheduleNotificationSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_notifications");
     const userId = await getSessionUserId();
     if (!userId) return null;
 

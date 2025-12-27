@@ -4,6 +4,7 @@ import { jsonRecordSchema } from "~/shared/lib/json";
 export const organizationTypeSchema = z.enum([
   "governing_body",
   "pso",
+  "league",
   "club",
   "affiliate",
 ]);
@@ -127,3 +128,8 @@ export const revokeDelegatedAccessSchema = z.object({
   notes: z.string().trim().max(500).optional(),
 });
 export type RevokeDelegatedAccessInput = z.infer<typeof revokeDelegatedAccessSchema>;
+
+export const setActiveOrganizationSchema = z.object({
+  organizationId: z.uuid().nullable(),
+});
+export type SetActiveOrganizationInput = z.infer<typeof setActiveOrganizationSchema>;

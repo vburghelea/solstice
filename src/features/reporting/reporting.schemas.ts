@@ -21,6 +21,7 @@ export const reportingSubmissionStatusSchema = z.enum([
 export const reportingOrganizationTypeSchema = z.enum([
   "governing_body",
   "pso",
+  "league",
   "club",
   "affiliate",
 ]);

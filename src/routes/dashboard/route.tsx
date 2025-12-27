@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminLayout } from "~/features/layouts/admin-layout";
+import { AppLayout } from "~/features/layouts/app-layout";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 
 export const Route = createFileRoute("/dashboard")({
@@ -12,5 +12,5 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardLayout() {
-  return <AdminLayout />;
+  return <AppLayout />;
 }

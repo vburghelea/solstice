@@ -71,6 +71,7 @@ export const env = createEnv({
     // Other
     COOKIE_DOMAIN: z.string().optional(),
     NODE_ENV: z.enum(["development", "production", "test"]).prefault("development"),
+    TENANT_KEY: z.enum(["qc", "viasport"]).prefault("qc"),
 
     // SST/AWS Lambda
     SST_STAGE: z.string().optional(),
@@ -80,6 +81,7 @@ export const env = createEnv({
 
     // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
     VITE_BASE_URL: z.url().optional(),
+    VITE_TENANT_KEY: z.enum(["qc", "viasport"]).optional(),
   },
   // Use process.env since we've just loaded .env
   runtimeEnv: process.env,

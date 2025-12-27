@@ -120,7 +120,8 @@ DATABASE_URL_UNPOOLED="postgresql://user:pass@direct.host/db"
 
 ```bash
 # Open tunnel to RDS via bastion host
-AWS_PROFILE=techprod npx sst tunnel --stage production
+AWS_PROFILE=techprod npx sst tunnel --stage qc-prod
+AWS_PROFILE=techprod npx sst tunnel --stage sin-prod
 
 # In another terminal, run migrations
 DATABASE_URL="postgres://..." pnpm db migrate
@@ -130,7 +131,8 @@ DATABASE_URL="postgres://..." pnpm db migrate
 
 ```bash
 # Run drizzle-kit with SST context
-AWS_PROFILE=techprod npx sst shell --stage production -- pnpm db migrate
+AWS_PROFILE=techprod npx sst shell --stage qc-prod -- pnpm db migrate
+AWS_PROFILE=techprod npx sst shell --stage sin-prod -- pnpm db migrate
 ```
 
 ### Local Development

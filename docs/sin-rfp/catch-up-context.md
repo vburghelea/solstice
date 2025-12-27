@@ -224,7 +224,7 @@ Also standard app secrets (Better Auth, OAuth, Square) from SST secrets.
    - If needed, `mcp__playwright__browser_close`
    - Navigate to `/dashboard/admin/sin` and verify panels
 4. SST deploy to techdev
-   - `AWS_PROFILE=techdev npx sst deploy --stage dev`
+   - `AWS_PROFILE=techdev npx sst deploy --stage sin-dev`
 
 ---
 

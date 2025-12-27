@@ -359,7 +359,7 @@ async function normalizePayload(
   return payload;
 }
 
-function DynamicFormRenderer(props: {
+export function DynamicFormRenderer(props: {
   formId: string;
   organizationId: string | null;
   definition: FormDefinition;

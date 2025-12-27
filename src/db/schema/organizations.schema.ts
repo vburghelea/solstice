@@ -16,6 +16,7 @@ import { user } from "./auth.schema";
 export const organizationTypeEnum = pgEnum("organization_type", [
   "governing_body",
   "pso",
+  "league",
   "club",
   "affiliate",
 ]);

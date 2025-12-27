@@ -34,12 +34,18 @@ import {
   type MemberDirectoryResponse,
 } from "~/features/members";
 import { exportToCSV, formatDate } from "~/lib/utils/csv-export";
+import { getBrand } from "~/tenant";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/members")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_members_directory");
+  },
   component: MembersPage,
 });
 
 function MembersPage() {
+  const brand = getBrand();
   const [searchTerm, setSearchTerm] = useState("");
   const deferredSearch = useDeferredValue(searchTerm);
   const [selectedMember, setSelectedMember] = useState<MemberDirectoryMember | null>(
@@ -243,8 +249,8 @@ function MembersPage() {
           Members Directory
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base">
-          Browse Quadball Canada members, check membership status, and find players open
-          to team invitations.
+          Browse {brand.name} members, check membership status, and find players open to
+          team invitations.
         </p>
       </div>
 

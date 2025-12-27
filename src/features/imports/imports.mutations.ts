@@ -4,6 +4,7 @@ import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.uti
 import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { JsonRecord } from "~/shared/lib/json";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createImportJobSchema,
   createImportUploadSchema,
@@ -31,13 +32,14 @@ const requireSessionUserId = async () => {
 };
 
 const requireOrgAccess = async (userId: string, organizationId: string) => {
-  const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-  return requireOrganizationMembership({ userId, organizationId });
+  const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+  return requireOrganizationAccess({ userId, organizationId });
 };
 
 export const createImportJob = createServerFn({ method: "POST" })
   .inputValidator(zod$(createImportJobSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     await requireOrgAccess(actorUserId, data.organizationId);
     const { getDb } = await import("~/db/server-helpers");
@@ -77,6 +79,7 @@ export const createImportJob = createServerFn({ method: "POST" })
 export const updateImportJobStatus = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateImportJobStatusSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importJobs } = await import("~/db/schema");
@@ -111,6 +114,7 @@ export const updateImportJobStatus = createServerFn({ method: "POST" })
 export const createMappingTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(createMappingTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     if (data.organizationId) {
       await requireOrgAccess(actorUserId, data.organizationId);
@@ -143,6 +147,7 @@ export const createMappingTemplate = createServerFn({ method: "POST" })
 export const updateMappingTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateMappingTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importMappingTemplates } = await import("~/db/schema");
@@ -186,6 +191,7 @@ export const updateMappingTemplate = createServerFn({ method: "POST" })
 export const deleteMappingTemplate = createServerFn({ method: "POST" })
   .inputValidator(zod$(deleteMappingTemplateSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importMappingTemplates } = await import("~/db/schema");
@@ -221,6 +227,7 @@ export const deleteMappingTemplate = createServerFn({ method: "POST" })
 export const createImportUpload = createServerFn({ method: "POST" })
   .inputValidator(zod$(createImportUploadSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     await requireOrgAccess(actorUserId, data.organizationId);
 
@@ -259,6 +266,7 @@ export const createImportUpload = createServerFn({ method: "POST" })
 export const runInteractiveImport = createServerFn({ method: "POST" })
   .inputValidator(zod$(runInteractiveImportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const {
@@ -436,6 +444,7 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
 export const runBatchImport = createServerFn({ method: "POST" })
   .inputValidator(zod$(runBatchImportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { runBatchImportJob } = await import("~/lib/imports/batch-runner");
 
@@ -445,6 +454,7 @@ export const runBatchImport = createServerFn({ method: "POST" })
 export const rollbackImportJob = createServerFn({ method: "POST" })
   .inputValidator(zod$(rollbackImportJobSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissions, importJobs } = await import("~/db/schema");

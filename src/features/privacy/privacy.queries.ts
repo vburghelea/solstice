@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { getPrivacyExportUrlSchema, policyTypeSchema } from "./privacy.schemas";
 
 const getSessionUserId = async () => {
@@ -12,6 +13,7 @@ const getSessionUserId = async () => {
 };
 
 export const listPolicyDocuments = createServerFn({ method: "GET" }).handler(async () => {
+  await assertFeatureEnabled("security_core");
   const { getDb } = await import("~/db/server-helpers");
   const { policyDocuments } = await import("~/db/schema");
   const { desc } = await import("drizzle-orm");
@@ -23,6 +25,7 @@ export const listPolicyDocuments = createServerFn({ method: "GET" }).handler(asy
 export const getLatestPolicyDocument = createServerFn({ method: "GET" })
   .inputValidator(zod$(policyTypeSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("security_core");
     const { getDb } = await import("~/db/server-helpers");
     const { policyDocuments } = await import("~/db/schema");
     const { desc, eq } = await import("drizzle-orm");
@@ -40,6 +43,7 @@ export const getLatestPolicyDocument = createServerFn({ method: "GET" })
 
 export const listUserPolicyAcceptances = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("security_core");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -56,6 +60,7 @@ export const listUserPolicyAcceptances = createServerFn({ method: "GET" }).handl
 );
 
 export const listPrivacyRequests = createServerFn({ method: "GET" }).handler(async () => {
+  await assertFeatureEnabled("security_core");
   const userId = await getSessionUserId();
   if (!userId) return [];
 
@@ -73,6 +78,7 @@ export const listPrivacyRequests = createServerFn({ method: "GET" }).handler(asy
 
 export const listAllPrivacyRequests = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -90,6 +96,7 @@ export const listAllPrivacyRequests = createServerFn({ method: "GET" }).handler(
 
 export const listRetentionPolicies = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -108,6 +115,7 @@ export const listRetentionPolicies = createServerFn({ method: "GET" }).handler(
 export const getPrivacyExportDownloadUrl = createServerFn({ method: "GET" })
   .inputValidator(zod$(getPrivacyExportUrlSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const userId = await getSessionUserId();
     if (!userId) return null;
 

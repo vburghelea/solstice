@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   acceptPolicySchema,
   applyPrivacyErasureSchema,
@@ -22,6 +23,7 @@ const getSessionUser = async () => {
 export const createPolicyDocument = createServerFn({ method: "POST" })
   .inputValidator(zod$(createPolicyDocumentSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -58,6 +60,7 @@ export const createPolicyDocument = createServerFn({ method: "POST" })
 export const acceptPolicy = createServerFn({ method: "POST" })
   .inputValidator(zod$(acceptPolicySchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("security_core");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -97,6 +100,7 @@ export const acceptPolicy = createServerFn({ method: "POST" })
 export const createPrivacyRequest = createServerFn({ method: "POST" })
   .inputValidator(zod$(createPrivacyRequestSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("security_core");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -129,6 +133,7 @@ export const createPrivacyRequest = createServerFn({ method: "POST" })
 export const updatePrivacyRequest = createServerFn({ method: "POST" })
   .inputValidator(zod$(updatePrivacyRequestSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -166,6 +171,7 @@ export const updatePrivacyRequest = createServerFn({ method: "POST" })
 export const upsertRetentionPolicy = createServerFn({ method: "POST" })
   .inputValidator(zod$(upsertRetentionPolicySchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -212,6 +218,7 @@ export const upsertRetentionPolicy = createServerFn({ method: "POST" })
 export const generatePrivacyExport = createServerFn({ method: "POST" })
   .inputValidator(zod$(generatePrivacyExportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -451,6 +458,7 @@ export const generatePrivacyExport = createServerFn({ method: "POST" })
 export const applyPrivacyErasure = createServerFn({ method: "POST" })
   .inputValidator(zod$(applyPrivacyErasureSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_privacy");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 

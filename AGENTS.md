@@ -30,7 +30,7 @@
 - MCP Playwright browser tool is available for both local and external URLs; use it to verify UI flows when needed.
 
 - Read Better Auth docs at https://www.better-auth.com/llms.txt when working with auth
-- Always run `pnpm lint` and `pnpm check-types` before completing tasks
+- Always run `pnpm lint` and `pnpm check-types` before completing long tasks (not in regular conversation)
 
 ## TanStack Start Server Functions
 

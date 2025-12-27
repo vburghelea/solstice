@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/card";
 import type { MembershipStatus } from "~/features/membership/membership.types";
 import { isAnyAdmin } from "~/features/roles/permission.service";
+import { getBrand } from "~/tenant";
 
 // Types for the dashboard data
 interface ProfileStatus {
@@ -94,6 +95,7 @@ export function MemberDashboard({
   pendingInvites,
   upcomingEvents,
 }: MemberDashboardProps) {
+  const brand = getBrand();
   const isAdmin = isAnyAdmin(user);
 
   return (
@@ -103,6 +105,7 @@ export function MemberDashboard({
         <h1 className="text-3xl font-bold tracking-tight">
           Welcome back, {user.name || "Member"}!
         </h1>
+        <p className="text-muted-foreground mt-2 text-sm">{brand.name} member overview</p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {membershipStatus?.hasMembership ? (
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">

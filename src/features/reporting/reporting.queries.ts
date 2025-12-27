@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { reportingSubmissionStatusSchema } from "./reporting.schemas";
 
 const getSessionUserId = async () => {
@@ -33,6 +34,7 @@ const listReportingSubmissionHistorySchema = z.object({
 });
 
 export const listReportingCycles = createServerFn({ method: "GET" }).handler(async () => {
+  await assertFeatureEnabled("sin_reporting");
   const { getDb } = await import("~/db/server-helpers");
   const { reportingCycles } = await import("~/db/schema");
   const { desc } = await import("drizzle-orm");
@@ -44,6 +46,7 @@ export const listReportingCycles = createServerFn({ method: "GET" }).handler(asy
 export const listReportingTasks = createServerFn({ method: "GET" })
   .inputValidator(zod$(listReportingTasksSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_reporting");
     const { getDb } = await import("~/db/server-helpers");
     const { reportingTasks } = await import("~/db/schema");
     const { and, eq } = await import("drizzle-orm");
@@ -58,9 +61,8 @@ export const listReportingTasks = createServerFn({ method: "GET" })
     if (data.organizationId) {
       const userId = await getSessionUserId();
       if (userId) {
-        const { requireOrganizationMembership } =
-          await import("~/lib/auth/guards/org-guard");
-        await requireOrganizationMembership({
+        const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+        await requireOrganizationAccess({
           userId,
           organizationId: data.organizationId,
         });
@@ -83,15 +85,15 @@ export const listReportingSubmissions = createServerFn({ method: "GET" })
     ),
   )
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_reporting");
     const { getDb } = await import("~/db/server-helpers");
     const { reportingSubmissions } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
 
     const userId = await getSessionUserId();
     if (userId) {
-      const { requireOrganizationMembership } =
-        await import("~/lib/auth/guards/org-guard");
-      await requireOrganizationMembership({
+      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+      await requireOrganizationAccess({
         userId,
         organizationId: data.organizationId,
       });
@@ -107,6 +109,7 @@ export const listReportingSubmissions = createServerFn({ method: "GET" })
 export const listReportingOverview = createServerFn({ method: "GET" })
   .inputValidator(zod$(listReportingOverviewSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_reporting");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -126,9 +129,8 @@ export const listReportingOverview = createServerFn({ method: "GET" })
     const isAdmin = await PermissionService.isGlobalAdmin(userId);
 
     if (data.organizationId) {
-      const { requireOrganizationMembership } =
-        await import("~/lib/auth/guards/org-guard");
-      await requireOrganizationMembership({
+      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+      await requireOrganizationAccess({
         userId,
         organizationId: data.organizationId,
       });
@@ -181,6 +183,7 @@ export const listReportingOverview = createServerFn({ method: "GET" })
 export const listReportingSubmissionHistory = createServerFn({ method: "GET" })
   .inputValidator(zod$(listReportingSubmissionHistorySchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_reporting");
     const userId = await getSessionUserId();
     if (!userId) return [];
 

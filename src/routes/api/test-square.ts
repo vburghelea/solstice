@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { debugGuard } from "~/lib/server/debug-guard";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/api/test-square")({
   server: {
     handlers: {
       GET: async () => {
+        await assertFeatureEnabled("qc_payments_square");
         // Block access in production - returns 404
         const guardResponse = debugGuard();
         if (guardResponse) return guardResponse;

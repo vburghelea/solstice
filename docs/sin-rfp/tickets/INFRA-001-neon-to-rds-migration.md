@@ -265,12 +265,14 @@ export default defineConfig({
 
 ### Phase 2: Deploy Dev Environment (Week 1)
 
+Use the `sin-*` stages for viaSport stacks.
+
 ```bash
 # Deploy dev stage with RDS
-AWS_PROFILE=techprod npx sst deploy --stage dev
+AWS_PROFILE=techdev npx sst deploy --stage qc-dev
 
 # Verify connection
-AWS_PROFILE=techprod npx sst shell --stage dev
+AWS_PROFILE=techdev npx sst shell --stage qc-dev
 # Then in shell: node -e "console.log(Resource.Database)"
 ```
 
@@ -285,7 +287,7 @@ AWS_PROFILE=techprod npx sst shell --stage dev
 
 ```bash
 # Deploy perf stage on demand for stress tests
-AWS_PROFILE=techprod npx sst deploy --stage perf
+AWS_PROFILE=techdev npx sst deploy --stage qc-perf
 ```
 
 **Verification:**
@@ -310,7 +312,7 @@ pg_dump --no-owner --no-privileges \
 
 ```bash
 # Connect via SST tunnel or bastion
-AWS_PROFILE=techprod npx sst tunnel --stage production
+AWS_PROFILE=techprod npx sst tunnel --stage qc-prod
 
 # In another terminal, restore to RDS
 pg_restore --no-owner --no-privileges \
@@ -346,7 +348,8 @@ WHERE contype = 'f' AND NOT convalidated;
 
 ```bash
 # Deploy production with RDS
-AWS_PROFILE=techprod npx sst deploy --stage production
+AWS_PROFILE=techprod npx sst deploy --stage qc-prod
+AWS_PROFILE=techprod npx sst deploy --stage sin-prod
 
 # Verify deployment
 curl -s https://your-cloudfront-url/api/health

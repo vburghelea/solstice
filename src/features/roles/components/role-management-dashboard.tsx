@@ -59,6 +59,7 @@ import type {
   RoleSummary,
   RoleUserSearchResult,
 } from "~/features/roles/roles.types";
+import { getBrand } from "~/tenant";
 
 function useRoleManagementData() {
   return useQuery<RoleManagementData>({
@@ -146,6 +147,7 @@ function useRoleAssignmentForm(
 }
 
 export function RoleManagementDashboard() {
+  const brand = getBrand();
   const queryClient = useQueryClient();
   const { requestStepUp } = useStepUpPrompt();
   const handleStepUpError = useCallback(
@@ -300,7 +302,7 @@ export function RoleManagementDashboard() {
               Role Management
             </h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-              Assign and revoke administrator access across Solstice and teams.
+              Assign and revoke administrator access across {brand.name} and teams.
             </p>
           </div>
           <Dialog open={assignDialogOpen} onOpenChange={handleDialogOpenChange}>

@@ -1,0 +1,85 @@
+import {
+  BarChart3,
+  Bell,
+  Building2,
+  FileText,
+  Home,
+  LineChart,
+  ShieldCheck,
+  UploadCloud,
+} from "lucide-react";
+import type { NavItem } from "./nav.types";
+
+export const getSinAdminNav = (): NavItem[] => [
+  {
+    icon: Home,
+    label: "Overview",
+    to: "/dashboard/admin/sin",
+    exact: true,
+    requiresGlobalAdmin: true,
+    feature: "sin_admin",
+  },
+  {
+    icon: Building2,
+    label: "Organizations",
+    to: "/dashboard/admin/sin/organizations",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_orgs",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Audit",
+    to: "/dashboard/admin/sin/audit",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_audit",
+  },
+  {
+    icon: Bell,
+    label: "Notifications",
+    to: "/dashboard/admin/sin/notifications",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_notifications",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Security",
+    to: "/dashboard/admin/sin/security",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_security",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Privacy",
+    to: "/dashboard/admin/sin/privacy",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_privacy",
+  },
+  {
+    icon: FileText,
+    label: "Forms",
+    to: "/dashboard/admin/sin/forms",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_forms",
+  },
+  {
+    icon: UploadCloud,
+    label: "Imports",
+    to: "/dashboard/admin/sin/imports",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_imports",
+  },
+  {
+    icon: BarChart3,
+    label: "Reporting",
+    to: "/dashboard/admin/sin/reporting",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_reporting",
+  },
+  {
+    icon: LineChart,
+    label: "Analytics",
+    to: "/dashboard/admin/sin/analytics",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_analytics",
+  },
+];

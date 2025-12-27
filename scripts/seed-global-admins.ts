@@ -9,36 +9,59 @@ import process from "node:process";
 import postgres from "postgres";
 import * as schema from "../src/db/schema";
 import { roles, user, userRoles } from "../src/db/schema";
+import { getTenantConfig } from "../src/tenant";
 
 type UserRow = typeof user.$inferSelect;
 
-const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
-  {
-    id: "solstice-admin",
-    name: "Solstice Admin",
-    description: "Platform administrator with full system access",
-    permissions: {
-      "system:*": true,
-      "roles:manage": true,
-      "memberships:manage": true,
-      "events:manage": true,
-      "teams:manage": true,
-      "reports:view": true,
-    },
+const tenantConfig = getTenantConfig();
+const tenantKey = tenantConfig.key;
+const platformRoleName =
+  tenantConfig.admin.globalRoleNames.find((name) => name === "Solstice Admin") ??
+  "Solstice Admin";
+const tenantRoleName =
+  tenantConfig.admin.globalRoleNames.find((name) => name !== platformRoleName) ??
+  (tenantKey === "viasport" ? "viaSport Admin" : "Quadball Canada Admin");
+
+const PLATFORM_ADMIN_ROLE: InferInsertModel<typeof roles> = {
+  id: "solstice-admin",
+  name: platformRoleName,
+  description: "Platform administrator with full system access",
+  permissions: {
+    "system:*": true,
+    "roles:manage": true,
+    "memberships:manage": true,
+    "events:manage": true,
+    "teams:manage": true,
+    "reports:view": true,
   },
-  {
-    id: "quadball-canada-admin",
-    name: "Quadball Canada Admin",
-    description: "Quadball Canada administrator with organization-wide access",
-    permissions: {
-      "quadball_canada:*": true,
-      "teams:manage": true,
-      "events:manage": true,
-      "members:manage": true,
-      "memberships:manage": true,
-      "reports:view": true,
-    },
-  },
+};
+
+const TENANT_ADMIN_ROLE: InferInsertModel<typeof roles> =
+  tenantKey === "viasport"
+    ? {
+        id: "viasport-admin",
+        name: tenantRoleName,
+        description: "viaSport administrator with organization-wide access",
+        permissions: {
+          "viasport:*": true,
+          "reports:view": true,
+        },
+      }
+    : {
+        id: "quadball-canada-admin",
+        name: tenantRoleName,
+        description: "Quadball Canada administrator with organization-wide access",
+        permissions: {
+          "quadball_canada:*": true,
+          "teams:manage": true,
+          "events:manage": true,
+          "members:manage": true,
+          "memberships:manage": true,
+          "reports:view": true,
+        },
+      };
+
+const SCOPED_ADMIN_ROLES: Array<InferInsertModel<typeof roles>> = [
   {
     id: "team-admin",
     name: "Team Admin",
@@ -59,6 +82,12 @@ const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
       "event:communications:manage": true,
     },
   },
+];
+
+const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
+  PLATFORM_ADMIN_ROLE,
+  TENANT_ADMIN_ROLE,
+  ...SCOPED_ADMIN_ROLES,
 ];
 
 const roleNameToId = new Map(DEFAULT_ROLES.map((role) => [role.name, role.id]));
@@ -98,19 +127,32 @@ function dedupe(values: string[]): string[] {
 
 function getAssignmentsFromInput() {
   const solsticeEmails = getArgValues("solstice");
-  const quadballEmails = getArgValues("quadball");
+  const tenantEmails =
+    getArgValues("tenant").length > 0
+      ? getArgValues("tenant")
+      : tenantKey === "viasport"
+        ? getArgValues("viasport")
+        : getArgValues("quadball");
 
   const envSolsticeEmails = parseCommaList(process.env["SOLSTICE_ADMIN_EMAILS"]);
-  const envQuadballEmails =
-    parseCommaList(process.env["QUADBALL_ADMIN_EMAILS"]) ||
-    parseCommaList(process.env["GLOBAL_ADMIN_EMAILS"]);
+  const envTenantEmails = parseCommaList(
+    process.env[
+      tenantKey === "viasport" ? "VIASPORT_ADMIN_EMAILS" : "QUADBALL_ADMIN_EMAILS"
+    ],
+  );
+  const envGlobalAdminEmails = parseCommaList(process.env["GLOBAL_ADMIN_EMAILS"]);
 
-  const solstice = dedupe(solsticeEmails.length ? solsticeEmails : envSolsticeEmails);
-  const quadball = dedupe(quadballEmails.length ? quadballEmails : envQuadballEmails);
+  const pickNonEmpty = (primary: string[], fallback: string[]) =>
+    primary.length > 0 ? primary : fallback;
+
+  const solstice = dedupe(pickNonEmpty(solsticeEmails, envSolsticeEmails));
+  const tenant = dedupe(
+    pickNonEmpty(tenantEmails, pickNonEmpty(envTenantEmails, envGlobalAdminEmails)),
+  );
 
   return {
     solstice,
-    quadball,
+    tenant,
   };
 }
 
@@ -311,11 +353,11 @@ async function main() {
   const assignments: Array<{ email: string; roleName: string }> = [];
 
   assignmentsInput.solstice.forEach((email) => {
-    assignments.push({ email, roleName: "Solstice Admin" });
+    assignments.push({ email, roleName: platformRoleName });
   });
 
-  assignmentsInput.quadball.forEach((email) => {
-    assignments.push({ email, roleName: "Quadball Canada Admin" });
+  assignmentsInput.tenant.forEach((email) => {
+    assignments.push({ email, roleName: tenantRoleName });
   });
 
   const connectionString = getConnectionString();

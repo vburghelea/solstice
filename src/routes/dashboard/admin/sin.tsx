@@ -1,75 +1,52 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AuditLogTable } from "~/features/audit/components/audit-log-table";
-import { FormBuilderShell } from "~/features/forms/components/form-builder-shell";
-import { ImportWizardShell } from "~/features/imports/components/import-wizard-shell";
-import { NotificationPreferencesCard } from "~/features/notifications/components/notification-preferences-card";
-import { NotificationTemplatePanel } from "~/features/notifications/components/notification-template-panel";
-import { OrganizationAdminPanel } from "~/features/organizations/components/organization-admin-panel";
-import { PrivacyAdminPanel } from "~/features/privacy/components/privacy-admin-panel";
-import { PrivacyDashboard } from "~/features/privacy/components/privacy-dashboard";
-import { RetentionPolicyPanel } from "~/features/privacy/components/retention-policy-panel";
-import { ReportingDashboardShell } from "~/features/reporting/components/reporting-dashboard-shell";
-import { ReportBuilderShell } from "~/features/reports/components/report-builder-shell";
-import { SecurityDashboard } from "~/features/security/components/security-dashboard";
+import { createFileRoute, Outlet, useRouteContext } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { getSinAdminNav } from "~/features/layouts/sin-admin-nav";
+import { filterNavItems, requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/admin/sin")({
-  component: SinAdminPage,
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin");
+  },
+  component: SinAdminLayout,
 });
 
-function SinAdminPage() {
+function SinAdminLayout() {
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+
+  const navItems = useMemo(() => filterNavItems(getSinAdminNav(), { user }), [user]);
+
   return (
-    <div className="container mx-auto space-y-10 p-6">
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Organizations & Tenancy</h2>
-        <OrganizationAdminPanel />
-      </section>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold">SIN Admin</h2>
+        <p className="text-muted-foreground text-sm">
+          Configure organizations, reporting, and compliance workflows.
+        </p>
+      </div>
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Audit Logging</h2>
-        <AuditLogTable />
-      </section>
+      {navItems.length > 0 ? (
+        <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
+              activeProps={{
+                className:
+                  "rounded-md bg-admin-secondary px-3 py-1.5 text-sm font-semibold text-admin-primary",
+                "aria-current": "page",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Notifications</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <NotificationPreferencesCard />
-          <NotificationTemplatePanel />
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Security</h2>
-        <SecurityDashboard />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Privacy & DSAR</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <PrivacyDashboard />
-          <PrivacyAdminPanel />
-        </div>
-        <RetentionPolicyPanel />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Dynamic Forms</h2>
-        <FormBuilderShell />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Bulk Imports</h2>
-        <ImportWizardShell />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Reporting Cycles</h2>
-        <ReportingDashboardShell />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Analytics & Export</h2>
-        <ReportBuilderShell />
-      </section>
+      <Outlet />
     </div>
   );
 }

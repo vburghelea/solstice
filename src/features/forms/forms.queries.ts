@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   getSubmissionFileDownloadSchema,
   listSubmissionFilesSchema,
@@ -34,8 +35,8 @@ const requireOrgAccess = async (
     return null;
   }
 
-  const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-  return requireOrganizationMembership({ userId, organizationId });
+  const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+  return requireOrganizationAccess({ userId, organizationId });
 };
 
 const getFormSchema = z.object({
@@ -57,9 +58,14 @@ const listSubmissionVersionsSchema = z.object({
   submissionId: z.uuid(),
 });
 
+const getFormSubmissionSchema = z.object({
+  submissionId: z.uuid(),
+});
+
 export const getForm = createServerFn({ method: "GET" })
   .inputValidator(zod$(getFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { forms } = await import("~/db/schema");
@@ -82,6 +88,7 @@ export const getForm = createServerFn({ method: "GET" })
 export const listForms = createServerFn({ method: "GET" })
   .inputValidator(zod$(listFormsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { forms, organizationMembers } = await import("~/db/schema");
@@ -127,6 +134,7 @@ export const listForms = createServerFn({ method: "GET" })
 export const getLatestFormVersion = createServerFn({ method: "GET" })
   .inputValidator(zod$(getFormSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { forms, formVersions } = await import("~/db/schema");
@@ -156,6 +164,7 @@ export const getLatestFormVersion = createServerFn({ method: "GET" })
 export const listFormSubmissions = createServerFn({ method: "GET" })
   .inputValidator(zod$(listFormSubmissionsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { forms, formSubmissions } = await import("~/db/schema");
@@ -179,9 +188,45 @@ export const listFormSubmissions = createServerFn({ method: "GET" })
       .orderBy(desc(formSubmissions.createdAt));
   });
 
+export const getFormSubmission = createServerFn({ method: "GET" })
+  .inputValidator(zod$(getFormSubmissionSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
+    const userId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { formSubmissions, forms } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [submission] = await db
+      .select({
+        id: formSubmissions.id,
+        formId: formSubmissions.formId,
+        organizationId: formSubmissions.organizationId,
+        status: formSubmissions.status,
+        createdAt: formSubmissions.createdAt,
+        submittedAt: formSubmissions.submittedAt,
+        reviewNotes: formSubmissions.reviewNotes,
+        formName: forms.name,
+      })
+      .from(formSubmissions)
+      .innerJoin(forms, eq(formSubmissions.formId, forms.id))
+      .where(eq(formSubmissions.id, data.submissionId))
+      .limit(1);
+
+    if (!submission) {
+      return null;
+    }
+
+    await requireOrgAccess(userId, submission.organizationId);
+
+    return submission;
+  });
+
 export const listFormSubmissionVersions = createServerFn({ method: "GET" })
   .inputValidator(zod$(listSubmissionVersionsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissionVersions, formSubmissions } = await import("~/db/schema");
@@ -210,6 +255,7 @@ export const listFormSubmissionVersions = createServerFn({ method: "GET" })
 export const listSubmissionFiles = createServerFn({ method: "GET" })
   .inputValidator(zod$(listSubmissionFilesSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissions, submissionFiles } = await import("~/db/schema");
@@ -237,6 +283,7 @@ export const listSubmissionFiles = createServerFn({ method: "GET" })
 export const getSubmissionFileDownloadUrl = createServerFn({ method: "GET" })
   .inputValidator(zod$(getSubmissionFileDownloadSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { formSubmissions, submissionFiles } = await import("~/db/schema");

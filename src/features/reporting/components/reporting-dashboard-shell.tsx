@@ -39,6 +39,7 @@ import {
 const organizationTypeOptions = [
   { value: "governing_body", label: "Governing body" },
   { value: "pso", label: "PSO" },
+  { value: "league", label: "League" },
   { value: "club", label: "Club" },
   { value: "affiliate", label: "Affiliate" },
 ];

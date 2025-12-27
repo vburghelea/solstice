@@ -7,7 +7,7 @@ import { getLatestPolicyDocument, listUserPolicyAcceptances } from "../privacy.q
 export function PrivacyAcceptanceCard() {
   const queryClient = useQueryClient();
 
-  const { data: policy } = useQuery({
+  const { data: policy, isLoading: policyLoading } = useQuery({
     queryKey: ["privacy", "policy", "latest"],
     queryFn: () => getLatestPolicyDocument({ data: "privacy_policy" }),
   });
@@ -19,10 +19,10 @@ export function PrivacyAcceptanceCard() {
 
   const hasAccepted = policy
     ? acceptances.some((acceptance) => acceptance.policyId === policy.id)
-    : true;
+    : false;
 
   const acceptMutation = useMutation({
-    mutationFn: () => acceptPolicy({ data: { policyId: policy?.id ?? "" } }),
+    mutationFn: (policyId: string) => acceptPolicy({ data: { policyId } }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["privacy", "policy"] });
       void queryClient.invalidateQueries({
@@ -31,13 +31,23 @@ export function PrivacyAcceptanceCard() {
     },
   });
 
+  const handleAccept = () => {
+    if (!policy?.id) return;
+    acceptMutation.mutate(policy.id);
+  };
+
+  // Button should be disabled if no policy ID, already accepted, or mutation pending
+  const isButtonDisabled = !policy?.id || hasAccepted || acceptMutation.isPending;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Privacy Policy</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
-        {policy ? (
+        {policyLoading ? (
+          <p className="text-muted-foreground">Loading policy...</p>
+        ) : policy ? (
           <>
             <p>
               Current version: <strong>{policy.version}</strong>
@@ -55,17 +65,18 @@ export function PrivacyAcceptanceCard() {
                 View policy document
               </a>
             ) : null}
-            <Button
-              type="button"
-              disabled={hasAccepted || acceptMutation.isPending}
-              onClick={() => acceptMutation.mutate()}
-            >
+            <Button type="button" disabled={isButtonDisabled} onClick={handleAccept}>
               {hasAccepted
                 ? "Policy accepted"
                 : acceptMutation.isPending
                   ? "Accepting..."
                   : "Accept policy"}
             </Button>
+            {acceptMutation.isError && (
+              <p className="text-destructive text-sm">
+                Failed to accept policy. Please try again.
+              </p>
+            )}
           </>
         ) : (
           <p className="text-muted-foreground">No policy document published.</p>

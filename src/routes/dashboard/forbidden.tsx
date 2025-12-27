@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { getBrand } from "~/tenant";
 
 export const Route = createFileRoute("/dashboard/forbidden")({
   component: ForbiddenPage,
 });
 
 function ForbiddenPage() {
+  const brand = getBrand();
+  const supportEmail = brand.supportEmail ?? "support@solstice.app";
+
   return (
     <div className="border-border bg-card mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-lg border p-12 text-center shadow-sm">
       <div className="bg-destructive/10 text-destructive flex h-16 w-16 items-center justify-center rounded-full">
@@ -24,7 +28,7 @@ function ForbiddenPage() {
           <Link to="/dashboard">Return to dashboard</Link>
         </Button>
         <Button asChild variant="outline">
-          <a href="mailto:info@quadball.ca">Contact support</a>
+          <a href={`mailto:${supportEmail}`}>Contact support</a>
         </Button>
       </div>
     </div>

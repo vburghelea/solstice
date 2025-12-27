@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { OrgContextProvider } from "~/features/organizations/org-context";
 import { renderWithRouter, screen } from "~/tests/utils";
-import { AdminLayout } from "../admin-layout";
+import { AppLayout } from "../app-layout";
 
 // Mock auth signOut
 vi.mock("~/lib/auth-client", () => ({
@@ -15,20 +16,25 @@ describe("AdminLayout with Router", () => {
   });
 
   it("renders admin layout with navigation", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithRouter(
+      <OrgContextProvider>
+        <AppLayout />
+      </OrgContextProvider>,
+    );
 
-    // Check navigation elements - Dashboard appears multiple times
+    // Check navigation elements - Dashboard appears at least once
     const dashboardTexts = screen.getAllByText("Dashboard");
-    expect(dashboardTexts.length).toBeGreaterThanOrEqual(2);
+    expect(dashboardTexts.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Teams")).toBeInTheDocument();
     expect(screen.getByText("Events")).toBeInTheDocument();
 
-    // Check admin panel header - use getAllByText since it appears in both desktop and mobile views
+    // Check brand header - use getAllByText since it appears in both desktop and mobile views
     const quadballTexts = screen.getAllByText("Quadball Canada");
     expect(quadballTexts).toHaveLength(2); // One for desktop, one for mobile
 
-    // "Admin Panel" text was changed to "Dashboard" in mobile view
-    expect(screen.getByText("Admin Panel")).toBeInTheDocument(); // Mobile header still shows Admin Panel
+    // Player Portal appears in both desktop and mobile views
+    const playerPortalTexts = screen.getAllByText("Player Portal");
+    expect(playerPortalTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders with user context", async () => {
@@ -62,19 +68,29 @@ describe("AdminLayout with Router", () => {
       twoFactorEnabled: false,
     };
 
-    await renderWithRouter(<AdminLayout />, { user: customUser });
+    await renderWithRouter(
+      <OrgContextProvider>
+        <AppLayout />
+      </OrgContextProvider>,
+      { user: customUser },
+    );
 
     // Navigation should still render with custom user
-    // Multiple "Dashboard" texts appear (sidebar subtitle and nav link)
+    // Dashboard appears at least once in the navigation
     const dashboardTexts = screen.getAllByText("Dashboard");
-    expect(dashboardTexts.length).toBeGreaterThanOrEqual(2);
+    expect(dashboardTexts.length).toBeGreaterThanOrEqual(1);
 
-    // Admin Panel still appears in mobile view
-    expect(screen.getByText("Admin Panel")).toBeInTheDocument();
+    // Player Portal appears in both desktop and mobile views
+    const playerPortalTexts = screen.getAllByText("Player Portal");
+    expect(playerPortalTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it("handles mobile menu toggle", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithRouter(
+      <OrgContextProvider>
+        <AppLayout />
+      </OrgContextProvider>,
+    );
 
     // Mobile menu is hidden by default on desktop
     // The test would need to mock window size to test mobile behavior
@@ -82,7 +98,11 @@ describe("AdminLayout with Router", () => {
   });
 
   it("displays all navigation links with correct hrefs", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithRouter(
+      <OrgContextProvider>
+        <AppLayout />
+      </OrgContextProvider>,
+    );
 
     const dashboardLinks = screen.getAllByRole("link", { name: /dashboard/i });
     const teamsLinks = screen.getAllByRole("link", { name: /teams/i });

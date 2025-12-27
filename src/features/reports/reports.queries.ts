@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 const listSavedReportsSchema = z
   .object({
@@ -12,6 +13,7 @@ const listSavedReportsSchema = z
 export const listSavedReports = createServerFn({ method: "GET" })
   .inputValidator(zod$(listSavedReportsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_analytics");
     const { getDb } = await import("~/db/server-helpers");
     const { savedReports } = await import("~/db/schema");
     const { eq, or } = await import("drizzle-orm");

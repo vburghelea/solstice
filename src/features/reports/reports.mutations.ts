@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createSavedReportSchema,
   deleteSavedReportSchema,
@@ -129,6 +130,7 @@ const loadReportData = async ({
 export const createSavedReport = createServerFn({ method: "POST" })
   .inputValidator(zod$(createSavedReportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_analytics");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -169,6 +171,7 @@ export const createSavedReport = createServerFn({ method: "POST" })
 export const updateSavedReport = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateSavedReportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_analytics");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -224,6 +227,7 @@ export const updateSavedReport = createServerFn({ method: "POST" })
 export const deleteSavedReport = createServerFn({ method: "POST" })
   .inputValidator(zod$(deleteSavedReportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_analytics");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return null;
 
@@ -263,6 +267,7 @@ export const deleteSavedReport = createServerFn({ method: "POST" })
 export const exportReport = createServerFn({ method: "POST" })
   .inputValidator(zod$(exportReportSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_analytics");
     const session = await getSession();
     const sessionUser = session?.user ?? null;
     if (!sessionUser?.id) return null;

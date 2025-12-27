@@ -9,6 +9,19 @@ export type AuthedRequestContext = {
   organizationRole?: string | null;
 };
 
+const getCookieValue = (headers: Headers, name: string) => {
+  const cookieHeader = headers.get("cookie");
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(";").map((entry) => entry.trim());
+  const prefix = `${name}=`;
+  for (const cookie of cookies) {
+    if (cookie.startsWith(prefix)) {
+      return decodeURIComponent(cookie.slice(prefix.length));
+    }
+  }
+  return null;
+};
+
 /**
  * Middleware to force authentication on a server function, and add the user to the context.
  */
@@ -54,17 +67,31 @@ export const authMiddleware = createMiddleware({ type: "function" }).server(
       requestId,
     };
 
-    const organizationId = headers.get("x-organization-id");
-    if (organizationId) {
-      const { getOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-      const membership = await getOrganizationMembership({
-        userId: user.id,
-        organizationId,
-      });
+    const contextOrgId =
+      (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+    const contextOrgRole =
+      (context as { organizationRole?: string | null } | undefined)?.organizationRole ??
+      null;
+    const headerOrgId = headers.get("x-organization-id");
+    const cookieOrgId = getCookieValue(headers, "active_org_id");
+    const requestedOrgId = headerOrgId ?? contextOrgId ?? cookieOrgId ?? null;
 
-      if (membership) {
-        authed.organizationId = membership.organizationId;
-        authed.organizationRole = membership.role;
+    if (requestedOrgId) {
+      if (contextOrgId === requestedOrgId && contextOrgRole) {
+        authed.organizationId = contextOrgId;
+        authed.organizationRole = contextOrgRole;
+      } else {
+        const { resolveOrganizationAccess } =
+          await import("~/features/organizations/organizations.access");
+        const access = await resolveOrganizationAccess({
+          userId: user.id,
+          organizationId: requestedOrgId,
+        });
+
+        if (access) {
+          authed.organizationId = access.organizationId;
+          authed.organizationRole = access.role;
+        }
       }
     }
 

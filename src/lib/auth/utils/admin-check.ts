@@ -1,7 +1,8 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import type { AuthUser } from "~/lib/auth/types";
+import { getTenantConfig } from "~/tenant";
 
-const GLOBAL_ADMIN_ROLE_NAMES = ["Solstice Admin", "Quadball Canada Admin"];
+const GLOBAL_ADMIN_ROLE_NAMES = getTenantConfig().admin.globalRoleNames;
 
 const getPermissionService = createServerOnlyFn(async () => {
   const { PermissionService } = await import("~/features/roles/permission.service");

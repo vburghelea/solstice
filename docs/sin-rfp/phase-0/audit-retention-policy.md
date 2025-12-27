@@ -26,6 +26,8 @@ PIPEDA-aligned accountability requirements.
 | SECURITY.\* | lockouts, anomalies      | context metadata       | no secrets      |
 
 Audit logs are append-only and protected with tamper-evident hashing.
+Audit entries are scoped to `organization_id` and filtered by org access rules
+to prevent cross-tenant visibility.
 
 ## 3.0 PII Redaction and Hashing Rules
 

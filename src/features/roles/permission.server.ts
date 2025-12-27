@@ -1,6 +1,7 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { and, eq, inArray } from "drizzle-orm";
 import { roles, userRoles } from "~/db/schema";
+import { getTenantConfig } from "~/tenant";
 
 /**
  * Server-side permission service
@@ -13,17 +14,13 @@ export class PermissionService {
   static isGlobalAdmin = createServerOnlyFn(async (userId: string): Promise<boolean> => {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
+    const globalRoleNames = getTenantConfig().admin.globalRoleNames;
 
     const [row] = await db
       .select()
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(
-        and(
-          eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
-        ),
-      )
+      .where(and(eq(userRoles.userId, userId), inArray(roles.name, globalRoleNames)))
       .limit(1);
 
     return !!row;

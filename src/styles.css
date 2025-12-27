@@ -97,6 +97,14 @@
   --sidebar-ring: oklch(0.705 0.015 286.067);
 }
 
+[data-tenant="viasport"] {
+  --color-brand-red: #1b5fad;
+  --color-brand-red-dark: #164e8d;
+  --color-admin-primary: #1b5fad;
+  --color-admin-secondary: #e6eef8;
+  --color-admin-text-secondary: #506a82;
+}
+
 .dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);

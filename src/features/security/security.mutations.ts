@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   lockUserSchema,
   recordSecurityEventSchema,
@@ -9,6 +10,7 @@ import {
 export const recordSecurityEvent = createServerFn({ method: "POST" })
   .inputValidator(zod$(recordSecurityEventSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("security_core");
     const { recordSecurityEvent: recordEvent } = await import("~/lib/security/events");
     const { applySecurityRules } = await import("~/lib/security/detection");
 
@@ -45,6 +47,7 @@ export const recordSecurityEvent = createServerFn({ method: "POST" })
 export const lockUserAccount = createServerFn({ method: "POST" })
   .inputValidator(zod$(lockUserSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_security");
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const { getRequest } = await import("@tanstack/react-start/server");
     const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
@@ -68,6 +71,7 @@ export const lockUserAccount = createServerFn({ method: "POST" })
 export const unlockUserAccount = createServerFn({ method: "POST" })
   .inputValidator(zod$(unlockUserSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_security");
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const { getRequest } = await import("@tanstack/react-start/server");
     const { requireAdmin } = await import("~/lib/auth/utils/admin-check");

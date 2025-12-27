@@ -3,7 +3,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig, loadEnv, type Plugin } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
+import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 // Browser-safe aliases for Node-only modules referenced by server bundles.
@@ -35,6 +35,62 @@ export default defineConfig(({ mode }) => {
   for (const [key, val] of Object.entries(env)) {
     if (!(key in process.env)) process.env[key] = val;
   }
+
+  const tenantKey = env["TENANT_KEY"] || env["VITE_TENANT_KEY"] || "qc";
+  const isViasport = tenantKey === "viasport";
+  const cachePrefix = isViasport ? "viasport" : "qc";
+  const manifest = (
+    isViasport
+      ? {
+          id: "/",
+          name: "viaSport BC SIN",
+          short_name: "viaSport SIN",
+          description: "viaSport Strength in Numbers (SIN) data platform.",
+          theme_color: "#1b5fad",
+          background_color: "#ffffff",
+          start_url: "/",
+          display: "standalone",
+          icons: [
+            {
+              src: "/icons/viasport-icon.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "any",
+            },
+            {
+              src: "/icons/viasport-icon-maskable.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "maskable",
+            },
+          ],
+        }
+      : {
+          id: "/",
+          name: "Quadball Canada",
+          short_name: "Quadball CA",
+          description:
+            "Official Quadball Canada platform for national events, club resources, and membership tools.",
+          theme_color: "#d82929",
+          background_color: "#ffffff",
+          start_url: "/",
+          display: "standalone",
+          icons: [
+            {
+              src: "/icons/quadball-icon.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "any",
+            },
+            {
+              src: "/icons/quadball-icon-maskable.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "maskable",
+            },
+          ],
+        }
+  ) satisfies Partial<ManifestOptions>;
 
   return {
     plugins: [
@@ -78,34 +134,10 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         includeAssets: [
           "favicon.ico",
-          "icons/quadball-icon.svg",
-          "icons/quadball-icon-maskable.svg",
+          `icons/${cachePrefix}-icon.svg`,
+          `icons/${cachePrefix}-icon-maskable.svg`,
         ],
-        manifest: {
-          id: "/",
-          name: "Quadball Canada",
-          short_name: "Quadball CA",
-          description:
-            "Official Quadball Canada platform for national events, club resources, and membership tools.",
-          theme_color: "#d82929",
-          background_color: "#ffffff",
-          start_url: "/",
-          display: "standalone",
-          icons: [
-            {
-              src: "/icons/quadball-icon.svg",
-              sizes: "512x512",
-              type: "image/svg+xml",
-              purpose: "any",
-            },
-            {
-              src: "/icons/quadball-icon-maskable.svg",
-              sizes: "512x512",
-              type: "image/svg+xml",
-              purpose: "maskable",
-            },
-          ],
-        },
+        manifest,
         workbox: {
           // Don't precache HTML - always fetch fresh from network
           navigateFallback: null,
@@ -121,7 +153,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ request }) => request.destination === "image",
               handler: "CacheFirst",
               options: {
-                cacheName: "qc-images",
+                cacheName: `${cachePrefix}-images`,
                 expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
               },
             },
@@ -131,7 +163,7 @@ export default defineConfig(({ mode }) => {
                 request.destination === "script" || request.destination === "style",
               handler: "StaleWhileRevalidate",
               options: {
-                cacheName: "qc-assets",
+                cacheName: `${cachePrefix}-assets`,
                 expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
               },
             },

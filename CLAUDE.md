@@ -2,44 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+# Overarching instructions
+
+- If you run into an issue that you can't solve after trying the best practices to solve it, return and let the user know _unless you have been instructed to push through obstacles and try the next thing_.
+  - This includes any time you are tempted to patch something with a workaround, or log-in or the dev server isn't working.
+  - If you must do a workaround, you must document the workaround and your reasoning in an external markdown file that you share with the user when you return so they can reason about the technical debt.
+
 ## Quick Reference
 
-### MCP Browser Access
-
-- Use the Playwright MCP browser tool to open local or external sites when manual
-  verification or UI capture is needed; it is available in this repo's toolchain.
-
-Avoid `@tanstack/react-start/server` in cron/shared/client imports; virtual modules.
-Only import Start server helpers inside `.server()`/handlers or server entry files.
-
-### Server Functions - Always Use Zod Validation
-
-```typescript
-// 1. Define schema
-const mySchema = z.object({
-  /* ... */
-});
-
-// 2. Use .inputValidator(schema.parse)
-export const myServerFn = createServerFn({ method: "POST" })
-  .inputValidator(mySchema.parse)
-  .handler(async ({ data }) => {
-    /* ... */
-  });
-```
-
-### Avoid @ts-expect-error
-
-- NEVER use as first solution
-- Try Zod validation first
-- Create proper type definitions
-- See [TanStack Start 2025 Updates](./docs/TANSTACK-START-2025-UPDATES.md) for comprehensive guide
-
-### TanStack Start v1 RC (November 2025)
-
-- **Package renamed**: Use `@tanstack/react-start` (not `@tanstack/start`)
-- **Deployment**: AWS Lambda via SST (Serverless Stack) in `ca-central-1`
-- **RSC**: Coming as non-breaking v1.x addition (not yet supported)
+- **Playwright MCP**: Use for UI verification; see "Playwright MCP" section at end
+- **Server Functions**: Always use `.inputValidator(schema.parse)` with Zod schemas
+- **Imports**: Avoid `@tanstack/react-start/server` in client code; use dynamic imports or `serverOnly()`
+- **Package**: Use `@tanstack/react-start` (not `@tanstack/start`)
+- **Type Safety**: Never use `@ts-expect-error` as first solution; see "Best Practices for Type Safety" section
 
 ### Square Payments Checklist
 
@@ -54,100 +29,15 @@ export const myServerFn = createServerFn({ method: "POST" })
 - Production verification (2025‑09‑19): checkout `LUJO45SIIB655EEP`, payment `Hd3J4zVKfMdLXNXalzSO94b6upOZY`.
   Use this as a baseline when debugging future regressions.
 
-## Using Repomix for AI Context Management
+## Repomix
 
-Repomix helps create focused context bundles for AI assistants like Claude. The goal is to pack relevant files while staying under the 60,000 token limit.
-
-### Quick Start
-
-```bash
-# Basic usage - pack specific files for a feature
-npx repomix@latest --include "src/features/events/**,src/db/schema/events*" --output evt-context.xml
-
-# Check token counts before generating
-npx repomix@latest --token-count-tree 100 --include "src/features/events/**"
-
-# Include git context for recent changes
-npx repomix@latest --include "src/features/events/**" --include-diffs --include-logs --include-logs-count 20
-```
-
-### Token Optimization Strategies
-
-1. **Start with token counting** to understand your budget:
-
-   ```bash
-   npx repomix@latest --token-count-tree --include "src/features/**/*.ts"
-   ```
-
-2. **Use targeted includes** rather than broad patterns:
-
-   ```bash
-   # Good: Specific to the task
-   --include "src/features/events/*.ts,src/db/schema/events*,src/lib/payments/square*"
-
-   # Bad: Too broad
-   --include "src/**/*.ts"
-   ```
-
-3. **Remove noise** with compression and comment removal:
-
-   ```bash
-   npx repomix@latest --compress --remove-comments --include "src/features/events/**"
-   ```
-
-4. **Leverage configuration files** for complex setups:
-   ```bash
-   npx repomix@latest --init  # Creates repomix.config.json
-   ```
-
-### Ticket-Specific Context Bundles
-
-For development tickets, create focused bundles that include:
-
-- Core feature files
-- Related schemas and types
-- Relevant test files
-- Dependencies (auth, database, utilities)
-- Documentation snippets
-
-See `repomix-configs/` directory for pre-configured bundles for each development ticket.
-
-### Best Practices
-
-1. **Always check token counts first** with `--token-count-tree`
-2. **Include test files** for understanding expected behavior
-3. **Add git context** when working on bug fixes or recent changes
-4. **Use output formats wisely**:
-   - XML (default): Best for Claude
-   - Markdown: Human-readable documentation
-   - JSON: Structured processing
-5. **Keep bundles under 50k tokens** to leave room for conversation
-
-### Example: Creating Context for Event Cancellation (EVT-1)
-
-```bash
-# First, check what we're including
-npx repomix@latest \
-  --token-count-tree \
-  --include "src/features/events/**/*.ts" \
-  --include "src/db/schema/events*.ts,src/db/schema/teams*.ts,src/db/schema/membership*.ts" \
-  --include "src/lib/payments/square*.ts" \
-  --include "src/lib/server/auth.ts,src/lib/server/fn-utils.ts"
-
-# If under 60k tokens, generate the bundle
-npx repomix@latest \
-  --include "src/features/events/**/*.ts" \
-  --include "src/db/schema/events*.ts,src/db/schema/teams*.ts,src/db/schema/membership*.ts" \
-  --include "src/lib/payments/square*.ts" \
-  --include "src/lib/server/auth.ts,src/lib/server/fn-utils.ts" \
-  --include-diffs \
-  --output repomix-evt1.xml
-```
+For creating AI context bundles, see `repomix-configs/README.md`. Pre-configured bundles exist for each development ticket.
 
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173)
-- `npx sst dev` - Start SST dev mode with live Lambda (for testing AWS integration)
+- `npx sst dev --stage qc-dev` - Start SST dev mode with live Lambda (QC)
+- `npx sst dev --stage sin-dev` - Start SST dev mode with live Lambda (viaSport)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
@@ -187,7 +77,7 @@ All checks must pass before the commit is allowed. The pre-commit hook matches w
 This is **Solstice**, a sports league management platform built with TanStack Start (full-stack React framework) and deployed to AWS via SST (Serverless Stack). The application uses:
 
 - **TanStack Router** for file-based routing with type safety
-- **Better Auth** for authentication (email/password + OAuth via GitHub/Google)
+- **Better Auth** for authentication (email/password + Google OAuth)
 - **Drizzle ORM** with PostgreSQL for database operations
 - **TanStack Query** for server state management and caching
 - **Tailwind CSS** for styling with shadcn/ui components
@@ -205,17 +95,12 @@ This is **Solstice**, a sports league management platform built with TanStack St
 ### Key Directories (Features-Based Architecture)
 
 - `src/app/` - Application-level code (providers, router setup)
-- `src/features/` - Feature modules organized by domain
-  - `auth/` - Authentication feature (components, hooks, API, tests)
-  - `profile/` - User profile management (components, server functions, guards)
-  - `layouts/` - Admin and public layout components
-  - Future features will follow the same pattern
+- `src/features/` - Feature modules organized by domain (auth, profile, events, teams, membership, dashboard, layouts, organizations, roles, forms, imports, notifications, reporting, etc.)
 - `src/shared/` - Shared resources across features
-  - `ui/` - shadcn/ui components and icons (auto-installed here via components.json)
   - `hooks/` - Shared React hooks (useTheme, etc.)
   - `lib/` - Utilities and helpers
-  - `types/` - Shared TypeScript types
 - `src/components/` - Application-specific components
+  - `ui/` - shadcn/ui components (auto-installed here via components.json)
   - `form-fields/` - Reusable form components (ValidatedInput, ValidatedSelect, etc.)
 - `src/db/` - Database layer
   - `schema/` - Drizzle schema definitions (single source of truth)
@@ -223,10 +108,10 @@ This is **Solstice**, a sports league management platform built with TanStack St
 - `src/routes/` - Thin route files that import from features
 - `src/lib/` - Core infrastructure
   - `auth/` - Better Auth configuration
-  - `form.ts` - TanStack Form custom hook setup
-  - `env.ts` - Environment variable management
+  - `pacer/` - Rate limiting utilities
   - `security/` - Security utilities and middleware
 - `src/tests/` - Test utilities and global test setup
+- `src/tenant/` - Multi-tenant configuration
 
 ### Environment Requirements
 
@@ -242,7 +127,8 @@ This is **Solstice**, a sports league management platform built with TanStack St
 SST manages secrets via AWS Secrets Manager. Set secrets with:
 
 ```bash
-npx sst secret set <SecretName> "<value>" --stage production
+npx sst secret set <SecretName> "<value>" --stage qc-prod
+npx sst secret set <SecretName> "<value>" --stage sin-prod
 ```
 
 Required SST secrets:
@@ -264,8 +150,8 @@ Required SST secrets:
    - OAuth credentials must be valid (not placeholders) for routes to work
 
 3. **Development Servers**:
-   - `pnpm dev` - Vite dev server (port 5173) - primary development mode
-   - `npx sst dev` - SST dev mode with live Lambda for AWS integration testing
+   - `AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono` - SST dev mode (QC)
+   - `AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono` - SST dev mode (viaSport)
 
 ### Database Connections
 
@@ -286,39 +172,39 @@ The RDS databases are in a private VPC. To access them locally, you need the SST
 sudo npx sst tunnel install
 
 # Start tunnel to dev database (keep running in a terminal)
-AWS_PROFILE=techdev npx sst tunnel --stage dev
+AWS_PROFILE=techdev npx sst tunnel --stage qc-dev
+AWS_PROFILE=techdev npx sst tunnel --stage sin-dev
 
 # Start tunnel to production database
-AWS_PROFILE=techprod npx sst tunnel --stage production
+AWS_PROFILE=techprod npx sst tunnel --stage qc-prod
+AWS_PROFILE=techprod npx sst tunnel --stage sin-prod
 ```
 
 #### Accessing the Dev Database
 
 With the tunnel running, you can:
 
+Use `sin-dev` instead of `qc-dev` for viaSport environments.
+
 1. **Get connection details** from SST:
 
    ```bash
-   AWS_PROFILE=techdev npx sst shell --stage dev -- printenv | grep SST_RESOURCE_Database
+   AWS_PROFILE=techdev npx sst shell --stage qc-dev -- printenv | grep SST_RESOURCE_Database
    ```
 
 2. **Connect via psql**:
 
    ```bash
-   PGPASSWORD="<password>" psql -h solstice-dev-databaseproxy-<id>.proxy-<region>.rds.amazonaws.com -U postgres -d solstice
+   PGPASSWORD="<password>" psql -h solstice-qc-dev-databaseproxy-<id>.proxy-<region>.rds.amazonaws.com -U postgres -d solstice
    ```
 
 3. **Push schema changes**:
 
    ```bash
-   AWS_PROFILE=techdev npx sst shell --stage dev -- npx drizzle-kit push --force
+   AWS_PROFILE=techdev npx sst shell --stage qc-dev -- npx drizzle-kit push --force
    ```
 
-4. **Run seed scripts**:
-   ```bash
-   # Update .env and .env.e2e with dev database URL first, then:
-   npx tsx scripts/seed-e2e-data.ts
-   ```
+4. **Run seed scripts** (see Database Seeding section below for which script to use)
 
 #### Local Development with Dev Database
 
@@ -327,13 +213,13 @@ To use the dev RDS database for local development:
 1. Start the SST tunnel (keep running):
 
    ```bash
-   AWS_PROFILE=techdev npx sst tunnel --stage dev
+   AWS_PROFILE=techdev npx sst tunnel --stage qc-dev
    ```
 
 2. Update `.env` and `.env.e2e` with the dev database URL:
 
    ```
-   DATABASE_URL="postgresql://postgres:<password>@solstice-dev-databaseproxy-<id>.proxy-cx20ui4g0b7v.ca-central-1.rds.amazonaws.com:5432/solstice?sslmode=require"
+   DATABASE_URL="postgresql://postgres:<password>@solstice-qc-dev-databaseproxy-<id>.proxy-cx20ui4g0b7v.ca-central-1.rds.amazonaws.com:5432/solstice?sslmode=require"
    ```
 
 3. Run local dev server:
@@ -352,6 +238,47 @@ PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "\d events"
 
 # List columns for a table
 PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "SELECT column_name FROM information_schema.columns WHERE table_name = 'events'"
+```
+
+#### Database Seeding
+
+There are two seed scripts with different purposes:
+
+1. **`scripts/seed-global-admins.ts`** - Creates roles and assigns admin access
+   - Tenant-aware (creates viaSport Admin for sin-_, Quadball Canada Admin for qc-_)
+   - Does NOT delete existing data - safe to run on any environment
+   - Creates: `Solstice Admin`, tenant-specific admin, `Team Admin`, `Event Admin`
+   - **Note**: This script uses Vite imports and may fail with tsx directly. Use raw SQL via SST shell instead:
+
+   ```bash
+   # Create roles directly via SST shell + psql
+   AWS_PROFILE=techdev npx sst shell --stage sin-dev -- bash -c 'PGPASSWORD="$( echo $SST_RESOURCE_Database | python3 -c "import sys,json; print(json.load(sys.stdin)[\"password\"])" )" PGHOST="$( echo $SST_RESOURCE_Database | python3 -c "import sys,json; print(json.load(sys.stdin)[\"host\"])" )" psql -U postgres -d solstice -c "
+   INSERT INTO roles (id, name, description, permissions, created_at, updated_at) VALUES
+     ('"'"'solstice-admin'"'"', '"'"'Solstice Admin'"'"', '"'"'Platform admin'"'"', '"'"'{\"system:*\": true}'"'"', NOW(), NOW()),
+     ('"'"'viasport-admin'"'"', '"'"'viaSport Admin'"'"', '"'"'viaSport admin'"'"', '"'"'{\"viasport:*\": true}'"'"', NOW(), NOW())
+   ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, updated_at = NOW();"'
+   ```
+
+2. **`scripts/seed-e2e-data.ts`** - Creates E2E test data (QC-specific)
+   - **DELETES ALL EXISTING DATA** - only use for E2E test environments
+   - Creates QC-specific: test users, teams, events, memberships
+   - Use for `qc-dev` E2E testing, NOT for `sin-dev` (viaSport)
+
+   ```bash
+   # For QC E2E testing only (requires tunnel or SST dev running)
+   npx tsx scripts/seed-e2e-data.ts
+   ```
+
+#### Running drizzle-kit via SST Dev Mode
+
+The most reliable way to run database operations is through SST dev mode (which handles the tunnel automatically):
+
+```bash
+# Start SST dev (tunnel is automatic)
+AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono
+
+# In another terminal, push schema through SST shell
+AWS_PROFILE=techdev npx sst shell --stage sin-dev -- npx drizzle-kit push --force
 ```
 
 ### Security Features
@@ -374,7 +301,7 @@ PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "SELECT column_nam
 ### CI/CD Pipeline
 
 - **GitHub Actions**: Automated testing, linting, and type checking
-- **SST Deployments**: Deploy via `npx sst deploy --stage <stage>`
+- **SST Deployments**: Deploy via `npx sst deploy --stage qc-dev|sin-dev|qc-perf|sin-perf|qc-prod|sin-prod`
 - **AWS Profiles**: `techdev` for `dev`/`perf` (synthetic data), `techprod` for `production`
 - **SSO Login Required**: Run `aws sso login --profile techdev` or
   `aws sso login --profile techprod` before deploying
@@ -389,7 +316,8 @@ PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "SELECT column_nam
 gh run list --limit 5
 
 # SST deployment status
-npx sst state --stage production
+npx sst state --stage qc-prod
+npx sst state --stage sin-prod
 
 # List AWS resources
 AWS_PROFILE=techprod aws lambda list-functions --region ca-central-1
@@ -413,7 +341,7 @@ curl -s https://d200ljtib0dq8n.cloudfront.net/api/health
 
 1. **Login Methods**:
    - Email/password via `auth.signIn.email()`
-   - OAuth via `auth.signInWithOAuth()` (Google, GitHub)
+   - OAuth via `auth.signInWithOAuth()` (Google)
 2. **Protected Routes**:
    - Auth guard middleware redirects unauthenticated users
    - Profile completion guard redirects incomplete profiles to `/onboarding`
@@ -586,174 +514,13 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
      });
    ```
 
-### TanStack Start Middleware
+### TanStack Start Patterns
 
-Middleware customizes behavior for server routes and server functions. Use `createMiddleware()` from `@tanstack/react-start`.
+For middleware, server routes, and data loading patterns, see:
 
-1. **Basic Middleware Pattern**:
-
-```typescript
-import { createMiddleware } from "@tanstack/react-start";
-
-// Request middleware (applies to all server requests)
-const loggingMiddleware = createMiddleware().server(
-  async ({ next, context, request }) => {
-    console.log(`Request: ${request.method} ${request.url}`);
-    return next();
-  },
-);
-
-// Server function middleware (with client-side support)
-const authMiddleware = createMiddleware({ type: "function" })
-  .client(async ({ next }) => {
-    // Runs on client before RPC call
-    return next();
-  })
-  .server(async ({ next, context }) => {
-    const user = await getSession();
-    if (!user) {
-      throw redirect({ to: "/auth/login" });
-    }
-    // Pass user to downstream handlers via context
-    return next({ context: { user } });
-  });
-```
-
-2. **Using Middleware with Server Functions**:
-
-```typescript
-export const sensitiveAction = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
-  .handler(async ({ context }) => {
-    // context.user is available from middleware
-    if (!context.user.isAdmin) {
-      throw new Error("Forbidden");
-    }
-    return performAction();
-  });
-```
-
-3. **Global Middleware** (define in `src/start.ts`):
-
-```typescript
-import { createStart } from "@tanstack/react-start";
-
-export const startInstance = createStart(() => ({
-  requestMiddleware: [securityMiddleware, loggingMiddleware],
-  functionMiddleware: [authMiddleware],
-}));
-```
-
-4. **Client-to-Server Context**: Client context is NOT auto-sent. Use `sendContext`:
-
-```typescript
-const trackingMiddleware = createMiddleware({ type: "function" })
-  .client(async ({ next }) => {
-    return next({
-      sendContext: { clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-    });
-  })
-  .server(async ({ next, context }) => {
-    console.log("Client timezone:", context.clientTimezone);
-    return next();
-  });
-```
-
-### TanStack Start Server Routes
-
-Server routes enable API endpoints alongside application routes. Define them in `src/routes/`.
-
-```typescript
-// src/routes/api/users.ts
-import { createFileRoute, json } from "@tanstack/react-start";
-
-export const Route = createFileRoute("/api/users")({
-  server: {
-    handlers: {
-      GET: async ({ request }) => {
-        const users = await db.users.findMany();
-        return json(users);
-      },
-      POST: async ({ request }) => {
-        const body = await request.json();
-        const user = await db.users.create(body);
-        return json(user, { status: 201 });
-      },
-    },
-  },
-});
-```
-
-**File naming conventions**:
-
-- `/routes/api/users.ts` → `/api/users`
-- `/routes/api/users/$id.ts` → `/api/users/:id`
-- `/routes/api/files/$.ts` → `/api/files/*` (wildcard)
-
-### Data Loading Patterns
-
-1. **Route Loaders** (runs on server for SSR, client for navigation):
-
-```typescript
-export const Route = createFileRoute("/users")({
-  loader: async () => getUsers(),
-  component: UsersPage,
-});
-
-function UsersPage() {
-  const users = Route.useLoaderData();
-  return <UserList users={users} />;
-}
-```
-
-2. **Preloading** (enabled by default on link hover):
-
-```typescript
-<Link to="/users" preload="intent">View Users</Link>
-
-// Configure stale time (default 30s)
-export const Route = createFileRoute("/users")({
-  preloadStaleTime: 30_000,
-  loader: async () => getUsers(),
-});
-```
-
-3. **With TanStack Query** (for fine-grained caching):
-
-```typescript
-import { queryOptions } from "@tanstack/react-query";
-
-const usersQueryOptions = queryOptions({
-  queryKey: ["users"],
-  queryFn: () => getUsers(),
-});
-
-export const Route = createFileRoute("/users")({
-  loader: async ({ context }) => {
-    // Prefetch for SSR
-    await context.queryClient.ensureQueryData(usersQueryOptions);
-  },
-  component: UsersPage,
-});
-
-function UsersPage() {
-  const { data: users } = useSuspenseQuery(usersQueryOptions);
-  return <UserList users={users} />;
-}
-```
-
-4. **Parallel Loading** (avoid waterfalls):
-
-```typescript
-export const Route = createFileRoute("/dashboard")({
-  loader: async ({ context }) => {
-    await Promise.all([
-      context.queryClient.ensureQueryData(usersQueryOptions),
-      context.queryClient.ensureQueryData(statsQueryOptions),
-    ]);
-  },
-});
-```
+- **Project-specific**: `docs/TANSTACK-START-2025-UPDATES.md`
+- **Official docs**: [TanStack Start Documentation](https://tanstack.com/start/latest)
+- **Global middleware**: Defined in `src/start.ts`
 
 ### Best Practices for Type Safety
 
@@ -779,83 +546,13 @@ export const Route = createFileRoute("/dashboard")({
 
 ### E2E Testing with Playwright
 
-**IMPORTANT**: Add E2E tests for all new features to ensure they work correctly from the user's perspective.
+**IMPORTANT**: Add E2E tests for all new features.
 
-1. **Test Structure**:
-   - Tests are organized by authentication requirement
-   - `e2e/tests/authenticated/` - Tests requiring login
-   - `e2e/tests/unauthenticated/` - Tests without login
-   - Use descriptive file names: `feature.auth.spec.ts` or `feature.unauth.spec.ts`
-
-2. **Test Data Management (CRITICAL)**:
-   - **Always clean up before and after tests** to ensure isolation
-   - Use cleanup utilities from `e2e/utils/cleanup.ts`
-   - Example:
-
-     ```typescript
-     import { clearUserTeams } from "../../utils/cleanup";
-
-     test.beforeEach(async ({ page }) => {
-       await clearUserTeams(page, process.env.E2E_TEST_EMAIL!);
-     });
-
-     test.afterEach(async ({ page }) => {
-       try {
-         await clearUserTeams(page, process.env.E2E_TEST_EMAIL!);
-       } catch (error) {
-         console.warn("Cleanup failed:", error);
-       }
-     });
-     ```
-
-3. **Writing Tests**:
-
-   ```typescript
-   import { test, expect } from "@playwright/test";
-
-   test("should display user dashboard", async ({ page }) => {
-     await page.goto("/dashboard");
-     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
-   });
-   ```
-
-4. **Using Playwright MCP for Verification**:
-   - Before using Playwright MCP:
-     - Check if dev server is running: `curl -s http://localhost:5173/api/health`
-     - If browser already in use, close it first: `mcp__playwright__browser_close`
-   - Use MCP to verify UI behavior before writing/updating E2E tests
-   - This ensures tests match actual application behavior
-   - Login is at /auth/login
-   - Username and password is in .env.e2e; one user: admin@example.com, password: testpassword123
-
-5. **Best Practices**:
-   - Use Playwright's recommended locators: `getByRole`, `getByLabel`, `getByText`
-   - Avoid arbitrary waits - use proper wait conditions
-   - Keep tests isolated and independent
-   - Test user journeys, not implementation details
-   - **Clean up test data** - don't leave data that affects other tests
-   - Use dedicated test users for different scenarios
-   - Handle known issues (like redirect parameter stripping) pragmatically
-
-6. **Running Tests**:
-   - `pnpm test:e2e:setup` - **Run this first** to seed clean test data
-   - `pnpm test:e2e` - Run all E2E tests
-   - `pnpm test:e2e:ui` - Interactive UI mode for debugging
-   - `pnpm test:e2e --project=chromium-auth` - Run specific test suite
-
-7. **Authentication in Tests**:
-   - Shared auth state is configured in `e2e/auth.setup.ts`
-   - Tests automatically use authenticated state when in `authenticated/` folder
-   - Test user credentials are in `.env.e2e`
-   - For tests needing fresh auth: `test.use({ storageState: undefined });`
-
-8. **Test Users**:
-   - `test@example.com` - General authenticated tests
-   - `teamcreator@example.com` - Team creation (no existing teams)
-   - `profile-edit@example.com` - Profile editing tests
-   - See `scripts/seed-e2e-data.ts` for all test users
-
-9. **See Also**: `docs/E2E-BEST-PRACTICES.md` for comprehensive testing guidelines
+- **Test locations**: `e2e/tests/authenticated/` and `e2e/tests/unauthenticated/`
+- **Running tests**: `pnpm test:e2e` (automatically runs `test:e2e:setup` first)
+- **Test credentials**: See `.env.e2e` and `scripts/seed-e2e-data.ts`
+- **Cleanup utilities**: Use `e2e/utils/cleanup.ts` for test isolation
+- **Full guide**: See `docs/E2E-BEST-PRACTICES.md` for comprehensive testing guidelines
 
 ### Common Tasks
 
@@ -892,227 +589,28 @@ For deploying to AWS, configure your AWS CLI with SSO profiles:
 aws sso login --profile techprod
 
 # Deploy to production
-AWS_PROFILE=techprod npx sst deploy --stage production
+AWS_PROFILE=techprod npx sst deploy --stage qc-prod
+AWS_PROFILE=techprod npx sst deploy --stage sin-prod
 
 # Set secrets
-AWS_PROFILE=techprod npx sst secret set DatabaseUrl "..." --stage production
+AWS_PROFILE=techprod npx sst secret set DatabaseUrl "..." --stage qc-prod
+AWS_PROFILE=techprod npx sst secret set DatabaseUrl "..." --stage sin-prod
 ```
 
 See `~/.aws/config` for profile configuration.
 
 ---
 
-## 4 — Directory Cheat‑Sheet
+## Playwright MCP
 
-Tree as of July 6, 2025
-
-```
-
-.
-├── AGENTS.md
-├── CLAUDE.md
-├── components.json
-├── coverage
-│   ├── base.css
-│   ├── block-navigation.js
-│   ├── coverage-final.json
-│   ├── favicon.png
-│   ├── features
-│   │   └── auth
-│   │       └── components
-│   │           ├── index.html
-│   │           └── login.tsx.html
-│   ├── index.html
-│   ├── lib
-│   │   └── auth
-│   │       └── middleware
-│   │           ├── auth-guard.ts.html
-│   │           └── index.html
-│   ├── prettify.css
-│   ├── prettify.js
-│   ├── shared
-│   │   ├── lib
-│   │   │   ├── index.html
-│   │   │   └── utils.ts.html
-│   │   └── ui
-│   │       ├── button.tsx.html
-│   │       ├── icons.tsx.html
-│   │       ├── index.html
-│   │       ├── input.tsx.html
-│   │       └── label.tsx.html
-│   ├── sort-arrow-sprite.png
-│   └── sorter.js
-├── dist
-│   ├── _headers
-│   ├── _redirects
-│   ├── assets
-│   │   ├── createLucideIcon-Bcg0Vi2e.js
-│   │   ├── index-CvP1hl19.js
-│   │   ├── index-Daq_2NZw.js
-│   │   ├── label-BpBwDb9J.js
-│   │   ├── loader-circle-6MYg0gu7.js
-│   │   ├── login-CU83squS.js
-│   │   ├── main-BaDK-79R.js
-│   │   ├── profile-3i2p7dMd.js
-│   │   ├── route-CscgpPZC.js
-│   │   ├── route-CZWZ9WpA.js
-│   │   ├── signup-CuG_U93y.js
-│   │   └── styles-by26pVYo.css
-│   └── favicon.ico
-├── docker-compose.yml
-├── docs
-│   ├── code-improvements.md
-│   ├── database-connections.md
-│   ├── project-brief.md
-│   ├── quadball-plan
-│   │   └── ... (project documentation)
-│   ├── reference
-│   │   └── database
-│   │       ├── schema-erd.png
-│   │       └── schema-erd.svg
-│   └── SECURITY.md
-├── drizzle.config.ts
-├── eslint.config.js
-├── LEARN_FULLSTACK.md
-├── LICENSE
-├── netlify
-│   └── edge-functions
-│       └── security-headers.ts
-├── netlify.toml
-├── package-lock.json
-├── package.json
-├── pnpm-lock.yaml
-├── pnpm-workspace.yaml
-├── public
-│   └── favicon.ico
-├── puppeteer.config.json
-├── README.md
-├── scripts
-│   ├── check-users.ts
-│   ├── generate-auth-secret.js
-│   ├── generate-erd.js
-│   ├── test-auth.ts
-│   ├── test-db-connection.ts
-│   └── test-security-headers.sh
-├── src
-│   ├── app
-│   │   └── providers.tsx
-│   ├── components
-│   │   ├── auth
-│   │   │   └── password-input.example.tsx
-│   │   ├── DefaultCatchBoundary.tsx
-│   │   ├── form-fields
-│   │   │   ├── FormSubmitButton.tsx
-│   │   │   └── ValidatedInput.tsx
-│   │   ├── NotFound.tsx
-│   │   └── ThemeToggle.tsx
-│   ├── db
-│   │   ├── connections.ts
-│   │   ├── index.ts
-│   │   └── schema
-│   │       ├── auth.schema.ts
-│   │       └── index.ts
-│   ├── features
-│   │   └── auth
-│   │       ├── __tests__
-│   │       │   └── login.test.tsx
-│   │       ├── components
-│   │       │   ├── login.tsx
-│   │       │   └── signup.tsx
-│   │       └── useAuthGuard.tsx
-│   ├── lib
-│   │   ├── auth
-│   │   │   ├── index.ts
-│   │   │   ├── middleware
-│   │   │   │   ├── __tests__
-│   │   │   │   └── auth-guard.ts
-│   │   │   └── types.ts
-│   │   ├── auth-client.ts
-│   │   ├── env.client.ts
-│   │   ├── env.server.ts
-│   │   ├── form.ts
-│   │   ├── schemas
-│   │   │   └── profile.ts
-│   │   ├── security
-│   │   │   ├── config.ts
-│   │   │   ├── index.ts
-│   │   │   └── middleware
-│   │   │   └── utils
-│   │   │       └── password-validator.ts
-│   │   └── server
-│   │       └── __tests__
-│   │           └── example.test.ts
-│   ├── router.tsx
-│   ├── routes
-│   │   ├── __root.tsx
-│   │   ├── (auth)
-│   │   │   ├── login.tsx
-│   │   │   ├── route.tsx
-│   │   │   └── signup.tsx
-│   │   ├── api
-│   │   │   └── auth
-│   │   │       ├── $.ts
-│   │   │       └── $action
-│   │   ├── dashboard
-│   │   │   ├── index.tsx
-│   │   │   ├── profile.tsx
-│   │   │   └── route.tsx
-│   │   └── index.tsx
-│   ├── routeTree.gen.ts
-│   ├── shared
-│   │   ├── hooks
-│   │   │   └── useTheme.ts
-│   │   ├── lib
-│   │   │   └── utils.ts
-│   │   └── ui
-│   │       ├── __tests__
-│   │       │   └── button.test.tsx
-│   │       ├── button.tsx
-│   │       ├── icons.tsx
-│   │       ├── input.tsx
-│   │       ├── label.tsx
-│   │       └── README.md
-│   ├── styles.css
-│   └── tests
-│       ├── mocks
-│       │   └── auth.ts
-│       ├── README.md
-│       ├── setup.ts
-│       └── utils.tsx
-├── tsconfig.json
-├── typedoc.json
-├── vite.config.ts
-└── vitest.config.ts
-
-125 directories, 120 files
-
-
-## Tool available
-
-Always use your playwright tool to navigate to localhost:5173 to test changes before finishing
-
-## Before using Playwright MCP
+Use Playwright to verify UI changes on localhost:5173.
 
 1. Check if dev server is running: `curl -s http://localhost:5173/api/health`
-2. If MCP shows error about browser already in use, close it first: `mcp__playwright__browser_close`
-3. Then navigate to the page you need
+   - If not running, start with `AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono`
+2. If browser already in use, close first: `mcp__playwright__browser_close`
+3. Always verify UI behavior with MCP before writing/updating E2E tests
 
-## Before rerunning E2E tests
+## Additional Resources
 
-Always use Playwright MCP to manually verify the expected behavior before running E2E tests. This helps ensure tests match the actual UI behavior.
-
-## Dev server
-
-Assume the dev server is running on port 5173 for every session, and check via playwright or curl
-
-## Rules
-Always read .cursor/rules/*
-
-## Docs
-Read /docs/quadball-plan/* as appropriate
-
-## Development Roadmap
-See /docs/development-backlog.md for prioritized feature implementation tickets
-```
-
-- Remember the best practices
+- **Project docs**: `docs/quadball-plan/*`
+- **Development backlog**: `docs/development-backlog.md`

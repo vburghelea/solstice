@@ -1,5 +1,7 @@
 # Solstice Codebase Guide
 
+Update instructions: Run `node scripts/update-code-guide.mjs`.
+
 Generated: 2025-12-24T21:05:08Z (UTC)
 
 Per-file inventory of the codebase. Every code file in the scope below is listed.
@@ -39,12 +41,10 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `eslint.config.js` (53 lines)
 - `playwright.config.ts` (98 lines)
 - `sst-env.d.ts` (84 lines)
-- `sst.config.ts` (498 lines) - SST infrastructure definition for AWS deployment.
-  Deploys TanStack Start to Lambda with CloudFront CDN in ca-central-1. Configures VPC with bastion/NAT,
-  RDS Postgres with proxy and SSL, S3 bucket for SIN artifacts, SQS notification queue with DLQ.
-  Defines SST secrets (auth, Square, email), cron jobs (notifications, retention), and SQS consumer.
-  Creates CloudWatch alarms (throttling, errors, duration, concurrency, RDS) and monitoring dashboard.
-- `vite.config.ts` (204 lines) - Vite config with TanStack Start, Nitro adapter, PWA, React compiler, and browser shims.
+- `sst.config.ts` (609 lines) - SST infra: stage/tenant mapping (qc/sin),
+  VPC (bastion+NAT), Postgres+proxy+SSL, TanStack Start on Lambda+CloudFront,
+  S3 artifacts, SQS notifications+DLQ, cron jobs, secrets, alarms/dashboard.
+- `vite.config.ts` (234 lines) - Vite config with TanStack Start, Nitro adapter, PWA, React compiler, and browser shims.
 - `vitest.config.ts` (42 lines)
 
 ## .husky (Generated/Tooling)
@@ -80,7 +80,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `scripts/generate-erd.js` (85 lines)
 - `scripts/get-square-location.ts` (81 lines)
 - `scripts/seed-e2e-data.ts` (714 lines) - Seed database with E2E test data/users.
-- `scripts/seed-global-admins.ts` (350 lines)
+- `scripts/seed-global-admins.ts` (388 lines)
+- `scripts/seed-sin-data.ts` (733 lines) - Destructive: deletes existing SIN data before seeding.
 - `scripts/test-auth.ts` (44 lines)
 - `scripts/test-db-connection.ts` (70 lines)
 - `scripts/test-routing.ts` (71 lines)
@@ -114,6 +115,7 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `e2e/tests/authenticated/roles-management.auth.spec.ts` (26 lines)
 - `e2e/tests/authenticated/settings.auth.spec.ts` (93 lines)
 - `e2e/tests/authenticated/sin-admin-access.auth.spec.ts` (29 lines)
+- `e2e/tests/authenticated/sin-portal-access.auth.spec.ts` (35 lines)
 - `e2e/tests/authenticated/team-browse.auth.spec.ts` (299 lines)
 - `e2e/tests/authenticated/team-members.auth.spec.ts` (348 lines)
 - `e2e/tests/authenticated/teams-create-no-conflict.auth.spec.ts` (156 lines)
@@ -135,7 +137,7 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 - `src/client.tsx` (25 lines) - Client entry: hydrates Start app, attaches router diagnostics, exposes **ROUTER** in dev.
 - `src/routeTree.gen.ts` (1006 lines) - Auto-generated route tree (do not edit).
-- `src/router.tsx` (67 lines) - Router factory: QueryClient + CSP nonce + SSR query integration.
+- `src/router.tsx` (67 lines)
 - `src/server.ts` (9 lines)
 - `src/start.ts` (7 lines) - TanStack Start entry point. Creates the Start instance with global
   function middleware: requestIdMiddleware for request tracing and orgContextMiddleware for
@@ -167,12 +169,13 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/components/ui/TypedLink.tsx` (57 lines) - Fully generic-typed Link component with Safari/WebKit
   workaround. Preserves TanStack Router's generic type parameters (TFrom, TTo, TMaskFrom, TMaskTo)
   for proper TypeScript inference while handling WebKit click event quirks.
-- `src/components/ui/admin-sidebar.tsx` (131 lines)
+- `src/components/ui/app-sidebar.tsx` (126 lines)
+- `src/components/ui/admin-sidebar.tsx` (103 lines)
 - `src/components/ui/alert-dialog.tsx` (139 lines)
 - `src/components/ui/alert.tsx` (63 lines)
 - `src/components/ui/avatar.tsx` (51 lines)
 - `src/components/ui/badge.tsx` (45 lines)
-- `src/components/ui/breadcrumbs.tsx` (71 lines)
+- `src/components/ui/breadcrumbs.tsx` (82 lines)
 - `src/components/ui/button.tsx` (57 lines)
 - `src/components/ui/card.tsx` (86 lines)
 - `src/components/ui/checkbox.tsx` (30 lines)
@@ -186,8 +189,9 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/components/ui/icons.tsx` (42 lines)
 - `src/components/ui/input.tsx` (21 lines)
 - `src/components/ui/label.tsx` (22 lines)
-- `src/components/ui/logo.tsx` (19 lines)
-- `src/components/ui/mobile-admin-header.tsx` (26 lines)
+- `src/components/ui/logo.tsx` (38 lines)
+- `src/components/ui/mobile-admin-header.tsx` (29 lines)
+- `src/components/ui/mobile-app-header.tsx` (37 lines)
 - `src/components/ui/mobile-data-cards.tsx` (136 lines)
 - `src/components/ui/popover.tsx` (44 lines)
 - `src/components/ui/radio-group.tsx` (43 lines)
@@ -225,7 +229,7 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/db/schema/index.ts` (14 lines)
 - `src/db/schema/membership.schema.ts` (119 lines)
 - `src/db/schema/notifications.schema.ts` (114 lines)
-- `src/db/schema/organizations.schema.ts` (150 lines)
+- `src/db/schema/organizations.schema.ts` (151 lines)
 - `src/db/schema/privacy.schema.ts` (114 lines)
 - `src/db/schema/reporting.schema.ts` (119 lines)
 - `src/db/schema/reports.schema.ts` (53 lines)
@@ -242,7 +246,7 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### audit
 
-- `src/features/audit/audit.queries.ts` (118 lines)
+- `src/features/audit/audit.queries.ts` (122 lines)
 - `src/features/audit/audit.schemas.ts` (22 lines)
 - `src/features/audit/components/audit-log-table.tsx` (174 lines)
 
@@ -253,8 +257,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/auth/__tests__/signup-with-router.test.tsx` (115 lines)
 - `src/features/auth/auth.queries.ts` (71 lines)
 - `src/features/auth/auth.schemas.ts` (89 lines)
-- `src/features/auth/components/login.tsx` (365 lines)
-- `src/features/auth/components/signup.tsx` (216 lines)
+- `src/features/auth/components/login.tsx` (367 lines)
+- `src/features/auth/components/signup.tsx` (218 lines)
 - `src/features/auth/hooks/useAuth.ts` (42 lines)
 - `src/features/auth/hooks/useAuthForm.ts` (67 lines)
 - `src/features/auth/index.ts` (8 lines)
@@ -271,10 +275,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### dashboard
 
-- `src/features/dashboard/MemberDashboard.tsx` (539 lines) - Member dashboard home page component.
-  Displays profile completion status, membership cards with status badges, team memberships
-  with pending invites, upcoming events, and admin quick actions. Role-aware section visibility.
-- `src/features/dashboard/PublicPortalPage.tsx` (90 lines)
+- `src/features/dashboard/MemberDashboard.tsx` (544 lines)
+- `src/features/dashboard/PublicPortalPage.tsx` (95 lines)
 - `src/features/dashboard/index.ts` (3 lines)
 
 #### events
@@ -288,13 +290,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/events/components/event-create-form.tsx` (866 lines)
 - `src/features/events/components/event-list.tsx` (513 lines)
 - `src/features/events/events.db-types.ts` (75 lines)
-- `src/features/events/events.mutations.ts` (1272 lines) - Event management server functions.
-  cancelEvent (cascade to registrations/payments), registerForEvent (individual/team with pricing),
-  createEvent, updateEvent, markEtransferPaid/markEtransferReminder, cancelEventRegistration.
-  Uses atomic JSONB merges and testable clock abstraction.
-- `src/features/events/events.queries.ts` (454 lines) - Event data fetching server functions.
-  listEvents (with filters, pagination, sorting), getEvent/getEventBySlug, getUpcomingEvents,
-  checkEventRegistration, getEventRegistrations (for admin). Returns typed EventWithDetails.
+- `src/features/events/events.mutations.ts` (1280 lines) - Square/e-transfer registration + refunds.
+- `src/features/events/events.queries.ts` (460 lines)
 - `src/features/events/events.schemas.ts` (118 lines)
 - `src/features/events/events.types.ts` (168 lines)
 - `src/features/events/index.ts` (33 lines)
@@ -314,15 +311,9 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### forms
 
-- `src/features/forms/components/form-builder-shell.tsx` (1627 lines) - Full-featured dynamic form builder UI.
-  Supports field types (text, select, file, etc.), validation rules, conditional logic, versioning,
-  submission review workflow, and file upload handling. Admin-facing form creation and management.
-- `src/features/forms/forms.mutations.ts` (581 lines) - Form management server functions.
-  createForm/updateForm (with versioning), publishForm, submitForm (with file upload validation),
-  reviewFormSubmission (approve/reject workflow), createFormUpload for S3 presigned URLs.
-- `src/features/forms/forms.queries.ts` (280 lines) - Form data fetching server functions.
-  getForm, listForms (with org filtering), listFormSubmissions, listSubmissionVersions,
-  getSubmissionFileDownload (S3 presigned URL), listSubmissionFiles. Enforces org access.
+- `src/features/forms/components/form-builder-shell.tsx` (1627 lines) - Builder + submission review workflow.
+- `src/features/forms/forms.mutations.ts` (589 lines)
+- `src/features/forms/forms.queries.ts` (327 lines)
 - `src/features/forms/forms.schemas.ts` (143 lines)
 - `src/features/forms/forms.utils.ts` (384 lines) - Form validation and processing utilities.
   sanitizePayload (XSS protection), validateFormPayload (required/min/max/regex rules),
@@ -333,30 +324,24 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/imports/components/import-wizard-shell.tsx` (858 lines) - Bulk data import wizard UI.
   Supports CSV/Excel parsing via papaparse/xlsx, column mapping templates, interactive vs batch
   processing lanes, validation preview, import job tracking, and rollback capability.
-- `src/features/imports/imports.mutations.ts` (502 lines) - Import job management mutations.
-  createImportJob, updateImportJobStatus, createMappingTemplate, runInteractiveImport (single-row),
-  runBatchImport (async worker), rollbackImportJob (deletes created submissions). Audit logs actions.
-- `src/features/imports/imports.queries.ts` (190 lines) - Import job data queries.
-  getImportJob, listImportJobs (with org filtering), listMappingTemplates, listImportJobErrors.
-  Enforces organization membership for access control.
+- `src/features/imports/imports.mutations.ts` (512 lines) - Batch + interactive imports; rollback window.
+- `src/features/imports/imports.queries.ts` (195 lines)
 - `src/features/imports/imports.schemas.ts` (81 lines)
 
 #### layouts
 
-- `src/features/layouts/__tests__/admin-layout.test.tsx` (106 lines)
-- `src/features/layouts/admin-layout.tsx` (55 lines) - Responsive admin shell layout component.
-  Renders persistent sidebar on desktop, overlay slide-out sidebar on mobile with backdrop
-  dismiss, breadcrumbs navigation, and Outlet for child route content.
-- `src/features/layouts/admin-nav.ts` (51 lines) - Admin sidebar navigation configuration.
-  Defines ADMIN_PRIMARY_NAV and ADMIN_SECONDARY_NAV arrays with route paths, icons, labels,
-  and role-based visibility (global admin roles for Reports, Roles, SIN Admin).
+- `src/features/layouts/__tests__/admin-layout.test.tsx` (122 lines)
+- `src/features/layouts/app-layout.tsx` (52 lines)
+- `src/features/layouts/admin-layout.tsx` (50 lines)
+- `src/features/layouts/admin-nav.ts` (25 lines)
+- `src/features/layouts/app-nav.ts` (135 lines)
+- `src/features/layouts/nav.types.ts` (18 lines)
+- `src/features/layouts/sin-admin-nav.ts` (85 lines)
 
 #### members
 
 - `src/features/members/index.ts` (3 lines)
-- `src/features/members/members.queries.ts` (352 lines) - Member directory server functions.
-  listMembers with search, pagination, team/membership aggregation, and privacy settings
-  enforcement. Respects user showEmail/showPhone/showBirthYear preferences for non-admins.
+- `src/features/members/members.queries.ts` (354 lines) - Privacy filtering for email/phone/birth year.
 - `src/features/members/members.schemas.ts` (9 lines)
 - `src/features/members/members.types.ts` (51 lines)
 
@@ -369,17 +354,17 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/membership/components/admin-memberships-report.tsx` (242 lines)
 - `src/features/membership/hooks/usePaymentReturn.ts` (87 lines)
 - `src/features/membership/index.ts` (18 lines)
-- `src/features/membership/membership.admin-queries.ts` (133 lines) - Admin-only membership queries.
+- `src/features/membership/membership.admin-queries.ts` (135 lines)
   Provides getAllMemberships server function for fetching paginated membership records with user
   info, status filtering, and admin role enforcement. Used by membership reports dashboard.
 - `src/features/membership/membership.db-types.ts` (11 lines)
 - `src/features/membership/membership.finalize.ts` (124 lines) - Idempotent membership finalization.
   finalizeMembershipForSession atomically creates/updates membership + payment session in
   a transaction. Handles duplicate payment IDs, sets expiry dates, and uses atomic JSONB merge.
-- `src/features/membership/membership.mutations.ts` (436 lines) - Membership purchase mutations.
+- `src/features/membership/membership.mutations.ts` (439 lines)
   createCheckoutSession (Square integration), confirmMembershipPurchase (with retry logic for
   pending payments). Validates membership type, prevents duplicates, and tracks payment sessions.
-- `src/features/membership/membership.queries.ts` (204 lines)
+- `src/features/membership/membership.queries.ts` (208 lines)
 - `src/features/membership/membership.schemas.ts` (30 lines)
 - `src/features/membership/membership.types.ts` (60 lines)
 
@@ -390,26 +375,27 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/notifications/components/notification-template-panel.tsx` (337 lines) - Admin UI for managing
   notification templates. CRUD operations for email/in-app templates with category selection,
   subject/body editing, system template flag, and inline draft editing with React Query mutations.
-- `src/features/notifications/notifications.mutations.ts` (273 lines)
-- `src/features/notifications/notifications.queries.ts` (106 lines)
+- `src/features/notifications/notifications.mutations.ts` (282 lines)
+- `src/features/notifications/notifications.queries.ts` (111 lines)
 - `src/features/notifications/notifications.schemas.ts` (93 lines)
 - `src/features/notifications/notifications.types.ts` (24 lines)
 
 #### organizations
 
-- `src/features/organizations/components/organization-admin-panel.tsx` (541 lines) - Organization management
-  admin UI. Create/edit organizations with type hierarchy, manage members with role assignment,
-  handle member invitations/approvals, and configure delegated access scopes.
-- `src/features/organizations/organizations.mutations.ts` (713 lines) - Organization management mutations.
-  createOrganization (with owner auto-add), updateOrganization, inviteMember/approveMember/removeMember,
-  updateMemberRole, createDelegatedAccess/revokeDelegatedAccess. Audit logs all admin actions.
-- `src/features/organizations/organizations.queries.ts` (186 lines)
-- `src/features/organizations/organizations.schemas.ts` (129 lines)
-- `src/features/organizations/organizations.types.ts` (58 lines)
+- `src/features/organizations/__tests__/organizations.access.test.ts` (217 lines)
+- `src/features/organizations/components/org-switcher.tsx` (89 lines)
+- `src/features/organizations/components/organization-admin-panel.tsx` (542 lines)
+- `src/features/organizations/org-context.tsx` (73 lines)
+- `src/features/organizations/organizations.access.ts` (260 lines)
+- `src/features/organizations/organizations.mutations.ts` (882 lines) - Org hierarchy + delegated access; sets active org cookie.
+- `src/features/organizations/organizations.queries.ts` (242 lines)
+- `src/features/organizations/organizations.schemas.ts` (135 lines)
+- `src/features/organizations/organizations.types.ts` (65 lines)
 
 #### privacy
 
-- `src/features/privacy/components/privacy-acceptance-card.tsx` (76 lines)
+- `src/features/privacy/components/onboarding-policy-step.tsx` (148 lines)
+- `src/features/privacy/components/privacy-acceptance-card.tsx` (91 lines)
 - `src/features/privacy/components/privacy-admin-panel.tsx` (256 lines) - GDPR/PIPEDA privacy request admin.
   Lists all privacy requests with status updates, triggers data export generation, initiates
   erasure workflows, and provides download links for completed export files.
@@ -417,10 +403,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/privacy/components/retention-policy-panel.tsx` (304 lines) - Data retention policy admin UI.
   Configure retention/archive/purge periods per data type, toggle legal hold status, and view
   existing policies in a table. Supports PIPEDA compliance requirements.
-- `src/features/privacy/privacy.mutations.ts` (651 lines) - Privacy/GDPR compliance mutations.
-  createPolicyDocument/acceptPolicy, createPrivacyRequest, updatePrivacyRequestStatus,
-  generatePrivacyExport (S3 upload), applyPrivacyErasure, upsertRetentionPolicy. Audit logs all.
-- `src/features/privacy/privacy.queries.ts` (148 lines)
+- `src/features/privacy/privacy.mutations.ts` (659 lines) - Privacy export + erasure (DSAR) + retention policies.
+- `src/features/privacy/privacy.queries.ts` (156 lines)
 - `src/features/privacy/privacy.schemas.ts` (74 lines)
 
 #### profile
@@ -445,29 +429,27 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### reporting
 
-- `src/features/reporting/components/reporting-dashboard-shell.tsx` (586 lines) - Organizational reporting
-  dashboard. Manage reporting cycles/tasks, view submission overview by organization, track
-  submission status workflow, and handle step-up authentication for sensitive operations.
-- `src/features/reporting/reporting.mutations.ts` (326 lines)
-- `src/features/reporting/reporting.queries.ts` (223 lines)
-- `src/features/reporting/reporting.schemas.ts` (57 lines)
+- `src/features/reporting/components/reporting-dashboard-shell.tsx` (587 lines)
+- `src/features/reporting/reporting.mutations.ts` (330 lines) - Reporting cycles/tasks + reminder scheduling (step-up).
+- `src/features/reporting/reporting.queries.ts` (229 lines)
+- `src/features/reporting/reporting.schemas.ts` (58 lines)
 
 #### reports
 
 - `src/features/reports/components/report-builder-shell.tsx` (647 lines) - Saved report builder and export UI.
   Create/edit saved reports with data source selection, column/filter/sort configuration,
   organization scoping, sharing options, and export to CSV/Excel/PDF formats.
-- `src/features/reports/reports.mutations.ts` (354 lines)
+- `src/features/reports/reports.mutations.ts` (359 lines) - PII field masking + export ACL.
 - `src/features/reports/reports.queries.ts` (34 lines)
 - `src/features/reports/reports.schemas.ts` (36 lines)
 
 #### roles
 
-- `src/features/roles/__tests__/permission.service.test.ts` (177 lines)
-- `src/features/roles/components/__tests__/role-management-dashboard.test.tsx` (120 lines)
-- `src/features/roles/components/role-management-dashboard.tsx` (899 lines)
-- `src/features/roles/permission.server.ts` (121 lines) - Server-only PermissionService wrapper.
-- `src/features/roles/permission.service.ts` (171 lines) - Core permission checking service.
+- `src/features/roles/__tests__/permission.service.test.ts` (183 lines)
+- `src/features/roles/components/__tests__/role-management-dashboard.test.tsx` (129 lines)
+- `src/features/roles/components/role-management-dashboard.tsx` (901 lines)
+- `src/features/roles/permission.server.ts` (120 lines)
+- `src/features/roles/permission.service.ts` (169 lines)
   PermissionService class with isGlobalAdmin, canManageTeam, canManageEvent, hasAnyRole methods.
   Queries userRoles/roles tables. isAnyAdmin helper exported for client-side role checks.
 - `src/features/roles/roles.mutations.ts` (442 lines) - Role assignment server functions.
@@ -483,8 +465,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/security/components/security-dashboard.tsx` (136 lines) - Admin security operations dashboard.
   Manual account lock/unlock controls with reason tracking, recent security events log,
   and active account locks list. Used for incident response and user management.
-- `src/features/security/security.mutations.ts` (87 lines)
-- `src/features/security/security.queries.ts` (188 lines)
+- `src/features/security/security.mutations.ts` (91 lines)
+- `src/features/security/security.queries.ts` (192 lines)
 - `src/features/security/security.schemas.ts` (29 lines)
 
 #### settings
@@ -503,14 +485,14 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/features/teams/__tests__/teams.schemas.test.ts` (380 lines)
 - `src/features/teams/components/__tests__/team-invitations.test.tsx` (90 lines)
 - `src/features/teams/components/team-invitations.tsx` (184 lines)
-- `src/features/teams/teams.cleanup.ts` (40 lines) - E2E test cleanup utility for teams.
+- `src/features/teams/teams.cleanup.ts` (42 lines)
   clearUserTeamsForTesting server function removes all team memberships for a user by email.
   Guarded to only run in non-production or when E2E_TEST_EMAIL is set.
 - `src/features/teams/teams.db-types.ts` (12 lines)
-- `src/features/teams/teams.mutations.ts` (743 lines) - Team CRUD and membership management.
+- `src/features/teams/teams.mutations.ts` (754 lines)
   createTeam (with captain auto-add), updateTeam, addTeamMember, removeTeamMember, updateTeamMember,
   requestTeamMembership, handleTeamInvite (accept/reject). Enforces single active membership constraint.
-- `src/features/teams/teams.queries.ts` (359 lines) - Team data fetching server functions.
+- `src/features/teams/teams.queries.ts` (368 lines)
   getTeam/getTeamBySlug (with member count), listTeams (with creator info), searchTeams (text search),
   getTeamMembers (with user details), getUserTeams, isTeamMember, getTeamInvitations.
 - `src/features/teams/teams.schemas.ts` (106 lines)
@@ -525,10 +507,10 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
   Exposes auth methods (signIn, signUp, signOut, session, twoFactor, etc.) via getters that
   initialize the client on first use with proper baseURL configuration.
 - `src/lib/auth/guards/__tests__/route-guards.test.tsx` (91 lines)
-- `src/lib/auth/guards/org-context.ts` (35 lines) - TanStack Start middleware for organization context.
+- `src/lib/auth/guards/org-context.ts` (72 lines)
   Reads x-organization-id header, resolves membership for authenticated user, and injects
   userId/organizationId/organizationMembership into server function context.
-- `src/lib/auth/guards/org-guard.ts` (58 lines) - Organization membership guards for server functions.
+- `src/lib/auth/guards/org-guard.ts` (82 lines)
   getOrganizationMembership fetches membership record; requireOrganizationMembership throws
   unauthorized/forbidden errors if user lacks membership or required role.
 - `src/lib/auth/guards/route-guards.ts` (85 lines) - TanStack Router beforeLoad guard utilities.
@@ -539,27 +521,27 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
   Better Auth. requireRecentAuth throws forbidden if session is stale.
 - `src/lib/auth/index.ts` (9 lines)
 - `src/lib/auth/middleware/__tests__/auth-guard.test.ts` (111 lines)
-- `src/lib/auth/middleware/auth-guard.ts` (78 lines) - Server function authentication middleware.
+- `src/lib/auth/middleware/auth-guard.ts` (107 lines)
   Validates session via Better Auth, checks account lockout, resolves organization membership
   from x-organization-id header, and injects AuthedRequestContext into function context.
 - `src/lib/auth/middleware/role-guard.ts` (61 lines) - Role-based route protection guards.
   requireRole checks user against required roles with optional team/event context scoping.
   requireGlobalAdmin is a convenience wrapper for global admin-only routes.
-- `src/lib/auth/server-helpers.ts` (203 lines) - Server-only Better Auth configuration.
+- `src/lib/auth/server-helpers.ts` (205 lines)
   Lazy-initializes betterAuth with Drizzle adapter, Google OAuth, TOTP 2FA, secure cookies
   (HTTPS-aware), domain filtering, and TanStack Start cookie integration. getAuth() accessor.
 - `src/lib/auth/types.ts` (69 lines)
-- `src/lib/auth/utils/admin-check.ts` (53 lines) - Global admin role verification utilities.
+- `src/lib/auth/utils/admin-check.ts` (54 lines)
   isAdmin/requireAdmin check via PermissionService (server); isAdminClient checks user.roles
   (client). Enforces MFA requirement for admins. Exports GLOBAL_ADMIN_ROLE_NAMES list.
 - `src/lib/db/jsonb-utils.ts` (87 lines) - Atomic JSONB operations for Drizzle ORM.
   Provides atomicJsonbMerge, atomicJsonbSet, atomicJsonbDelete, and atomicJsonbDeepMerge
   SQL helpers to prevent race conditions in concurrent JSONB column updates.
-- `src/lib/email/sendgrid.ts` (336 lines) - SendGrid email service wrapper with mock fallback.
+- `src/lib/email/sendgrid.ts` (346 lines)
   Type-safe email sending with Zod schemas, template ID constants, attachment support, and
   automatic mock mode in development. Used for transactional emails (receipts, invites, etc.).
-- `src/lib/env.client.ts` (39 lines) - Client-safe env parsing with VITE\_ vars and feature flags.
-- `src/lib/env.server.ts` (170 lines) - Server-only environment configuration.
+- `src/lib/env.client.ts` (40 lines)
+- `src/lib/env.server.ts` (172 lines)
   Uses @t3-oss/env-core with Zod validation for database URLs, OAuth, Square, SendGrid, and SST/AWS vars.
   Dotenv loading with AWS Lambda/Vite runtime detection. Exports getDbUrl, getPooledDbUrl, getUnpooledDbUrl,
   getBaseUrl (SST or VITE_BASE_URL), getAuthSecret (cached, validated). Runtime helpers: isProduction,
@@ -651,9 +633,7 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### \_\_root.tsx
 
-- `src/routes/__root.tsx` (166 lines) - Root route with auth and privacy checks.
-  beforeLoad fetches user (server/client), enforces privacy policy acceptance redirect, sets
-  user context. Renders head/meta, lazy-loads devtools in dev, and wraps children in StepUpProvider.
+- `src/routes/__root.tsx` (197 lines)
 
 #### admin
 
@@ -663,18 +643,14 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 - `src/routes/api/auth/$.ts` (21 lines)
 - `src/routes/api/auth/$action/$provider.ts` (17 lines)
-- `src/routes/api/debug-square.ts` (43 lines)
+- `src/routes/api/debug-square.ts` (45 lines)
 - `src/routes/api/health.ts` (195 lines) - Comprehensive health check endpoint.
   GET handler returns status (healthy/degraded/unhealthy), DB connection test with latency,
   Square config validation, membership types availability, and connection pool metrics.
-- `src/routes/api/payments/square/callback.ts` (469 lines) - Square checkout callback handler.
-  GET handler processes Square redirect after payment. Handles both membership and event
-  payment sessions: verifies payment, finalizes membership/registration, sends receipt email.
-- `src/routes/api/test-square.ts` (36 lines)
+- `src/routes/api/payments/square/callback.ts` (471 lines)
+- `src/routes/api/test-square.ts` (38 lines)
 - `src/routes/api/test/cleanup.ts` (166 lines)
-- `src/routes/api/webhooks/square.ts` (458 lines) - Square webhook receiver.
-  POST handler validates signature via processSquareWebhook, finalizes membership/event
-  payments on success, handles refunds, and updates session status. Logs to audit trail.
+- `src/routes/api/webhooks/square.ts` (460 lines)
 
 #### auth
 
@@ -684,12 +660,21 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### dashboard
 
+- `src/routes/dashboard/admin/index.tsx` (49 lines)
 - `src/routes/dashboard/admin/roles.tsx` (14 lines)
-- `src/routes/dashboard/admin/route.tsx` (21 lines)
-- `src/routes/dashboard/admin/sin.tsx` (75 lines) - Super admin "SIN" dashboard page.
-  Aggregates all admin panels: Organizations, Audit Logs, Notifications, Security, Privacy,
-  Forms, Imports, Reporting Cycles, and Analytics/Export into a single admin view.
-- `src/routes/dashboard/events.tsx` (9 lines)
+- `src/routes/dashboard/admin/route.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin.tsx` (55 lines)
+- `src/routes/dashboard/admin/sin/analytics.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/audit.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/forms.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/imports.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/index.tsx` (98 lines)
+- `src/routes/dashboard/admin/sin/notifications.tsx` (22 lines)
+- `src/routes/dashboard/admin/sin/organizations.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/privacy.tsx` (24 lines)
+- `src/routes/dashboard/admin/sin/reporting.tsx` (18 lines)
+- `src/routes/dashboard/admin/sin/security.tsx` (18 lines)
+- `src/routes/dashboard/events.tsx` (13 lines)
 - `src/routes/dashboard/events/$eventId.manage.tsx` (873 lines) - Admin event management page.
   Tabbed interface for event overview, registrations table (with e-transfer status, refund actions),
   and settings. Supports event cancellation, status updates, e-transfer payment marking, and CSV export.
@@ -702,20 +687,25 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/routes/dashboard/events/$slug.tsx` (9 lines)
 - `src/routes/dashboard/events/create.tsx` (34 lines)
 - `src/routes/dashboard/events/index.tsx` (35 lines)
-- `src/routes/dashboard/forbidden.tsx` (32 lines)
-- `src/routes/dashboard/index.tsx` (209 lines)
-- `src/routes/dashboard/members.tsx` (626 lines) - Member directory page.
-  Searchable data table with privacy-aware columns (email/phone visibility), team badges,
-  membership status. Mobile-responsive card view, member detail dialog, and CSV export.
-- `src/routes/dashboard/membership.tsx` (346 lines) - Membership purchase/status page.
-  Displays current membership status, available membership types, Square checkout integration,
-  payment return handling with confirmation flow, and error recovery for failed payments.
+- `src/routes/dashboard/forbidden.tsx` (36 lines)
+- `src/routes/dashboard/index.tsx` (217 lines)
+- `src/routes/dashboard/members.tsx` (632 lines)
+- `src/routes/dashboard/membership.tsx` (352 lines)
 - `src/routes/dashboard/privacy.tsx` (16 lines)
 - `src/routes/dashboard/profile.tsx` (21 lines)
-- `src/routes/dashboard/reports.tsx` (29 lines)
+- `src/routes/dashboard/reports.tsx` (31 lines)
+- `src/routes/dashboard/select-org.tsx` (48 lines)
+- `src/routes/dashboard/sin.tsx` (19 lines)
+- `src/routes/dashboard/sin/analytics.tsx` (56 lines)
+- `src/routes/dashboard/sin/forms.tsx` (80 lines)
+- `src/routes/dashboard/sin/forms/$formId.tsx` (105 lines)
+- `src/routes/dashboard/sin/imports.tsx` (85 lines)
+- `src/routes/dashboard/sin/index.tsx` (69 lines)
+- `src/routes/dashboard/sin/reporting.tsx` (110 lines)
+- `src/routes/dashboard/sin/submissions/$submissionId.tsx` (159 lines)
 - `src/routes/dashboard/route.tsx` (16 lines)
 - `src/routes/dashboard/settings.tsx` (14 lines)
-- `src/routes/dashboard/teams.tsx` (9 lines)
+- `src/routes/dashboard/teams.tsx` (13 lines)
 - `src/routes/dashboard/teams/$teamId.index.tsx` (305 lines)
 - `src/routes/dashboard/teams/$teamId.manage.tsx` (325 lines)
 - `src/routes/dashboard/teams/$teamId.members.tsx` (396 lines)
@@ -730,8 +720,8 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 
 #### onboarding
 
-- `src/routes/onboarding/index.tsx` (21 lines)
-- `src/routes/onboarding/route.tsx` (21 lines)
+- `src/routes/onboarding/index.tsx` (165 lines)
+- `src/routes/onboarding/route.tsx` (42 lines)
 
 ### src/shared
 
@@ -763,6 +753,17 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - `src/shims/stream-web.browser.ts` (8 lines)
 - `src/shims/stream.browser.ts` (16 lines)
 
+### src/tenant
+
+- `src/tenant/__tests__/feature-gates.test.ts` (97 lines)
+- `src/tenant/__tests__/tenant-env.test.ts` (52 lines)
+- `src/tenant/feature-gates.ts` (54 lines)
+- `src/tenant/index.ts` (22 lines)
+- `src/tenant/tenant-env.ts` (56 lines)
+- `src/tenant/tenant.types.ts` (73 lines)
+- `src/tenant/tenants/qc.ts` (63 lines)
+- `src/tenant/tenants/viasport.ts` (63 lines)
+
 ### src/tests
 
 - `src/tests/mocks/auth.ts` (66 lines) - Test mocks for Better Auth client/session.
@@ -785,3 +786,77 @@ Per-file inventory of the codebase. Every code file in the scope below is listed
 - Better Auth cookie cache is disabled due to upstream bug (see src/lib/auth/server-helpers.ts).
 - Root route duplicates server/client user fetch logic (see src/routes/\_\_root.tsx).
 - createServerFn without inputValidator: `src/features/auth/auth.queries.ts`, `src/features/auth/mfa/mfa.mutations.ts`, `src/features/profile/profile.queries.ts`, `src/features/settings/settings.queries.ts`, `src/lib/server/auth.ts`
+
+## Files to Add
+
+New files created after 2025-12-24T21:05:08Z that need documentation:
+
+### E2E Tests
+
+### Scripts
+
+### UI Components
+
+### Features - Layouts
+
+### Features - Organizations
+
+### Features - Privacy
+
+### Routes - Dashboard Admin SIN
+
+### Routes - Dashboard SIN
+
+### Tenant Module (New)
+
+## Files to Update
+
+Existing files modified after 2025-12-24T21:05:08Z that need documentation refresh:
+
+### Scripts
+
+### UI Components
+
+### Database Schema
+
+### Features - Audit
+
+### Features - Auth
+
+### Features - Dashboard
+
+### Features - Events
+
+### Features - Forms
+
+### Features - Imports
+
+### Features - Layouts
+
+### Features - Members
+
+### Features - Membership
+
+### Features - Notifications
+
+### Features - Organizations
+
+### Features - Privacy
+
+### Features - Reporting
+
+### Features - Reports
+
+### Features - Roles
+
+### Features - Security
+
+### Features - Teams
+
+### Lib - Auth
+
+### Lib - Other
+
+### Routes
+
+### Config

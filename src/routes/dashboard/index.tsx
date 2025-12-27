@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import {
@@ -23,8 +23,15 @@ import {
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import type { MembershipStatus } from "~/features/membership/membership.types";
 import { getUserTeams, type UserTeam } from "~/features/teams/teams.queries";
+import { getBrand } from "~/tenant";
+import { isFeatureEnabled } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/")({
+  beforeLoad: () => {
+    if (isFeatureEnabled("sin_portal") && !isFeatureEnabled("qc_portal")) {
+      throw redirect({ to: "/dashboard/sin" });
+    }
+  },
   loader: async () => {
     // Load data in parallel on the server
     const [membershipResult, userTeams] = await Promise.all([
@@ -45,6 +52,7 @@ export const Route = createFileRoute("/dashboard/")({
 });
 
 function DashboardIndex() {
+  const brand = getBrand();
   const { user } = Route.useRouteContext();
   const { membershipStatus, userTeams } = Route.useLoaderData();
 
@@ -59,7 +67,7 @@ function DashboardIndex() {
           Welcome back, {user?.name || "Player"}!
         </h1>
         <p className="text-muted-foreground mt-2">
-          Here's an overview of your Quadball Canada account
+          Here's an overview of your {brand.name} account
         </p>
       </div>
 
@@ -177,7 +185,7 @@ function DashboardIndex() {
                 Join a Team
               </CardTitle>
               <CardDescription>
-                Find and join a team to compete in tournaments
+                Find and join a team to compete this season
               </CardDescription>
             </CardHeader>
             <CardContent>

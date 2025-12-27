@@ -27,12 +27,18 @@ import {
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { getBrand } from "~/tenant";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/membership")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_membership");
+  },
   component: MembershipPage,
 });
 
 function MembershipPage() {
+  const brand = getBrand();
   const [processingPayment, setProcessingPayment] = useState(false);
   const paymentReturn = usePaymentReturn();
   const [hasProcessedReturn, setHasProcessedReturn] = useState(false);
@@ -241,7 +247,7 @@ function MembershipPage() {
     <div className="container mx-auto py-8">
       <h1 className="mb-8 text-3xl font-bold">Membership</h1>
       <p className="text-muted-foreground mb-6">
-        Join Quadball Canada and access exclusive member benefits
+        Join {brand.name} and access exclusive member benefits
       </p>
 
       {isSandbox ? (

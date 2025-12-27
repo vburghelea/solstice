@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { listNotificationsSchema } from "./notifications.schemas";
 import type { NotificationRow } from "./notifications.types";
 
@@ -15,6 +16,7 @@ const getSessionUserId = async () => {
 export const listNotifications = createServerFn({ method: "GET" })
   .inputValidator(zod$(listNotificationsSchema))
   .handler(async ({ data }): Promise<NotificationRow[]> => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -51,6 +53,7 @@ export const listNotifications = createServerFn({ method: "GET" })
 
 export const getUnreadNotificationCount = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return 0;
 
@@ -70,6 +73,7 @@ export const getUnreadNotificationCount = createServerFn({ method: "GET" }).hand
 
 export const getNotificationPreferences = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("notifications_core");
     const userId = await getSessionUserId();
     if (!userId) return [];
 
@@ -87,6 +91,7 @@ export const getNotificationPreferences = createServerFn({ method: "GET" }).hand
 
 export const listNotificationTemplates = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("sin_admin_notifications");
     const userId = await getSessionUserId();
     if (!userId) return [];
 

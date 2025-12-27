@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { NotificationBell } from "~/features/notifications/components/notification-bell";
+import { getBrand } from "~/tenant";
 import { Button } from "./button";
 
 interface MobileAdminHeaderProps {
@@ -7,6 +8,8 @@ interface MobileAdminHeaderProps {
 }
 
 export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
+  const brand = getBrand();
+
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white lg:hidden">
       <div className="flex h-16 items-center justify-between px-4">
@@ -15,8 +18,8 @@ export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
             <Menu className="h-6 w-6" />
           </Button>
           <div>
-            <h1 className="text-admin-text-primary text-lg font-bold">Quadball Canada</h1>
-            <p className="text-admin-text-secondary text-xs">Admin Panel</p>
+            <h1 className="text-admin-text-primary text-lg font-bold">{brand.name}</h1>
+            <p className="text-admin-text-secondary text-xs">{brand.adminSubtitle}</p>
           </div>
         </div>
         <NotificationBell />

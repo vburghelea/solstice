@@ -56,3 +56,26 @@ export async function requireOrganizationMembership(
 
   return membership;
 }
+
+export async function requireOrganizationAccess(
+  { userId, organizationId }: MembershipLookup,
+  options?: { roles?: OrganizationRole[] },
+) {
+  if (!userId) {
+    throw unauthorized("User not authenticated");
+  }
+
+  const { resolveOrganizationAccess } =
+    await import("~/features/organizations/organizations.access");
+  const access = await resolveOrganizationAccess({ userId, organizationId });
+
+  if (!access) {
+    throw forbidden("Organization access required");
+  }
+
+  if (options?.roles && !options.roles.includes(access.role as OrganizationRole)) {
+    throw forbidden("Insufficient organization role");
+  }
+
+  return access;
+}

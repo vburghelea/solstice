@@ -1,7 +1,9 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { roles, userRoles } from "~/db/schema";
+import { getTenantConfig } from "~/tenant";
 
-const GLOBAL_ADMIN_ROLE_NAMES = ["Solstice Admin", "Quadball Canada Admin"];
+const GLOBAL_ADMIN_ROLE_NAMES = getTenantConfig().admin.globalRoleNames;
+const ANY_ADMIN_ROLE_NAMES = [...GLOBAL_ADMIN_ROLE_NAMES, "Team Admin", "Event Admin"];
 
 export class PermissionService {
   /**
@@ -163,9 +165,5 @@ export function userHasRole(
 export function isAnyAdmin(user: { roles?: Array<{ role: { name: string } }> }): boolean {
   if (!user.roles) return false;
 
-  return user.roles.some((userRole) =>
-    ["Solstice Admin", "Quadball Canada Admin", "Team Admin", "Event Admin"].includes(
-      userRole.role.name,
-    ),
-  );
+  return user.roles.some((userRole) => ANY_ADMIN_ROLE_NAMES.includes(userRole.role.name));
 }

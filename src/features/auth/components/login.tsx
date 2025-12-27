@@ -12,6 +12,7 @@ import { recordSecurityEvent } from "~/features/security/security.mutations";
 import { getAccountLockStatus } from "~/features/security/security.queries";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
+import { getBrand } from "~/tenant";
 import { authQueryKey } from "../auth.queries";
 import { loginFormSchema } from "../auth.schemas";
 
@@ -20,6 +21,7 @@ type LoginFormProps = {
 };
 
 export default function LoginForm(props?: LoginFormProps) {
+  const brand = getBrand();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
@@ -148,7 +150,7 @@ export default function LoginForm(props?: LoginFormProps) {
                 <div className="flex h-8 w-8 items-center justify-center rounded-md">
                   <LogoIcon className="size-6" />
                 </div>
-                <span className="sr-only">Quadball Canada</span>
+                <span className="sr-only">{brand.name}</span>
               </a>
               <h1 className="text-xl font-bold">Confirm your sign-in</h1>
               <p className="text-muted-foreground text-sm">
@@ -248,9 +250,9 @@ export default function LoginForm(props?: LoginFormProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Quadball Canada</span>
+              <span className="sr-only">{brand.name}</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome back to Quadball Canada</h1>
+            <h1 className="text-xl font-bold">Welcome back to {brand.name}</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field

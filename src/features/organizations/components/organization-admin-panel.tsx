@@ -28,14 +28,15 @@ import {
   updateOrganizationMemberRole,
 } from "../organizations.mutations";
 import {
+  listAllOrganizations,
   listDelegatedAccess,
   listOrganizationMembers,
-  listOrganizations,
 } from "../organizations.queries";
 
 const organizationTypes = [
   { value: "governing_body", label: "Governing body" },
   { value: "pso", label: "PSO" },
+  { value: "league", label: "League" },
   { value: "club", label: "Club" },
   { value: "affiliate", label: "Affiliate" },
 ];
@@ -65,7 +66,7 @@ export function OrganizationAdminPanel() {
   const queryClient = useQueryClient();
   const { data: organizations = [] } = useQuery({
     queryKey: ["organizations", "admin"],
-    queryFn: () => listOrganizations({ data: { includeArchived: true } }),
+    queryFn: () => listAllOrganizations({ data: { includeArchived: true } }),
   });
 
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
@@ -115,7 +116,7 @@ export function OrganizationAdminPanel() {
         data: {
           name: orgName,
           slug: orgSlug,
-          type: orgType as "governing_body" | "pso" | "club" | "affiliate",
+          type: orgType as "governing_body" | "pso" | "league" | "club" | "affiliate",
           parentOrgId: parentOrgId ?? undefined,
         },
       }),

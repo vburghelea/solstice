@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import { getOrgHierarchy } from "~/tenant";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
+import type { OrganizationType } from "~/tenant/tenant.types";
 import {
   approveOrganizationMemberSchema,
   createDelegatedAccessSchema,
@@ -7,6 +10,7 @@ import {
   inviteOrganizationMemberSchema,
   removeOrganizationMemberSchema,
   revokeDelegatedAccessSchema,
+  setActiveOrganizationSchema,
   updateOrganizationMemberRoleSchema,
   updateOrganizationSchema,
 } from "./organizations.schemas";
@@ -23,6 +27,49 @@ const errorResult = (code: OrganizationOperationErrorCode, message: string) => (
   errors: [{ code, message }],
 });
 
+const validateOrgHierarchy = async (params: {
+  type: OrganizationType;
+  parentOrgId: string | null;
+}) => {
+  const { type, parentOrgId } = params;
+  const hierarchy = getOrgHierarchy();
+
+  if (!parentOrgId) {
+    if (!hierarchy.rootTypes.includes(type)) {
+      return errorResult(
+        "VALIDATION_ERROR",
+        `Organization type "${type}" cannot be a root organization.`,
+      );
+    }
+    return null;
+  }
+
+  const { getDb } = await import("~/db/server-helpers");
+  const { organizations } = await import("~/db/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const db = await getDb();
+  const [parent] = await db
+    .select({ id: organizations.id, type: organizations.type })
+    .from(organizations)
+    .where(eq(organizations.id, parentOrgId))
+    .limit(1);
+
+  if (!parent) {
+    return errorResult("NOT_FOUND", "Parent organization not found");
+  }
+
+  const allowed = hierarchy.allowedChildren[parent.type] ?? [];
+  if (!allowed.includes(type)) {
+    return errorResult(
+      "VALIDATION_ERROR",
+      `Organization type "${type}" cannot be created under "${parent.type}".`,
+    );
+  }
+
+  return null;
+};
+
 const getSessionUser = async () => {
   const { getAuth } = await import("~/lib/auth/server-helpers");
   const { getRequest } = await import("@tanstack/react-start/server");
@@ -32,10 +79,49 @@ const getSessionUser = async () => {
   return session?.user ?? null;
 };
 
+const serializeCookie = (
+  name: string,
+  value: string,
+  options: {
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+    path?: string;
+    domain?: string;
+    maxAge?: number;
+  },
+) => {
+  const segments = [`${name}=${value}`];
+
+  if (options.maxAge !== undefined) {
+    segments.push(`Max-Age=${options.maxAge}`);
+  }
+  if (options.domain) {
+    segments.push(`Domain=${options.domain}`);
+  }
+  if (options.path) {
+    segments.push(`Path=${options.path}`);
+  }
+  if (options.sameSite) {
+    const normalized =
+      options.sameSite.charAt(0).toUpperCase() + options.sameSite.slice(1);
+    segments.push(`SameSite=${normalized}`);
+  }
+  if (options.secure) {
+    segments.push("Secure");
+  }
+  if (options.httpOnly) {
+    segments.push("HttpOnly");
+  }
+
+  return segments.join("; ");
+};
+
 export const createOrganization = createServerFn({ method: "POST" })
   .inputValidator(zod$(createOrganizationSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationSummary>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -46,6 +132,13 @@ export const createOrganization = createServerFn({ method: "POST" })
         const { organizationMembers, organizations } = await import("~/db/schema");
 
         const db = await getDb();
+        const hierarchyError = await validateOrgHierarchy({
+          type: data.type,
+          parentOrgId: data.parentOrgId ?? null,
+        });
+        if (hierarchyError) {
+          return hierarchyError;
+        }
         const [organization] = await db.transaction(async (tx) => {
           const [org] = await tx
             .insert(organizations)
@@ -113,6 +206,7 @@ export const updateOrganization = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateOrganizationSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationSummary>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -139,6 +233,28 @@ export const updateOrganization = createServerFn({ method: "POST" })
 
         if (!existing) {
           return errorResult("NOT_FOUND", "Organization not found");
+        }
+
+        const nextType = data.data.type ?? existing.type;
+        const nextParentOrgId = Object.prototype.hasOwnProperty.call(
+          data.data,
+          "parentOrgId",
+        )
+          ? (data.data.parentOrgId ?? null)
+          : existing.parentOrgId;
+
+        const shouldValidate =
+          data.data.type !== undefined ||
+          Object.prototype.hasOwnProperty.call(data.data, "parentOrgId");
+
+        if (shouldValidate) {
+          const hierarchyError = await validateOrgHierarchy({
+            type: nextType,
+            parentOrgId: nextParentOrgId,
+          });
+          if (hierarchyError) {
+            return hierarchyError;
+          }
         }
 
         const [updated] = await db
@@ -214,6 +330,7 @@ export const inviteOrganizationMember = createServerFn({ method: "POST" })
   .inputValidator(zod$(inviteOrganizationMemberSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationMemberRow>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -298,6 +415,7 @@ export const approveOrganizationMember = createServerFn({ method: "POST" })
   .inputValidator(zod$(approveOrganizationMemberSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationMemberRow>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -386,6 +504,7 @@ export const updateOrganizationMemberRole = createServerFn({ method: "POST" })
   .inputValidator(zod$(updateOrganizationMemberRoleSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationMemberRow>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -470,6 +589,7 @@ export const removeOrganizationMember = createServerFn({ method: "POST" })
   .inputValidator(zod$(removeOrganizationMemberSchema))
   .handler(
     async ({ data }): Promise<OrganizationOperationResult<OrganizationMemberRow>> => {
+      await assertFeatureEnabled("sin_admin_orgs");
       const sessionUser = await getSessionUser();
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -553,6 +673,7 @@ export const removeOrganizationMember = createServerFn({ method: "POST" })
 export const createDelegatedAccess = createServerFn({ method: "POST" })
   .inputValidator(zod$(createDelegatedAccessSchema))
   .handler(async ({ data }): Promise<OrganizationOperationResult<DelegatedAccessRow>> => {
+    await assertFeatureEnabled("sin_admin_orgs");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) {
       return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -631,6 +752,7 @@ export const createDelegatedAccess = createServerFn({ method: "POST" })
 export const revokeDelegatedAccess = createServerFn({ method: "POST" })
   .inputValidator(zod$(revokeDelegatedAccessSchema))
   .handler(async ({ data }): Promise<OrganizationOperationResult<DelegatedAccessRow>> => {
+    await assertFeatureEnabled("sin_admin_orgs");
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) {
       return errorResult("UNAUTHORIZED", "User not authenticated");
@@ -711,3 +833,50 @@ export const revokeDelegatedAccess = createServerFn({ method: "POST" })
       return errorResult("DATABASE_ERROR", "Failed to revoke access");
     }
   });
+
+export const setActiveOrganization = createServerFn({ method: "POST" })
+  .inputValidator(zod$(setActiveOrganizationSchema))
+  .handler(
+    async ({
+      data,
+    }): Promise<OrganizationOperationResult<{ organizationId: string | null }>> => {
+      await assertFeatureEnabled("sin_portal");
+      const sessionUser = await getSessionUser();
+      if (!sessionUser?.id) {
+        return errorResult("UNAUTHORIZED", "User not authenticated");
+      }
+
+      if (data.organizationId) {
+        const { resolveOrganizationAccess } = await import("./organizations.access");
+        const access = await resolveOrganizationAccess({
+          userId: sessionUser.id,
+          organizationId: data.organizationId,
+        });
+
+        if (!access) {
+          return errorResult("FORBIDDEN", "Organization access required");
+        }
+      }
+
+      const { setResponseHeader } = await import("@tanstack/react-start/server");
+      const { securityConfig } = await import("~/lib/security/config");
+      const maxAge = 60 * 60 * 24 * 30;
+      const cookieValue = data.organizationId
+        ? encodeURIComponent(data.organizationId)
+        : "";
+
+      const cookie = serializeCookie("active_org_id", cookieValue, {
+        ...securityConfig.cookies,
+        maxAge: data.organizationId ? maxAge : 0,
+      });
+
+      setResponseHeader("Set-Cookie", cookie);
+
+      return {
+        success: true,
+        data: {
+          organizationId: data.organizationId,
+        },
+      };
+    },
+  );

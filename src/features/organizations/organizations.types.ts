@@ -1,3 +1,5 @@
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+
 export type OrganizationOperationErrorCode =
   | "VALIDATION_ERROR"
   | "UNAUTHORIZED"
@@ -55,4 +57,9 @@ export interface DelegatedAccessRow {
   revokedAt: Date | null;
   revokedBy: string | null;
   notes: string | null;
+}
+
+export interface AccessibleOrganization extends OrganizationSummary {
+  role: OrganizationRole | null;
+  delegatedScopes?: string[];
 }

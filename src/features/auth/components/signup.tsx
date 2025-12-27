@@ -8,10 +8,12 @@ import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
+import { getBrand } from "~/tenant";
 import { authQueryKey } from "../auth.queries";
 import { signupFormFields } from "../auth.schemas";
 
 export default function SignupForm() {
+  const brand = getBrand();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
@@ -79,9 +81,9 @@ export default function SignupForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Quadball Canada</span>
+              <span className="sr-only">{brand.name}</span>
             </a>
-            <h1 className="text-xl font-bold">Sign up for Quadball Canada</h1>
+            <h1 className="text-xl font-bold">Sign up for {brand.name}</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field

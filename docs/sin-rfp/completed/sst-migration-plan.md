@@ -16,13 +16,16 @@
 aws sso login --profile techprod
 
 # Deploy to production
-AWS_PROFILE=techprod npx sst deploy --stage production
+AWS_PROFILE=techprod npx sst deploy --stage qc-prod
+AWS_PROFILE=techprod npx sst deploy --stage sin-prod
 
 # Set secrets
-AWS_PROFILE=techprod npx sst secret set <SecretName> "<value>" --stage production
+AWS_PROFILE=techprod npx sst secret set <SecretName> "<value>" --stage qc-prod
+AWS_PROFILE=techprod npx sst secret set <SecretName> "<value>" --stage sin-prod
 
 # List secrets
-AWS_PROFILE=techprod npx sst secret list --stage production
+AWS_PROFILE=techprod npx sst secret list --stage qc-prod
+AWS_PROFILE=techprod npx sst secret list --stage sin-prod
 ```
 
 ## SST Secrets Configuration

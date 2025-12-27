@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { AuditLog } from "~/db/schema";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import { listAuditLogsSchema } from "./audit.schemas";
 
 const getSessionUserId = async () => {
@@ -15,6 +16,7 @@ const getSessionUserId = async () => {
 export const listAuditLogs = createServerFn({ method: "GET" })
   .inputValidator(zod$(listAuditLogsSchema))
   .handler(async ({ data }): Promise<AuditLog[]> => {
+    await assertFeatureEnabled("sin_admin_audit");
     const userId = await getSessionUserId();
     const { unauthorized, forbidden } = await import("~/lib/server/errors");
     if (!userId) {
@@ -93,6 +95,7 @@ export const listAuditLogs = createServerFn({ method: "GET" })
 export const exportAuditLogs = createServerFn({ method: "GET" })
   .inputValidator(zod$(listAuditLogsSchema))
   .handler(async ({ data }): Promise<string> => {
+    await assertFeatureEnabled("sin_admin_audit");
     const logs = await listAuditLogs({ data });
     const { toCsv } = await import("~/shared/lib/csv");
     return toCsv(logs as Array<Record<string, unknown>>);
@@ -100,6 +103,7 @@ export const exportAuditLogs = createServerFn({ method: "GET" })
 
 export const verifyAuditHashChain = createServerFn({ method: "GET" }).handler(
   async () => {
+    await assertFeatureEnabled("sin_admin_audit");
     const userId = await getSessionUserId();
     const { unauthorized, forbidden } = await import("~/lib/server/errors");
     if (!userId) {

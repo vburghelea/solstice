@@ -32,6 +32,20 @@ Key attributes:
 - Event-driven processing for notifications and batch imports
 - Centralized logging, audit, and security monitoring
 
+## 2.1 Tenant Distribution Layer
+
+The application uses a single codebase with tenant-aware configuration to
+support both QC and viaSport distribution paths. Tenant selection is resolved
+from `TENANT_KEY`/`VITE_TENANT_KEY` (hard-fail on mismatch), and feature flags
+control routes, navigation, and server-side access to prevent cross-tenant data
+exposure even if URLs are guessed. Branding and organization hierarchy rules
+are also derived from the active tenant.
+
+Canonical stages enforce deterministic tenant selection:
+`qc-dev`, `sin-dev`, `qc-perf`, `sin-perf`, `qc-prod`, `sin-prod`.
+The prefix selects tenant (`sin` maps to `viasport`), and the suffix selects the
+environment class (`dev` | `perf` | `prod`).
+
 ## 3.0 Logical Architecture Diagram
 
 ```mermaid

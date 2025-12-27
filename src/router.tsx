@@ -36,7 +36,7 @@ function createAppRouter() {
 
   const router = createTanStackRouter({
     routeTree,
-    context: { queryClient, user: null },
+    context: { queryClient, user: null, activeOrganizationId: null },
     defaultPreload: "intent",
     ...(nonce ? { ssr: { nonce } } : {}),
     // react-query will handle data fetching & caching

@@ -6,6 +6,7 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+import { getBrand } from "~/tenant";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | undefined;
@@ -25,6 +26,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
   const schema = await import("~/db/schema");
   const { env, getAuthSecret, getBaseUrl, isProduction } =
     await import("~/lib/env.server");
+  const brand = getBrand();
 
   const baseUrl = getBaseUrl();
   const isHttpsDeployment = baseUrl?.startsWith("https://") ?? false;
@@ -53,7 +55,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
   const dbConnection = await db();
 
   return betterAuth({
-    appName: "viaSport SIN",
+    appName: brand.name,
     baseURL: baseUrl,
     secret: getAuthSecret(),
     trustedOrigins: isProduction()
@@ -159,7 +161,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [
       twoFactor({
-        issuer: "viaSport SIN",
+        issuer: brand.name,
         totpOptions: {
           digits: 6,
           period: 30,

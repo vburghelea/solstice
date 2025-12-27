@@ -1,4 +1,5 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { AdminSectionLayout } from "~/features/layouts/admin-layout";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 
 export const Route = createFileRoute("/dashboard/admin")({
@@ -15,7 +16,3 @@ export const Route = createFileRoute("/dashboard/admin")({
   },
   component: AdminSectionLayout,
 });
-
-function AdminSectionLayout() {
-  return <Outlet />;
-}

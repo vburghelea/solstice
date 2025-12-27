@@ -3,6 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 const LABEL_OVERRIDES: Record<string, string> = {
   dashboard: "Dashboard",
   admin: "Admin",
+  sin: "SIN",
   teams: "Teams",
   events: "Events",
   members: "Members",
@@ -10,8 +11,18 @@ const LABEL_OVERRIDES: Record<string, string> = {
   profile: "Profile",
   settings: "Settings",
   reports: "Reports",
+  reporting: "Reporting",
+  forms: "Forms",
+  submissions: "Submissions",
+  imports: "Imports",
+  analytics: "Analytics",
+  organizations: "Organizations",
+  audit: "Audit",
+  notifications: "Notifications",
+  security: "Security",
   roles: "Roles",
   forbidden: "Forbidden",
+  "select-org": "Select Organization",
   manage: "Manage",
 };
 

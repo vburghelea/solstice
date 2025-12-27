@@ -1,6 +1,98 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./.sst/platform/config.d.ts" />
 
+type StageEnvClass = "dev" | "perf" | "prod";
+type StageTenantKey = "qc" | "viasport";
+
+type StageInfo = {
+  stage: string;
+  stageEnv: StageEnvClass;
+  stageTenant?: StageTenantKey;
+  isCanonical: boolean;
+};
+
+const CANONICAL_STAGE_PATTERN = /^(qc|sin)-(dev|perf|prod)$/;
+const CANONICAL_STAGE_LIST = [
+  "qc-dev",
+  "sin-dev",
+  "qc-perf",
+  "sin-perf",
+  "qc-prod",
+  "sin-prod",
+] as const;
+
+const parseTenantKey = (value: string | undefined, label: string) => {
+  if (!value) return undefined;
+  if (value === "qc" || value === "viasport") return value;
+  throw new Error(`Invalid ${label}: expected "qc" | "viasport", got "${value}"`);
+};
+
+const resolveStageInfo = (rawStage: string | undefined): StageInfo => {
+  const stage = rawStage ?? "dev";
+
+  const canonicalMatch = CANONICAL_STAGE_PATTERN.exec(stage);
+  if (canonicalMatch) {
+    const prefix = canonicalMatch[1] as "qc" | "sin";
+    const stageEnv = canonicalMatch[2] as StageEnvClass;
+    const stageTenant: StageTenantKey = prefix === "qc" ? "qc" : "viasport";
+    return { stage, stageEnv, stageTenant, isCanonical: true };
+  }
+
+  if (stage.startsWith("qc-") || stage.startsWith("sin-")) {
+    throw new Error(
+      `Invalid canonical stage "${stage}". Expected one of: ${CANONICAL_STAGE_LIST.join(
+        ", ",
+      )}`,
+    );
+  }
+
+  const lower = stage.toLowerCase();
+  const stageEnv: StageEnvClass =
+    lower === "production" || lower === "prod" || lower.endsWith("-prod")
+      ? "prod"
+      : lower === "perf" || lower.endsWith("-perf")
+        ? "perf"
+        : "dev";
+
+  return { stage, stageEnv, isCanonical: false };
+};
+
+const resolveTenantEnv = (info: StageInfo) => {
+  const envTenantKey = parseTenantKey(process.env["TENANT_KEY"], "TENANT_KEY");
+  const envViteTenantKey = parseTenantKey(
+    process.env["VITE_TENANT_KEY"],
+    "VITE_TENANT_KEY",
+  );
+
+  if (envTenantKey && envViteTenantKey && envTenantKey !== envViteTenantKey) {
+    throw new Error(
+      `Tenant key mismatch: TENANT_KEY=${envTenantKey} VITE_TENANT_KEY=${envViteTenantKey}`,
+    );
+  }
+
+  if (info.isCanonical) {
+    const expected = info.stageTenant!;
+    if (envTenantKey && envTenantKey !== expected) {
+      throw new Error(
+        `Stage "${info.stage}" maps to tenant "${expected}" but TENANT_KEY="${envTenantKey}" was provided.`,
+      );
+    }
+    if (envViteTenantKey && envViteTenantKey !== expected) {
+      throw new Error(
+        `Stage "${info.stage}" maps to tenant "${expected}" but VITE_TENANT_KEY="${envViteTenantKey}" was provided.`,
+      );
+    }
+    return { tenantKey: expected, viteTenantKey: expected };
+  }
+
+  const lowerStage = info.stage.toLowerCase();
+  const heuristicTenant: StageTenantKey =
+    lowerStage.includes("sin") || lowerStage.includes("viasport") ? "viasport" : "qc";
+  const tenantKey = envTenantKey ?? heuristicTenant;
+  const viteTenantKey = envViteTenantKey ?? tenantKey;
+  return { tenantKey, viteTenantKey };
+};
+
 /**
  * SST Configuration for Solstice (Quadball Canada)
  *
@@ -13,10 +105,13 @@
 
 export default $config({
   app(input) {
+    const stageInfo = resolveStageInfo(input?.stage);
+    const isProd = stageInfo.stageEnv === "prod";
+
     return {
       name: "solstice",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage ?? ""),
+      removal: isProd ? "retain" : "remove",
+      protect: isProd,
       home: "aws",
       providers: {
         aws: {
@@ -29,9 +124,10 @@ export default $config({
     };
   },
   async run() {
-    const stage = $app.stage ?? "dev";
-    const isProd = stage === "production";
-    const isPerf = stage === "perf";
+    const stageInfo = resolveStageInfo($app.stage ?? "dev");
+    const stage = stageInfo.stage;
+    const isProd = stageInfo.stageEnv === "prod";
+    const isPerf = stageInfo.stageEnv === "perf";
 
     const dbVersion = "16.11";
     const dbConfig = isProd
@@ -133,7 +229,7 @@ export default $config({
       },
     });
 
-    // Define secrets - set via: npx sst secret set <NAME> <value> --stage production
+    // Define secrets - set via: npx sst secret set <NAME> <value> --stage qc-prod|sin-prod
     const secrets = {
       baseUrl: new sst.Secret("BaseUrl"), // CloudFront URL
       betterAuthSecret: new sst.Secret("BetterAuthSecret"),
@@ -153,6 +249,11 @@ export default $config({
       NODE_ENV: isProd || isPerf ? "production" : "development",
     };
 
+    const devBaseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
+    const baseUrl = $dev ? devBaseUrl : secrets.baseUrl.value;
+
+    const { tenantKey, viteTenantKey } = resolveTenantEnv(stageInfo);
+
     const notificationEnv = {
       SIN_NOTIFICATIONS_QUEUE_URL: notificationsQueue.url,
       SIN_NOTIFICATIONS_FROM_EMAIL: secrets.sinNotificationsFromEmail.value,
@@ -164,14 +265,18 @@ export default $config({
       buildCommand: "pnpm build",
       dev: {
         command: "pnpm dev",
+        url: devBaseUrl,
       },
       link: [database, sinArtifacts, notificationsQueue, ...Object.values(secrets)],
       vpc,
       environment: {
         // Runtime environment detection
         ...runtimeEnv,
+        TENANT_KEY: tenantKey,
+        VITE_TENANT_KEY: viteTenantKey,
         // Base URL for auth callbacks
-        VITE_BASE_URL: secrets.baseUrl.value,
+        BASE_URL: baseUrl,
+        VITE_BASE_URL: baseUrl,
         SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
         ...notificationEnv,
         // Map SST secrets to expected env var names
@@ -193,6 +298,8 @@ export default $config({
         link: [database, sinArtifacts, notificationsQueue, ...Object.values(secrets)],
         environment: {
           ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
           SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
           ...notificationEnv,
         },
@@ -206,6 +313,8 @@ export default $config({
         link: [database, sinArtifacts, ...Object.values(secrets)],
         environment: {
           ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
           SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
         },
       },
@@ -218,6 +327,8 @@ export default $config({
         timeout: "60 seconds",
         environment: {
           ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
           SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
           ...notificationEnv,
         },

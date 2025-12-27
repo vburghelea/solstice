@@ -16,7 +16,9 @@ import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+import { Route as DashboardSinRouteImport } from "./routes/dashboard/sin";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
+import { Route as DashboardSelectOrgRouteImport } from "./routes/dashboard/select-org";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
 import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
 import { Route as DashboardPrivacyRouteImport } from "./routes/dashboard/privacy";
@@ -32,10 +34,16 @@ import { Route as ApiDebugSquareRouteImport } from "./routes/api/debug-square";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardSinIndexRouteImport } from "./routes/dashboard/sin/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
+import { Route as DashboardAdminIndexRouteImport } from "./routes/dashboard/admin/index";
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardSinReportingRouteImport } from "./routes/dashboard/sin/reporting";
+import { Route as DashboardSinImportsRouteImport } from "./routes/dashboard/sin/imports";
+import { Route as DashboardSinFormsRouteImport } from "./routes/dashboard/sin/forms";
+import { Route as DashboardSinAnalyticsRouteImport } from "./routes/dashboard/sin/analytics";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 import { Route as DashboardEventsSlugRouteImport } from "./routes/dashboard/events/$slug";
 import { Route as DashboardAdminSinRouteImport } from "./routes/dashboard/admin/sin";
@@ -45,10 +53,22 @@ import { Route as ApiTestCleanupRouteImport } from "./routes/api/test/cleanup";
 import { Route as ApiAuthSplatRouteImport } from "./routes/api/auth/$";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardEventsSlugIndexRouteImport } from "./routes/dashboard/events/$slug.index";
+import { Route as DashboardAdminSinIndexRouteImport } from "./routes/dashboard/admin/sin/index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+import { Route as DashboardSinSubmissionsSubmissionIdRouteImport } from "./routes/dashboard/sin/submissions/$submissionId";
+import { Route as DashboardSinFormsFormIdRouteImport } from "./routes/dashboard/sin/forms/$formId";
 import { Route as DashboardEventsSlugRegisterRouteImport } from "./routes/dashboard/events/$slug.register";
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+import { Route as DashboardAdminSinSecurityRouteImport } from "./routes/dashboard/admin/sin/security";
+import { Route as DashboardAdminSinReportingRouteImport } from "./routes/dashboard/admin/sin/reporting";
+import { Route as DashboardAdminSinPrivacyRouteImport } from "./routes/dashboard/admin/sin/privacy";
+import { Route as DashboardAdminSinOrganizationsRouteImport } from "./routes/dashboard/admin/sin/organizations";
+import { Route as DashboardAdminSinNotificationsRouteImport } from "./routes/dashboard/admin/sin/notifications";
+import { Route as DashboardAdminSinImportsRouteImport } from "./routes/dashboard/admin/sin/imports";
+import { Route as DashboardAdminSinFormsRouteImport } from "./routes/dashboard/admin/sin/forms";
+import { Route as DashboardAdminSinAuditRouteImport } from "./routes/dashboard/admin/sin/audit";
+import { Route as DashboardAdminSinAnalyticsRouteImport } from "./routes/dashboard/admin/sin/analytics";
 import { Route as ApiPaymentsSquareCallbackRouteImport } from "./routes/api/payments/square/callback";
 import { Route as ApiAuthActionProviderRouteImport } from "./routes/api/auth/$action/$provider";
 
@@ -87,9 +107,19 @@ const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   path: "/teams",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const DashboardSinRoute = DashboardSinRouteImport.update({
+  id: "/sin",
+  path: "/sin",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: "/settings",
   path: "/settings",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardSelectOrgRoute = DashboardSelectOrgRouteImport.update({
+  id: "/select-org",
+  path: "/select-org",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const DashboardReportsRoute = DashboardReportsRouteImport.update({
@@ -167,10 +197,20 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardSinIndexRoute = DashboardSinIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
 const DashboardEventsIndexRoute = DashboardEventsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardEventsRoute,
+} as any);
+const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DashboardAdminRouteRoute,
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -186,6 +226,26 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   id: "/$teamId",
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
+} as any);
+const DashboardSinReportingRoute = DashboardSinReportingRouteImport.update({
+  id: "/reporting",
+  path: "/reporting",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
+const DashboardSinImportsRoute = DashboardSinImportsRouteImport.update({
+  id: "/imports",
+  path: "/imports",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
+const DashboardSinFormsRoute = DashboardSinFormsRouteImport.update({
+  id: "/forms",
+  path: "/forms",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
+const DashboardSinAnalyticsRoute = DashboardSinAnalyticsRouteImport.update({
+  id: "/analytics",
+  path: "/analytics",
+  getParentRoute: () => DashboardSinRoute,
 } as any);
 const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
   id: "/create",
@@ -234,6 +294,11 @@ const DashboardEventsSlugIndexRoute =
     path: "/",
     getParentRoute: () => DashboardEventsSlugRoute,
   } as any);
+const DashboardAdminSinIndexRoute = DashboardAdminSinIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DashboardAdminSinRoute,
+} as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -246,6 +311,17 @@ const DashboardTeamsTeamIdManageRoute =
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
+const DashboardSinSubmissionsSubmissionIdRoute =
+  DashboardSinSubmissionsSubmissionIdRouteImport.update({
+    id: "/submissions/$submissionId",
+    path: "/submissions/$submissionId",
+    getParentRoute: () => DashboardSinRoute,
+  } as any);
+const DashboardSinFormsFormIdRoute = DashboardSinFormsFormIdRouteImport.update({
+  id: "/$formId",
+  path: "/$formId",
+  getParentRoute: () => DashboardSinFormsRoute,
+} as any);
 const DashboardEventsSlugRegisterRoute =
   DashboardEventsSlugRegisterRouteImport.update({
     id: "/register",
@@ -257,6 +333,58 @@ const DashboardEventsEventIdManageRoute =
     id: "/$eventId/manage",
     path: "/$eventId/manage",
     getParentRoute: () => DashboardEventsRoute,
+  } as any);
+const DashboardAdminSinSecurityRoute =
+  DashboardAdminSinSecurityRouteImport.update({
+    id: "/security",
+    path: "/security",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinReportingRoute =
+  DashboardAdminSinReportingRouteImport.update({
+    id: "/reporting",
+    path: "/reporting",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinPrivacyRoute =
+  DashboardAdminSinPrivacyRouteImport.update({
+    id: "/privacy",
+    path: "/privacy",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinOrganizationsRoute =
+  DashboardAdminSinOrganizationsRouteImport.update({
+    id: "/organizations",
+    path: "/organizations",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinNotificationsRoute =
+  DashboardAdminSinNotificationsRouteImport.update({
+    id: "/notifications",
+    path: "/notifications",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinImportsRoute =
+  DashboardAdminSinImportsRouteImport.update({
+    id: "/imports",
+    path: "/imports",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinFormsRoute = DashboardAdminSinFormsRouteImport.update({
+  id: "/forms",
+  path: "/forms",
+  getParentRoute: () => DashboardAdminSinRoute,
+} as any);
+const DashboardAdminSinAuditRoute = DashboardAdminSinAuditRouteImport.update({
+  id: "/audit",
+  path: "/audit",
+  getParentRoute: () => DashboardAdminSinRoute,
+} as any);
+const DashboardAdminSinAnalyticsRoute =
+  DashboardAdminSinAnalyticsRouteImport.update({
+    id: "/analytics",
+    path: "/analytics",
+    getParentRoute: () => DashboardAdminSinRoute,
   } as any);
 const ApiPaymentsSquareCallbackRoute =
   ApiPaymentsSquareCallbackRouteImport.update({
@@ -289,7 +417,9 @@ export interface FileRoutesByFullPath {
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/select-org": typeof DashboardSelectOrgRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/sin": typeof DashboardSinRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -297,27 +427,44 @@ export interface FileRoutesByFullPath {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
-  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinRouteWithChildren;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
+  "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dashboard/admin/": typeof DashboardAdminIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/sin/": typeof DashboardSinIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
+  "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
+  "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
+  "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
+  "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
+  "/dashboard/admin/sin/organizations": typeof DashboardAdminSinOrganizationsRoute;
+  "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
+  "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
+  "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
+  "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
+  "/dashboard/sin/submissions/$submissionId": typeof DashboardSinSubmissionsSubmissionIdRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/admin/sin/": typeof DashboardAdminSinIndexRoute;
   "/dashboard/events/$slug/": typeof DashboardEventsSlugIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
-  "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/roles": typeof AdminRolesRoute;
   "/api/debug-square": typeof ApiDebugSquareRoute;
   "/api/health": typeof ApiHealthRoute;
@@ -330,6 +477,7 @@ export interface FileRoutesByTo {
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/select-org": typeof DashboardSelectOrgRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
@@ -337,18 +485,35 @@ export interface FileRoutesByTo {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
-  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
+  "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dashboard/admin": typeof DashboardAdminIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
+  "/dashboard/sin": typeof DashboardSinIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
+  "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
+  "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
+  "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
+  "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
+  "/dashboard/admin/sin/organizations": typeof DashboardAdminSinOrganizationsRoute;
+  "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
+  "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
+  "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
+  "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
+  "/dashboard/sin/submissions/$submissionId": typeof DashboardSinSubmissionsSubmissionIdRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinIndexRoute;
   "/dashboard/events/$slug": typeof DashboardEventsSlugIndexRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
@@ -372,7 +537,9 @@ export interface FileRoutesById {
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/select-org": typeof DashboardSelectOrgRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/sin": typeof DashboardSinRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -380,20 +547,38 @@ export interface FileRoutesById {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
-  "/dashboard/admin/sin": typeof DashboardAdminSinRoute;
+  "/dashboard/admin/sin": typeof DashboardAdminSinRouteWithChildren;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
+  "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dashboard/admin/": typeof DashboardAdminIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/sin/": typeof DashboardSinIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
+  "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
+  "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
+  "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
+  "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
+  "/dashboard/admin/sin/organizations": typeof DashboardAdminSinOrganizationsRoute;
+  "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
+  "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
+  "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
+  "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
+  "/dashboard/sin/submissions/$submissionId": typeof DashboardSinSubmissionsSubmissionIdRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/admin/sin/": typeof DashboardAdminSinIndexRoute;
   "/dashboard/events/$slug/": typeof DashboardEventsSlugIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
@@ -418,7 +603,9 @@ export interface FileRouteTypes {
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
+    | "/dashboard/select-org"
     | "/dashboard/settings"
+    | "/dashboard/sin"
     | "/dashboard/teams"
     | "/dashboard/"
     | "/onboarding/"
@@ -429,24 +616,41 @@ export interface FileRouteTypes {
     | "/dashboard/admin/sin"
     | "/dashboard/events/$slug"
     | "/dashboard/events/create"
+    | "/dashboard/sin/analytics"
+    | "/dashboard/sin/forms"
+    | "/dashboard/sin/imports"
+    | "/dashboard/sin/reporting"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dashboard/admin/"
     | "/dashboard/events/"
+    | "/dashboard/sin/"
     | "/dashboard/teams/"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback"
+    | "/dashboard/admin/sin/analytics"
+    | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/forms"
+    | "/dashboard/admin/sin/imports"
+    | "/dashboard/admin/sin/notifications"
+    | "/dashboard/admin/sin/organizations"
+    | "/dashboard/admin/sin/privacy"
+    | "/dashboard/admin/sin/reporting"
+    | "/dashboard/admin/sin/security"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
+    | "/dashboard/sin/forms/$formId"
+    | "/dashboard/sin/submissions/$submissionId"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/admin/sin/"
     | "/dashboard/events/$slug/"
     | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
     | "/auth"
-    | "/dashboard/admin"
     | "/admin/roles"
     | "/api/debug-square"
     | "/api/health"
@@ -459,6 +663,7 @@ export interface FileRouteTypes {
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
+    | "/dashboard/select-org"
     | "/dashboard/settings"
     | "/dashboard"
     | "/onboarding"
@@ -466,18 +671,35 @@ export interface FileRouteTypes {
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
-    | "/dashboard/admin/sin"
     | "/dashboard/events/create"
+    | "/dashboard/sin/analytics"
+    | "/dashboard/sin/forms"
+    | "/dashboard/sin/imports"
+    | "/dashboard/sin/reporting"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dashboard/admin"
     | "/dashboard/events"
+    | "/dashboard/sin"
     | "/dashboard/teams"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback"
+    | "/dashboard/admin/sin/analytics"
+    | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/forms"
+    | "/dashboard/admin/sin/imports"
+    | "/dashboard/admin/sin/notifications"
+    | "/dashboard/admin/sin/organizations"
+    | "/dashboard/admin/sin/privacy"
+    | "/dashboard/admin/sin/reporting"
+    | "/dashboard/admin/sin/security"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
+    | "/dashboard/sin/forms/$formId"
+    | "/dashboard/sin/submissions/$submissionId"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/admin/sin"
     | "/dashboard/events/$slug"
     | "/dashboard/teams/$teamId";
   id:
@@ -500,7 +722,9 @@ export interface FileRouteTypes {
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
+    | "/dashboard/select-org"
     | "/dashboard/settings"
+    | "/dashboard/sin"
     | "/dashboard/teams"
     | "/dashboard/"
     | "/onboarding/"
@@ -511,17 +735,35 @@ export interface FileRouteTypes {
     | "/dashboard/admin/sin"
     | "/dashboard/events/$slug"
     | "/dashboard/events/create"
+    | "/dashboard/sin/analytics"
+    | "/dashboard/sin/forms"
+    | "/dashboard/sin/imports"
+    | "/dashboard/sin/reporting"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dashboard/admin/"
     | "/dashboard/events/"
+    | "/dashboard/sin/"
     | "/dashboard/teams/"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback"
+    | "/dashboard/admin/sin/analytics"
+    | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/forms"
+    | "/dashboard/admin/sin/imports"
+    | "/dashboard/admin/sin/notifications"
+    | "/dashboard/admin/sin/organizations"
+    | "/dashboard/admin/sin/privacy"
+    | "/dashboard/admin/sin/reporting"
+    | "/dashboard/admin/sin/security"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
+    | "/dashboard/sin/forms/$formId"
+    | "/dashboard/sin/submissions/$submissionId"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/admin/sin/"
     | "/dashboard/events/$slug/"
     | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
@@ -593,11 +835,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/dashboard/sin": {
+      id: "/dashboard/sin";
+      path: "/sin";
+      fullPath: "/dashboard/sin";
+      preLoaderRoute: typeof DashboardSinRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
     "/dashboard/settings": {
       id: "/dashboard/settings";
       path: "/settings";
       fullPath: "/dashboard/settings";
       preLoaderRoute: typeof DashboardSettingsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/select-org": {
+      id: "/dashboard/select-org";
+      path: "/select-org";
+      fullPath: "/dashboard/select-org";
+      preLoaderRoute: typeof DashboardSelectOrgRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/dashboard/reports": {
@@ -705,12 +961,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsIndexRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/sin/": {
+      id: "/dashboard/sin/";
+      path: "/";
+      fullPath: "/dashboard/sin/";
+      preLoaderRoute: typeof DashboardSinIndexRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
     "/dashboard/events/": {
       id: "/dashboard/events/";
       path: "/";
       fullPath: "/dashboard/events/";
       preLoaderRoute: typeof DashboardEventsIndexRouteImport;
       parentRoute: typeof DashboardEventsRoute;
+    };
+    "/dashboard/admin/": {
+      id: "/dashboard/admin/";
+      path: "/";
+      fullPath: "/dashboard/admin/";
+      preLoaderRoute: typeof DashboardAdminIndexRouteImport;
+      parentRoute: typeof DashboardAdminRouteRoute;
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -732,6 +1002,34 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/teams/$teamId";
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/sin/reporting": {
+      id: "/dashboard/sin/reporting";
+      path: "/reporting";
+      fullPath: "/dashboard/sin/reporting";
+      preLoaderRoute: typeof DashboardSinReportingRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/imports": {
+      id: "/dashboard/sin/imports";
+      path: "/imports";
+      fullPath: "/dashboard/sin/imports";
+      preLoaderRoute: typeof DashboardSinImportsRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/forms": {
+      id: "/dashboard/sin/forms";
+      path: "/forms";
+      fullPath: "/dashboard/sin/forms";
+      preLoaderRoute: typeof DashboardSinFormsRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/analytics": {
+      id: "/dashboard/sin/analytics";
+      path: "/analytics";
+      fullPath: "/dashboard/sin/analytics";
+      preLoaderRoute: typeof DashboardSinAnalyticsRouteImport;
+      parentRoute: typeof DashboardSinRoute;
     };
     "/dashboard/events/create": {
       id: "/dashboard/events/create";
@@ -796,6 +1094,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsSlugIndexRouteImport;
       parentRoute: typeof DashboardEventsSlugRoute;
     };
+    "/dashboard/admin/sin/": {
+      id: "/dashboard/admin/sin/";
+      path: "/";
+      fullPath: "/dashboard/admin/sin/";
+      preLoaderRoute: typeof DashboardAdminSinIndexRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
       path: "/members";
@@ -810,6 +1115,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
     };
+    "/dashboard/sin/submissions/$submissionId": {
+      id: "/dashboard/sin/submissions/$submissionId";
+      path: "/submissions/$submissionId";
+      fullPath: "/dashboard/sin/submissions/$submissionId";
+      preLoaderRoute: typeof DashboardSinSubmissionsSubmissionIdRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/forms/$formId": {
+      id: "/dashboard/sin/forms/$formId";
+      path: "/$formId";
+      fullPath: "/dashboard/sin/forms/$formId";
+      preLoaderRoute: typeof DashboardSinFormsFormIdRouteImport;
+      parentRoute: typeof DashboardSinFormsRoute;
+    };
     "/dashboard/events/$slug/register": {
       id: "/dashboard/events/$slug/register";
       path: "/register";
@@ -823,6 +1142,69 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/events/$eventId/manage";
       preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
       parentRoute: typeof DashboardEventsRoute;
+    };
+    "/dashboard/admin/sin/security": {
+      id: "/dashboard/admin/sin/security";
+      path: "/security";
+      fullPath: "/dashboard/admin/sin/security";
+      preLoaderRoute: typeof DashboardAdminSinSecurityRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/reporting": {
+      id: "/dashboard/admin/sin/reporting";
+      path: "/reporting";
+      fullPath: "/dashboard/admin/sin/reporting";
+      preLoaderRoute: typeof DashboardAdminSinReportingRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/privacy": {
+      id: "/dashboard/admin/sin/privacy";
+      path: "/privacy";
+      fullPath: "/dashboard/admin/sin/privacy";
+      preLoaderRoute: typeof DashboardAdminSinPrivacyRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/organizations": {
+      id: "/dashboard/admin/sin/organizations";
+      path: "/organizations";
+      fullPath: "/dashboard/admin/sin/organizations";
+      preLoaderRoute: typeof DashboardAdminSinOrganizationsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/notifications": {
+      id: "/dashboard/admin/sin/notifications";
+      path: "/notifications";
+      fullPath: "/dashboard/admin/sin/notifications";
+      preLoaderRoute: typeof DashboardAdminSinNotificationsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/imports": {
+      id: "/dashboard/admin/sin/imports";
+      path: "/imports";
+      fullPath: "/dashboard/admin/sin/imports";
+      preLoaderRoute: typeof DashboardAdminSinImportsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/forms": {
+      id: "/dashboard/admin/sin/forms";
+      path: "/forms";
+      fullPath: "/dashboard/admin/sin/forms";
+      preLoaderRoute: typeof DashboardAdminSinFormsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/audit": {
+      id: "/dashboard/admin/sin/audit";
+      path: "/audit";
+      fullPath: "/dashboard/admin/sin/audit";
+      preLoaderRoute: typeof DashboardAdminSinAuditRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/analytics": {
+      id: "/dashboard/admin/sin/analytics";
+      path: "/analytics";
+      fullPath: "/dashboard/admin/sin/analytics";
+      preLoaderRoute: typeof DashboardAdminSinAnalyticsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
     };
     "/api/payments/square/callback": {
       id: "/api/payments/square/callback";
@@ -855,14 +1237,45 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 );
 
+interface DashboardAdminSinRouteChildren {
+  DashboardAdminSinAnalyticsRoute: typeof DashboardAdminSinAnalyticsRoute;
+  DashboardAdminSinAuditRoute: typeof DashboardAdminSinAuditRoute;
+  DashboardAdminSinFormsRoute: typeof DashboardAdminSinFormsRoute;
+  DashboardAdminSinImportsRoute: typeof DashboardAdminSinImportsRoute;
+  DashboardAdminSinNotificationsRoute: typeof DashboardAdminSinNotificationsRoute;
+  DashboardAdminSinOrganizationsRoute: typeof DashboardAdminSinOrganizationsRoute;
+  DashboardAdminSinPrivacyRoute: typeof DashboardAdminSinPrivacyRoute;
+  DashboardAdminSinReportingRoute: typeof DashboardAdminSinReportingRoute;
+  DashboardAdminSinSecurityRoute: typeof DashboardAdminSinSecurityRoute;
+  DashboardAdminSinIndexRoute: typeof DashboardAdminSinIndexRoute;
+}
+
+const DashboardAdminSinRouteChildren: DashboardAdminSinRouteChildren = {
+  DashboardAdminSinAnalyticsRoute: DashboardAdminSinAnalyticsRoute,
+  DashboardAdminSinAuditRoute: DashboardAdminSinAuditRoute,
+  DashboardAdminSinFormsRoute: DashboardAdminSinFormsRoute,
+  DashboardAdminSinImportsRoute: DashboardAdminSinImportsRoute,
+  DashboardAdminSinNotificationsRoute: DashboardAdminSinNotificationsRoute,
+  DashboardAdminSinOrganizationsRoute: DashboardAdminSinOrganizationsRoute,
+  DashboardAdminSinPrivacyRoute: DashboardAdminSinPrivacyRoute,
+  DashboardAdminSinReportingRoute: DashboardAdminSinReportingRoute,
+  DashboardAdminSinSecurityRoute: DashboardAdminSinSecurityRoute,
+  DashboardAdminSinIndexRoute: DashboardAdminSinIndexRoute,
+};
+
+const DashboardAdminSinRouteWithChildren =
+  DashboardAdminSinRoute._addFileChildren(DashboardAdminSinRouteChildren);
+
 interface DashboardAdminRouteRouteChildren {
   DashboardAdminRolesRoute: typeof DashboardAdminRolesRoute;
-  DashboardAdminSinRoute: typeof DashboardAdminSinRoute;
+  DashboardAdminSinRoute: typeof DashboardAdminSinRouteWithChildren;
+  DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute;
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminRolesRoute: DashboardAdminRolesRoute,
-  DashboardAdminSinRoute: DashboardAdminSinRoute,
+  DashboardAdminSinRoute: DashboardAdminSinRouteWithChildren,
+  DashboardAdminIndexRoute: DashboardAdminIndexRoute,
 };
 
 const DashboardAdminRouteRouteWithChildren =
@@ -897,6 +1310,40 @@ const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
 
 const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
   DashboardEventsRouteChildren,
+);
+
+interface DashboardSinFormsRouteChildren {
+  DashboardSinFormsFormIdRoute: typeof DashboardSinFormsFormIdRoute;
+}
+
+const DashboardSinFormsRouteChildren: DashboardSinFormsRouteChildren = {
+  DashboardSinFormsFormIdRoute: DashboardSinFormsFormIdRoute,
+};
+
+const DashboardSinFormsRouteWithChildren =
+  DashboardSinFormsRoute._addFileChildren(DashboardSinFormsRouteChildren);
+
+interface DashboardSinRouteChildren {
+  DashboardSinAnalyticsRoute: typeof DashboardSinAnalyticsRoute;
+  DashboardSinFormsRoute: typeof DashboardSinFormsRouteWithChildren;
+  DashboardSinImportsRoute: typeof DashboardSinImportsRoute;
+  DashboardSinReportingRoute: typeof DashboardSinReportingRoute;
+  DashboardSinIndexRoute: typeof DashboardSinIndexRoute;
+  DashboardSinSubmissionsSubmissionIdRoute: typeof DashboardSinSubmissionsSubmissionIdRoute;
+}
+
+const DashboardSinRouteChildren: DashboardSinRouteChildren = {
+  DashboardSinAnalyticsRoute: DashboardSinAnalyticsRoute,
+  DashboardSinFormsRoute: DashboardSinFormsRouteWithChildren,
+  DashboardSinImportsRoute: DashboardSinImportsRoute,
+  DashboardSinReportingRoute: DashboardSinReportingRoute,
+  DashboardSinIndexRoute: DashboardSinIndexRoute,
+  DashboardSinSubmissionsSubmissionIdRoute:
+    DashboardSinSubmissionsSubmissionIdRoute,
+};
+
+const DashboardSinRouteWithChildren = DashboardSinRoute._addFileChildren(
+  DashboardSinRouteChildren,
 );
 
 interface DashboardTeamsTeamIdRouteChildren {
@@ -941,7 +1388,9 @@ interface DashboardRouteRouteChildren {
   DashboardPrivacyRoute: typeof DashboardPrivacyRoute;
   DashboardProfileRoute: typeof DashboardProfileRoute;
   DashboardReportsRoute: typeof DashboardReportsRoute;
+  DashboardSelectOrgRoute: typeof DashboardSelectOrgRoute;
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
+  DashboardSinRoute: typeof DashboardSinRouteWithChildren;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 }
@@ -955,7 +1404,9 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardPrivacyRoute: DashboardPrivacyRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReportsRoute: DashboardReportsRoute,
+  DashboardSelectOrgRoute: DashboardSelectOrgRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSinRoute: DashboardSinRouteWithChildren,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 };

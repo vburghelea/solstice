@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
+import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 const requireSessionUserId = async () => {
   const { getAuth } = await import("~/lib/auth/server-helpers");
@@ -30,8 +31,8 @@ const requireOrgAccess = async (
     return null;
   }
 
-  const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-  return requireOrganizationMembership({ userId, organizationId });
+  const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+  return requireOrganizationAccess({ userId, organizationId });
 };
 
 const getImportJobSchema = z.object({
@@ -59,6 +60,7 @@ const listImportJobErrorsSchema = z.object({
 export const getImportJob = createServerFn({ method: "GET" })
   .inputValidator(zod$(getImportJobSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_imports");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importJobs } = await import("~/db/schema");
@@ -74,6 +76,7 @@ export const getImportJob = createServerFn({ method: "GET" })
 export const listImportJobs = createServerFn({ method: "GET" })
   .inputValidator(zod$(listImportJobsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_imports");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importJobs, organizationMembers } = await import("~/db/schema");
@@ -129,6 +132,7 @@ export const listImportJobs = createServerFn({ method: "GET" })
 export const listMappingTemplates = createServerFn({ method: "GET" })
   .inputValidator(zod$(listMappingTemplatesSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_imports");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importMappingTemplates } = await import("~/db/schema");
@@ -164,6 +168,7 @@ export const listMappingTemplates = createServerFn({ method: "GET" })
 export const listImportJobErrors = createServerFn({ method: "GET" })
   .inputValidator(zod$(listImportJobErrorsSchema))
   .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_imports");
     const userId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
     const { importJobErrors, importJobs } = await import("~/db/schema");

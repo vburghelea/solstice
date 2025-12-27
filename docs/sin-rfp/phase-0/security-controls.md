@@ -37,6 +37,8 @@ Session management:
 - Least-privilege enforcement at API and data layers
 - Default deny posture for cross-organization access
 - Field-level access policies for sensitive data
+- Server-side feature gating to block tenant-ineligible endpoints even if URLs
+  are guessed (UI, route, and server function enforcement).
 
 ## 4.0 Data Protection
 

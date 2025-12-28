@@ -18,6 +18,7 @@ import {
 } from "~/features/auth/auth.queries";
 import { StepUpProvider } from "~/features/auth/step-up";
 import { OrgContextProvider } from "~/features/organizations/org-context";
+import { validateActiveOrganization } from "~/features/organizations/organizations.queries";
 import {
   getLatestPolicyDocument,
   listUserPolicyAcceptances,
@@ -46,6 +47,44 @@ const TanStackRouterDevtools = import.meta.env.DEV
 // Lazy load Toaster to avoid SSR issues
 const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaster })));
 
+const serializeCookie = (
+  name: string,
+  value: string,
+  options: {
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+    path?: string;
+    domain?: string;
+    maxAge?: number;
+  },
+) => {
+  const segments = [`${name}=${value}`];
+
+  if (options.maxAge !== undefined) {
+    segments.push(`Max-Age=${options.maxAge}`);
+  }
+  if (options.domain) {
+    segments.push(`Domain=${options.domain}`);
+  }
+  if (options.path) {
+    segments.push(`Path=${options.path}`);
+  }
+  if (options.sameSite) {
+    const normalized =
+      options.sameSite.charAt(0).toUpperCase() + options.sameSite.slice(1);
+    segments.push(`SameSite=${normalized}`);
+  }
+  if (options.secure) {
+    segments.push("Secure");
+  }
+  if (options.httpOnly) {
+    segments.push("HttpOnly");
+  }
+
+  return segments.join("; ");
+};
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthQueryResult;
@@ -62,13 +101,33 @@ export const Route = createRootRouteWithContext<{
           const prefix = "active_org_id=";
           const cookies = cookieHeader.split(";").map((entry) => entry.trim());
           const match = cookies.find((cookie) => cookie.startsWith(prefix));
-          return match ? decodeURIComponent(match.slice(prefix.length)) : null;
+          const value = match ? decodeURIComponent(match.slice(prefix.length)) : null;
+          return value || null;
         }
 
         return window.localStorage.getItem("active_org_id");
       };
 
-      const activeOrganizationId = await resolveActiveOrganizationId();
+      const clearActiveOrganizationCookie = async () => {
+        const { setResponseHeader } = await import("@tanstack/react-start/server");
+        const { securityConfig } = await import("~/lib/security/config");
+        const cookie = serializeCookie("active_org_id", "", {
+          ...securityConfig.cookies,
+          maxAge: 0,
+        });
+        setResponseHeader("Set-Cookie", cookie);
+      };
+
+      const syncLocalStorage = (organizationId: string | null) => {
+        if (typeof window === "undefined") return;
+        if (organizationId) {
+          window.localStorage.setItem("active_org_id", organizationId);
+        } else {
+          window.localStorage.removeItem("active_org_id");
+        }
+      };
+
+      const candidateOrganizationId = await resolveActiveOrganizationId();
 
       // Check if we're on the server or client
       if (typeof window === "undefined") {
@@ -96,6 +155,18 @@ export const Route = createRootRouteWithContext<{
           }
         }
 
+        let activeOrganizationId: string | null = null;
+        if (candidateOrganizationId && user?.id) {
+          const access = await validateActiveOrganization({
+            data: { organizationId: candidateOrganizationId },
+          });
+          activeOrganizationId = access?.organizationId ?? null;
+        }
+
+        if (candidateOrganizationId && !activeOrganizationId) {
+          await clearActiveOrganizationCookie();
+        }
+
         return { user, activeOrganizationId };
       } else {
         // Client: fetch the full user data
@@ -105,6 +176,20 @@ export const Route = createRootRouteWithContext<{
         // The onboarding page will handle showing the policy step if needed
         if (user && !user.profileComplete && location.pathname.startsWith("/dashboard")) {
           throw redirect({ to: "/onboarding" });
+        }
+
+        let activeOrganizationId: string | null = null;
+        if (candidateOrganizationId && user?.id) {
+          const access = await validateActiveOrganization({
+            data: { organizationId: candidateOrganizationId },
+          });
+          activeOrganizationId = access?.organizationId ?? null;
+        }
+
+        if (candidateOrganizationId && !activeOrganizationId) {
+          syncLocalStorage(null);
+        } else if (activeOrganizationId) {
+          syncLocalStorage(activeOrganizationId);
         }
 
         return { user, activeOrganizationId };

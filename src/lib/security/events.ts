@@ -1,6 +1,48 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import type { JsonRecord } from "~/shared/lib/json";
 
+const normalizeIpCandidate = (candidate: string, isIP: (value: string) => number) => {
+  const trimmed = candidate.trim();
+  if (!trimmed) return null;
+  if (isIP(trimmed)) return trimmed;
+  if (trimmed.includes(":") && trimmed.includes(".")) {
+    const [withoutPort] = trimmed.split(":");
+    if (withoutPort && isIP(withoutPort)) return withoutPort;
+  }
+  return null;
+};
+
+const resolveIpAddress = async (
+  inputIp: string | null | undefined,
+  headers: Headers,
+): Promise<string> => {
+  const { isIP } = await import("node:net");
+  if (inputIp) {
+    const normalized = normalizeIpCandidate(inputIp, isIP);
+    if (normalized) return normalized;
+  }
+
+  const forwardedFor = headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const candidates = forwardedFor
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+    for (const candidate of candidates) {
+      const normalized = normalizeIpCandidate(candidate, isIP);
+      if (normalized) return normalized;
+    }
+  }
+
+  const realIp = headers.get("x-real-ip");
+  if (realIp) {
+    const normalized = normalizeIpCandidate(realIp, isIP);
+    if (normalized) return normalized;
+  }
+
+  return "0.0.0.0";
+};
+
 export const recordSecurityEvent = createServerOnlyFn(
   async (params: {
     userId?: string | null;
@@ -12,35 +54,33 @@ export const recordSecurityEvent = createServerOnlyFn(
     riskScore?: number;
     riskFactors?: string[];
     metadata?: JsonRecord;
+    headers?: Headers;
   }) => {
     const { getDb } = await import("~/db/server-helpers");
     const { securityEvents } = await import("~/db/schema");
     const { getRequest } = await import("@tanstack/react-start/server");
 
-    const request = getRequest();
-    const ipAddress =
-      params.ipAddress ??
-      request.headers.get("x-forwarded-for") ??
-      request.headers.get("x-real-ip") ??
-      "0.0.0.0";
-    const userAgent = params.userAgent ?? request.headers.get("user-agent");
+    const requestHeaders = params.headers ?? getRequest().headers;
+    const ipAddress = await resolveIpAddress(params.ipAddress, requestHeaders);
+    const userAgent = params.userAgent ?? requestHeaders.get("user-agent");
     const geoCountry =
       params.geoCountry ??
-      request.headers.get("cf-ipcountry") ??
-      request.headers.get("x-vercel-ip-country") ??
+      requestHeaders.get("cf-ipcountry") ??
+      requestHeaders.get("x-vercel-ip-country") ??
       null;
     const geoRegion =
       params.geoRegion ??
-      request.headers.get("x-vercel-ip-country-region") ??
-      request.headers.get("x-country-region") ??
+      requestHeaders.get("x-vercel-ip-country-region") ??
+      requestHeaders.get("x-country-region") ??
       null;
 
+    const normalizedEventType = params.eventType.toLowerCase();
     const db = await getDb();
     const [event] = await db
       .insert(securityEvents)
       .values({
         userId: params.userId ?? null,
-        eventType: params.eventType,
+        eventType: normalizedEventType,
         ipAddress,
         userAgent,
         geoCountry,
@@ -52,7 +92,7 @@ export const recordSecurityEvent = createServerOnlyFn(
       .returning();
 
     const { logAuthEvent, logSecurityEvent } = await import("~/lib/audit");
-    const normalizedEvent = params.eventType.toUpperCase();
+    const normalizedEvent = normalizedEventType.toUpperCase();
     await logSecurityEvent({
       action: `SECURITY.${normalizedEvent}`,
       actorUserId: params.userId ?? null,

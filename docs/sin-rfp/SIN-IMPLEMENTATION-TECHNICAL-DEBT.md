@@ -54,19 +54,38 @@ This document tracks technical debt, design decisions, and follow-up items disco
 
 **Follow-up needed:**
 
-- [ ] Set up SQS queue in production
-- [ ] Configure dead-letter queue for failed notifications
-- [ ] Add CloudWatch alarms for DLQ depth
+- [x] SQS queue + DLQ deployed in sin-dev (verified 2025-12-27; redrive
+      maxReceiveCount=3).
+- [ ] Promote queue + DLQ to perf/prod stages (SST wiring in `sst.config.ts`).
+- [ ] Confirm CloudWatch alarms for queue backlog + DLQ after deploy (alarms
+      added in `sst.config.ts`; deployment pending).
+
+**Evidence (2025-12-27):**
+
+- `aws sqs list-queues` shows
+  `solstice-sin-dev-SinNotificationsQueueQueue-nnrvkurb` and
+  `solstice-sin-dev-SinNotificationsDlqQueue-dmdumzdh`.
+- `aws sqs get-queue-attributes` shows `RedrivePolicy` with
+  `deadLetterTargetArn=...SinNotificationsDlqQueue...` and `maxReceiveCount=3`.
+- `aws cloudwatch describe-alarms` (sin-dev) returns no SQS queue alarms yet.
 
 ### 4. Email Configuration
 
-**Decision:** Using `austinwallacetech@gmail.com` as initial FROM address.
+**Decision:** Using `notifications@quadballcanada.com` as initial FROM address
+(`SinNotificationsFromEmail` secret).
 
 **Technical Debt:**
 
-- [ ] Set up proper SES domain verification for `@quadball.ca`
+- [ ] Set up SES domain verification for `quadballcanada.com`
 - [ ] Configure SPF/DKIM/DMARC for deliverability
-- [ ] Switch to production email domain
+- [ ] Confirm production email domain and update secrets if different
+
+**Evidence (2025-12-27):**
+
+- `aws sesv2 list-email-identities` (techdev + techprod, ca-central-1) returned
+  no identities.
+- `dig TXT quadballcanada.com` and `_dmarc.quadballcanada.com` returned no SPF
+  or DMARC records.
 
 ### 5. Step-Up Auth Session Extraction
 
@@ -234,9 +253,9 @@ If issues arise:
 
 - [x] All patches applied and tested
 - [x] Dependencies installed (`@aws-sdk/client-sqs`, `@aws-sdk/client-ses`, `@types/aws-lambda`)
-- [ ] Environment variables configured in SST (added to `sst.config.ts`; secrets still need values)
-- [ ] SQS queue created (configured in `sst.config.ts`; deploy pending)
-- [ ] SES email verified
+- [x] Environment variables configured in SST for sin-dev (prod pending)
+- [x] SQS queue created in sin-dev (prod/perf pending)
+- [ ] SES email verified (no SES identity present yet)
 - [x] Deployed to dev (https://d151to0xpdboo8.cloudfront.net)
 - [x] Basic testing passed (homepage, login page load)
 - [ ] Manual testing of new features

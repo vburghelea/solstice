@@ -1,0 +1,5824 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+- Pay special attention to the Repository Description. These contain important context and guidelines specific to this project.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: src/tenant/**/*.ts, src/routes/__root.tsx, src/routes/dashboard/route.tsx, src/routes/dashboard/index.tsx, src/routes/dashboard/sin.tsx, src/routes/dashboard/sin/**/*.tsx, src/routes/dashboard/select-org.tsx, src/routes/dashboard/admin/route.tsx, src/routes/dashboard/admin/index.tsx, src/routes/dashboard/admin/sin.tsx, src/routes/dashboard/admin/sin/**/*.tsx, src/routes/dashboard/forbidden.tsx, src/routes/dashboard/membership.tsx, src/routes/dashboard/members.tsx, src/routes/dashboard/events.tsx, src/routes/dashboard/teams.tsx, src/routes/dashboard/reports.tsx, src/features/layouts/*.ts, src/features/layouts/*.tsx, src/features/organizations/org-context.tsx, src/features/organizations/components/org-switcher.tsx, src/components/ui/app-sidebar.tsx, src/components/ui/admin-sidebar.tsx, src/components/ui/mobile-app-header.tsx, src/components/ui/mobile-admin-header.tsx, src/components/ui/breadcrumbs.tsx, src/components/ui/logo.tsx, src/lib/env.client.ts, src/lib/env.server.ts, sst.config.ts, docs/sin-rfp/tenant-stage-mapping-plan.md, docs/sin-rfp/route-tree-implementation-plan.md
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<user_provided_header>
+# Review Task: Tenant Architecture & Route System
+
+## Focus
+Review the **multi-tenant architecture and routing system** for correctness, security, and proper feature gating.
+
+## Key Questions
+1. Is tenant configuration properly isolated between QC and viaSport?
+2. Are feature flags correctly gating routes in `beforeLoad`?
+3. Is the active organization context properly validated and persisted?
+4. Are route guards correctly preventing cross-tenant access?
+5. Is the org switcher properly scoping data to accessible organizations?
+
+## Areas to Review
+- Tenant config in `src/tenant/*` - are features properly defined?
+- Route guards - do they call `requireFeatureInRoute()` correctly?
+- Org context flow - cookie → validation → context injection
+- Layout components - do they respect tenant branding?
+- SST config - are tenant keys properly mapped to stages?
+
+## Output Format
+For each issue found:
+1. **Category**: Config/Routing/Security/UX
+2. **Location**: file:line
+3. **Issue**: What's wrong
+4. **Impact**: What could happen
+5. **Fix**: Suggested remediation
+</user_provided_header>
+
+<directory_structure>
+docs/
+  sin-rfp/
+    route-tree-implementation-plan.md
+    tenant-stage-mapping-plan.md
+src/
+  components/
+    ui/
+      admin-sidebar.tsx
+      app-sidebar.tsx
+      breadcrumbs.tsx
+      logo.tsx
+      mobile-admin-header.tsx
+      mobile-app-header.tsx
+  features/
+    layouts/
+      admin-layout.tsx
+      admin-nav.ts
+      app-layout.tsx
+      app-nav.ts
+      nav.types.ts
+      sin-admin-nav.ts
+    organizations/
+      components/
+        org-switcher.tsx
+      org-context.tsx
+  lib/
+    env.client.ts
+    env.server.ts
+  routes/
+    dashboard/
+      admin/
+        sin/
+          analytics.tsx
+          audit.tsx
+          forms.tsx
+          imports.tsx
+          index.tsx
+          notifications.tsx
+          organizations.tsx
+          privacy.tsx
+          reporting.tsx
+          security.tsx
+        index.tsx
+        route.tsx
+        sin.tsx
+      sin/
+        forms/
+          $formId.tsx
+        submissions/
+          $submissionId.tsx
+        analytics.tsx
+        forms.tsx
+        imports.tsx
+        index.tsx
+        reporting.tsx
+      events.tsx
+      forbidden.tsx
+      index.tsx
+      members.tsx
+      membership.tsx
+      reports.tsx
+      route.tsx
+      select-org.tsx
+      sin.tsx
+      teams.tsx
+    __root.tsx
+  tenant/
+    __tests__/
+      feature-gates.test.ts
+      tenant-env.test.ts
+    tenants/
+      qc.ts
+      viasport.ts
+    feature-gates.ts
+    index.ts
+    tenant-env.ts
+    tenant.types.ts
+sst.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="docs/sin-rfp/route-tree-implementation-plan.md">
+# Tenant Distribution + Route Tree Implementation Plan
+
+This plan converts the current single-tenant QC-centric app into a dual-distribution
+(QC + viaSport) platform with a tenant-driven route tree, feature gating, org context,
+and branding. It is a file-by-file implementation plan with explicit sequencing.
+
+## Context to Read Before Implementing
+
+### High-level RFP + architecture context
+- `docs/sin-rfp/Gpt-5.2-pro-conversaion.md`
+- `docs/sin-rfp/system-requirements-addendum.md`
+- `docs/sin-rfp/viasport-sin-rfp.md`
+- `docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md`
+- `docs/sin-rfp/phase-0/architecture-reference.md`
+- `docs/sin-rfp/phase-0/security-controls.md`
+- `docs/sin-rfp/phase-0/audit-retention-policy.md`
+
+### Repo-wide rules + architecture notes
+- `AGENTS.md`
+- `CLAUDE.md`
+- `CODE_GUIDE.md`
+- `.cursor/rules/*` (expected, but not present; only `.cursor/rules_unused/` exists)
+- `docs/quadball-plan/*` (read as needed for feature-specific decisions)
+
+### Existing layout + navigation
+- `src/features/layouts/admin-layout.tsx`
+- `src/features/layouts/admin-nav.ts`
+- `src/components/ui/admin-sidebar.tsx`
+- `src/components/ui/mobile-admin-header.tsx`
+- `src/components/ui/breadcrumbs.tsx`
+- `src/styles.css`
+
+### Existing routing
+- [x] `src/routes/__root.tsx`
+- `src/routes/index.tsx`
+- `src/routes/onboarding/route.tsx`
+- `src/routes/dashboard/route.tsx`
+- `src/routes/dashboard/index.tsx`
+- `src/routes/dashboard/forbidden.tsx`
+- `src/routes/dashboard/admin/route.tsx`
+- `src/routes/dashboard/admin/roles.tsx`
+- `src/routes/dashboard/admin/sin.tsx`
+- `src/routes/dashboard/events.tsx` + `src/routes/dashboard/events/*`
+- `src/routes/dashboard/teams.tsx` + `src/routes/dashboard/teams/*`
+- `src/routes/api/*` (Square callbacks/webhooks)
+- `src/routes/api/health.ts`
+
+### Org context + auth guards
+- `src/lib/auth/guards/route-guards.ts`
+- `src/lib/auth/guards/org-guard.ts`
+- `src/lib/auth/guards/org-context.ts`
+- `src/lib/auth/middleware/auth-guard.ts`
+- `src/lib/auth/utils/admin-check.ts`
+- `src/lib/server/errors.ts`
+
+### Tenant-sensitive features to gate
+- `src/features/organizations/*`
+- `src/features/audit/*`
+- `src/features/forms/*`
+- `src/features/imports/*`
+- `src/features/reporting/*`
+- `src/features/reports/*`
+- `src/features/security/*`
+- `src/features/privacy/*`
+- `src/features/notifications/*`
+- `src/features/membership/*`
+- `src/features/events/*`
+- `src/features/teams/*`
+- `src/features/members/*`
+
+### Branding + auth
+- `src/features/auth/components/login.tsx`
+- `src/features/auth/components/signup.tsx`
+- `src/features/dashboard/PublicPortalPage.tsx`
+- `src/components/ui/logo.tsx`
+- `src/lib/auth/server-helpers.ts`
+- `src/lib/email/sendgrid.ts`
+- `vite.config.ts` (PWA manifest)
+
+### Environment + infra
+- `src/lib/env.client.ts`
+- `src/lib/env.server.ts`
+- `sst.config.ts`
+- `sst-env.d.ts`
+- `.env`, `.env.local`, `.env.e2e` (values only, do not commit)
+- `src/db/schema/organizations.schema.ts`
+- `src/db/migrations/*` (org type enum migration)
+
+---
+
+## End State (Route Tree)
+
+This is the target route tree. It keeps `/dashboard/*` as the main authenticated shell
+and splits SIN admin into sub-routes. It introduces `/dashboard/sin/*` for viaSport
+user-facing SIN features and `/dashboard/select-org` for org context selection.
+
+```txt
+src/routes/
+  __root.tsx
+  index.tsx
+
+  auth/
+    route.tsx
+    login.tsx
+    signup.tsx
+
+  onboarding/
+    route.tsx
+    index.tsx
+
+  api/
+    ... (unchanged)
+
+  dashboard/
+    route.tsx                 # AppLayout
+    index.tsx                 # QC dashboard OR redirect to /dashboard/sin
+    forbidden.tsx
+    profile.tsx
+    settings.tsx
+    privacy.tsx
+    select-org.tsx            # NEW
+
+    # QC product (existing)
+    membership.tsx
+    members.tsx
+    reports.tsx
+
+    events.tsx
+    events/
+      index.tsx
+      create.tsx
+      $slug.tsx
+      $slug.index.tsx
+      $slug.register.tsx
+      $eventId.manage.tsx
+
+    teams.tsx
+    teams/
+      index.tsx
+      browse.tsx
+      create.tsx
+      $teamId.tsx
+      $teamId.index.tsx
+      $teamId.manage.tsx
+      $teamId.members.tsx
+
+    # viaSport product (NEW)
+    sin.tsx                   # layout + org selection guard
+    sin/
+      index.tsx
+      reporting.tsx
+      forms.tsx
+      forms/
+        $formId.tsx
+      submissions/
+        $submissionId.tsx
+      imports.tsx
+      analytics.tsx
+
+    admin/
+      route.tsx               # admin subnav layout inside AppLayout
+      index.tsx               # admin landing
+      roles.tsx
+
+      sin.tsx                 # SIN Admin layout (subnav + outlet)
+      sin/
+        index.tsx
+        organizations.tsx
+        audit.tsx
+        notifications.tsx
+        security.tsx
+        privacy.tsx
+        forms.tsx
+        imports.tsx
+        reporting.tsx
+        analytics.tsx
+```
+
+**Adjustment to the GPT conversation tree:** keep a single AppLayout for `/dashboard/*`
+so the sidebar is consistent and we avoid double sidebars. Admin and SIN Admin
+subnavs render inside the content area for `/dashboard/admin/*` and
+`/dashboard/admin/sin/*`.
+
+---
+
+## Phase 0 — Tenant Model & Feature Flags (Foundation)
+
+### Create tenant config and feature gating
+- [x] `src/tenant/tenant.types.ts`
+  - Define `TenantKey`, `FeatureKey`, `TenantConfig`, `BrandConfig`.
+  - Add `OrgTypeLabelMap`, `OrgHierarchyRules`, `AdminRoleNames`.
+  - FeatureKey set should include baseline vs SIN features, for example:
+    - Distribution: `qc_portal`, `sin_portal`
+    - QC modules: `qc_membership`, `qc_events`, `qc_teams`, `qc_members_directory`,
+      `qc_reports`, `qc_payments_square`
+    - SIN admin modules: `sin_admin`, `sin_admin_orgs`, `sin_admin_audit`,
+      `sin_admin_notifications`, `sin_admin_security`, `sin_admin_privacy`,
+      `sin_admin_forms`, `sin_admin_imports`, `sin_admin_reporting`,
+      `sin_admin_analytics`
+    - SIN user modules: `sin_reporting`, `sin_forms`, `sin_imports`, `sin_analytics`
+    - Platform baseline: `security_core`, `notifications_core`
+  - Default baseline features to `true` for both tenants unless explicitly disabled.
+- [x] `src/tenant/tenant-env.ts`
+  - Read `TENANT_KEY` (server) and `VITE_TENANT_KEY` (client).
+  - Default to `qc`, validate against allowed values.
+  - Hard-fail on mismatch if both are present (canonical rule):
+    - Server: `TENANT_KEY ?? VITE_TENANT_KEY ?? "qc"`
+    - Client: `VITE_TENANT_KEY ?? "qc"`
+    - If both exist and differ: throw (dev + prod)
+- [x] `src/tenant/tenants/qc.ts`
+  - QC branding, feature flags, org labels, hierarchy rules.
+- [x] `src/tenant/tenants/viasport.ts`
+  - viaSport branding, feature flags, org labels, hierarchy rules.
+- [x] `src/tenant/index.ts`
+  - Export `tenant`, `getTenantConfig()`, `isTenant()`, `getBrand()`.
+- [x] `src/tenant/feature-gates.ts`
+  - `isFeatureEnabled(key)`
+  - `assertFeatureEnabled(key)` for server calls
+  - `requireFeatureInRoute(key)` for route `beforeLoad`
+  - `filterNavItems(items, user)` helper for UI gating
+
+### Wire env values
+- [x] `src/lib/env.client.ts`
+  - Add `VITE_TENANT_KEY` to client env schema.
+- [x] `src/lib/env.server.ts`
+  - Add `TENANT_KEY` and `VITE_TENANT_KEY` to server env schema.
+  - Suggested schema:
+    - `TENANT_KEY: z.enum([\"qc\", \"viasport\"]).prefault(\"qc\")`
+    - `VITE_TENANT_KEY: z.enum([\"qc\", \"viasport\"]).optional()`
+- [x] `sst.config.ts`
+  - Set `TENANT_KEY` and `VITE_TENANT_KEY` in `environment`.
+  - Use different values per AWS account/stage.
+  - Prefer canonical stages: `qc-dev`, `sin-dev`, `qc-perf`, `sin-perf`,
+    `qc-prod`, `sin-prod` (prefix selects tenant, suffix selects env class).
+    Hard-fail if canonical stage implies a tenant that disagrees with
+    `TENANT_KEY`/`VITE_TENANT_KEY`.
+  - Optional: derive `app.name` from tenant (e.g., `solstice-qc`, `solstice-viasport`)
+    if you want separate stack names. Decide before changing to avoid state churn.
+
+### Add real `league` org type (Decision: Option A)
+- [x] `src/db/schema/organizations.schema.ts`
+  - Add `league` to `organizationTypeEnum`.
+- [x] `src/features/organizations/organizations.schemas.ts`
+  - Add `league` to `organizationTypeSchema`.
+- [x] `src/features/organizations/components/organization-admin-panel.tsx`
+  - Add `league` to org type options.
+- [x] `src/features/reporting/reporting.schemas.ts`
+  - Add `league` to `reportingOrganizationTypeSchema`.
+- [x] `src/features/reporting/components/reporting-dashboard-shell.tsx`
+  - Add `league` to `organizationTypeOptions`.
+- [x] `src/db/migrations/*`
+  - Generate + apply enum migration (`organization_type`).
+  - Org hierarchy note:
+    - viaSport: `governing_body → pso → league → club → (teams)`
+    - QC: `pso → league → club → (teams)` (QC can set root as `pso` or `governing_body`)
+
+---
+
+## Phase 1 — Global Admin Roles + Tenant-Aware Permissions
+
+### Replace hard-coded role names with tenant config
+- [x] `src/lib/auth/utils/admin-check.ts`
+  - Use `tenant.admin.globalRoleNames` for global admin checks.
+- [x] `src/features/roles/permission.service.ts`
+  - Use tenant role names in `isGlobalAdmin()` and `isAnyAdmin()`.
+- [x] `src/features/roles/permission.server.ts`
+  - Use tenant role names in server checks.
+  - Ensure tenant role names match existing seeded roles (or update seeds/tests).
+
+### Update role UI + tests
+- [x] `src/features/roles/components/role-management-dashboard.tsx`
+  - Replace “Solstice/Quadball” copy with tenant brand.
+- [x] `src/features/roles/__tests__/permission.service.test.ts`
+  - Update expected global role names.
+- [x] `src/features/roles/components/__tests__/role-management-dashboard.test.tsx`
+  - Update snapshot/copy expectations.
+
+### Seed scripts
+- [x] `scripts/seed-global-admins.ts`
+  - Derive default global roles from tenant config.
+  - Add viaSport global admin role(s) if absent.
+
+---
+
+## Phase 2 — Server-Side Feature Gating (Non-negotiable)
+
+Add `assertFeatureEnabled()` at the top of each server function to ensure
+QC cannot call viaSport-only endpoints even if URLs are guessed.
+
+### QC-only features
+- [x] `src/features/membership/membership.queries.ts`
+- [x] `src/features/membership/membership.mutations.ts`
+- [x] `src/features/membership/membership.admin-queries.ts`
+- [x] `src/features/events/events.queries.ts`
+- [x] `src/features/events/events.mutations.ts`
+- [x] `src/features/teams/teams.queries.ts`
+- [x] `src/features/teams/teams.mutations.ts`
+- [x] `src/features/teams/teams.cleanup.ts`
+- [x] `src/features/members/members.queries.ts`
+
+### viaSport SIN features
+- [x] `src/features/organizations/organizations.queries.ts`
+- [x] `src/features/organizations/organizations.mutations.ts`
+- [x] `src/features/audit/audit.queries.ts`
+- [x] `src/features/forms/forms.queries.ts`
+- [x] `src/features/forms/forms.mutations.ts`
+- [x] `src/features/imports/imports.queries.ts`
+- [x] `src/features/imports/imports.mutations.ts`
+- [x] `src/features/reporting/reporting.queries.ts`
+- [x] `src/features/reporting/reporting.mutations.ts`
+- [x] `src/features/reports/reports.queries.ts`
+- [x] `src/features/reports/reports.mutations.ts`
+- [x] `src/features/security/security.queries.ts`
+- [x] `src/features/security/security.mutations.ts`
+- [x] `src/features/privacy/privacy.queries.ts`
+- [x] `src/features/privacy/privacy.mutations.ts`
+- [x] `src/features/notifications/notifications.queries.ts`
+- [x] `src/features/notifications/notifications.mutations.ts`
+  - Template CRUD guarded by `sin_admin_*`; user preference endpoints stay
+    enabled under `notifications_core`.
+  - Keep core security/notification protections enabled even when SIN admin is off.
+
+### API routes to gate
+- [x] `src/routes/api/payments/square/callback.ts`
+- [x] `src/routes/api/webhooks/square.ts`
+- [x] `src/routes/api/test-square.ts`
+- [x] `src/routes/api/debug-square.ts`
+
+---
+
+## Phase 3 — Navigation + Layout Refactor
+
+### Navigation types and generators
+- [x] `src/features/layouts/nav.types.ts`
+  - `NavItem` type with `feature`, `requiresGlobalAdmin`, `requiresOrgRole`.
+- [x] `src/features/layouts/app-nav.ts`
+  - Build nav lists for QC vs viaSport based on feature flags.
+- [x] `src/features/layouts/admin-nav.ts`
+  - Convert from static arrays to `getAdminNav()`.
+- [x] `src/features/layouts/sin-admin-nav.ts`
+  - Add SIN Admin subnav items.
+
+### Layout components
+- [x] `src/features/layouts/app-layout.tsx`
+  - New AppLayout used by `/dashboard/route.tsx`.
+- [x] `src/components/ui/app-sidebar.tsx`
+  - Single sidebar with sections (Portal / Admin Console / Account).
+- [x] `src/features/layouts/admin-layout.tsx`
+  - Either remove or convert to a lightweight AdminSectionLayout
+    (no sidebar; AppLayout already provides it).
+- [x] `src/components/ui/mobile-app-header.tsx`
+  - New mobile header for AppLayout with brand + NotificationBell.
+- [x] `src/components/ui/mobile-admin-header.tsx`
+  - Tenant-driven brand text and “Admin Console”.
+- [x] `src/components/ui/breadcrumbs.tsx`
+  - Add labels for `sin`, `organizations`, `audit`, `notifications`, etc.
+
+---
+
+## Phase 4 — Route Refactor to Target Tree
+
+### Base layout
+- [x] `src/routes/dashboard/route.tsx`
+  - Render `AppLayout` and keep `requireAuthAndProfile` guard.
+- [x] `src/routes/onboarding/route.tsx`
+  - Use AppLayout or a minimal layout; keep redirect logic.
+
+### QC routes (gated)
+- [x] `src/routes/dashboard/index.tsx`
+  - Redirect to `/dashboard/sin` for viaSport tenant.
+- [x] `src/routes/dashboard/membership.tsx`
+  - Add `beforeLoad` feature gate `qc_membership`.
+- [x] `src/routes/dashboard/members.tsx`
+  - Add `beforeLoad` feature gate `qc_members_directory`.
+- [x] `src/routes/dashboard/reports.tsx`
+  - Add `beforeLoad` feature gate `qc_reports`.
+- [x] `src/routes/dashboard/events.tsx`
+  - Add `beforeLoad` feature gate `qc_events` (covers child routes).
+- [x] `src/routes/dashboard/teams.tsx`
+  - Add `beforeLoad` feature gate `qc_teams` (covers child routes).
+
+### viaSport SIN user portal
+- [x] `src/routes/dashboard/sin.tsx` (NEW)
+  - Layout route: `requireFeatureInRoute("sin_portal")`
+  - Enforce active org selection or redirect to `/dashboard/select-org`.
+- [x] `src/routes/dashboard/sin/index.tsx` (NEW)
+  - SIN landing with cards linking to reporting/forms/imports/analytics.
+- [x] `src/routes/dashboard/sin/reporting.tsx` (NEW)
+  - Render reporting user dashboard (subset of `ReportingDashboardShell`).
+- [x] `src/routes/dashboard/sin/forms.tsx` (NEW)
+  - List assigned forms for active org.
+- [x] `src/routes/dashboard/sin/forms/$formId.tsx` (NEW)
+  - Form submission view using existing form renderer.
+- [x] `src/routes/dashboard/sin/submissions/$submissionId.tsx` (NEW)
+  - Submission detail and history view.
+- [x] `src/routes/dashboard/sin/imports.tsx` (NEW)
+  - Read-only status view for imports (if needed for users).
+- [x] `src/routes/dashboard/sin/analytics.tsx` (NEW)
+  - Report builder/export UI gated by org role.
+
+### Admin routes
+- [x] `src/routes/dashboard/admin/route.tsx`
+  - Render AdminSectionLayout and keep `requireGlobalAdmin` guard.
+- [x] `src/routes/dashboard/admin/index.tsx` (NEW)
+  - Admin landing links: Roles + SIN Admin.
+- [x] `src/routes/dashboard/admin/sin.tsx`
+  - Convert to layout route with `SinAdminSubnav` + `<Outlet />`.
+  - Gate at the parent layout route whenever possible to avoid per-page misses.
+- [x] `src/routes/dashboard/admin/sin/index.tsx` (NEW)
+  - Overview cards for SIN admin modules.
+- [x] `src/routes/dashboard/admin/sin/organizations.tsx`
+  - Render `OrganizationAdminPanel`.
+- [x] `src/routes/dashboard/admin/sin/audit.tsx`
+  - Render `AuditLogTable`.
+- [x] `src/routes/dashboard/admin/sin/notifications.tsx`
+  - Render notification admin UI.
+- [x] `src/routes/dashboard/admin/sin/security.tsx`
+  - Render `SecurityDashboard`.
+- [x] `src/routes/dashboard/admin/sin/privacy.tsx`
+  - Render `PrivacyDashboard`, `PrivacyAdminPanel`, `RetentionPolicyPanel`.
+- [x] `src/routes/dashboard/admin/sin/forms.tsx`
+  - Render `FormBuilderShell`.
+- [x] `src/routes/dashboard/admin/sin/imports.tsx`
+  - Render `ImportWizardShell`.
+- [x] `src/routes/dashboard/admin/sin/reporting.tsx`
+  - Render `ReportingDashboardShell`.
+- [x] `src/routes/dashboard/admin/sin/analytics.tsx`
+  - Render `ReportBuilderShell`.
+
+### Org selection
+- [x] `src/routes/dashboard/select-org.tsx` (NEW)
+  - Org selection UI (see Phase 5).
+
+---
+
+## Phase 5 — Org Context & Org Switcher
+
+### Org access model
+- [x] `src/features/organizations/organizations.access.ts` (NEW)
+  - Compute accessible orgs for a user via membership + delegated access + descendants.
+- [x] `src/features/organizations/organizations.queries.ts`
+  - Add `listAccessibleOrganizations()` for OrgSwitcher.
+- [x] `src/features/organizations/organizations.mutations.ts`
+  - Enforce tenant hierarchy rules on create/update.
+
+### Client org context
+- [x] `src/features/organizations/components/org-switcher.tsx` (NEW)
+  - Render accessible orgs and set `active_org_id` cookie.
+- [x] `src/features/organizations/org-context.tsx` (NEW)
+  - React context and hook for active org id.
+
+### Server org context
+- [x] `src/lib/auth/guards/org-context.ts`
+  - Prefer cookie (`active_org_id`), allow `x-organization-id` override,
+    always verify membership server-side.
+- [x] `src/lib/auth/middleware/auth-guard.ts`
+  - Include resolved org id/role in function context.
+- [x] `src/start.ts`
+  - Add client-side function middleware to pass active org if needed.
+  - Cookie config (if set via server response):
+    - `httpOnly: true`, `secure: isProduction()`, `sameSite: \"lax\"`
+    - `maxAge: 60 * 60 * 24 * 30` (30 days)
+
+---
+
+## Phase 6 — Tenant Branding + Copy
+
+Replace hard-coded QC copy with tenant-driven branding.
+
+- `src/routes/__root.tsx`
+  - Use tenant brand for `<title>` and meta description.
+  - Add `data-tenant` attribute for CSS overrides.
+- [x] `src/styles.css`
+  - Add `[data-tenant="viasport"]` CSS variable overrides.
+- [x] `src/components/ui/logo.tsx`
+  - Use tenant-specific logo and alt text.
+- [x] `src/components/ui/app-sidebar.tsx`
+  - Brand name + subtitle from tenant config.
+- [x] `src/components/ui/mobile-app-header.tsx`
+  - Tenant brand + subtitle.
+- [x] `src/components/ui/admin-sidebar.tsx`
+  - Tenant brand + “Admin Console” label.
+- [x] `src/components/ui/mobile-admin-header.tsx`
+  - Tenant brand + “Admin Console” label.
+- [x] `src/features/auth/components/login.tsx`
+- [x] `src/features/auth/components/signup.tsx`
+- [x] `src/features/dashboard/PublicPortalPage.tsx`
+- [x] `src/features/dashboard/MemberDashboard.tsx`
+- [x] `src/routes/dashboard/index.tsx`
+- [x] `src/routes/dashboard/membership.tsx`
+- [x] `src/routes/dashboard/members.tsx`
+- [x] `src/routes/dashboard/forbidden.tsx`
+- [x] `src/lib/auth/server-helpers.ts`
+  - Use tenant brand for `appName` and 2FA issuer.
+- [x] `src/lib/email/sendgrid.ts`
+- [x] `vite.config.ts`
+  - Make PWA manifest tenant-aware (name, short_name, theme_color, icons).
+  - Store tenant-specific icons under `public/icons/` (e.g., `viasport-icon.svg`).
+
+---
+
+## Phase 7 — QA, Tests, and Docs
+
+### Tests
+- [x] `src/features/layouts/__tests__/admin-layout.test.tsx`
+  - Update for AppLayout + tenant branding.
+- [x] `src/features/roles/__tests__/permission.service.test.ts`
+- [x] `src/features/roles/components/__tests__/role-management-dashboard.test.tsx`
+- [x] `src/tenant/__tests__/feature-gates.test.ts`
+- [x] `src/tenant/__tests__/tenant-env.test.ts`
+- [x] `e2e/tests/*`
+  - Add checks: QC cannot access `/dashboard/sin/*`.
+  - viaSport redirects `/dashboard` → `/dashboard/sin`.
+
+### Documentation
+- [x] `docs/sin-rfp/phase-0/architecture-reference.md`
+  - Add tenant distribution layer explanation.
+- [x] `docs/sin-rfp/phase-0/security-controls.md`
+  - Add note on server-side feature gating.
+- [x] `docs/sin-rfp/phase-0/audit-retention-policy.md`
+  - Ensure policy references org-scoped auditing.
+- [x] `docs/sin-rfp/route-tree-implementation-plan.md`
+  - Keep environment mismatch hard-fail requirements and org hierarchy notes.
+
+---
+
+## Notes & Guardrails
+
+- Do not introduce non-ASCII content in code files unless it already exists.
+- Server-only imports must remain inside `handler()` (TanStack Start rule).
+- Feature gating must be done in three layers: UI, route guard, server fn.
+- Prefer a single AppLayout for `/dashboard/*` to avoid double sidebars.
+- Org type labels can be tenant-specific, but the DB enum must include `league`.
+- Tenant key mismatch must hard-fail (dev + prod).
+
+---
+
+## Sequencing Summary
+
+1. Tenant model + env wiring (Phase 0)
+2. Global admin role + permission wiring (Phase 1)
+3. Server-side feature gating (Phase 2)
+4. AppLayout + nav refactor (Phase 3)
+5. Route tree refactor (Phase 4)
+6. Org context + org switcher (Phase 5)
+7. Branding + tenant copy (Phase 6)
+8. Tests + docs (Phase 7)
+
+This sequence minimizes churn and prevents QC from accessing viaSport-only endpoints
+at any step.
+</file>
+
+<file path="docs/sin-rfp/tenant-stage-mapping-plan.md">
+# Tenant Stage Mapping Plan (Canonical Stages)
+
+## Goal
+
+Formalize tenant selection and environment classification using canonical stage
+names so the tenant is deterministic and misconfiguration fails fast.
+
+## Canonical Stages
+
+| Stage     | Tenant Key | Environment Class |
+|-----------|------------|-------------------|
+| qc-dev    | qc         | dev               |
+| sin-dev   | viasport   | dev               |
+| qc-perf   | qc         | perf              |
+| sin-perf  | viasport   | perf              |
+| qc-prod   | qc         | prod              |
+| sin-prod  | viasport   | prod              |
+
+Notes:
+- "sin" maps to tenant key "viasport".
+- Environment class "prod" is treated as production.
+
+## Implementation Steps
+
+1. Add a shared stage resolver in `sst.config.ts`.
+   - Use a canonical stage pattern: `^(qc|sin)-(dev|perf|prod)$`.
+   - Implement a helper to resolve:
+     - `stageTenant` (qc | viasport)
+     - `stageEnv` (dev | perf | prod)
+   - Use this resolver in both `app()` and `run()` so removal/protect
+     logic and runtime env agree.
+
+2. Update production/perf detection to honor canonical stage suffixes.
+   - `isProd` should be true when `stageEnv === "prod"` (and remain true for
+     legacy "production" if we keep it).
+   - `isPerf` should be true when `stageEnv === "perf"`.
+   - Update `removal` and `protect` logic to use `stageEnv`, not raw stage.
+
+3. Fail fast on near-canonical typos.
+   - If a stage starts with `qc-` or `sin-` but does not match the canonical
+     pattern, throw with a message listing valid canonical stages.
+
+4. Derive tenant env vars from canonical stage names and guard against drift.
+   - If stage is canonical:
+     - set `tenantKey` to `stageTenant`.
+     - if `TENANT_KEY` or `VITE_TENANT_KEY` are provided and differ from
+       `stageTenant`, throw with a clear error message.
+   - If stage is not canonical:
+     - keep current fallback (env vars first, then heuristic) for backward
+       compatibility.
+
+5. Document the canonical stage policy.
+   - Update `docs/sin-rfp/phase-0/architecture-reference.md` with the canonical
+     stage list and tenant mapping rule.
+   - Add a short note to `docs/sin-rfp/route-tree-implementation-plan.md` in
+     the environment section describing the canonical stages.
+
+## Validation
+
+- Run `pnpm lint` and `pnpm check-types`.
+- Spot check with:
+  - `AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono`
+  - `AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono`
+
+## Notes / Risks
+
+- Canonical stages create separate stacks per tenant; this is desirable to keep
+  infra isolated, but costs more.
+- Backward-compatible stages (e.g., `dev`, `perf`, `production`) will continue
+  to behave as before unless we decide to enforce canonical-only later.
+</file>
+
+<file path="src/components/ui/app-sidebar.tsx">
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { LogOut } from "lucide-react";
+import { useMemo, useState } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { authQueryKey } from "~/features/auth/auth.queries";
+import { getAppNavSections } from "~/features/layouts/app-nav";
+import { recordSecurityEvent } from "~/features/security/security.mutations";
+import { auth } from "~/lib/auth-client";
+import { filterNavItems } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+import { Logo } from "~/components/ui/logo";
+import { useOrgContext } from "~/features/organizations/org-context";
+
+interface AppSidebarProps {
+  onNavigation?: () => void;
+}
+
+export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
+  const queryClient = useQueryClient();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
+  const navigate = useNavigate();
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+  const { organizationRole } = useOrgContext();
+  const brand = getBrand();
+
+  const sections = useMemo(() => {
+    return getAppNavSections()
+      .map((section) => ({
+        ...section,
+        items: filterNavItems(section.items, { user, organizationRole }),
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [organizationRole, user]);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
+    try {
+      if (user?.id) {
+        void recordSecurityEvent({ data: { eventType: "logout", userId: user.id } });
+      }
+      await auth.signOut({
+        fetchOptions: {
+          onResponse: async () => {
+            queryClient.setQueryData(authQueryKey, null);
+            await router.invalidate();
+          },
+        },
+      });
+
+      await navigate({ to: "/auth/login" });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setIsLoggingOut(false);
+      return;
+    }
+
+    setIsLoggingOut(false);
+  };
+
+  return (
+    <aside className="flex w-72 flex-col border-r border-gray-200 bg-white">
+      <div className="p-6">
+        <Link to="/dashboard" className="transition-opacity hover:opacity-80">
+          <div className="flex items-center gap-3">
+            <Logo className="h-10 w-10" alt={`${brand.name} logo`} />
+            <div>
+              <h1 className="text-admin-text-primary text-lg font-bold">
+                {brand.name}
+              </h1>
+              <p className="text-admin-text-secondary text-xs">
+                {brand.portalSubtitle}
+              </p>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      <nav className="flex-1 space-y-6 px-4 pb-4">
+        {sections.map((section) => (
+          <div key={section.label} className="space-y-2">
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+              {section.label}
+            </p>
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="nav-item"
+                  onClick={onNavigation}
+                  {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
+                  activeProps={{
+                    className: "nav-item-active",
+                    "aria-current": "page",
+                    "data-status": "active",
+                  }}
+                >
+                  <Icon className="pointer-events-none h-5 w-5" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+
+      <div className="border-t border-gray-200 px-4 py-4">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
+          disabled={isLoggingOut}
+        >
+          <LogOut className="h-5 w-5" />
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+</file>
+
+<file path="src/components/ui/mobile-app-header.tsx">
+import { Menu } from "lucide-react";
+import { NotificationBell } from "~/features/notifications/components/notification-bell";
+import { getBrand } from "~/tenant";
+import { Button } from "./button";
+import { Logo } from "./logo";
+
+interface MobileAppHeaderProps {
+  onMenuClick: () => void;
+}
+
+export function MobileAppHeader({ onMenuClick }: MobileAppHeaderProps) {
+  const brand = getBrand();
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white lg:hidden">
+      <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={onMenuClick}>
+            <Menu className="h-6 w-6" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <Logo className="h-8 w-8" alt={`${brand.name} logo`} />
+            <div>
+              <h1 className="text-admin-text-primary text-base font-bold">
+                {brand.name}
+              </h1>
+              <p className="text-admin-text-secondary text-xs">
+                {brand.portalSubtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+        <NotificationBell />
+      </div>
+    </header>
+  );
+}
+</file>
+
+<file path="src/features/layouts/app-layout.tsx">
+import { Outlet } from "@tanstack/react-router";
+import { X } from "lucide-react";
+import { useState } from "react";
+import { AppSidebar } from "~/components/ui/app-sidebar";
+import { Breadcrumbs } from "~/components/ui/breadcrumbs";
+import { Button } from "~/components/ui/button";
+import { MobileAppHeader } from "~/components/ui/mobile-app-header";
+
+export function AppLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <div className="hidden lg:block">
+        <AppSidebar />
+      </div>
+
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-xl">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(false)}
+              className="absolute top-4 right-2 z-10"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <div className="flex-1 overflow-y-auto">
+              <AppSidebar onNavigation={() => setSidebarOpen(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-1 flex-col">
+        <MobileAppHeader onMenuClick={() => setSidebarOpen(true)} />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6">
+            <Breadcrumbs />
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/features/layouts/app-nav.ts">
+import {
+  BarChart3,
+  Calendar,
+  ClipboardList,
+  CreditCard,
+  FileText,
+  Home,
+  LayoutGrid,
+  LineChart,
+  ShieldCheck,
+  Settings,
+  UploadCloud,
+  User,
+  UserCheck,
+  Users,
+} from "lucide-react";
+import { getAdminNav } from "./admin-nav";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+import type { NavItem, NavSection } from "./nav.types";
+
+const analyticsRoles: OrganizationRole[] = ["owner", "admin", "reporter"];
+
+const portalItems: NavItem[] = [
+  {
+    icon: Home,
+    label: "Dashboard",
+    to: "/dashboard",
+    exact: true,
+    feature: "qc_portal",
+  },
+  {
+    icon: LayoutGrid,
+    label: "SIN Portal",
+    to: "/dashboard/sin",
+    exact: true,
+    feature: "sin_portal",
+  },
+  {
+    icon: CreditCard,
+    label: "Membership",
+    to: "/dashboard/membership",
+    feature: "qc_membership",
+  },
+  {
+    icon: Users,
+    label: "Teams",
+    to: "/dashboard/teams",
+    feature: "qc_teams",
+  },
+  {
+    icon: Calendar,
+    label: "Events",
+    to: "/dashboard/events",
+    feature: "qc_events",
+  },
+  {
+    icon: UserCheck,
+    label: "Members",
+    to: "/dashboard/members",
+    feature: "qc_members_directory",
+  },
+  {
+    icon: BarChart3,
+    label: "Reports",
+    to: "/dashboard/reports",
+    feature: "qc_reports",
+  },
+  {
+    icon: ClipboardList,
+    label: "Reporting",
+    to: "/dashboard/sin/reporting",
+    feature: "sin_reporting",
+  },
+  {
+    icon: FileText,
+    label: "Forms",
+    to: "/dashboard/sin/forms",
+    feature: "sin_forms",
+  },
+  {
+    icon: UploadCloud,
+    label: "Imports",
+    to: "/dashboard/sin/imports",
+    feature: "sin_imports",
+  },
+  {
+    icon: LineChart,
+    label: "Analytics",
+    to: "/dashboard/sin/analytics",
+    feature: "sin_analytics",
+    requiresOrgRole: analyticsRoles,
+  },
+];
+
+const accountItems: NavItem[] = [
+  {
+    icon: User,
+    label: "Profile",
+    to: "/dashboard/profile",
+    exact: true,
+  },
+  {
+    icon: Settings,
+    label: "Settings",
+    to: "/dashboard/settings",
+    exact: true,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Privacy",
+    to: "/dashboard/privacy",
+    exact: true,
+  },
+];
+
+export const getPortalNav = (): NavSection => ({
+  label: "Portal",
+  items: [...portalItems],
+});
+
+export const getAdminConsoleNav = (): NavSection => ({
+  label: "Admin Console",
+  items: getAdminNav(),
+});
+
+export const getAccountNav = (): NavSection => ({
+  label: "Account",
+  items: [...accountItems],
+});
+
+export const getAppNavSections = (): NavSection[] => [
+  getPortalNav(),
+  getAdminConsoleNav(),
+  getAccountNav(),
+];
+</file>
+
+<file path="src/features/layouts/nav.types.ts">
+import type { LucideIcon } from "lucide-react";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+import type { FeatureKey } from "~/tenant/tenant.types";
+
+export type NavItem = {
+  label: string;
+  to: string;
+  icon: LucideIcon;
+  exact?: boolean;
+  feature?: FeatureKey;
+  requiresGlobalAdmin?: boolean;
+  requiresOrgRole?: OrganizationRole | OrganizationRole[];
+};
+
+export type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+</file>
+
+<file path="src/features/layouts/sin-admin-nav.ts">
+import {
+  BarChart3,
+  Bell,
+  Building2,
+  FileText,
+  Home,
+  LineChart,
+  ShieldCheck,
+  UploadCloud,
+} from "lucide-react";
+import type { NavItem } from "./nav.types";
+
+export const getSinAdminNav = (): NavItem[] => [
+  {
+    icon: Home,
+    label: "Overview",
+    to: "/dashboard/admin/sin",
+    exact: true,
+    requiresGlobalAdmin: true,
+    feature: "sin_admin",
+  },
+  {
+    icon: Building2,
+    label: "Organizations",
+    to: "/dashboard/admin/sin/organizations",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_orgs",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Audit",
+    to: "/dashboard/admin/sin/audit",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_audit",
+  },
+  {
+    icon: Bell,
+    label: "Notifications",
+    to: "/dashboard/admin/sin/notifications",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_notifications",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Security",
+    to: "/dashboard/admin/sin/security",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_security",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Privacy",
+    to: "/dashboard/admin/sin/privacy",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_privacy",
+  },
+  {
+    icon: FileText,
+    label: "Forms",
+    to: "/dashboard/admin/sin/forms",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_forms",
+  },
+  {
+    icon: UploadCloud,
+    label: "Imports",
+    to: "/dashboard/admin/sin/imports",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_imports",
+  },
+  {
+    icon: BarChart3,
+    label: "Reporting",
+    to: "/dashboard/admin/sin/reporting",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_reporting",
+  },
+  {
+    icon: LineChart,
+    label: "Analytics",
+    to: "/dashboard/admin/sin/analytics",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin_analytics",
+  },
+];
+</file>
+
+<file path="src/features/organizations/components/org-switcher.tsx">
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { setActiveOrganization } from "~/features/organizations/organizations.mutations";
+import { useOrgContext } from "~/features/organizations/org-context";
+
+interface OrgSwitcherProps {
+  /** Callback when organization is successfully selected */
+  onSuccess?: (organizationId: string | null) => void;
+}
+
+export function OrgSwitcher({ onSuccess }: OrgSwitcherProps = {}) {
+  const {
+    accessibleOrganizations,
+    activeOrganizationId,
+    setActiveOrganizationId,
+    isLoading,
+  } = useOrgContext();
+
+  const mutation = useMutation({
+    mutationFn: (organizationId: string | null) =>
+      setActiveOrganization({ data: { organizationId } }),
+    onSuccess: (result) => {
+      if (!result?.success) {
+        const message = result?.errors?.[0]?.message ?? "Failed to update organization";
+        toast.error(message);
+        return;
+      }
+
+      const newOrgId = result.data?.organizationId ?? null;
+      setActiveOrganizationId(newOrgId);
+      onSuccess?.(newOrgId);
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Failed to update organization");
+    },
+  });
+
+  if (isLoading) {
+    return <div className="text-muted-foreground text-sm">Loading organizations…</div>;
+  }
+
+  if (accessibleOrganizations.length === 0) {
+    return (
+      <div className="text-muted-foreground text-sm">
+        No organizations available for your account.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <Select
+        value={activeOrganizationId ?? ""}
+        onValueChange={(value) => {
+          const nextId = value === "__none__" ? null : value;
+          mutation.mutate(nextId);
+        }}
+        disabled={mutation.isPending}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select organization" />
+        </SelectTrigger>
+        <SelectContent>
+          {activeOrganizationId ? (
+            <SelectItem value="__none__">Clear selection</SelectItem>
+          ) : null}
+          {accessibleOrganizations.map((organization) => (
+            <SelectItem key={organization.id} value={organization.id}>
+              {organization.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {mutation.isPending ? (
+        <Button variant="outline" disabled className="w-fit">
+          Updating…
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+</file>
+
+<file path="src/features/organizations/org-context.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { useRouteContext } from "@tanstack/react-router";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { listAccessibleOrganizations } from "~/features/organizations/organizations.queries";
+import { isFeatureEnabled } from "~/tenant/feature-gates";
+import type { AccessibleOrganization } from "~/features/organizations/organizations.types";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+
+type OrgContextValue = {
+  activeOrganizationId: string | null;
+  organizationRole: OrganizationRole | null;
+  accessibleOrganizations: AccessibleOrganization[];
+  setActiveOrganizationId: (organizationId: string | null) => void;
+  isLoading: boolean;
+};
+
+const OrgContext = createContext<OrgContextValue | null>(null);
+
+export function OrgContextProvider({ children }: { children: React.ReactNode }) {
+  const context = useRouteContext({ strict: false }) as
+    | { activeOrganizationId?: string | null }
+    | undefined;
+  const initialOrgId = context?.activeOrganizationId ?? null;
+  const [activeOrganizationId, setActiveOrganizationId] = useState<string | null>(
+    initialOrgId,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (activeOrganizationId) {
+      window.localStorage.setItem("active_org_id", activeOrganizationId);
+    } else {
+      window.localStorage.removeItem("active_org_id");
+    }
+  }, [activeOrganizationId]);
+
+  const isSinPortalEnabled = isFeatureEnabled("sin_portal");
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["organizations", "accessible"],
+    queryFn: () => listAccessibleOrganizations({ data: null }),
+    enabled: isSinPortalEnabled,
+  });
+
+  const activeOrganization = useMemo(
+    () =>
+      data.find((organization) => organization.id === activeOrganizationId) ?? null,
+    [activeOrganizationId, data],
+  );
+
+  const organizationRole = activeOrganization?.role ?? null;
+
+  return (
+    <OrgContext.Provider
+      value={{
+        activeOrganizationId,
+        organizationRole,
+        accessibleOrganizations: data,
+        setActiveOrganizationId,
+        isLoading,
+      }}
+    >
+      {children}
+    </OrgContext.Provider>
+  );
+}
+
+export const useOrgContext = () => {
+  const context = useContext(OrgContext);
+  if (!context) {
+    throw new Error("useOrgContext must be used within OrgContextProvider");
+  }
+  return context;
+};
+</file>
+
+<file path="src/routes/dashboard/admin/sin/analytics.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { ReportBuilderShell } from "~/features/reports/components/report-builder-shell";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/analytics")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_analytics");
+  },
+  component: SinAnalyticsAdminPage,
+});
+
+function SinAnalyticsAdminPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <ReportBuilderShell />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/audit.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { AuditLogTable } from "~/features/audit/components/audit-log-table";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/audit")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_audit");
+  },
+  component: SinAuditPage,
+});
+
+function SinAuditPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <AuditLogTable />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/forms.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { FormBuilderShell } from "~/features/forms/components/form-builder-shell";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/forms")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_forms");
+  },
+  component: SinFormsAdminPage,
+});
+
+function SinFormsAdminPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <FormBuilderShell />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/imports.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { ImportWizardShell } from "~/features/imports/components/import-wizard-shell";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/imports")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_imports");
+  },
+  component: SinImportsAdminPage,
+});
+
+function SinImportsAdminPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <ImportWizardShell />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/index.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+
+export const Route = createFileRoute("/dashboard/admin/sin/")({
+  component: SinAdminOverview,
+});
+
+function SinAdminOverview() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Organizations</CardTitle>
+            <CardDescription>Create and manage tenant hierarchy.</CardDescription>
+            <Button asChild className="w-fit">
+              <Link to="/dashboard/admin/sin/organizations">Manage orgs</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Audit</CardTitle>
+            <CardDescription>Review audit trails and verification.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/audit">View audit logs</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Notifications</CardTitle>
+            <CardDescription>Manage templates and delivery settings.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/notifications">Manage notifications</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Security</CardTitle>
+            <CardDescription>Monitor auth and security controls.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/security">Open security</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Privacy</CardTitle>
+            <CardDescription>Manage privacy policies and retention.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/privacy">Open privacy</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Forms</CardTitle>
+            <CardDescription>Build, publish, and review forms.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/forms">Open forms</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Imports</CardTitle>
+            <CardDescription>Run import workflows and batch jobs.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/imports">Open imports</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Reporting</CardTitle>
+            <CardDescription>Configure reporting cycles and tasks.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/reporting">Open reporting</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Analytics</CardTitle>
+            <CardDescription>Build reports and exports.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/admin/sin/analytics">Open analytics</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/notifications.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { NotificationPreferencesCard } from "~/features/notifications/components/notification-preferences-card";
+import { NotificationTemplatePanel } from "~/features/notifications/components/notification-template-panel";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/notifications")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_notifications");
+  },
+  component: SinNotificationsPage,
+});
+
+function SinNotificationsPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <NotificationTemplatePanel />
+        <NotificationPreferencesCard />
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/organizations.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { OrganizationAdminPanel } from "~/features/organizations/components/organization-admin-panel";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/organizations")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_orgs");
+  },
+  component: SinOrganizationsPage,
+});
+
+function SinOrganizationsPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <OrganizationAdminPanel />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/privacy.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { PrivacyAdminPanel } from "~/features/privacy/components/privacy-admin-panel";
+import { PrivacyDashboard } from "~/features/privacy/components/privacy-dashboard";
+import { RetentionPolicyPanel } from "~/features/privacy/components/retention-policy-panel";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/privacy")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_privacy");
+  },
+  component: SinPrivacyPage,
+});
+
+function SinPrivacyPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PrivacyDashboard />
+        <PrivacyAdminPanel />
+      </div>
+      <RetentionPolicyPanel />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/reporting.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { ReportingDashboardShell } from "~/features/reporting/components/reporting-dashboard-shell";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/reporting")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_reporting");
+  },
+  component: SinReportingAdminPage,
+});
+
+function SinReportingAdminPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <ReportingDashboardShell />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/sin/security.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { SecurityDashboard } from "~/features/security/components/security-dashboard";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin/security")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin_security");
+  },
+  component: SinSecurityPage,
+});
+
+function SinSecurityPage() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <SecurityDashboard />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/admin/index.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { isFeatureEnabled } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/")({
+  component: AdminHome,
+});
+
+function AdminHome() {
+  const showSinAdmin = isFeatureEnabled("sin_admin");
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Admin</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          {showSinAdmin ? "Manage global roles and SIN administration." : "Manage global roles."}
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Roles</CardTitle>
+            <CardDescription>Manage global administrator roles.</CardDescription>
+            <Button asChild className="w-fit">
+              <Link to="/dashboard/admin/roles">Manage roles</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        {showSinAdmin ? (
+          <Card>
+            <CardHeader className="space-y-2">
+              <CardTitle>SIN Admin</CardTitle>
+              <CardDescription>
+                Configure organizations, reporting, security, and privacy workflows.
+              </CardDescription>
+              <Button asChild className="w-fit" variant="outline">
+                <Link to="/dashboard/admin/sin">Open SIN admin</Link>
+              </Button>
+            </CardHeader>
+          </Card>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/forms/$formId.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { listFormSubmissions, getForm, getLatestFormVersion } from "~/features/forms/forms.queries";
+import { DynamicFormRenderer } from "~/features/forms/components/form-builder-shell";
+import type { FormDefinition } from "~/features/forms/forms.schemas";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/forms/$formId")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_forms");
+  },
+  loader: async ({ params }) => {
+    const [form, latestVersion] = await Promise.all([
+      getForm({ data: { formId: params.formId } }),
+      getLatestFormVersion({ data: { formId: params.formId } }),
+    ]);
+
+    return { form, latestVersion };
+  },
+  component: SinFormDetailPage,
+});
+
+function SinFormDetailPage() {
+  const { form, latestVersion } = Route.useLoaderData();
+  const formId = form?.id ?? null;
+
+  const { data: submissions = [] } = useQuery({
+    queryKey: ["forms", "submissions", formId],
+    queryFn: () => (formId ? listFormSubmissions({ data: { formId } }) : []),
+    enabled: Boolean(formId),
+  });
+
+  if (!form || !latestVersion) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Form not found.</CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{form.name}</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          {form.description || "Complete the form for your organization."}
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Submit response</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DynamicFormRenderer
+            formId={form.id}
+            organizationId={form.organizationId}
+            definition={latestVersion.definition as FormDefinition}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Submission history</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {submissions.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No submissions yet.</p>
+          ) : (
+            submissions.map((submission) => (
+              <div
+                key={submission.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm"
+              >
+                <div>
+                  <p className="font-medium">Submission {submission.id.slice(0, 8)}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {new Date(submission.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant="secondary" className="capitalize">
+                    {submission.status.replace(/_/g, " ")}
+                  </Badge>
+                  <Link
+                    to={`/dashboard/sin/submissions/${submission.id}`}
+                    className="text-primary text-sm hover:underline"
+                  >
+                    View details
+                  </Link>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/submissions/$submissionId.tsx">
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  getFormSubmission,
+  getSubmissionFileDownloadUrl,
+  listFormSubmissionVersions,
+  listSubmissionFiles,
+} from "~/features/forms/forms.queries";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/submissions/$submissionId")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_forms");
+  },
+  loader: async ({ params }) => {
+    const submission = await getFormSubmission({
+      data: { submissionId: params.submissionId },
+    });
+    return { submission };
+  },
+  component: SubmissionDetailPage,
+});
+
+function SubmissionDetailPage() {
+  const { submission } = Route.useLoaderData();
+  const submissionId = submission?.id ?? null;
+
+  const { data: versions = [] } = useQuery({
+    queryKey: ["forms", "submission-versions", submissionId],
+    queryFn: () =>
+      submissionId
+        ? listFormSubmissionVersions({ data: { submissionId } })
+        : [],
+    enabled: Boolean(submissionId),
+  });
+
+  const { data: files = [] } = useQuery({
+    queryKey: ["forms", "submission-files", submissionId],
+    queryFn: () =>
+      submissionId ? listSubmissionFiles({ data: { submissionId } }) : [],
+    enabled: Boolean(submissionId),
+  });
+
+  const downloadMutation = useMutation({
+    mutationFn: (submissionFileId: string) =>
+      getSubmissionFileDownloadUrl({ data: { submissionFileId } }),
+    onSuccess: (result) => {
+      if (result?.url) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+      }
+    },
+  });
+
+  if (!submission) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Submission not found.</CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Submission details
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          {submission.formName}
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Overview</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="secondary" className="capitalize">
+              {submission.status.replace(/_/g, " ")}
+            </Badge>
+            <span className="text-muted-foreground">
+              Submitted {new Date(submission.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          {submission.reviewNotes ? (
+            <p className="text-muted-foreground text-sm">
+              Review notes: {submission.reviewNotes}
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Versions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {versions.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No version history yet.</p>
+          ) : (
+            versions.map((version) => (
+              <div
+                key={version.id}
+                className="flex items-center justify-between gap-4 rounded-md border p-3 text-sm"
+              >
+                <div>
+                  <p className="font-medium">Version {version.versionNumber}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {new Date(version.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  {version.changeReason || "Submitted"}
+                </p>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Files</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {files.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No files uploaded.</p>
+          ) : (
+            files.map((file) => (
+              <div
+                key={file.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm"
+              >
+                <div>
+                  <p className="font-medium">{file.fileName}</p>
+                  <p className="text-muted-foreground text-xs">{file.mimeType}</p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => downloadMutation.mutate(file.id)}
+                  disabled={downloadMutation.isPending}
+                >
+                  Download
+                </Button>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/analytics.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { ReportBuilderShell } from "~/features/reports/components/report-builder-shell";
+import { useOrgContext } from "~/features/organizations/org-context";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/analytics")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_analytics");
+  },
+  component: SinAnalyticsPage,
+});
+
+const allowedRoles = new Set(["owner", "admin", "reporter"]);
+
+function SinAnalyticsPage() {
+  const { activeOrganizationId, organizationRole } = useOrgContext();
+
+  if (!activeOrganizationId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select an organization to access analytics.</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link to="/dashboard/select-org">Choose organization</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!organizationRole || !allowedRoles.has(organizationRole)) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Analytics access required</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">
+            Your organization role does not include analytics access.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <ReportBuilderShell />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/forms.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { listForms } from "~/features/forms/forms.queries";
+import { useOrgContext } from "~/features/organizations/org-context";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/forms")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_forms");
+  },
+  component: SinFormsPage,
+});
+
+function SinFormsPage() {
+  const { activeOrganizationId } = useOrgContext();
+
+  const { data: forms = [], isLoading } = useQuery({
+    queryKey: ["sin", "forms", activeOrganizationId],
+    queryFn: () =>
+      activeOrganizationId
+        ? listForms({ data: { organizationId: activeOrganizationId } })
+        : [],
+    enabled: Boolean(activeOrganizationId),
+  });
+
+  if (!activeOrganizationId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select an organization to view assigned forms.</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link to="/dashboard/select-org">Choose organization</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Forms</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Complete required forms for your organization.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="text-muted-foreground">Loading forms…</div>
+      ) : forms.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>No forms assigned yet.</CardTitle>
+          </CardHeader>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {forms.map((form) => (
+            <Card key={form.id}>
+              <CardHeader className="space-y-2">
+                <CardTitle className="text-base">{form.name}</CardTitle>
+                <p className="text-muted-foreground text-xs">
+                  {form.description || "No description provided."}
+                </p>
+                <Button asChild size="sm" className="w-fit">
+                  <Link to={`/dashboard/sin/forms/${form.id}`}>Open form</Link>
+                </Button>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/imports.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { listImportJobs } from "~/features/imports/imports.queries";
+import { useOrgContext } from "~/features/organizations/org-context";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/imports")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_imports");
+  },
+  component: SinImportsPage,
+});
+
+function SinImportsPage() {
+  const { activeOrganizationId } = useOrgContext();
+
+  const { data: jobs = [], isLoading } = useQuery({
+    queryKey: ["imports", "portal", activeOrganizationId],
+    queryFn: () =>
+      activeOrganizationId
+        ? listImportJobs({ data: { organizationId: activeOrganizationId } })
+        : [],
+    enabled: Boolean(activeOrganizationId),
+  });
+
+  if (!activeOrganizationId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select an organization to view imports.</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link to="/dashboard/select-org">Choose organization</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Imports</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Review recent import activity for your organization.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="text-muted-foreground">Loading import jobs…</div>
+      ) : jobs.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>No imports yet.</CardTitle>
+          </CardHeader>
+        </Card>
+      ) : (
+        <div className="grid gap-3">
+          {jobs.map((job) => (
+            <Card key={job.id}>
+              <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div>
+                  <p className="text-sm font-semibold capitalize">
+                    {job.type} import • {job.lane}
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Started {new Date(job.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <Badge variant="secondary" className="capitalize">
+                  {job.status.replace(/_/g, " ")}
+                </Badge>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/index.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_portal");
+  },
+  component: SinPortalHome,
+});
+
+function SinPortalHome() {
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">SIN Portal</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Manage reporting, forms, imports, and analytics for your organization.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Reporting</CardTitle>
+            <CardDescription>Submit required reporting tasks.</CardDescription>
+            <Button asChild className="w-fit">
+              <Link to="/dashboard/sin/reporting">Open Reporting</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Forms</CardTitle>
+            <CardDescription>Complete organization forms and surveys.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/sin/forms">View Forms</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Imports</CardTitle>
+            <CardDescription>Track data imports and status updates.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/sin/imports">View Imports</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-2">
+            <CardTitle>Analytics</CardTitle>
+            <CardDescription>Build reports and export insights.</CardDescription>
+            <Button asChild className="w-fit" variant="outline">
+              <Link to="/dashboard/sin/analytics">Open Analytics</Link>
+            </Button>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin/reporting.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { listReportingOverview } from "~/features/reporting/reporting.queries";
+import { useOrgContext } from "~/features/organizations/org-context";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin/reporting")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_reporting");
+  },
+  component: SinReportingPage,
+});
+
+const statusTone = (status: string) => {
+  if (status === "submitted" || status === "approved") {
+    return "bg-green-100 text-green-800";
+  }
+  if (status === "overdue" || status === "changes_requested") {
+    return "bg-amber-100 text-amber-800";
+  }
+  if (status === "rejected") {
+    return "bg-red-100 text-red-800";
+  }
+  return "bg-gray-200 text-gray-700";
+};
+
+function SinReportingPage() {
+  const { activeOrganizationId } = useOrgContext();
+
+  const { data: overview = [], isLoading } = useQuery({
+    queryKey: ["reporting", "portal", activeOrganizationId],
+    queryFn: () =>
+      activeOrganizationId
+        ? listReportingOverview({ data: { organizationId: activeOrganizationId } })
+        : [],
+    enabled: Boolean(activeOrganizationId),
+  });
+
+  if (!activeOrganizationId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select an organization to view reporting tasks.</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link to="/dashboard/select-org">Choose organization</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Reporting Tasks
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Track upcoming reporting submissions and review your history.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="text-muted-foreground">Loading reporting tasks…</div>
+      ) : overview.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>No reporting tasks yet.</CardTitle>
+          </CardHeader>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {overview.map((item) => (
+            <Card key={item.submissionId}>
+              <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-base">{item.taskTitle}</CardTitle>
+                  <p className="text-muted-foreground text-xs">
+                    Due {new Date(item.dueDate).toLocaleDateString()} • Cycle {item.cycleName}
+                  </p>
+                </div>
+                <Badge variant="secondary" className={statusTone(item.status)}>
+                  {item.status.replace(/_/g, " ")}
+                </Badge>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-3">
+                <Button asChild size="sm">
+                  <Link to={`/dashboard/sin/forms/${item.formId}`}>Open form</Link>
+                </Button>
+                {item.formSubmissionId ? (
+                  <Button asChild size="sm" variant="outline">
+                    <Link to={`/dashboard/sin/submissions/${item.formSubmissionId}`}>
+                      View submission
+                    </Link>
+                  </Button>
+                ) : null}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/route.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { AppLayout } from "~/features/layouts/app-layout";
+import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+
+export const Route = createFileRoute("/dashboard")({
+  component: DashboardLayout,
+  beforeLoad: async ({ context, location }) => {
+    // ✅  Redirect unauthenticated visitors to `/auth/login`
+    // ✅  Redirect authenticated but incomplete profiles to `/onboarding`
+    requireAuthAndProfile({ user: context.user, location });
+  },
+});
+
+function DashboardLayout() {
+  return <AppLayout />;
+}
+</file>
+
+<file path="src/routes/dashboard/select-org.tsx">
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { z } from "zod";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { OrgSwitcher } from "~/features/organizations/components/org-switcher";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+const searchSchema = z.object({
+  redirect: z.string().optional(),
+});
+
+export const Route = createFileRoute("/dashboard/select-org")({
+  validateSearch: searchSchema,
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_portal");
+  },
+  component: SelectOrgPage,
+});
+
+function SelectOrgPage() {
+  const navigate = useNavigate();
+  const { redirect } = useSearch({ from: "/dashboard/select-org" });
+
+  const handleOrgSelected = (organizationId: string | null) => {
+    // Only redirect if an organization was selected (not cleared)
+    if (organizationId) {
+      const destination = redirect || "/dashboard/sin";
+      navigate({ to: destination });
+    }
+  };
+
+  return (
+    <div className="container mx-auto max-w-2xl space-y-6 p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Select an organization</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">
+            Choose the organization you are working with to access SIN features.
+          </p>
+          <div className="mt-4">
+            <OrgSwitcher onSuccess={handleOrgSelected} />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/sin.tsx">
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/sin")({
+  beforeLoad: ({ context, location }) => {
+    requireFeatureInRoute("sin_portal");
+    if (!context.activeOrganizationId) {
+      throw redirect({
+        to: "/dashboard/select-org",
+        search: { redirect: location.href },
+      });
+    }
+  },
+  component: SinLayout,
+});
+
+function SinLayout() {
+  return <Outlet />;
+}
+</file>
+
+<file path="src/routes/dashboard/teams.tsx">
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/teams")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_teams");
+  },
+  component: TeamsLayout,
+});
+
+function TeamsLayout() {
+  return <Outlet />;
+}
+</file>
+
+<file path="src/tenant/__tests__/feature-gates.test.ts">
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Home } from "lucide-react";
+import type { AuthUser } from "~/lib/auth/types";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+import type { NavItem } from "~/features/layouts/nav.types";
+import { qcTenant } from "~/tenant/tenants/qc";
+import { viasportTenant } from "~/tenant/tenants/viasport";
+
+let activeTenant = qcTenant;
+
+const isAdminClientMock = vi.fn();
+
+vi.mock("~/tenant", () => ({
+  getTenantConfig: () => activeTenant,
+}));
+
+vi.mock("~/lib/auth/utils/admin-check", () => ({
+  isAdminClient: (...args: unknown[]) => isAdminClientMock(...args),
+}));
+
+vi.mock("~/lib/server/errors", () => ({
+  forbidden: (message: string) => new Error(message),
+}));
+
+const {
+  isFeatureEnabled,
+  assertFeatureEnabled,
+  requireFeatureInRoute,
+  filterNavItems,
+} = await import("~/tenant/feature-gates");
+
+describe("feature gates", () => {
+  beforeEach(() => {
+    activeTenant = qcTenant;
+    isAdminClientMock.mockReset();
+  });
+
+  it("reports feature availability from tenant config", () => {
+    expect(isFeatureEnabled("qc_portal")).toBe(true);
+    expect(isFeatureEnabled("sin_portal")).toBe(false);
+
+    activeTenant = viasportTenant;
+    expect(isFeatureEnabled("sin_portal")).toBe(true);
+    expect(isFeatureEnabled("qc_portal")).toBe(false);
+  });
+
+  it("throws on disabled feature", async () => {
+    await expect(assertFeatureEnabled("sin_portal")).rejects.toThrow(
+      "Feature not enabled for this tenant",
+    );
+    await expect(assertFeatureEnabled("qc_portal")).resolves.toBeUndefined();
+  });
+
+  it("requireFeatureInRoute throws for disabled features", () => {
+    let thrown: unknown = null;
+    try {
+      requireFeatureInRoute("sin_portal");
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toBeTruthy();
+    expect(() => requireFeatureInRoute("qc_portal")).not.toThrow();
+  });
+
+  it("filters nav items by feature, admin, and org role", () => {
+    const items: NavItem[] = [
+      { label: "QC Portal", to: "/qc", icon: Home, feature: "qc_portal" },
+      { label: "SIN Portal", to: "/sin", icon: Home, feature: "sin_portal" },
+      { label: "Admin", to: "/admin", icon: Home, requiresGlobalAdmin: true },
+      {
+        label: "Analytics",
+        to: "/analytics",
+        icon: Home,
+        requiresOrgRole: "reporter",
+      },
+    ];
+
+    const user = { roles: [] } as unknown as AuthUser;
+
+    isAdminClientMock.mockReturnValue(false);
+    const filtered = filterNavItems(items, {
+      user,
+      organizationRole: "reporter" as OrganizationRole,
+    });
+
+    expect(filtered.map((item) => item.label)).toEqual(["QC Portal", "Analytics"]);
+
+    isAdminClientMock.mockReturnValue(true);
+    const filteredAdmin = filterNavItems(items, {
+      user,
+      organizationRole: null,
+    });
+
+    expect(filteredAdmin.map((item) => item.label)).toEqual(["QC Portal", "Admin"]);
+  });
+});
+</file>
+
+<file path="src/tenant/__tests__/tenant-env.test.ts">
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { getServerTenantKey } from "~/tenant/tenant-env";
+
+const originalTenantKey = process.env["TENANT_KEY"];
+const originalViteTenantKey = process.env["VITE_TENANT_KEY"];
+
+const resetEnv = () => {
+  if (originalTenantKey === undefined) {
+    delete process.env["TENANT_KEY"];
+  } else {
+    process.env["TENANT_KEY"] = originalTenantKey;
+  }
+
+  if (originalViteTenantKey === undefined) {
+    delete process.env["VITE_TENANT_KEY"];
+  } else {
+    process.env["VITE_TENANT_KEY"] = originalViteTenantKey;
+  }
+};
+
+beforeEach(() => {
+  delete process.env["TENANT_KEY"];
+  delete process.env["VITE_TENANT_KEY"];
+});
+
+afterEach(() => {
+  resetEnv();
+});
+
+describe("tenant env resolution", () => {
+  it("defaults to qc when no tenant keys are set", () => {
+    expect(getServerTenantKey()).toBe("qc");
+  });
+
+  it("uses TENANT_KEY when provided", () => {
+    process.env["TENANT_KEY"] = "viasport";
+    expect(getServerTenantKey()).toBe("viasport");
+  });
+
+  it("uses VITE_TENANT_KEY when server key is missing", () => {
+    process.env["VITE_TENANT_KEY"] = "viasport";
+    expect(getServerTenantKey()).toBe("viasport");
+  });
+
+  it("throws when TENANT_KEY and VITE_TENANT_KEY mismatch", () => {
+    process.env["TENANT_KEY"] = "qc";
+    process.env["VITE_TENANT_KEY"] = "viasport";
+    expect(() => getServerTenantKey()).toThrow(
+      "Tenant key mismatch: TENANT_KEY=qc VITE_TENANT_KEY=viasport",
+    );
+  });
+});
+</file>
+
+<file path="src/tenant/tenants/qc.ts">
+import type { TenantConfig } from "../tenant.types";
+
+export const qcTenant: TenantConfig = {
+  key: "qc",
+  brand: {
+    name: "Quadball Canada",
+    shortName: "QC",
+    portalSubtitle: "Player Portal",
+    adminSubtitle: "Admin Console",
+    description: "Quadball Canada membership, teams, and events platform",
+    marketingUrl: "https://quadballcanada.ca",
+    supportEmail: "support@quadballcanada.com",
+    supportName: "Quadball Canada Team",
+    logoVariant: "qc",
+    themeColor: "#d82929",
+  },
+  features: {
+    qc_portal: true,
+    sin_portal: false,
+    qc_membership: true,
+    qc_events: true,
+    qc_teams: true,
+    qc_members_directory: true,
+    qc_reports: true,
+    qc_payments_square: true,
+    sin_admin: false,
+    sin_admin_orgs: false,
+    sin_admin_audit: false,
+    sin_admin_notifications: false,
+    sin_admin_security: false,
+    sin_admin_privacy: false,
+    sin_admin_forms: false,
+    sin_admin_imports: false,
+    sin_admin_reporting: false,
+    sin_admin_analytics: false,
+    sin_reporting: false,
+    sin_forms: false,
+    sin_imports: false,
+    sin_analytics: false,
+    security_core: true,
+    notifications_core: true,
+  },
+  orgLabels: {
+    governing_body: "Governing Body",
+    pso: "PSO",
+    league: "League",
+    club: "Club",
+    affiliate: "Affiliate",
+  },
+  orgHierarchy: {
+    rootTypes: ["governing_body", "pso"],
+    allowedChildren: {
+      governing_body: ["pso"],
+      pso: ["league", "club", "affiliate"],
+      league: ["club", "affiliate"],
+      club: ["affiliate"],
+      affiliate: [],
+    },
+  },
+  admin: {
+    globalRoleNames: ["Solstice Admin", "Quadball Canada Admin"],
+  },
+};
+</file>
+
+<file path="src/tenant/tenants/viasport.ts">
+import type { TenantConfig } from "../tenant.types";
+
+export const viasportTenant: TenantConfig = {
+  key: "viasport",
+  brand: {
+    name: "viaSport BC",
+    shortName: "viaSport",
+    portalSubtitle: "SIN Portal",
+    adminSubtitle: "Admin Console",
+    description: "viaSport Strength in Numbers (SIN) data platform",
+    marketingUrl: "https://viasport.ca",
+    supportEmail: "support@viasport.ca",
+    supportName: "viaSport BC Team",
+    logoVariant: "viasport",
+    themeColor: "#1b5fad",
+  },
+  features: {
+    qc_portal: false,
+    sin_portal: true,
+    qc_membership: false,
+    qc_events: false,
+    qc_teams: false,
+    qc_members_directory: false,
+    qc_reports: false,
+    qc_payments_square: false,
+    sin_admin: true,
+    sin_admin_orgs: true,
+    sin_admin_audit: true,
+    sin_admin_notifications: true,
+    sin_admin_security: true,
+    sin_admin_privacy: true,
+    sin_admin_forms: true,
+    sin_admin_imports: true,
+    sin_admin_reporting: true,
+    sin_admin_analytics: true,
+    sin_reporting: true,
+    sin_forms: true,
+    sin_imports: true,
+    sin_analytics: true,
+    security_core: true,
+    notifications_core: true,
+  },
+  orgLabels: {
+    governing_body: "Governing Body",
+    pso: "PSO",
+    league: "League",
+    club: "Club",
+    affiliate: "Affiliate",
+  },
+  orgHierarchy: {
+    rootTypes: ["governing_body"],
+    allowedChildren: {
+      governing_body: ["pso"],
+      pso: ["league", "club", "affiliate"],
+      league: ["club", "affiliate"],
+      club: ["affiliate"],
+      affiliate: [],
+    },
+  },
+  admin: {
+    globalRoleNames: ["Solstice Admin", "viaSport Admin"],
+  },
+};
+</file>
+
+<file path="src/tenant/feature-gates.ts">
+import { redirect } from "@tanstack/react-router";
+import type { AuthUser } from "~/lib/auth/types";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+import type { NavItem } from "~/features/layouts/nav.types";
+import { getTenantConfig } from "./index";
+import type { FeatureKey } from "./tenant.types";
+
+export const isFeatureEnabled = (key: FeatureKey) =>
+  Boolean(getTenantConfig().features[key]);
+
+export const assertFeatureEnabled = async (key: FeatureKey) => {
+  if (!isFeatureEnabled(key)) {
+    const { forbidden } = await import("~/lib/server/errors");
+    throw forbidden("Feature not enabled for this tenant");
+  }
+};
+
+export const requireFeatureInRoute = (
+  key: FeatureKey,
+  redirectTo = "/dashboard/forbidden",
+) => {
+  if (!isFeatureEnabled(key)) {
+    throw redirect({ to: redirectTo });
+  }
+};
+
+export const filterNavItems = (
+  items: NavItem[],
+  options?: {
+    user?: AuthUser | null;
+    organizationRole?: OrganizationRole | null;
+  },
+) => {
+  return items.filter((item) => {
+    if (item.feature && !isFeatureEnabled(item.feature)) return false;
+
+    if (item.requiresGlobalAdmin) {
+      if (!options?.user) return false;
+      if (!isAdminClient(options.user)) return false;
+    }
+
+    if (item.requiresOrgRole) {
+      const role = options?.organizationRole ?? null;
+      if (!role) return false;
+      const required = Array.isArray(item.requiresOrgRole)
+        ? item.requiresOrgRole
+        : [item.requiresOrgRole];
+      if (!required.includes(role)) return false;
+    }
+
+    return true;
+  });
+};
+</file>
+
+<file path="src/tenant/index.ts">
+import { getTenantKey } from "./tenant-env";
+import type { TenantConfig, TenantKey } from "./tenant.types";
+import { qcTenant } from "./tenants/qc";
+import { viasportTenant } from "./tenants/viasport";
+
+const TENANT_MAP: Record<TenantKey, TenantConfig> = {
+  qc: qcTenant,
+  viasport: viasportTenant,
+};
+
+export const getTenantConfig = (key?: TenantKey): TenantConfig => {
+  const resolvedKey = key ?? getTenantKey();
+  return TENANT_MAP[resolvedKey];
+};
+
+export const tenant = getTenantConfig();
+
+export const isTenant = (key: TenantKey) => getTenantKey() === key;
+
+export const getBrand = () => getTenantConfig().brand;
+
+export const getOrgHierarchy = () => getTenantConfig().orgHierarchy;
+</file>
+
+<file path="src/tenant/tenant-env.ts">
+import { z } from "zod";
+import { env as clientEnv } from "~/lib/env.client";
+import type { TenantKey } from "./tenant.types";
+
+const tenantKeySchema = z.enum(["qc", "viasport"]);
+
+const parseTenantKey = (value: string | undefined, label: string) => {
+  if (!value) return undefined;
+  const parsed = tenantKeySchema.safeParse(value);
+  if (!parsed.success) {
+    const message = parsed.error.issues.map((issue) => issue.message).join("; ");
+    throw new Error(`Invalid ${label}: ${message}`);
+  }
+  return parsed.data;
+};
+
+const resolveTenantKey = (
+  serverKey: TenantKey | undefined,
+  clientKey: TenantKey | undefined,
+) => {
+  if (serverKey && clientKey && serverKey !== clientKey) {
+    throw new Error(
+      `Tenant key mismatch: TENANT_KEY=${serverKey} VITE_TENANT_KEY=${clientKey}`,
+    );
+  }
+
+  return serverKey ?? clientKey ?? "qc";
+};
+
+const getServerEnv = (key: string) => {
+  if (typeof process === "undefined") return undefined;
+  return process.env[key];
+};
+
+export const getServerTenantKey = (): TenantKey => {
+  const serverKey = parseTenantKey(getServerEnv("TENANT_KEY"), "TENANT_KEY");
+  const clientKey = parseTenantKey(
+    getServerEnv("VITE_TENANT_KEY"),
+    "VITE_TENANT_KEY",
+  );
+
+  return resolveTenantKey(serverKey, clientKey);
+};
+
+export const getClientTenantKey = (): TenantKey => {
+  const clientKey = parseTenantKey(clientEnv.VITE_TENANT_KEY, "VITE_TENANT_KEY");
+  return clientKey ?? "qc";
+};
+
+export const getTenantKey = (): TenantKey => {
+  if (typeof window === "undefined") {
+    return getServerTenantKey();
+  }
+
+  return getClientTenantKey();
+};
+</file>
+
+<file path="src/tenant/tenant.types.ts">
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+
+export type TenantKey = "qc" | "viasport";
+
+export const featureKeys = [
+  "qc_portal",
+  "sin_portal",
+  "qc_membership",
+  "qc_events",
+  "qc_teams",
+  "qc_members_directory",
+  "qc_reports",
+  "qc_payments_square",
+  "sin_admin",
+  "sin_admin_orgs",
+  "sin_admin_audit",
+  "sin_admin_notifications",
+  "sin_admin_security",
+  "sin_admin_privacy",
+  "sin_admin_forms",
+  "sin_admin_imports",
+  "sin_admin_reporting",
+  "sin_admin_analytics",
+  "sin_reporting",
+  "sin_forms",
+  "sin_imports",
+  "sin_analytics",
+  "security_core",
+  "notifications_core",
+] as const;
+
+export type FeatureKey = (typeof featureKeys)[number];
+
+export type BrandConfig = {
+  name: string;
+  shortName: string;
+  portalSubtitle?: string;
+  adminSubtitle?: string;
+  description?: string;
+  marketingUrl?: string;
+  supportEmail?: string;
+  supportName?: string;
+  logoVariant?: "qc" | "viasport" | "default";
+  themeColor?: string;
+};
+
+export type OrganizationType =
+  | "governing_body"
+  | "pso"
+  | "league"
+  | "club"
+  | "affiliate";
+
+export type OrgTypeLabelMap = Record<OrganizationType, string>;
+
+export type OrgHierarchyRules = {
+  rootTypes: OrganizationType[];
+  allowedChildren: Record<OrganizationType, OrganizationType[]>;
+};
+
+export type AdminRoleNames = {
+  globalRoleNames: string[];
+  orgAdminRoles?: OrganizationRole[];
+};
+
+export type TenantConfig = {
+  key: TenantKey;
+  brand: BrandConfig;
+  features: Record<FeatureKey, boolean>;
+  orgLabels: OrgTypeLabelMap;
+  orgHierarchy: OrgHierarchyRules;
+  admin: AdminRoleNames;
+};
+</file>
+
+<file path="src/components/ui/logo.tsx">
+import { useEffect, useState } from "react";
+import { getBrand } from "~/tenant";
+
+interface LogoProps {
+  className?: string;
+  alt?: string;
+}
+
+const logoSources = {
+  qc: {
+    src: "/quadball-canada-logo.svg",
+    fallback: "/quadball-canada-logo.jpg",
+  },
+  viasport: {
+    src: "/viasport-logo.svg",
+    fallback: "/viasport-logo.svg",
+  },
+} as const;
+
+export function Logo({ className, alt }: LogoProps) {
+  const brand = getBrand();
+  const source =
+    brand.logoVariant === "viasport" ? logoSources.viasport : logoSources.qc;
+  const [src, setSrc] = useState<string>(source.src);
+
+  useEffect(() => {
+    setSrc(source.src);
+  }, [source.src]);
+
+  return (
+    <img
+      src={src}
+      alt={alt ?? `${brand.name} logo`}
+      className={"object-contain " + (className ?? "")}
+      onError={() => setSrc(source.fallback)}
+    />
+  );
+}
+</file>
+
+<file path="src/components/ui/mobile-admin-header.tsx">
+import { Menu } from "lucide-react";
+import { NotificationBell } from "~/features/notifications/components/notification-bell";
+import { getBrand } from "~/tenant";
+import { Button } from "./button";
+
+interface MobileAdminHeaderProps {
+  onMenuClick: () => void;
+}
+
+export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
+  const brand = getBrand();
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white lg:hidden">
+      <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={onMenuClick}>
+            <Menu className="h-6 w-6" />
+          </Button>
+          <div>
+            <h1 className="text-admin-text-primary text-lg font-bold">{brand.name}</h1>
+            <p className="text-admin-text-secondary text-xs">{brand.adminSubtitle}</p>
+          </div>
+        </div>
+        <NotificationBell />
+      </div>
+    </header>
+  );
+}
+</file>
+
+<file path="src/lib/env.client.ts">
+/**
+ * Client-safe environment variables
+ * Only VITE_ prefixed variables are available in the browser
+ */
+
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+
+export const env = createEnv({
+  clientPrefix: "VITE_",
+  client: {
+    VITE_BASE_URL: z.url().optional(),
+    VITE_ENABLE_ANALYTICS: z.coerce.boolean().prefault(false),
+    VITE_ENABLE_SENTRY: z.coerce.boolean().prefault(false),
+    VITE_POSTHOG_KEY: z.string().optional(),
+    VITE_SENTRY_DSN: z.string().optional(),
+    VITE_TENANT_KEY: z.enum(["qc", "viasport"]).optional(),
+  },
+  runtimeEnv: import.meta.env,
+  emptyStringAsUndefined: true,
+  // Workaround for VITE_BASE_URL validation during SSR
+  // See: https://github.com/t3-oss/t3-env/issues/110
+  skipValidation: !!import.meta.env["SKIP_ENV_VALIDATION"],
+});
+
+// Helper functions for client-side feature flags
+export const isAnalyticsEnabled = () => env.VITE_ENABLE_ANALYTICS;
+export const isSentryEnabled = () => env.VITE_ENABLE_SENTRY;
+
+// Determine the correct base URL
+const getClientBaseUrl = () => {
+  // In the browser, use the current origin
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  // During SSR, fall back to VITE_BASE_URL if provided, otherwise use a default
+  return env.VITE_BASE_URL || "http://localhost:5173";
+};
+
+export const getBaseUrl = () => getClientBaseUrl();
+</file>
+
+<file path="src/routes/dashboard/admin/route.tsx">
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { AdminSectionLayout } from "~/features/layouts/admin-layout";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
+
+export const Route = createFileRoute("/dashboard/admin")({
+  beforeLoad: async ({ context, location }) => {
+    const { user } = context;
+
+    if (!user) {
+      throw redirect({ to: "/auth/login", search: { redirect: location.href } });
+    }
+
+    if (!isAdminClient(user)) {
+      throw redirect({ to: "/dashboard/forbidden", search: { from: location.href } });
+    }
+  },
+  component: AdminSectionLayout,
+});
+</file>
+
+<file path="src/routes/dashboard/admin/sin.tsx">
+import { createFileRoute, Outlet, useRouteContext } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { getSinAdminNav } from "~/features/layouts/sin-admin-nav";
+import { requireFeatureInRoute, filterNavItems } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/admin/sin")({
+  beforeLoad: () => {
+    requireFeatureInRoute("sin_admin");
+  },
+  component: SinAdminLayout,
+});
+
+function SinAdminLayout() {
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+
+  const navItems = useMemo(
+    () => filterNavItems(getSinAdminNav(), { user }),
+    [user],
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold">SIN Admin</h2>
+        <p className="text-muted-foreground text-sm">
+          Configure organizations, reporting, and compliance workflows.
+        </p>
+      </div>
+
+      {navItems.length > 0 ? (
+        <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
+              activeProps={{
+                className:
+                  "rounded-md bg-admin-secondary px-3 py-1.5 text-sm font-semibold text-admin-primary",
+                "aria-current": "page",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+
+      <Outlet />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/events.tsx">
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/events")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_events");
+  },
+  component: EventsLayout,
+});
+
+function EventsLayout() {
+  return <Outlet />;
+}
+</file>
+
+<file path="src/routes/dashboard/forbidden.tsx">
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { getBrand } from "~/tenant";
+
+export const Route = createFileRoute("/dashboard/forbidden")({
+  component: ForbiddenPage,
+});
+
+function ForbiddenPage() {
+  const brand = getBrand();
+  const supportEmail = brand.supportEmail ?? "support@solstice.app";
+
+  return (
+    <div className="border-border bg-card mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-lg border p-12 text-center shadow-sm">
+      <div className="bg-destructive/10 text-destructive flex h-16 w-16 items-center justify-center rounded-full">
+        <AlertTriangle className="h-8 w-8" />
+      </div>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Access restricted</h1>
+        <p className="text-muted-foreground">
+          You don’t have permission to view this section. If you believe this is a
+          mistake, reach out to an administrator or head back to your dashboard.
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Button asChild variant="secondary">
+          <Link to="/dashboard">Return to dashboard</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <a href={`mailto:${supportEmail}`}>Contact support</a>
+        </Button>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/features/layouts/admin-layout.tsx">
+import { Outlet, useRouteContext } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { filterNavItems } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+import { getAdminNav } from "./admin-nav";
+
+export function AdminSectionLayout() {
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+  const brand = getBrand();
+
+  const navItems = useMemo(
+    () => filterNavItems(getAdminNav(), { user }),
+    [user],
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold">{brand.adminSubtitle}</h2>
+        <p className="text-muted-foreground text-sm">
+          Manage access, roles, and SIN administration.
+        </p>
+      </div>
+
+      {navItems.length > 0 ? (
+        <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
+              activeProps={{
+                className:
+                  "rounded-md bg-admin-secondary px-3 py-1.5 text-sm font-semibold text-admin-primary",
+                "aria-current": "page",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+
+      <Outlet />
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/members.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  CalendarCheck,
+  Loader2,
+  Mail,
+  Phone,
+  Search,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+import { useCallback, useDeferredValue, useMemo, useState, type ReactNode } from "react";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { DataTable } from "~/components/ui/data-table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import {
+  MobileDataCard,
+  MobileDataCardsList,
+  ResponsiveDataView,
+} from "~/components/ui/mobile-data-cards";
+import {
+  listMembers,
+  type MemberDirectoryMember,
+  type MemberDirectoryResponse,
+} from "~/features/members";
+import { exportToCSV, formatDate } from "~/lib/utils/csv-export";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+
+export const Route = createFileRoute("/dashboard/members")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_members_directory");
+  },
+  component: MembersPage,
+});
+
+function MembersPage() {
+  const brand = getBrand();
+  const [searchTerm, setSearchTerm] = useState("");
+  const deferredSearch = useDeferredValue(searchTerm);
+  const [selectedMember, setSelectedMember] = useState<MemberDirectoryMember | null>(
+    null,
+  );
+
+  const { data, isLoading, isFetching, error } = useQuery<
+    MemberDirectoryResponse,
+    Error,
+    MemberDirectoryResponse
+  >({
+    queryKey: ["members-directory", { search: deferredSearch }],
+    queryFn: async (): Promise<MemberDirectoryResponse> => {
+      const payload = deferredSearch ? { search: deferredSearch } : {};
+      const result = await listMembers({ data: payload });
+
+      if (!result.success || !result.data) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to fetch member directory",
+        );
+      }
+
+      return result.data;
+    },
+  });
+
+  const columns = useMemo<ColumnDef<MemberDirectoryMember>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Member",
+        cell: ({ row }) => {
+          const member = row.original;
+          return (
+            <div className="space-y-1">
+              <div className="leading-none font-medium">{member.name}</div>
+              <div className="text-muted-foreground text-xs">
+                {member.pronouns || "Pronouns not provided"}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "teams",
+        header: "Active Teams",
+        cell: ({ row }) => {
+          const teams = row.original.teams;
+
+          if (!teams.length) {
+            return <span className="text-muted-foreground text-sm">No active team</span>;
+          }
+
+          return (
+            <div className="flex flex-wrap gap-1">
+              {teams.map((team) => (
+                <Badge key={team} variant="secondary" className="text-xs">
+                  {team}
+                </Badge>
+              ))}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "membershipStatus",
+        header: "Membership",
+        cell: ({ row }) => {
+          const { membershipStatus, hasActiveMembership, membershipType } = row.original;
+          const badgeClass = hasActiveMembership
+            ? "bg-green-100 text-green-800"
+            : membershipStatus === "expired"
+              ? "bg-amber-100 text-amber-800"
+              : membershipStatus === "cancelled"
+                ? "bg-red-100 text-red-800"
+                : "bg-gray-200 text-gray-700";
+          const label = hasActiveMembership
+            ? "Active"
+            : membershipStatus === "none"
+              ? "No membership"
+              : membershipStatus.charAt(0).toUpperCase() + membershipStatus.slice(1);
+
+          return (
+            <div className="flex flex-col gap-1">
+              <Badge variant="secondary" className={`text-xs font-medium ${badgeClass}`}>
+                {label}
+              </Badge>
+              {membershipType ? (
+                <span className="text-muted-foreground text-xs">{membershipType}</span>
+              ) : null}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "membershipEndDate",
+        header: "Expires",
+        cell: ({ row }) => {
+          const { membershipEndDate, hasActiveMembership } = row.original;
+
+          if (!membershipEndDate) {
+            return <span className="text-muted-foreground text-sm">—</span>;
+          }
+
+          return (
+            <span
+              className={`text-sm ${hasActiveMembership ? "text-green-700" : "text-muted-foreground"}`}
+            >
+              {formatDate(membershipEndDate)}
+            </span>
+          );
+        },
+      },
+      {
+        id: "contact",
+        header: "Contact",
+        cell: ({ row }) => {
+          const member = row.original;
+          return (
+            <div className="space-y-1 text-xs">
+              <div className="flex items-center gap-1">
+                <Mail className="text-muted-foreground h-3.5 w-3.5" />
+                {member.emailVisible && member.email ? (
+                  <a
+                    href={`mailto:${member.email}`}
+                    className="text-primary hover:underline"
+                  >
+                    {member.email}
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">Hidden</span>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <Phone className="text-muted-foreground h-3.5 w-3.5" />
+                {member.phoneVisible && member.phone ? (
+                  <span>{member.phone}</span>
+                ) : (
+                  <span className="text-muted-foreground">Hidden</span>
+                )}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "actions",
+        header: () => <span className="sr-only">Actions</span>,
+        cell: ({ row }) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSelectedMember(row.original)}
+          >
+            View
+          </Button>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+    ],
+    [setSelectedMember],
+  );
+
+  const handleClearSearch = useCallback(() => {
+    setSearchTerm("");
+  }, []);
+
+  const handleExport = useCallback(() => {
+    const members = data?.members;
+    if (!members?.length) {
+      return;
+    }
+
+    const rows = members.map((member) => ({
+      Name: member.name,
+      Pronouns: member.pronouns || "",
+      Email: member.emailVisible && member.email ? member.email : "Hidden",
+      Phone: member.phoneVisible && member.phone ? member.phone : "Hidden",
+      "Active Teams": member.teams.join(", "),
+      "Membership Status": member.membershipStatus,
+      "Membership Type": member.membershipType ?? "",
+      "Membership Expires": member.membershipEndDate
+        ? formatDate(member.membershipEndDate)
+        : "",
+      "Open to Invites": member.allowTeamInvitations ? "Yes" : "No",
+      "Birth Year":
+        member.birthYearVisible && member.birthYear ? String(member.birthYear) : "Hidden",
+    }));
+
+    const filename = `members-directory-${new Date().toISOString().split("T")[0]}.csv`;
+    exportToCSV(rows, filename);
+  }, [data]);
+
+  const totalMembers = data?.pagination.total ?? 0;
+
+  return (
+    <div className="container mx-auto space-y-8 p-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Members Directory
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Browse {brand.name} members, check membership status, and find players open to
+          team invitations.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex w-full flex-col gap-2 lg:max-w-lg">
+          <label htmlFor="member-search" className="text-sm font-medium">
+            Search members
+          </label>
+          <div className="relative flex items-center">
+            <Search className="text-muted-foreground absolute left-3 h-4 w-4" />
+            <Input
+              id="member-search"
+              placeholder="Search by name, email, or team"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="pl-9"
+              autoComplete="off"
+            />
+            {searchTerm ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-1/2 right-1 -translate-y-1/2 px-2 text-xs"
+                onClick={handleClearSearch}
+              >
+                Clear
+              </Button>
+            ) : null}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+            <Users className="h-3.5 w-3.5" />
+            <span>{totalMembers} members</span>
+          </Badge>
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={!data?.members?.length}
+          >
+            Export CSV
+          </Button>
+        </div>
+      </div>
+
+      {isLoading && !data ? (
+        <div className="flex h-64 items-center justify-center">
+          <Loader2 className="text-muted-foreground mr-2 h-6 w-6 animate-spin" />
+          <span className="text-muted-foreground">Loading members…</span>
+        </div>
+      ) : error ? (
+        <Alert variant="destructive">
+          <AlertTitle>Unable to load members</AlertTitle>
+          <AlertDescription>
+            {(error as Error).message ||
+              "An unexpected error occurred while loading the member directory."}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="space-y-4">
+          {isFetching && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Refreshing directory…</span>
+            </div>
+          )}
+          <ResponsiveDataView
+            table={
+              <DataTable
+                columns={columns}
+                data={data?.members ?? []}
+                pageSize={10}
+                enableColumnToggle={false}
+              />
+            }
+            cards={
+              <MembersMobileCards
+                members={data?.members ?? []}
+                onSelectMember={setSelectedMember}
+              />
+            }
+          />
+          {data?.members?.length === 0 && (
+            <div className="border-border bg-muted/30 text-muted-foreground flex flex-col items-center gap-2 rounded-md border p-8 text-center">
+              <ShieldCheck className="h-8 w-8" />
+              <p>No members match your current search.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <MemberDetailDialog
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
+    </div>
+  );
+}
+
+interface MembersMobileCardsProps {
+  members: MemberDirectoryMember[];
+  onSelectMember: (member: MemberDirectoryMember) => void;
+}
+
+function MembersMobileCards({ members, onSelectMember }: MembersMobileCardsProps) {
+  if (members.length === 0) return null;
+
+  return (
+    <MobileDataCardsList>
+      {members.map((member) => {
+        const statusBadgeClass = member.hasActiveMembership
+          ? "bg-green-100 text-green-800"
+          : member.membershipStatus === "expired"
+            ? "bg-amber-100 text-amber-800"
+            : member.membershipStatus === "cancelled"
+              ? "bg-red-100 text-red-800"
+              : "bg-gray-200 text-gray-700";
+
+        const statusLabel = member.hasActiveMembership
+          ? "Active"
+          : member.membershipStatus === "none"
+            ? "No membership"
+            : member.membershipStatus.charAt(0).toUpperCase() +
+              member.membershipStatus.slice(1);
+
+        return (
+          <MobileDataCard
+            key={member.id}
+            title={member.name}
+            subtitle={member.pronouns || "Pronouns not set"}
+            badge={
+              <Badge
+                variant="secondary"
+                className={`text-xs font-medium ${statusBadgeClass}`}
+              >
+                {statusLabel}
+              </Badge>
+            }
+            fields={[
+              {
+                label: "Teams",
+                value:
+                  member.teams.length > 0 ? member.teams.join(", ") : "No active team",
+              },
+              {
+                label: "Email",
+                value:
+                  member.emailVisible && member.email ? (
+                    <span className="text-primary block truncate">{member.email}</span>
+                  ) : (
+                    <span className="text-muted-foreground">Hidden</span>
+                  ),
+              },
+              {
+                label: "Membership Type",
+                value: member.membershipType || "—",
+              },
+              {
+                label: "Phone",
+                value:
+                  member.phoneVisible && member.phone ? (
+                    member.phone
+                  ) : (
+                    <span className="text-muted-foreground">Hidden</span>
+                  ),
+              },
+            ]}
+            onClick={() => onSelectMember(member)}
+          />
+        );
+      })}
+    </MobileDataCardsList>
+  );
+}
+
+interface MemberDetailDialogProps {
+  member: MemberDirectoryMember | null;
+  onClose: () => void;
+}
+
+function MemberDetailDialog({ member, onClose }: MemberDetailDialogProps) {
+  const open = Boolean(member);
+
+  return (
+    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
+      <DialogContent>
+        {member ? (
+          <div className="space-y-6">
+            <DialogHeader className="space-y-1">
+              <DialogTitle className="text-2xl">{member.name}</DialogTitle>
+              <DialogDescription>View member profile details</DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <InfoBlock title="Membership" icon={<CalendarCheck className="h-4 w-4" />}>
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="secondary"
+                      className={
+                        member.hasActiveMembership
+                          ? "bg-green-100 text-green-800"
+                          : member.membershipStatus === "expired"
+                            ? "bg-amber-100 text-amber-800"
+                            : member.membershipStatus === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-200 text-gray-700"
+                      }
+                    >
+                      {member.hasActiveMembership
+                        ? "Active"
+                        : member.membershipStatus === "none"
+                          ? "No membership"
+                          : member.membershipStatus.charAt(0).toUpperCase() +
+                            member.membershipStatus.slice(1)}
+                    </Badge>
+                    {member.membershipType ? (
+                      <span className="text-muted-foreground text-xs">
+                        {member.membershipType}
+                      </span>
+                    ) : null}
+                  </div>
+                  {member.membershipEndDate ? (
+                    <p className="text-muted-foreground text-xs">
+                      Expires: {formatDate(member.membershipEndDate)}
+                    </p>
+                  ) : null}
+                </div>
+              </InfoBlock>
+
+              <InfoBlock title="Contact" icon={<Mail className="h-4 w-4" />}>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                      Email
+                    </p>
+                    {member.emailVisible && member.email ? (
+                      <a
+                        href={`mailto:${member.email}`}
+                        className="text-primary hover:underline"
+                      >
+                        {member.email}
+                      </a>
+                    ) : (
+                      <p className="text-muted-foreground">Hidden (privacy settings)</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                      Phone
+                    </p>
+                    {member.phoneVisible && member.phone ? (
+                      <p>{member.phone}</p>
+                    ) : (
+                      <p className="text-muted-foreground">Hidden (privacy settings)</p>
+                    )}
+                  </div>
+                </div>
+              </InfoBlock>
+
+              <InfoBlock title="Teams" icon={<Users className="h-4 w-4" />}>
+                {member.teams.length ? (
+                  <ul className="space-y-1 text-sm">
+                    {member.teams.map((team) => (
+                      <li key={team}>{team}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground text-sm">No active team</p>
+                )}
+              </InfoBlock>
+
+              <InfoBlock title="Availability" icon={<ShieldCheck className="h-4 w-4" />}>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                      Open to Team Invitations
+                    </p>
+                    <p>{member.allowTeamInvitations ? "Yes" : "No"}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                      Birth Year
+                    </p>
+                    <p>
+                      {member.birthYearVisible && member.birthYear
+                        ? member.birthYear
+                        : "Hidden (privacy settings)"}
+                    </p>
+                  </div>
+                </div>
+              </InfoBlock>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">Membership history</h3>
+              {member.membershipHistory.length ? (
+                <div className="rounded-md border">
+                  {/* Desktop: Table layout */}
+                  <div className="hidden sm:block">
+                    <div className="bg-muted/40 text-muted-foreground grid grid-cols-3 gap-2 border-b p-3 text-xs font-semibold uppercase">
+                      <span>Status</span>
+                      <span>Membership Type</span>
+                      <span>Valid Dates</span>
+                    </div>
+                    <div className="divide-y text-sm">
+                      {member.membershipHistory.map((entry, index) => (
+                        <div
+                          key={`${entry.status}-${entry.endDate ?? index}`}
+                          className="grid grid-cols-3 gap-2 p-3"
+                        >
+                          <span className="font-medium">
+                            {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {entry.membershipType || "—"}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {entry.startDate ? formatDate(entry.startDate) : "—"} –{" "}
+                            {entry.endDate ? formatDate(entry.endDate) : "—"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Mobile: Stacked card layout */}
+                  <div className="divide-y sm:hidden">
+                    {member.membershipHistory.map((entry, index) => (
+                      <div
+                        key={`mobile-${entry.status}-${entry.endDate ?? index}`}
+                        className="space-y-1 p-3 text-sm"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">
+                            {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            {entry.membershipType || "—"}
+                          </span>
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          {entry.startDate ? formatDate(entry.startDate) : "—"} –{" "}
+                          {entry.endDate ? formatDate(entry.endDate) : "—"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  No membership records found for this member.
+                </p>
+              )}
+            </div>
+          </div>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface InfoBlockProps {
+  title: string;
+  icon?: ReactNode;
+  children: ReactNode;
+}
+
+function InfoBlock({ title, icon, children }: InfoBlockProps) {
+  return (
+    <div className="rounded-lg border p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+        {icon}
+        <span>{title}</span>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/ui/breadcrumbs.tsx">
+import { Link, useLocation } from "@tanstack/react-router";
+
+const LABEL_OVERRIDES: Record<string, string> = {
+  dashboard: "Dashboard",
+  admin: "Admin",
+  sin: "SIN",
+  teams: "Teams",
+  events: "Events",
+  members: "Members",
+  membership: "Membership",
+  profile: "Profile",
+  settings: "Settings",
+  reports: "Reports",
+  reporting: "Reporting",
+  forms: "Forms",
+  submissions: "Submissions",
+  imports: "Imports",
+  analytics: "Analytics",
+  organizations: "Organizations",
+  audit: "Audit",
+  notifications: "Notifications",
+  security: "Security",
+  roles: "Roles",
+  forbidden: "Forbidden",
+  "select-org": "Select Organization",
+  manage: "Manage",
+};
+
+function formatSegment(segment: string): string {
+  if (LABEL_OVERRIDES[segment]) {
+    return LABEL_OVERRIDES[segment];
+  }
+
+  const clean = segment.replace(/[-_]/g, " ");
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
+export function Breadcrumbs() {
+  const location = useLocation();
+  const segments = location.pathname.split("/").filter(Boolean);
+
+  if (segments.length <= 1) {
+    return null;
+  }
+
+  const crumbs = segments
+    .map((segment, index) => ({ segment, index }))
+    .filter(({ index }) => index !== 0) // skip the root dashboard node; rendered separately below
+    .map(({ segment, index }) => {
+      const href = `/${segments.slice(0, index + 1).join("/")}`;
+      const label = formatSegment(segment);
+      const isLast = index === segments.length - 1;
+
+      const node = isLast ? (
+        <span className="text-muted-foreground">{label}</span>
+      ) : (
+        <Link to={href} className="text-muted-foreground hover:text-foreground">
+          {label}
+        </Link>
+      );
+
+      return { key: href, node };
+    });
+
+  return (
+    <nav aria-label="Breadcrumb" className="text-sm">
+      <ol className="text-muted-foreground flex flex-wrap items-center gap-2">
+        <li>
+          <Link to="/dashboard" className="hover:text-foreground">
+            Dashboard
+          </Link>
+        </li>
+        {crumbs.map((crumb) => (
+          <li key={crumb.key} className="flex items-center gap-2">
+            <span aria-hidden="true">/</span>
+            {crumb.node}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+</file>
+
+<file path="src/features/layouts/admin-nav.ts">
+import { Building2, Home, ShieldCheck } from "lucide-react";
+import type { NavItem } from "./nav.types";
+
+export const getAdminNav = (): NavItem[] => [
+  {
+    icon: Home,
+    label: "Admin Home",
+    to: "/dashboard/admin",
+    exact: true,
+    requiresGlobalAdmin: true,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Roles",
+    to: "/dashboard/admin/roles",
+    requiresGlobalAdmin: true,
+  },
+  {
+    icon: Building2,
+    label: "SIN Admin",
+    to: "/dashboard/admin/sin",
+    requiresGlobalAdmin: true,
+    feature: "sin_admin",
+  },
+];
+</file>
+
+<file path="src/routes/dashboard/reports.tsx">
+import { createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
+import { AdminMembershipsReport } from "~/features/membership/components/admin-memberships-report";
+import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+
+export const Route = createFileRoute("/dashboard/reports")({
+  beforeLoad: async ({ context }) => {
+    requireFeatureInRoute("qc_reports");
+    await requireGlobalAdmin(context.user);
+  },
+  component: ReportsPage,
+});
+
+function ReportsPage() {
+  return (
+    <div className="container mx-auto space-y-8 p-6">
+      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Reports</h1>
+
+      <Suspense
+        fallback={
+          <div className="flex h-64 items-center justify-center">
+            <div className="text-muted-foreground">Loading reports...</div>
+          </div>
+        }
+      >
+        <AdminMembershipsReport />
+      </Suspense>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/dashboard/index.tsx">
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  Trophy,
+  User,
+  UserPlus,
+  Users,
+  XCircle,
+} from "~/components/ui/icons";
+import { getUserMembershipStatus } from "~/features/membership/membership.queries";
+import type { MembershipStatus } from "~/features/membership/membership.types";
+import { getUserTeams, type UserTeam } from "~/features/teams/teams.queries";
+import { isFeatureEnabled } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+
+export const Route = createFileRoute("/dashboard/")({
+  beforeLoad: () => {
+    if (isFeatureEnabled("sin_portal") && !isFeatureEnabled("qc_portal")) {
+      throw redirect({ to: "/dashboard/sin" });
+    }
+  },
+  loader: async () => {
+    // Load data in parallel on the server
+    const [membershipResult, userTeams] = await Promise.all([
+      getUserMembershipStatus(),
+      getUserTeams({ data: {} }),
+    ]);
+
+    const membershipStatus: MembershipStatus | null = membershipResult.success
+      ? (membershipResult.data ?? null)
+      : null;
+
+    return {
+      membershipStatus,
+      userTeams: userTeams || [],
+    };
+  },
+  component: DashboardIndex,
+});
+
+function DashboardIndex() {
+  const brand = getBrand();
+  const { user } = Route.useRouteContext();
+  const { membershipStatus, userTeams } = Route.useLoaderData();
+
+  const teamCount = (userTeams as UserTeam[]).length;
+  const upcomingEventsCount = 0;
+
+  return (
+    <div className="container mx-auto space-y-8 p-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Welcome back, {user?.name || "Player"}!
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Here's an overview of your {brand.name} account
+        </p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Membership Status Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Membership Status</CardTitle>
+            {membershipStatus?.hasMembership ? (
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            ) : (
+              <XCircle className="text-muted-foreground h-4 w-4" />
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {membershipStatus?.hasMembership ? "Active" : "Inactive"}
+            </div>
+            {membershipStatus?.hasMembership && membershipStatus.daysRemaining ? (
+              <p className="text-muted-foreground mt-1 text-xs">
+                <Clock className="mr-1 inline h-3 w-3" />
+                {membershipStatus.daysRemaining} days remaining
+              </p>
+            ) : null}
+            {!membershipStatus?.hasMembership && (
+              <p className="text-muted-foreground mt-1 text-xs">
+                <AlertCircle className="mr-1 inline h-3 w-3" />
+                No active membership
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Teams Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">My Teams</CardTitle>
+            <Users className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{teamCount}</div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {teamCount === 0
+                ? "Not on any teams yet"
+                : `Active team${teamCount !== 1 ? "s" : ""}`}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Events Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
+            <Calendar className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{upcomingEventsCount}</div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {upcomingEventsCount === 0 ? "No events scheduled" : "Events this season"}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Complete Profile - always shown since profile is complete to access dashboard */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                View Profile
+              </CardTitle>
+              <CardDescription>
+                Review and update your profile information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <Link to="/dashboard/profile">View Profile</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Buy/Renew Membership */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                {membershipStatus?.hasMembership ? "Renew Membership" : "Buy Membership"}
+              </CardTitle>
+              <CardDescription>
+                {membershipStatus?.hasMembership
+                  ? "Extend your membership for another year"
+                  : "Get your annual player membership"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <Link to="/dashboard/membership">
+                  {membershipStatus?.hasMembership ? "Renew Now" : "Get Membership"}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Join Team */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5" />
+                Join a Team
+              </CardTitle>
+            <CardDescription>
+              Find and join a team to compete this season
+            </CardDescription>
+          </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full" variant="outline">
+                <Link to="/dashboard/teams/browse">Browse Teams</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Recent Activity - Placeholder */}
+      <div>
+        <h2 className="mb-4 text-lg font-semibold">Recent Activity</h2>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-muted-foreground flex items-center justify-center py-8">
+              <Trophy className="mr-3 h-12 w-12 opacity-20" />
+              <div>
+                <p className="text-sm font-medium">No recent activity</p>
+                <p className="text-xs">Your recent activities will appear here</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/routes/__root.tsx">
+/// <reference types="vite/client" />
+import type { QueryClient } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  isRedirect,
+  Outlet,
+  redirect,
+  ScriptOnce,
+  Scripts,
+} from "@tanstack/react-router";
+
+import { lazy, Suspense } from "react";
+import {
+  authQueryOptions,
+  getCurrentUser,
+  type AuthQueryResult,
+} from "~/features/auth/auth.queries";
+import { StepUpProvider } from "~/features/auth/step-up";
+import { OrgContextProvider } from "~/features/organizations/org-context";
+import {
+  getLatestPolicyDocument,
+  listUserPolicyAcceptances,
+} from "~/features/privacy/privacy.queries";
+import appCss from "~/styles.css?url";
+import { getBrand } from "~/tenant";
+import { getTenantKey } from "~/tenant/tenant-env";
+
+// Lazy load devtools only in development to exclude from production bundles
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-query-devtools").then((mod) => ({
+        default: mod.ReactQueryDevtools,
+      })),
+    )
+  : null;
+
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-router-devtools").then((mod) => ({
+        default: mod.TanStackRouterDevtools,
+      })),
+    )
+  : null;
+
+// Lazy load Toaster to avoid SSR issues
+const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaster })));
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  user: AuthQueryResult;
+  activeOrganizationId: string | null;
+}>()({
+  beforeLoad: async ({ context, location }) => {
+    try {
+      const resolveActiveOrganizationId = async () => {
+        if (typeof window === "undefined") {
+          const { getRequest } = await import("@tanstack/react-start/server");
+          const request = getRequest();
+          const cookieHeader = request.headers.get("cookie");
+          if (!cookieHeader) return null;
+          const prefix = "active_org_id=";
+          const cookies = cookieHeader.split(";").map((entry) => entry.trim());
+          const match = cookies.find((cookie) => cookie.startsWith(prefix));
+          return match ? decodeURIComponent(match.slice(prefix.length)) : null;
+        }
+
+        return window.localStorage.getItem("active_org_id");
+      };
+
+      const activeOrganizationId = await resolveActiveOrganizationId();
+
+      // Check if we're on the server or client
+      if (typeof window === "undefined") {
+        // Server: use the server function
+        const user = await getCurrentUser();
+
+        // Check if user needs to complete onboarding (profile + policy acceptance)
+        if (user && location.pathname.startsWith("/dashboard")) {
+          // Check profile completion first
+          if (!user.profileComplete) {
+            throw redirect({ to: "/onboarding" });
+          }
+
+          // Then check policy acceptance (only on server to avoid client navigation issues)
+          const policy = await getLatestPolicyDocument({ data: "privacy_policy" });
+          if (policy) {
+            const acceptances = await listUserPolicyAcceptances();
+            const hasAccepted = acceptances.some(
+              (acceptance) => acceptance.policyId === policy.id,
+            );
+            if (!hasAccepted) {
+              // Redirect to onboarding which now handles policy acceptance
+              throw redirect({ to: "/onboarding" });
+            }
+          }
+        }
+
+        return { user, activeOrganizationId };
+      } else {
+        // Client: fetch the full user data
+        const user = await context.queryClient.fetchQuery(authQueryOptions());
+
+        // On client-side navigation, we rely on React Query for policy checks
+        // The onboarding page will handle showing the policy step if needed
+        if (user && !user.profileComplete && location.pathname.startsWith("/dashboard")) {
+          throw redirect({ to: "/onboarding" });
+        }
+
+        return { user, activeOrganizationId };
+      }
+    } catch (error) {
+      // Re-throw redirects - they're navigation signals, not errors
+      if (isRedirect(error)) {
+        throw error;
+      }
+      console.error("Error loading user:", error);
+      return { user: null, activeOrganizationId: null };
+    }
+  },
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: getBrand().name,
+      },
+      {
+        name: "description",
+        content: getBrand().description ?? "Member portal for Solstice tenants.",
+      },
+    ],
+    links: [{ rel: "stylesheet", href: appCss }],
+  }),
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <StepUpProvider>
+        <OrgContextProvider>
+          <Outlet />
+        </OrgContextProvider>
+      </StepUpProvider>
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { readonly children: React.ReactNode }) {
+  return (
+    // suppress since we're updating the "dark" class in a custom script below
+    <html lang="en" data-tenant={getTenantKey()} suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <ScriptOnce>
+          {`
+            // Minimal process shim for TanStack server functions
+            if (typeof globalThis.process === 'undefined') {
+              globalThis.process = {
+                env: { NODE_ENV: '${import.meta.env.PROD ? "production" : "development"}' },
+                versions: { node: '22.0.0' }
+              };
+            }
+
+            // Theme toggle
+            document.documentElement.classList.toggle(
+              'dark',
+              localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            );
+          `}
+        </ScriptOnce>
+
+        {children}
+
+        <Suspense fallback={null}>
+          <Toaster richColors closeButton />
+        </Suspense>
+        {import.meta.env.DEV && ReactQueryDevtools && TanStackRouterDevtools && (
+          <Suspense fallback={null}>
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <TanStackRouterDevtools position="bottom-right" />
+          </Suspense>
+        )}
+
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+</file>
+
+<file path="sst.config.ts">
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/// <reference path="./.sst/platform/config.d.ts" />
+
+type StageEnvClass = "dev" | "perf" | "prod";
+type StageTenantKey = "qc" | "viasport";
+
+type StageInfo = {
+  stage: string;
+  stageEnv: StageEnvClass;
+  stageTenant?: StageTenantKey;
+  isCanonical: boolean;
+};
+
+const CANONICAL_STAGE_PATTERN = /^(qc|sin)-(dev|perf|prod)$/;
+const CANONICAL_STAGE_LIST = [
+  "qc-dev",
+  "sin-dev",
+  "qc-perf",
+  "sin-perf",
+  "qc-prod",
+  "sin-prod",
+] as const;
+
+const parseTenantKey = (value: string | undefined, label: string) => {
+  if (!value) return undefined;
+  if (value === "qc" || value === "viasport") return value;
+  throw new Error(`Invalid ${label}: expected "qc" | "viasport", got "${value}"`);
+};
+
+const resolveStageInfo = (rawStage: string | undefined): StageInfo => {
+  const stage = rawStage ?? "dev";
+
+  const canonicalMatch = CANONICAL_STAGE_PATTERN.exec(stage);
+  if (canonicalMatch) {
+    const prefix = canonicalMatch[1] as "qc" | "sin";
+    const stageEnv = canonicalMatch[2] as StageEnvClass;
+    const stageTenant: StageTenantKey = prefix === "qc" ? "qc" : "viasport";
+    return { stage, stageEnv, stageTenant, isCanonical: true };
+  }
+
+  if (stage.startsWith("qc-") || stage.startsWith("sin-")) {
+    throw new Error(
+      `Invalid canonical stage "${stage}". Expected one of: ${CANONICAL_STAGE_LIST.join(
+        ", ",
+      )}`,
+    );
+  }
+
+  const lower = stage.toLowerCase();
+  const stageEnv: StageEnvClass =
+    lower === "production" || lower === "prod" || lower.endsWith("-prod")
+      ? "prod"
+      : lower === "perf" || lower.endsWith("-perf")
+        ? "perf"
+        : "dev";
+
+  return { stage, stageEnv, isCanonical: false };
+};
+
+const resolveTenantEnv = (info: StageInfo) => {
+  const envTenantKey = parseTenantKey(process.env["TENANT_KEY"], "TENANT_KEY");
+  const envViteTenantKey = parseTenantKey(
+    process.env["VITE_TENANT_KEY"],
+    "VITE_TENANT_KEY",
+  );
+
+  if (envTenantKey && envViteTenantKey && envTenantKey !== envViteTenantKey) {
+    throw new Error(
+      `Tenant key mismatch: TENANT_KEY=${envTenantKey} VITE_TENANT_KEY=${envViteTenantKey}`,
+    );
+  }
+
+  if (info.isCanonical) {
+    const expected = info.stageTenant!;
+    if (envTenantKey && envTenantKey !== expected) {
+      throw new Error(
+        `Stage "${info.stage}" maps to tenant "${expected}" but TENANT_KEY="${envTenantKey}" was provided.`,
+      );
+    }
+    if (envViteTenantKey && envViteTenantKey !== expected) {
+      throw new Error(
+        `Stage "${info.stage}" maps to tenant "${expected}" but VITE_TENANT_KEY="${envViteTenantKey}" was provided.`,
+      );
+    }
+    return { tenantKey: expected, viteTenantKey: expected };
+  }
+
+  const lowerStage = info.stage.toLowerCase();
+  const heuristicTenant: StageTenantKey =
+    lowerStage.includes("sin") || lowerStage.includes("viasport") ? "viasport" : "qc";
+  const tenantKey = envTenantKey ?? heuristicTenant;
+  const viteTenantKey = envViteTenantKey ?? tenantKey;
+  return { tenantKey, viteTenantKey };
+};
+
+/**
+ * SST Configuration for Solstice (Quadball Canada)
+ *
+ * Deploys TanStack Start app to AWS Lambda with CloudFront CDN.
+ * All resources deployed to ca-central-1 for PIPEDA/Canadian data residency.
+ *
+ * Known issue workaround: Lambda Function URL permissions require $transform.
+ * See: https://github.com/sst/sst/issues/6198
+ */
+
+export default $config({
+  app(input) {
+    const stageInfo = resolveStageInfo(input?.stage);
+    const isProd = stageInfo.stageEnv === "prod";
+
+    return {
+      name: "solstice",
+      removal: isProd ? "retain" : "remove",
+      protect: isProd,
+      home: "aws",
+      providers: {
+        aws: {
+          region: "ca-central-1",
+        },
+        "aws-native": {
+          region: "ca-central-1",
+        },
+      },
+    };
+  },
+  async run() {
+    const stageInfo = resolveStageInfo($app.stage ?? "dev");
+    const stage = stageInfo.stage;
+    const isProd = stageInfo.stageEnv === "prod";
+    const isPerf = stageInfo.stageEnv === "perf";
+
+    const dbVersion = "16.11";
+    const dbConfig = isProd
+      ? {
+          instance: "t4g.large",
+          storage: "200 GB",
+          multiAz: true,
+          backupRetentionDays: 35,
+          deletionProtection: true,
+          forceSsl: true,
+        }
+      : isPerf
+        ? {
+            instance: "t4g.large",
+            storage: "200 GB",
+            multiAz: false,
+            backupRetentionDays: 7,
+            deletionProtection: false,
+            forceSsl: true,
+          }
+        : {
+            instance: "t4g.micro",
+            storage: "50 GB",
+            multiAz: false,
+            backupRetentionDays: 7,
+            deletionProtection: false,
+            forceSsl: true,
+          };
+
+    // Workaround for Lambda Function URL invoke permissions
+    // See: https://github.com/sst/sst/issues/6198
+    // Documented fix from sst-migration-plan.md
+    $transform(aws.lambda.FunctionUrl, (args, _opts, name) => {
+      new awsnative.lambda.Permission(`${name}InvokePermission`, {
+        action: "lambda:InvokeFunction",
+        functionName: args.functionName,
+        principal: "*",
+        invokedViaFunctionUrl: true,
+      });
+    });
+
+    const vpc = new sst.aws.Vpc("Vpc", {
+      bastion: true,
+      nat: "ec2",
+    });
+
+    const database = new sst.aws.Postgres("Database", {
+      vpc,
+      version: dbVersion,
+      instance: dbConfig.instance,
+      storage: dbConfig.storage,
+      multiAz: dbConfig.multiAz,
+      proxy: true,
+      transform: {
+        parameterGroup: (args) => ({
+          ...args,
+          parameters: [
+            {
+              name: "rds.force_ssl",
+              value: dbConfig.forceSsl ? "1" : "0",
+            },
+            {
+              name: "rds.logical_replication",
+              value: "1",
+              applyMethod: "pending-reboot",
+            },
+          ],
+        }),
+        instance: (args) => ({
+          ...args,
+          backupRetentionPeriod: dbConfig.backupRetentionDays,
+          deletionProtection: dbConfig.deletionProtection,
+        }),
+      },
+    });
+
+    const sinArtifacts = new sst.aws.Bucket("SinArtifacts", {
+      cors: [
+        {
+          allowedHeaders: ["*"],
+          allowedMethods: ["GET", "PUT", "HEAD"],
+          allowedOrigins: [
+            "http://localhost:5173",
+            "http://localhost:3001",
+            "http://localhost:8888",
+            "http://localhost:5174",
+          ],
+          maxAge: "1 day",
+        },
+      ],
+    });
+
+    const notificationsDlq = new sst.aws.Queue("SinNotificationsDlq");
+    const notificationsQueue = new sst.aws.Queue("SinNotificationsQueue", {
+      visibilityTimeout: "2 minutes",
+      dlq: {
+        queue: notificationsDlq.arn,
+        retry: 3,
+      },
+    });
+
+    // Define secrets - set via: npx sst secret set <NAME> <value> --stage qc-prod|sin-prod
+    const secrets = {
+      baseUrl: new sst.Secret("BaseUrl"), // CloudFront URL
+      betterAuthSecret: new sst.Secret("BetterAuthSecret"),
+      googleClientId: new sst.Secret("GoogleClientId"),
+      googleClientSecret: new sst.Secret("GoogleClientSecret"),
+      squareEnv: new sst.Secret("SquareEnv"),
+      squareApplicationId: new sst.Secret("SquareApplicationId"),
+      squareAccessToken: new sst.Secret("SquareAccessToken"),
+      squareLocationId: new sst.Secret("SquareLocationId"),
+      squareWebhookSignatureKey: new sst.Secret("SquareWebhookSignatureKey"),
+      sinNotificationsFromEmail: new sst.Secret("SinNotificationsFromEmail"),
+      sinNotificationsReplyToEmail: new sst.Secret("SinNotificationsReplyToEmail"),
+    };
+
+    const runtimeEnv = {
+      SST_STAGE: stage,
+      NODE_ENV: isProd || isPerf ? "production" : "development",
+    };
+
+    const devBaseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
+    const baseUrl = $dev ? devBaseUrl : secrets.baseUrl.value;
+
+    const { tenantKey, viteTenantKey } = resolveTenantEnv(stageInfo);
+
+    const notificationEnv = {
+      SIN_NOTIFICATIONS_QUEUE_URL: notificationsQueue.url,
+      SIN_NOTIFICATIONS_FROM_EMAIL: secrets.sinNotificationsFromEmail.value,
+      SIN_NOTIFICATIONS_REPLY_TO_EMAIL: secrets.sinNotificationsReplyToEmail.value,
+    };
+
+    // Deploy TanStack Start app
+    const web = new sst.aws.TanStackStart("Web", {
+      buildCommand: "pnpm build",
+      dev: {
+        command: "pnpm dev",
+        url: devBaseUrl,
+      },
+      link: [database, sinArtifacts, notificationsQueue, ...Object.values(secrets)],
+      vpc,
+      environment: {
+        // Runtime environment detection
+        ...runtimeEnv,
+        TENANT_KEY: tenantKey,
+        VITE_TENANT_KEY: viteTenantKey,
+        // Base URL for auth callbacks
+        BASE_URL: baseUrl,
+        VITE_BASE_URL: baseUrl,
+        SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+        ...notificationEnv,
+        // Map SST secrets to expected env var names
+        BETTER_AUTH_SECRET: secrets.betterAuthSecret.value,
+        GOOGLE_CLIENT_ID: secrets.googleClientId.value,
+        GOOGLE_CLIENT_SECRET: secrets.googleClientSecret.value,
+        SQUARE_ENV: secrets.squareEnv.value,
+        SQUARE_APPLICATION_ID: secrets.squareApplicationId.value,
+        SQUARE_ACCESS_TOKEN: secrets.squareAccessToken.value,
+        SQUARE_LOCATION_ID: secrets.squareLocationId.value,
+        SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
+      },
+    });
+
+    new sst.aws.Cron("ScheduledNotifications", {
+      schedule: "rate(5 minutes)",
+      job: {
+        handler: "src/cron/process-notifications.handler",
+        link: [database, sinArtifacts, notificationsQueue, ...Object.values(secrets)],
+        environment: {
+          ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
+          SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+          ...notificationEnv,
+        },
+      },
+    });
+
+    new sst.aws.Cron("RetentionEnforcement", {
+      schedule: "rate(1 day)",
+      job: {
+        handler: "src/cron/enforce-retention.handler",
+        link: [database, sinArtifacts, ...Object.values(secrets)],
+        environment: {
+          ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
+          SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+        },
+      },
+    });
+
+    notificationsQueue.subscribe(
+      {
+        handler: "src/cron/notification-worker.handler",
+        link: [database, sinArtifacts, ...Object.values(secrets)],
+        timeout: "60 seconds",
+        environment: {
+          ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
+          SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+          ...notificationEnv,
+        },
+      },
+      {
+        batch: {
+          size: 10,
+          window: "10 seconds",
+          partialResponses: true,
+        },
+      },
+    );
+
+    // =========================================================================
+    // CloudWatch Alarms for Monitoring
+    // =========================================================================
+
+    // Get the Lambda function name from the web deployment
+    // Note: SST creates the function with a generated name, we'll use pattern matching
+    const webFunctionNamePattern = `solstice-${stage}-Web*`;
+
+    // SNS Topic for alarm notifications (create only for production)
+    const alarmTopic =
+      isProd || isPerf
+        ? new aws.sns.Topic("AlarmNotifications", {
+            name: `solstice-${stage}-alarms`,
+            tags: {
+              Environment: stage,
+              Application: "solstice",
+            },
+          })
+        : undefined;
+
+    // Lambda Throttling Alarm - Critical for catching concurrency issues
+    new aws.cloudwatch.MetricAlarm("LambdaThrottlingAlarm", {
+      alarmName: `solstice-${stage}-lambda-throttling`,
+      alarmDescription:
+        "Lambda functions are being throttled due to concurrent execution limits",
+      namespace: "AWS/Lambda",
+      metricName: "Throttles",
+      statistic: "Sum",
+      period: 60, // 1 minute
+      evaluationPeriods: 1,
+      threshold: 1, // Alert on any throttling
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "throttling",
+      },
+    });
+
+    // Lambda Errors Alarm
+    new aws.cloudwatch.MetricAlarm("LambdaErrorsAlarm", {
+      alarmName: `solstice-${stage}-lambda-errors`,
+      alarmDescription: "Lambda functions are experiencing errors",
+      namespace: "AWS/Lambda",
+      metricName: "Errors",
+      statistic: "Sum",
+      period: 300, // 5 minutes
+      evaluationPeriods: 1,
+      threshold: 5, // 5 errors in 5 minutes
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "errors",
+      },
+    });
+
+    // Lambda Duration Alarm - Approaching timeout
+    new aws.cloudwatch.MetricAlarm("LambdaDurationAlarm", {
+      alarmName: `solstice-${stage}-lambda-duration`,
+      alarmDescription: "Lambda functions are taking too long (approaching timeout)",
+      namespace: "AWS/Lambda",
+      metricName: "Duration",
+      extendedStatistic: "p95", // 95th percentile (use extendedStatistic for percentiles)
+      period: 300, // 5 minutes
+      evaluationPeriods: 2,
+      threshold: 15000, // 15 seconds (Lambda timeout is 20s)
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "duration",
+      },
+    });
+
+    // Lambda Concurrent Executions - High usage warning
+    new aws.cloudwatch.MetricAlarm("LambdaConcurrencyAlarm", {
+      alarmName: `solstice-${stage}-lambda-concurrency`,
+      alarmDescription: "Lambda concurrent executions are high",
+      namespace: "AWS/Lambda",
+      metricName: "ConcurrentExecutions",
+      statistic: "Maximum",
+      period: 60, // 1 minute
+      evaluationPeriods: 3,
+      threshold: 8, // Alert when approaching the 10 limit
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "concurrency",
+      },
+    });
+
+    // RDS Proxy - Client Connection Failures
+    // Note: Uses the database proxy name from SST
+    new aws.cloudwatch.MetricAlarm("RdsProxyConnectionAlarm", {
+      alarmName: `solstice-${stage}-rds-proxy-connections`,
+      alarmDescription: "RDS Proxy is experiencing connection issues",
+      namespace: "AWS/RDS",
+      metricName: "ClientConnectionsReceived",
+      statistic: "Sum",
+      period: 300, // 5 minutes
+      evaluationPeriods: 2,
+      threshold: 0, // Alert if no connections for 10 minutes
+      comparisonOperator: "LessThanOrEqualToThreshold",
+      treatMissingData: "breaching", // Missing data means no connections
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "database",
+      },
+    });
+
+    // RDS Instance - CPU Utilization
+    new aws.cloudwatch.MetricAlarm("RdsCpuAlarm", {
+      alarmName: `solstice-${stage}-rds-cpu`,
+      alarmDescription: "RDS CPU utilization is high",
+      namespace: "AWS/RDS",
+      metricName: "CPUUtilization",
+      statistic: "Average",
+      period: 300, // 5 minutes
+      evaluationPeriods: 2,
+      threshold: 80, // 80% CPU
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "database",
+      },
+    });
+
+    // CloudWatch Dashboard for quick visibility
+    new aws.cloudwatch.Dashboard("MonitoringDashboard", {
+      dashboardName: `solstice-${stage}`,
+      dashboardBody: JSON.stringify({
+        widgets: [
+          {
+            type: "metric",
+            x: 0,
+            y: 0,
+            width: 12,
+            height: 6,
+            properties: {
+              title: "Lambda Invocations & Errors",
+              region: "ca-central-1",
+              metrics: [
+                ["AWS/Lambda", "Invocations", { stat: "Sum", period: 60 }],
+                [".", "Errors", { stat: "Sum", period: 60 }],
+                [".", "Throttles", { stat: "Sum", period: 60 }],
+              ],
+              view: "timeSeries",
+              stacked: false,
+            },
+          },
+          {
+            type: "metric",
+            x: 12,
+            y: 0,
+            width: 12,
+            height: 6,
+            properties: {
+              title: "Lambda Duration",
+              region: "ca-central-1",
+              metrics: [
+                ["AWS/Lambda", "Duration", { stat: "p50", period: 60 }],
+                [".", "Duration", { stat: "p95", period: 60 }],
+                [".", "Duration", { stat: "Maximum", period: 60 }],
+              ],
+              view: "timeSeries",
+              stacked: false,
+            },
+          },
+          {
+            type: "metric",
+            x: 0,
+            y: 6,
+            width: 12,
+            height: 6,
+            properties: {
+              title: "Lambda Concurrency",
+              region: "ca-central-1",
+              metrics: [
+                ["AWS/Lambda", "ConcurrentExecutions", { stat: "Maximum", period: 60 }],
+              ],
+              view: "timeSeries",
+              stacked: false,
+              annotations: {
+                horizontal: [
+                  {
+                    value: 10,
+                    label: "Account Limit",
+                    color: "#ff0000",
+                  },
+                ],
+              },
+            },
+          },
+          {
+            type: "metric",
+            x: 12,
+            y: 6,
+            width: 12,
+            height: 6,
+            properties: {
+              title: "RDS Connections",
+              region: "ca-central-1",
+              metrics: [
+                ["AWS/RDS", "DatabaseConnections", { stat: "Maximum", period: 60 }],
+              ],
+              view: "timeSeries",
+              stacked: false,
+            },
+          },
+          {
+            type: "metric",
+            x: 0,
+            y: 12,
+            width: 24,
+            height: 6,
+            properties: {
+              title: "RDS Proxy Metrics",
+              region: "ca-central-1",
+              metrics: [
+                ["AWS/RDS", "ClientConnections", { stat: "Maximum", period: 60 }],
+                [".", "ClientConnectionsReceived", { stat: "Sum", period: 60 }],
+                [".", "QueryRequests", { stat: "Sum", period: 60 }],
+              ],
+              view: "timeSeries",
+              stacked: false,
+            },
+          },
+        ],
+      }),
+    });
+
+    return {
+      url: web.url,
+      alarmTopicArn: alarmTopic?.arn,
+      dashboardUrl: `https://ca-central-1.console.aws.amazon.com/cloudwatch/home?region=ca-central-1#dashboards:name=solstice-${stage}`,
+    };
+  },
+});
+</file>
+
+<file path="src/routes/dashboard/membership.tsx">
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  clearPaymentParams,
+  getPaymentErrorMessage,
+  usePaymentReturn,
+} from "~/features/membership/hooks/usePaymentReturn";
+import {
+  confirmMembershipPurchase,
+  createCheckoutSession,
+} from "~/features/membership/membership.mutations";
+import {
+  getUserMembershipStatus,
+  listMembershipTypes,
+} from "~/features/membership/membership.queries";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+
+export const Route = createFileRoute("/dashboard/membership")({
+  beforeLoad: () => {
+    requireFeatureInRoute("qc_membership");
+  },
+  component: MembershipPage,
+});
+
+function MembershipPage() {
+  const brand = getBrand();
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const paymentReturn = usePaymentReturn();
+  const [hasProcessedReturn, setHasProcessedReturn] = useState(false);
+
+  const membershipStatusQuery = useQuery({
+    queryKey: ["membership-status"],
+    queryFn: async () => {
+      const result = await getUserMembershipStatus();
+      if (!result.success) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to fetch membership status",
+        );
+      }
+      return result.data || null;
+    },
+  });
+
+  const { refetch: refetchMembershipStatus } = membershipStatusQuery;
+
+  const membershipTypesQuery = useQuery({
+    queryKey: ["membership-types"],
+    queryFn: async () => {
+      const result = await listMembershipTypes();
+      if (!result.success) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to fetch membership types",
+        );
+      }
+      return result.data || [];
+    },
+  });
+
+  const squareStatusQuery = useQuery({
+    queryKey: ["square-status"],
+    queryFn: async () => {
+      const response = await fetch("/api/health");
+      if (!response.ok) {
+        throw new Error("Failed to load payment status");
+      }
+      const data = (await response.json()) as {
+        services?: { square?: { environment?: string } };
+      };
+      return data.services?.square ?? null;
+    },
+    staleTime: 60_000,
+    retry: false,
+    enabled: typeof window !== "undefined",
+  });
+
+  const confirmPurchase = useCallback(
+    async (sessionId: string, membershipTypeId: string, paymentId: string) => {
+      setProcessingPayment(true);
+      try {
+        const result = await unwrapServerFnResult(
+          confirmMembershipPurchase({
+            data: {
+              membershipTypeId,
+              sessionId,
+              paymentId,
+            },
+          }),
+        );
+
+        if (result.success) {
+          toast.success("Membership purchased successfully!");
+          clearPaymentParams();
+          await refetchMembershipStatus();
+        } else {
+          toast.error(result.errors?.[0]?.message || "Failed to confirm membership");
+        }
+      } catch (error) {
+        console.error("Error confirming membership:", error);
+        toast.error("Failed to confirm membership purchase");
+      } finally {
+        setProcessingPayment(false);
+      }
+    },
+    [refetchMembershipStatus],
+  );
+
+  const handleMockPaymentReturn = useCallback(
+    async (sessionId: string, membershipTypeId: string) => {
+      await confirmPurchase(sessionId, membershipTypeId, `mock_payment_${Date.now()}`);
+    },
+    [confirmPurchase],
+  );
+
+  // Process payment return if needed
+  const processPaymentReturn = useCallback(async () => {
+    if (hasProcessedReturn) return;
+
+    // Handle mock checkout
+    if (paymentReturn.isMockCheckout && paymentReturn.sessionId) {
+      if (!paymentReturn.membershipTypeId) {
+        setHasProcessedReturn(true);
+        toast.error("Missing membership type for checkout session");
+        clearPaymentParams();
+        return;
+      }
+
+      setHasProcessedReturn(true);
+      await handleMockPaymentReturn(
+        paymentReturn.sessionId,
+        paymentReturn.membershipTypeId || "",
+      );
+    }
+    // Handle real Square success
+    else if (paymentReturn.success && paymentReturn.paymentId) {
+      if (!paymentReturn.sessionId || !paymentReturn.membershipTypeId) {
+        setHasProcessedReturn(true);
+        toast.error("Missing checkout information. Please contact support.");
+        clearPaymentParams();
+        return;
+      }
+
+      setHasProcessedReturn(true);
+      await confirmPurchase(
+        paymentReturn.sessionId,
+        paymentReturn.membershipTypeId,
+        paymentReturn.paymentId,
+      );
+    }
+    // Handle errors
+    else if (paymentReturn.error) {
+      setHasProcessedReturn(true);
+      const errorMessage = getPaymentErrorMessage(paymentReturn.error);
+      if (errorMessage) toast.error(errorMessage);
+      clearPaymentParams();
+    }
+  }, [hasProcessedReturn, paymentReturn, handleMockPaymentReturn, confirmPurchase]);
+
+  // Process payment return using useEffect
+  useEffect(() => {
+    if (
+      !hasProcessedReturn &&
+      (paymentReturn.isMockCheckout || paymentReturn.success || paymentReturn.error) &&
+      (paymentReturn.sessionId || paymentReturn.paymentId || paymentReturn.error)
+    ) {
+      processPaymentReturn();
+    }
+  }, [paymentReturn, hasProcessedReturn, processPaymentReturn]);
+
+  const handlePurchase = async (membershipTypeId: string) => {
+    try {
+      const result = await unwrapServerFnResult(
+        createCheckoutSession({
+          data: { membershipTypeId },
+        }),
+      );
+      if (result.success && result.data) {
+        // Redirect to checkout URL
+        window.location.href = result.data.checkoutUrl;
+      } else {
+        toast.error(result.errors?.[0]?.message || "Failed to create checkout session");
+      }
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      toast.error("Failed to create checkout session");
+    }
+  };
+
+  if (membershipStatusQuery.isLoading || membershipTypesQuery.isLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (membershipStatusQuery.error || membershipTypesQuery.error) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+            <CardDescription>
+              {membershipStatusQuery.error?.message ||
+                membershipTypesQuery.error?.message}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  const membershipStatus = membershipStatusQuery.data;
+  const membershipTypes = membershipTypesQuery.data || [];
+  const isSandbox = squareStatusQuery.data?.environment === "sandbox";
+
+  if (processingPayment) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <p>Processing your payment...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="mb-8 text-3xl font-bold">Membership</h1>
+      <p className="text-muted-foreground mb-6">
+        Join {brand.name} and access exclusive member benefits
+      </p>
+
+      {isSandbox ? (
+        <Alert className="mb-6 border-amber-200 bg-amber-50 text-amber-900">
+          <AlertCircle className="text-amber-700" />
+          <AlertTitle>Sandbox payments enabled</AlertTitle>
+          <AlertDescription>
+            Purchases are running in Square sandbox mode. Use test credentials only.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {/* Current Membership Status */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Current Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {membershipStatus?.hasMembership ? (
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                Active Membership
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Type: {membershipStatus.currentMembership?.membershipType.name}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Expires:{" "}
+                {membershipStatus.currentMembership
+                  ? new Date(
+                      membershipStatus.currentMembership.endDate,
+                    ).toLocaleDateString()
+                  : "N/A"}
+              </p>
+              {membershipStatus.daysRemaining != null &&
+                membershipStatus.daysRemaining > 0 && (
+                  <p className="text-muted-foreground text-sm">
+                    Days Remaining: {membershipStatus.daysRemaining}
+                  </p>
+                )}
+            </div>
+          ) : (
+            <div>
+              <p className="text-lg font-semibold">No Active Membership</p>
+              <p className="text-muted-foreground text-sm">
+                Join today to participate in events and access member benefits
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Available Memberships */}
+      <div>
+        <h2 className="mb-4 text-2xl font-bold">Available Memberships</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {membershipTypes.map((type) => {
+            const isCurrent =
+              membershipStatus?.currentMembership?.membershipType.id === type.id;
+            const canPurchase =
+              !membershipStatus?.hasMembership ||
+              (membershipStatus.daysRemaining ?? 0) <= 30;
+
+            return (
+              <Card key={type.id}>
+                <CardHeader>
+                  <CardTitle>{type.name}</CardTitle>
+                  <CardDescription>${(type.priceCents / 100).toFixed(2)}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm">{type.description}</p>
+                </CardContent>
+                <CardFooter>
+                  {isCurrent ? (
+                    <Button className="w-full" disabled>
+                      Current Plan
+                    </Button>
+                  ) : canPurchase ? (
+                    <Button
+                      className="w-full"
+                      onClick={() => handlePurchase(type.id)}
+                      disabled={processingPayment}
+                    >
+                      {membershipStatus?.hasMembership &&
+                      (membershipStatus.daysRemaining ?? 0) <= 30
+                        ? "Renew"
+                        : "Purchase"}
+                    </Button>
+                  ) : (
+                    <Button className="w-full" disabled>
+                      Not Available
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/lib/env.server.ts">
+/**
+ * Server-only environment configuration
+ * This module should only be imported in server-side code
+ */
+
+// This module should only be imported in server-side code
+
+// Load dotenv synchronously before createEnv is called.
+// Vite injects import.meta.env; SST/esbuild cron/Lambdas do not.
+import dotenv from "dotenv";
+const isAwsLambdaRuntime =
+  process.env["AWS_LAMBDA_FUNCTION_NAME"] !== undefined ||
+  process.env["AWS_EXECUTION_ENV"]?.includes("AWS_Lambda") === true;
+const isViteRuntime = typeof import.meta.env !== "undefined";
+
+if (!isAwsLambdaRuntime && !isViteRuntime) {
+  dotenv.config();
+}
+
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+
+import { parseOAuthAllowedDomains } from "./env/oauth-domain";
+
+export const env = createEnv({
+  server: {
+    // Database
+    DATABASE_URL: z.url().optional(),
+    DATABASE_URL_UNPOOLED: z.url().optional(),
+    DATABASE_POOLED_URL: z.url().optional(),
+    DATABASE_UNPOOLED_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
+
+    // Auth secret is validated lazily in getAuthSecret().
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    OAUTH_ALLOWED_DOMAINS: z
+      .string()
+      .optional()
+      .transform((value, ctx) => {
+        try {
+          return parseOAuthAllowedDomains(value);
+        } catch (error) {
+          ctx.addIssue({
+            code: "custom",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Invalid OAuth allowed domains configuration",
+            path: ["OAUTH_ALLOWED_DOMAINS"],
+          });
+          return z.NEVER;
+        }
+      }),
+
+    // Square Payment Integration
+    SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),
+    SQUARE_APPLICATION_ID: z.string().optional(),
+    SQUARE_ACCESS_TOKEN: z.string().optional(),
+    SQUARE_LOCATION_ID: z.string().optional(),
+    SQUARE_WEBHOOK_SIGNATURE_KEY: z.string().optional(),
+    SQUARE_WEBHOOK_URL: z.url().optional(),
+    SUPPORT_EMAIL: z.email().optional(),
+
+    // SendGrid Email Integration
+    SENDGRID_API_KEY: z.string().optional(),
+    SENDGRID_FROM_EMAIL: z.email().optional(),
+    SENDGRID_FROM_NAME: z.string().optional(),
+
+    // Other
+    COOKIE_DOMAIN: z.string().optional(),
+    NODE_ENV: z.enum(["development", "production", "test"]).prefault("development"),
+    TENANT_KEY: z.enum(["qc", "viasport"]).prefault("qc"),
+
+    // SST/AWS Lambda
+    SST_STAGE: z.string().optional(),
+    AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
+    AWS_EXECUTION_ENV: z.string().optional(),
+    SIN_ARTIFACTS_BUCKET: z.string().optional(),
+
+    // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
+    VITE_BASE_URL: z.url().optional(),
+    VITE_TENANT_KEY: z.enum(["qc", "viasport"]).optional(),
+  },
+  // Use process.env since we've just loaded .env
+  runtimeEnv: process.env,
+  emptyStringAsUndefined: true,
+});
+
+const requireDbUrl = (value: string | undefined, label: string) => {
+  if (!value) {
+    throw new Error(`Missing database URL configuration for ${label}.`);
+  }
+  return value;
+};
+
+// Helper functions
+export const getDbUrl = () => requireDbUrl(env.DATABASE_URL, "DATABASE_URL");
+
+export const getPooledDbUrl = () =>
+  requireDbUrl(
+    env.DATABASE_POOLED_URL || env.NETLIFY_DATABASE_URL || env.DATABASE_URL,
+    "DATABASE_POOLED_URL or DATABASE_URL",
+  );
+
+export const getUnpooledDbUrl = () =>
+  requireDbUrl(
+    env.DATABASE_UNPOOLED_URL ||
+      env.DATABASE_URL_UNPOOLED ||
+      env.NETLIFY_DATABASE_URL_UNPOOLED ||
+      env.DATABASE_URL,
+    "DATABASE_UNPOOLED_URL or DATABASE_URL",
+  );
+
+export const getBaseUrl = () => {
+  // SST sets BASE_URL via secrets in production
+  const sst = process.env["BASE_URL"];
+  const explicit = env.VITE_BASE_URL;
+
+  const candidate = sst || explicit;
+
+  if (!candidate) {
+    throw new Error(
+      "Base URL is unknown. Set BASE_URL (SST) or VITE_BASE_URL (local dev).",
+    );
+  }
+
+  return candidate;
+};
+
+let cachedAuthSecret: string | undefined;
+const authSecretSchema = z
+  .string()
+  .min(32, "BETTER_AUTH_SECRET must be at least 32 characters");
+
+export const getAuthSecret = () => {
+  if (cachedAuthSecret) return cachedAuthSecret;
+
+  const raw = process.env["BETTER_AUTH_SECRET"];
+  const parsed = authSecretSchema.safeParse(raw);
+
+  if (!parsed.success) {
+    const message =
+      parsed.error.issues.map((issue) => issue.message).join("; ") ||
+      "Invalid BETTER_AUTH_SECRET";
+    throw new Error(message);
+  }
+
+  cachedAuthSecret = parsed.data;
+  return cachedAuthSecret;
+};
+
+export const isProduction = () => env.NODE_ENV === "production";
+export const isDevelopment = () => env.NODE_ENV === "development";
+export const isTest = () => env.NODE_ENV === "test";
+
+export const isServerless = () => {
+  const awsEnv =
+    process.env["AWS_LAMBDA_FUNCTION_NAME"] ||
+    process.env["AWS_EXECUTION_ENV"]?.includes("AWS_Lambda");
+  const sstEnv = process.env["SST_STAGE"] || process.env["SST_DEV"] === "true";
+  const netlifyEnv = process.env["NETLIFY"] === "true";
+  const vercelEnv = process.env["VERCEL"] === "1" || process.env["VERCEL_ENV"];
+
+  return !!(awsEnv || sstEnv || netlifyEnv || vercelEnv);
+};
+
+export const isAWSLambda = () =>
+  !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);
+
+export const getSSTStage = () => process.env["SST_STAGE"];
+</file>
+
+<file path="src/components/ui/admin-sidebar.tsx">
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { LogOut } from "lucide-react";
+import { useMemo, useState } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { authQueryKey } from "~/features/auth/auth.queries";
+import { recordSecurityEvent } from "~/features/security/security.mutations";
+import { auth } from "~/lib/auth-client";
+import { filterNavItems } from "~/tenant/feature-gates";
+import { getBrand } from "~/tenant";
+import { getAdminNav } from "~/features/layouts/admin-nav";
+
+interface AdminSidebarProps {
+  onNavigation?: () => void;
+}
+
+export function AdminSidebar({ onNavigation }: AdminSidebarProps = {}) {
+  const queryClient = useQueryClient();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
+  const navigate = useNavigate();
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+  const brand = getBrand();
+
+  const sidebarItems = useMemo(
+    () => filterNavItems(getAdminNav(), { user }),
+    [user],
+  );
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
+    try {
+      if (user?.id) {
+        void recordSecurityEvent({ data: { eventType: "logout", userId: user.id } });
+      }
+      await auth.signOut({
+        fetchOptions: {
+          onResponse: async () => {
+            queryClient.setQueryData(authQueryKey, null);
+            await router.invalidate();
+          },
+        },
+      });
+
+      await navigate({ to: "/auth/login" });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setIsLoggingOut(false);
+      return;
+    }
+
+    setIsLoggingOut(false);
+  };
+
+  return (
+    <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
+      <div className="p-6">
+        <Link to="/" className="transition-opacity hover:opacity-80">
+          <h1 className="text-admin-text-primary text-xl font-bold">{brand.name}</h1>
+          <p className="text-admin-text-secondary text-sm">
+            {brand.adminSubtitle}
+          </p>
+        </Link>
+      </div>
+      <nav className="flex-1 space-y-2 px-4 py-2">
+        {sidebarItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="nav-item"
+              onClick={onNavigation}
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
+              activeProps={{
+                className: "nav-item-active",
+                "aria-current": "page",
+                "data-status": "active",
+              }}
+            >
+              <Icon className="pointer-events-none h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+      <div className="space-y-2 border-t border-gray-200 px-4 py-4">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
+          disabled={isLoggingOut}
+        >
+          <LogOut className="h-5 w-5" />
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+</file>
+
+</files>

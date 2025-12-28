@@ -7,7 +7,8 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { authQueryKey } from "~/features/auth/auth.queries";
 import { getAppNavSections } from "~/features/layouts/app-nav";
 import { useOrgContext } from "~/features/organizations/org-context";
-import { recordSecurityEvent } from "~/features/security/security.mutations";
+import { clearActiveOrganizationState } from "~/features/organizations/org-context-utils";
+import { setActiveOrganization } from "~/features/organizations/organizations.mutations";
 import { auth } from "~/lib/auth-client";
 import { getBrand } from "~/tenant";
 import { filterNavItems } from "~/tenant/feature-gates";
@@ -23,7 +24,7 @@ export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
   const navigate = useNavigate();
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
-  const { organizationRole } = useOrgContext();
+  const { organizationRole, setActiveOrganizationId } = useOrgContext();
   const brand = getBrand();
 
   const sections = useMemo(() => {
@@ -40,9 +41,12 @@ export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
     setIsLoggingOut(true);
 
     try {
-      if (user?.id) {
-        void recordSecurityEvent({ data: { eventType: "logout", userId: user.id } });
+      try {
+        await setActiveOrganization({ data: { organizationId: null } });
+      } catch (error) {
+        console.warn("Failed to clear active organization cookie", error);
       }
+      clearActiveOrganizationState(queryClient, setActiveOrganizationId);
       await auth.signOut({
         fetchOptions: {
           onResponse: async () => {

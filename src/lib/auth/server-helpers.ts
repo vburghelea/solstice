@@ -4,6 +4,7 @@
  */
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
 import { twoFactor } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getBrand } from "~/tenant";
@@ -53,6 +54,201 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
 
   // Get database connection
   const dbConnection = await db();
+
+  const resolveTwoFactorUserId = async (ctx: {
+    context: {
+      authCookies: { sessionToken: { name: string } };
+      secret: string;
+      internalAdapter: {
+        findVerificationValue: (token: string) => Promise<{ value: string } | null>;
+      };
+      createAuthCookie: (name: string) => { name: string };
+    };
+    getSignedCookie: (name: string, secret: string) => Promise<string | false | null>;
+  }) => {
+    const twoFactorCookie = ctx.context.createAuthCookie("two_factor");
+    const cookieResult = await ctx.getSignedCookie(
+      twoFactorCookie.name,
+      ctx.context.secret,
+    );
+    // getSignedCookie returns false if signature is invalid
+    const identifier = typeof cookieResult === "string" ? cookieResult : null;
+    if (!identifier) return null;
+
+    const verification =
+      await ctx.context.internalAdapter.findVerificationValue(identifier);
+    return verification?.value ?? null;
+  };
+
+  const securityEventPlugin = {
+    id: "security-events",
+    hooks: {
+      before: [
+        {
+          matcher(context: { path: string }) {
+            return context.path === "/sign-out";
+          },
+          handler: createAuthMiddleware(async (ctx) => {
+            const sessionToken = await ctx.getSignedCookie(
+              ctx.context.authCookies.sessionToken.name,
+              ctx.context.secret,
+            );
+            if (!sessionToken) return;
+
+            const session = await ctx.context.internalAdapter.findSession(sessionToken);
+            return {
+              context: {
+                securityEventUserId: session?.user?.id ?? null,
+              },
+            };
+          }),
+        },
+      ],
+      after: [
+        {
+          matcher(context: { path: string }) {
+            return (
+              context.path === "/sign-in/email" ||
+              context.path === "/sign-out" ||
+              context.path.startsWith("/two-factor/verify-")
+            );
+          },
+          handler: createAuthMiddleware(async (ctx) => {
+            const returned = ctx.context.returned;
+            const isError = returned instanceof APIError;
+            const headers = ctx.headers ?? new Headers();
+            const userAgent = headers.get("user-agent");
+            const geoCountry =
+              headers.get("cf-ipcountry") ?? headers.get("x-vercel-ip-country");
+            const geoRegion =
+              headers.get("x-vercel-ip-country-region") ??
+              headers.get("x-country-region");
+
+            const { recordSecurityEvent } = await import("~/lib/security/events");
+            const { applySecurityRules } = await import("~/lib/security/detection");
+
+            const recordEvent = async (
+              event: Omit<
+                Parameters<typeof recordSecurityEvent>[0],
+                "headers" | "userAgent" | "geoCountry" | "geoRegion"
+              >,
+            ) => {
+              const created = await recordSecurityEvent({
+                ...event,
+                headers,
+                userAgent: userAgent ?? null,
+                geoCountry: geoCountry ?? null,
+                geoRegion: geoRegion ?? null,
+              });
+
+              if (created?.userId) {
+                await applySecurityRules({
+                  userId: created.userId,
+                  eventType: created.eventType,
+                  eventId: created.id,
+                  ipAddress: created.ipAddress,
+                  userAgent: created.userAgent,
+                  geoCountry: created.geoCountry,
+                  geoRegion: created.geoRegion,
+                });
+              }
+
+              return created;
+            };
+
+            if (ctx.path === "/sign-in/email") {
+              const isTwoFactorRedirect =
+                !isError &&
+                returned &&
+                typeof returned === "object" &&
+                "twoFactorRedirect" in returned;
+
+              if (isError) {
+                const email =
+                  typeof ctx.body?.email === "string"
+                    ? ctx.body.email.toLowerCase()
+                    : null;
+                const userResult = email
+                  ? await ctx.context.internalAdapter.findUserByEmail(email)
+                  : null;
+                await recordEvent({
+                  userId: userResult?.user?.id ?? null,
+                  eventType: "login_fail",
+                });
+                return;
+              }
+
+              if (isTwoFactorRedirect) {
+                return;
+              }
+
+              const responseUserId =
+                returned &&
+                typeof returned === "object" &&
+                "user" in returned &&
+                typeof returned.user === "object"
+                  ? ((returned.user as { id?: string | null }).id ?? null)
+                  : null;
+              const userId = responseUserId ?? ctx.context.newSession?.user?.id ?? null;
+
+              if (userId) {
+                await recordEvent({
+                  userId,
+                  eventType: "login_success",
+                });
+              }
+
+              return;
+            }
+
+            if (ctx.path.startsWith("/two-factor/verify-")) {
+              const responseUserId =
+                returned &&
+                typeof returned === "object" &&
+                "user" in returned &&
+                typeof returned.user === "object"
+                  ? ((returned.user as { id?: string | null }).id ?? null)
+                  : null;
+              const fallbackUserId = await resolveTwoFactorUserId(ctx);
+              const userId =
+                responseUserId ?? ctx.context.newSession?.user?.id ?? fallbackUserId;
+
+              if (userId) {
+                if (isError) {
+                  await recordEvent({
+                    userId,
+                    eventType: "mfa_fail",
+                  });
+                } else {
+                  await recordEvent({
+                    userId,
+                    eventType: "mfa_success",
+                  });
+                  await recordEvent({
+                    userId,
+                    eventType: "login_success",
+                  });
+                }
+              }
+
+              return;
+            }
+
+            if (ctx.path === "/sign-out") {
+              const userId = (ctx.context as { securityEventUserId?: string | null })
+                .securityEventUserId;
+              if (userId && !isError) {
+                await recordEvent({
+                  userId,
+                  eventType: "logout",
+                });
+              }
+            }
+          }),
+        },
+      ],
+    },
+  };
 
   return betterAuth({
     appName: brand.name,
@@ -171,6 +367,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
           length: 8,
         },
       }),
+      securityEventPlugin,
       tanstackStartCookies(), // MUST be the last plugin
     ],
   });

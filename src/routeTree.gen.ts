@@ -15,6 +15,7 @@ import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as JoinTokenRouteImport } from "./routes/join/$token";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSinRouteImport } from "./routes/dashboard/sin";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
@@ -22,6 +23,7 @@ import { Route as DashboardSelectOrgRouteImport } from "./routes/dashboard/selec
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
 import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
 import { Route as DashboardPrivacyRouteImport } from "./routes/dashboard/privacy";
+import { Route as DashboardOrganizationsRouteImport } from "./routes/dashboard/organizations";
 import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
 import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members";
 import { Route as DashboardForbiddenRouteImport } from "./routes/dashboard/forbidden";
@@ -40,8 +42,12 @@ import { Route as DashboardAdminIndexRouteImport } from "./routes/dashboard/admi
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardSinTemplatesRouteImport } from "./routes/dashboard/sin/templates";
+import { Route as DashboardSinSupportRouteImport } from "./routes/dashboard/sin/support";
 import { Route as DashboardSinReportingRouteImport } from "./routes/dashboard/sin/reporting";
+import { Route as DashboardSinOrganizationAccessRouteImport } from "./routes/dashboard/sin/organization-access";
 import { Route as DashboardSinImportsRouteImport } from "./routes/dashboard/sin/imports";
+import { Route as DashboardSinHelpRouteImport } from "./routes/dashboard/sin/help";
 import { Route as DashboardSinFormsRouteImport } from "./routes/dashboard/sin/forms";
 import { Route as DashboardSinAnalyticsRouteImport } from "./routes/dashboard/sin/analytics";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
@@ -60,6 +66,8 @@ import { Route as DashboardSinSubmissionsSubmissionIdRouteImport } from "./route
 import { Route as DashboardSinFormsFormIdRouteImport } from "./routes/dashboard/sin/forms/$formId";
 import { Route as DashboardEventsSlugRegisterRouteImport } from "./routes/dashboard/events/$slug.register";
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+import { Route as DashboardAdminSinTemplatesRouteImport } from "./routes/dashboard/admin/sin/templates";
+import { Route as DashboardAdminSinSupportRouteImport } from "./routes/dashboard/admin/sin/support";
 import { Route as DashboardAdminSinSecurityRouteImport } from "./routes/dashboard/admin/sin/security";
 import { Route as DashboardAdminSinReportingRouteImport } from "./routes/dashboard/admin/sin/reporting";
 import { Route as DashboardAdminSinPrivacyRouteImport } from "./routes/dashboard/admin/sin/privacy";
@@ -67,6 +75,8 @@ import { Route as DashboardAdminSinOrganizationsRouteImport } from "./routes/das
 import { Route as DashboardAdminSinNotificationsRouteImport } from "./routes/dashboard/admin/sin/notifications";
 import { Route as DashboardAdminSinImportsRouteImport } from "./routes/dashboard/admin/sin/imports";
 import { Route as DashboardAdminSinFormsRouteImport } from "./routes/dashboard/admin/sin/forms";
+import { Route as DashboardAdminSinDataQualityRouteImport } from "./routes/dashboard/admin/sin/data-quality";
+import { Route as DashboardAdminSinDataCatalogRouteImport } from "./routes/dashboard/admin/sin/data-catalog";
 import { Route as DashboardAdminSinAuditRouteImport } from "./routes/dashboard/admin/sin/audit";
 import { Route as DashboardAdminSinAnalyticsRouteImport } from "./routes/dashboard/admin/sin/analytics";
 import { Route as ApiPaymentsSquareCallbackRouteImport } from "./routes/api/payments/square/callback";
@@ -102,6 +112,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const JoinTokenRoute = JoinTokenRouteImport.update({
+  id: "/join/$token",
+  path: "/join/$token",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
@@ -135,6 +150,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
 const DashboardPrivacyRoute = DashboardPrivacyRouteImport.update({
   id: "/privacy",
   path: "/privacy",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardOrganizationsRoute = DashboardOrganizationsRouteImport.update({
+  id: "/organizations",
+  path: "/organizations",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
@@ -227,14 +247,35 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardSinTemplatesRoute = DashboardSinTemplatesRouteImport.update({
+  id: "/templates",
+  path: "/templates",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
+const DashboardSinSupportRoute = DashboardSinSupportRouteImport.update({
+  id: "/support",
+  path: "/support",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
 const DashboardSinReportingRoute = DashboardSinReportingRouteImport.update({
   id: "/reporting",
   path: "/reporting",
   getParentRoute: () => DashboardSinRoute,
 } as any);
+const DashboardSinOrganizationAccessRoute =
+  DashboardSinOrganizationAccessRouteImport.update({
+    id: "/organization-access",
+    path: "/organization-access",
+    getParentRoute: () => DashboardSinRoute,
+  } as any);
 const DashboardSinImportsRoute = DashboardSinImportsRouteImport.update({
   id: "/imports",
   path: "/imports",
+  getParentRoute: () => DashboardSinRoute,
+} as any);
+const DashboardSinHelpRoute = DashboardSinHelpRouteImport.update({
+  id: "/help",
+  path: "/help",
   getParentRoute: () => DashboardSinRoute,
 } as any);
 const DashboardSinFormsRoute = DashboardSinFormsRouteImport.update({
@@ -334,6 +375,18 @@ const DashboardEventsEventIdManageRoute =
     path: "/$eventId/manage",
     getParentRoute: () => DashboardEventsRoute,
   } as any);
+const DashboardAdminSinTemplatesRoute =
+  DashboardAdminSinTemplatesRouteImport.update({
+    id: "/templates",
+    path: "/templates",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinSupportRoute =
+  DashboardAdminSinSupportRouteImport.update({
+    id: "/support",
+    path: "/support",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
 const DashboardAdminSinSecurityRoute =
   DashboardAdminSinSecurityRouteImport.update({
     id: "/security",
@@ -375,6 +428,18 @@ const DashboardAdminSinFormsRoute = DashboardAdminSinFormsRouteImport.update({
   path: "/forms",
   getParentRoute: () => DashboardAdminSinRoute,
 } as any);
+const DashboardAdminSinDataQualityRoute =
+  DashboardAdminSinDataQualityRouteImport.update({
+    id: "/data-quality",
+    path: "/data-quality",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
+const DashboardAdminSinDataCatalogRoute =
+  DashboardAdminSinDataCatalogRouteImport.update({
+    id: "/data-catalog",
+    path: "/data-catalog",
+    getParentRoute: () => DashboardAdminSinRoute,
+  } as any);
 const DashboardAdminSinAuditRoute = DashboardAdminSinAuditRouteImport.update({
   id: "/audit",
   path: "/audit",
@@ -414,6 +479,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/organizations": typeof DashboardOrganizationsRoute;
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
@@ -421,6 +487,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/sin": typeof DashboardSinRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/join/$token": typeof JoinTokenRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/api/auth/$": typeof ApiAuthSplatRoute;
@@ -432,8 +499,12 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
   "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/help": typeof DashboardSinHelpRoute;
   "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/organization-access": typeof DashboardSinOrganizationAccessRoute;
   "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
+  "/dashboard/sin/support": typeof DashboardSinSupportRoute;
+  "/dashboard/sin/templates": typeof DashboardSinTemplatesRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -445,6 +516,8 @@ export interface FileRoutesByFullPath {
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
   "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/data-catalog": typeof DashboardAdminSinDataCatalogRoute;
+  "/dashboard/admin/sin/data-quality": typeof DashboardAdminSinDataQualityRoute;
   "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
   "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
   "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
@@ -452,6 +525,8 @@ export interface FileRoutesByFullPath {
   "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
   "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
   "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
+  "/dashboard/admin/sin/support": typeof DashboardAdminSinSupportRoute;
+  "/dashboard/admin/sin/templates": typeof DashboardAdminSinTemplatesRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
   "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
@@ -474,11 +549,13 @@ export interface FileRoutesByTo {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/organizations": typeof DashboardOrganizationsRoute;
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/select-org": typeof DashboardSelectOrgRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/join/$token": typeof JoinTokenRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/api/auth/$": typeof ApiAuthSplatRoute;
@@ -488,8 +565,12 @@ export interface FileRoutesByTo {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
   "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/help": typeof DashboardSinHelpRoute;
   "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/organization-access": typeof DashboardSinOrganizationAccessRoute;
   "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
+  "/dashboard/sin/support": typeof DashboardSinSupportRoute;
+  "/dashboard/sin/templates": typeof DashboardSinTemplatesRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/dashboard/admin": typeof DashboardAdminIndexRoute;
@@ -500,6 +581,8 @@ export interface FileRoutesByTo {
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
   "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/data-catalog": typeof DashboardAdminSinDataCatalogRoute;
+  "/dashboard/admin/sin/data-quality": typeof DashboardAdminSinDataQualityRoute;
   "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
   "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
   "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
@@ -507,6 +590,8 @@ export interface FileRoutesByTo {
   "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
   "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
   "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
+  "/dashboard/admin/sin/support": typeof DashboardAdminSinSupportRoute;
+  "/dashboard/admin/sin/templates": typeof DashboardAdminSinTemplatesRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
   "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
@@ -534,6 +619,7 @@ export interface FileRoutesById {
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/organizations": typeof DashboardOrganizationsRoute;
   "/dashboard/privacy": typeof DashboardPrivacyRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
@@ -541,6 +627,7 @@ export interface FileRoutesById {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/sin": typeof DashboardSinRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/join/$token": typeof JoinTokenRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/api/auth/$": typeof ApiAuthSplatRoute;
@@ -552,8 +639,12 @@ export interface FileRoutesById {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/sin/analytics": typeof DashboardSinAnalyticsRoute;
   "/dashboard/sin/forms": typeof DashboardSinFormsRouteWithChildren;
+  "/dashboard/sin/help": typeof DashboardSinHelpRoute;
   "/dashboard/sin/imports": typeof DashboardSinImportsRoute;
+  "/dashboard/sin/organization-access": typeof DashboardSinOrganizationAccessRoute;
   "/dashboard/sin/reporting": typeof DashboardSinReportingRoute;
+  "/dashboard/sin/support": typeof DashboardSinSupportRoute;
+  "/dashboard/sin/templates": typeof DashboardSinTemplatesRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -565,6 +656,8 @@ export interface FileRoutesById {
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/admin/sin/analytics": typeof DashboardAdminSinAnalyticsRoute;
   "/dashboard/admin/sin/audit": typeof DashboardAdminSinAuditRoute;
+  "/dashboard/admin/sin/data-catalog": typeof DashboardAdminSinDataCatalogRoute;
+  "/dashboard/admin/sin/data-quality": typeof DashboardAdminSinDataQualityRoute;
   "/dashboard/admin/sin/forms": typeof DashboardAdminSinFormsRoute;
   "/dashboard/admin/sin/imports": typeof DashboardAdminSinImportsRoute;
   "/dashboard/admin/sin/notifications": typeof DashboardAdminSinNotificationsRoute;
@@ -572,6 +665,8 @@ export interface FileRoutesById {
   "/dashboard/admin/sin/privacy": typeof DashboardAdminSinPrivacyRoute;
   "/dashboard/admin/sin/reporting": typeof DashboardAdminSinReportingRoute;
   "/dashboard/admin/sin/security": typeof DashboardAdminSinSecurityRoute;
+  "/dashboard/admin/sin/support": typeof DashboardAdminSinSupportRoute;
+  "/dashboard/admin/sin/templates": typeof DashboardAdminSinTemplatesRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/events/$slug/register": typeof DashboardEventsSlugRegisterRoute;
   "/dashboard/sin/forms/$formId": typeof DashboardSinFormsFormIdRoute;
@@ -600,6 +695,7 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/organizations"
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
@@ -607,6 +703,7 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/sin"
     | "/dashboard/teams"
+    | "/join/$token"
     | "/dashboard/"
     | "/onboarding/"
     | "/api/auth/$"
@@ -618,8 +715,12 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/sin/analytics"
     | "/dashboard/sin/forms"
+    | "/dashboard/sin/help"
     | "/dashboard/sin/imports"
+    | "/dashboard/sin/organization-access"
     | "/dashboard/sin/reporting"
+    | "/dashboard/sin/support"
+    | "/dashboard/sin/templates"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -631,6 +732,8 @@ export interface FileRouteTypes {
     | "/api/payments/square/callback"
     | "/dashboard/admin/sin/analytics"
     | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/data-catalog"
+    | "/dashboard/admin/sin/data-quality"
     | "/dashboard/admin/sin/forms"
     | "/dashboard/admin/sin/imports"
     | "/dashboard/admin/sin/notifications"
@@ -638,6 +741,8 @@ export interface FileRouteTypes {
     | "/dashboard/admin/sin/privacy"
     | "/dashboard/admin/sin/reporting"
     | "/dashboard/admin/sin/security"
+    | "/dashboard/admin/sin/support"
+    | "/dashboard/admin/sin/templates"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
     | "/dashboard/sin/forms/$formId"
@@ -660,11 +765,13 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/organizations"
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/select-org"
     | "/dashboard/settings"
+    | "/join/$token"
     | "/dashboard"
     | "/onboarding"
     | "/api/auth/$"
@@ -674,8 +781,12 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/sin/analytics"
     | "/dashboard/sin/forms"
+    | "/dashboard/sin/help"
     | "/dashboard/sin/imports"
+    | "/dashboard/sin/organization-access"
     | "/dashboard/sin/reporting"
+    | "/dashboard/sin/support"
+    | "/dashboard/sin/templates"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/dashboard/admin"
@@ -686,6 +797,8 @@ export interface FileRouteTypes {
     | "/api/payments/square/callback"
     | "/dashboard/admin/sin/analytics"
     | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/data-catalog"
+    | "/dashboard/admin/sin/data-quality"
     | "/dashboard/admin/sin/forms"
     | "/dashboard/admin/sin/imports"
     | "/dashboard/admin/sin/notifications"
@@ -693,6 +806,8 @@ export interface FileRouteTypes {
     | "/dashboard/admin/sin/privacy"
     | "/dashboard/admin/sin/reporting"
     | "/dashboard/admin/sin/security"
+    | "/dashboard/admin/sin/support"
+    | "/dashboard/admin/sin/templates"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
     | "/dashboard/sin/forms/$formId"
@@ -719,6 +834,7 @@ export interface FileRouteTypes {
     | "/dashboard/forbidden"
     | "/dashboard/members"
     | "/dashboard/membership"
+    | "/dashboard/organizations"
     | "/dashboard/privacy"
     | "/dashboard/profile"
     | "/dashboard/reports"
@@ -726,6 +842,7 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/sin"
     | "/dashboard/teams"
+    | "/join/$token"
     | "/dashboard/"
     | "/onboarding/"
     | "/api/auth/$"
@@ -737,8 +854,12 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/sin/analytics"
     | "/dashboard/sin/forms"
+    | "/dashboard/sin/help"
     | "/dashboard/sin/imports"
+    | "/dashboard/sin/organization-access"
     | "/dashboard/sin/reporting"
+    | "/dashboard/sin/support"
+    | "/dashboard/sin/templates"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -750,6 +871,8 @@ export interface FileRouteTypes {
     | "/api/payments/square/callback"
     | "/dashboard/admin/sin/analytics"
     | "/dashboard/admin/sin/audit"
+    | "/dashboard/admin/sin/data-catalog"
+    | "/dashboard/admin/sin/data-quality"
     | "/dashboard/admin/sin/forms"
     | "/dashboard/admin/sin/imports"
     | "/dashboard/admin/sin/notifications"
@@ -757,6 +880,8 @@ export interface FileRouteTypes {
     | "/dashboard/admin/sin/privacy"
     | "/dashboard/admin/sin/reporting"
     | "/dashboard/admin/sin/security"
+    | "/dashboard/admin/sin/support"
+    | "/dashboard/admin/sin/templates"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/events/$slug/register"
     | "/dashboard/sin/forms/$formId"
@@ -777,6 +902,7 @@ export interface RootRouteChildren {
   ApiDebugSquareRoute: typeof ApiDebugSquareRoute;
   ApiHealthRoute: typeof ApiHealthRoute;
   ApiTestSquareRoute: typeof ApiTestSquareRoute;
+  JoinTokenRoute: typeof JoinTokenRoute;
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute;
   ApiTestCleanupRoute: typeof ApiTestCleanupRoute;
   ApiWebhooksSquareRoute: typeof ApiWebhooksSquareRoute;
@@ -828,6 +954,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/join/$token": {
+      id: "/join/$token";
+      path: "/join/$token";
+      fullPath: "/join/$token";
+      preLoaderRoute: typeof JoinTokenRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams": {
       id: "/dashboard/teams";
       path: "/teams";
@@ -875,6 +1008,13 @@ declare module "@tanstack/react-router" {
       path: "/privacy";
       fullPath: "/dashboard/privacy";
       preLoaderRoute: typeof DashboardPrivacyRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/organizations": {
+      id: "/dashboard/organizations";
+      path: "/organizations";
+      fullPath: "/dashboard/organizations";
+      preLoaderRoute: typeof DashboardOrganizationsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/dashboard/membership": {
@@ -1003,6 +1143,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/sin/templates": {
+      id: "/dashboard/sin/templates";
+      path: "/templates";
+      fullPath: "/dashboard/sin/templates";
+      preLoaderRoute: typeof DashboardSinTemplatesRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/support": {
+      id: "/dashboard/sin/support";
+      path: "/support";
+      fullPath: "/dashboard/sin/support";
+      preLoaderRoute: typeof DashboardSinSupportRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
     "/dashboard/sin/reporting": {
       id: "/dashboard/sin/reporting";
       path: "/reporting";
@@ -1010,11 +1164,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSinReportingRouteImport;
       parentRoute: typeof DashboardSinRoute;
     };
+    "/dashboard/sin/organization-access": {
+      id: "/dashboard/sin/organization-access";
+      path: "/organization-access";
+      fullPath: "/dashboard/sin/organization-access";
+      preLoaderRoute: typeof DashboardSinOrganizationAccessRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
     "/dashboard/sin/imports": {
       id: "/dashboard/sin/imports";
       path: "/imports";
       fullPath: "/dashboard/sin/imports";
       preLoaderRoute: typeof DashboardSinImportsRouteImport;
+      parentRoute: typeof DashboardSinRoute;
+    };
+    "/dashboard/sin/help": {
+      id: "/dashboard/sin/help";
+      path: "/help";
+      fullPath: "/dashboard/sin/help";
+      preLoaderRoute: typeof DashboardSinHelpRouteImport;
       parentRoute: typeof DashboardSinRoute;
     };
     "/dashboard/sin/forms": {
@@ -1143,6 +1311,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+    "/dashboard/admin/sin/templates": {
+      id: "/dashboard/admin/sin/templates";
+      path: "/templates";
+      fullPath: "/dashboard/admin/sin/templates";
+      preLoaderRoute: typeof DashboardAdminSinTemplatesRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/support": {
+      id: "/dashboard/admin/sin/support";
+      path: "/support";
+      fullPath: "/dashboard/admin/sin/support";
+      preLoaderRoute: typeof DashboardAdminSinSupportRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
     "/dashboard/admin/sin/security": {
       id: "/dashboard/admin/sin/security";
       path: "/security";
@@ -1190,6 +1372,20 @@ declare module "@tanstack/react-router" {
       path: "/forms";
       fullPath: "/dashboard/admin/sin/forms";
       preLoaderRoute: typeof DashboardAdminSinFormsRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/data-quality": {
+      id: "/dashboard/admin/sin/data-quality";
+      path: "/data-quality";
+      fullPath: "/dashboard/admin/sin/data-quality";
+      preLoaderRoute: typeof DashboardAdminSinDataQualityRouteImport;
+      parentRoute: typeof DashboardAdminSinRoute;
+    };
+    "/dashboard/admin/sin/data-catalog": {
+      id: "/dashboard/admin/sin/data-catalog";
+      path: "/data-catalog";
+      fullPath: "/dashboard/admin/sin/data-catalog";
+      preLoaderRoute: typeof DashboardAdminSinDataCatalogRouteImport;
       parentRoute: typeof DashboardAdminSinRoute;
     };
     "/dashboard/admin/sin/audit": {
@@ -1240,6 +1436,8 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface DashboardAdminSinRouteChildren {
   DashboardAdminSinAnalyticsRoute: typeof DashboardAdminSinAnalyticsRoute;
   DashboardAdminSinAuditRoute: typeof DashboardAdminSinAuditRoute;
+  DashboardAdminSinDataCatalogRoute: typeof DashboardAdminSinDataCatalogRoute;
+  DashboardAdminSinDataQualityRoute: typeof DashboardAdminSinDataQualityRoute;
   DashboardAdminSinFormsRoute: typeof DashboardAdminSinFormsRoute;
   DashboardAdminSinImportsRoute: typeof DashboardAdminSinImportsRoute;
   DashboardAdminSinNotificationsRoute: typeof DashboardAdminSinNotificationsRoute;
@@ -1247,12 +1445,16 @@ interface DashboardAdminSinRouteChildren {
   DashboardAdminSinPrivacyRoute: typeof DashboardAdminSinPrivacyRoute;
   DashboardAdminSinReportingRoute: typeof DashboardAdminSinReportingRoute;
   DashboardAdminSinSecurityRoute: typeof DashboardAdminSinSecurityRoute;
+  DashboardAdminSinSupportRoute: typeof DashboardAdminSinSupportRoute;
+  DashboardAdminSinTemplatesRoute: typeof DashboardAdminSinTemplatesRoute;
   DashboardAdminSinIndexRoute: typeof DashboardAdminSinIndexRoute;
 }
 
 const DashboardAdminSinRouteChildren: DashboardAdminSinRouteChildren = {
   DashboardAdminSinAnalyticsRoute: DashboardAdminSinAnalyticsRoute,
   DashboardAdminSinAuditRoute: DashboardAdminSinAuditRoute,
+  DashboardAdminSinDataCatalogRoute: DashboardAdminSinDataCatalogRoute,
+  DashboardAdminSinDataQualityRoute: DashboardAdminSinDataQualityRoute,
   DashboardAdminSinFormsRoute: DashboardAdminSinFormsRoute,
   DashboardAdminSinImportsRoute: DashboardAdminSinImportsRoute,
   DashboardAdminSinNotificationsRoute: DashboardAdminSinNotificationsRoute,
@@ -1260,6 +1462,8 @@ const DashboardAdminSinRouteChildren: DashboardAdminSinRouteChildren = {
   DashboardAdminSinPrivacyRoute: DashboardAdminSinPrivacyRoute,
   DashboardAdminSinReportingRoute: DashboardAdminSinReportingRoute,
   DashboardAdminSinSecurityRoute: DashboardAdminSinSecurityRoute,
+  DashboardAdminSinSupportRoute: DashboardAdminSinSupportRoute,
+  DashboardAdminSinTemplatesRoute: DashboardAdminSinTemplatesRoute,
   DashboardAdminSinIndexRoute: DashboardAdminSinIndexRoute,
 };
 
@@ -1326,8 +1530,12 @@ const DashboardSinFormsRouteWithChildren =
 interface DashboardSinRouteChildren {
   DashboardSinAnalyticsRoute: typeof DashboardSinAnalyticsRoute;
   DashboardSinFormsRoute: typeof DashboardSinFormsRouteWithChildren;
+  DashboardSinHelpRoute: typeof DashboardSinHelpRoute;
   DashboardSinImportsRoute: typeof DashboardSinImportsRoute;
+  DashboardSinOrganizationAccessRoute: typeof DashboardSinOrganizationAccessRoute;
   DashboardSinReportingRoute: typeof DashboardSinReportingRoute;
+  DashboardSinSupportRoute: typeof DashboardSinSupportRoute;
+  DashboardSinTemplatesRoute: typeof DashboardSinTemplatesRoute;
   DashboardSinIndexRoute: typeof DashboardSinIndexRoute;
   DashboardSinSubmissionsSubmissionIdRoute: typeof DashboardSinSubmissionsSubmissionIdRoute;
 }
@@ -1335,8 +1543,12 @@ interface DashboardSinRouteChildren {
 const DashboardSinRouteChildren: DashboardSinRouteChildren = {
   DashboardSinAnalyticsRoute: DashboardSinAnalyticsRoute,
   DashboardSinFormsRoute: DashboardSinFormsRouteWithChildren,
+  DashboardSinHelpRoute: DashboardSinHelpRoute,
   DashboardSinImportsRoute: DashboardSinImportsRoute,
+  DashboardSinOrganizationAccessRoute: DashboardSinOrganizationAccessRoute,
   DashboardSinReportingRoute: DashboardSinReportingRoute,
+  DashboardSinSupportRoute: DashboardSinSupportRoute,
+  DashboardSinTemplatesRoute: DashboardSinTemplatesRoute,
   DashboardSinIndexRoute: DashboardSinIndexRoute,
   DashboardSinSubmissionsSubmissionIdRoute:
     DashboardSinSubmissionsSubmissionIdRoute,
@@ -1385,6 +1597,7 @@ interface DashboardRouteRouteChildren {
   DashboardForbiddenRoute: typeof DashboardForbiddenRoute;
   DashboardMembersRoute: typeof DashboardMembersRoute;
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
+  DashboardOrganizationsRoute: typeof DashboardOrganizationsRoute;
   DashboardPrivacyRoute: typeof DashboardPrivacyRoute;
   DashboardProfileRoute: typeof DashboardProfileRoute;
   DashboardReportsRoute: typeof DashboardReportsRoute;
@@ -1401,6 +1614,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardForbiddenRoute: DashboardForbiddenRoute,
   DashboardMembersRoute: DashboardMembersRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardOrganizationsRoute: DashboardOrganizationsRoute,
   DashboardPrivacyRoute: DashboardPrivacyRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReportsRoute: DashboardReportsRoute,
@@ -1436,6 +1650,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDebugSquareRoute: ApiDebugSquareRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiTestSquareRoute: ApiTestSquareRoute,
+  JoinTokenRoute: JoinTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTestCleanupRoute: ApiTestCleanupRoute,
   ApiWebhooksSquareRoute: ApiWebhooksSquareRoute,

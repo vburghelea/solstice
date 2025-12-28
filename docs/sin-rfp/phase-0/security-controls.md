@@ -9,6 +9,10 @@
 | Version  | 1.0                         |
 | Scope    | Production SIN platform     |
 
+> Implementation status (2025-12-27): Partial. MFA, session policy, audit
+> logging, and security detection controls are implemented; privacy retention
+> evidence and production hardening items remain in Streams H/L.
+
 ## 1.0 Overview
 
 The SIN platform will implement layered security controls covering identity,

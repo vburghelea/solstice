@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
@@ -119,49 +120,45 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
     return created ?? null;
   });
 
-export const createNotification = createServerFn({ method: "POST" })
+export const sendAdminNotification = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(createNotificationSchema))
-  .handler(async ({ data }): Promise<NotificationRow | null> => {
-    await assertFeatureEnabled("notifications_core");
-    const { getDb } = await import("~/db/server-helpers");
-    const { notifications } = await import("~/db/schema");
-    const db = await getDb();
+  .handler(async ({ data, context }) => {
+    await assertFeatureEnabled("sin_admin_notifications");
+    const sessionUser = requireUser(context);
 
-    const [created] = await db
-      .insert(notifications)
-      .values({
-        userId: data.userId,
-        organizationId: data.organizationId ?? null,
-        type: data.type,
-        category: data.category,
-        title: data.title,
-        body: data.body,
-        link: data.link ?? null,
-        metadata: data.metadata ?? {},
-      })
-      .returning();
+    const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+    await requireAdmin(sessionUser.id);
 
-    if (created) {
-      const { logDataChange } = await import("~/lib/audit");
-      await logDataChange({
-        action: "NOTIFICATION_CREATE",
-        actorUserId: data.userId,
-        actorOrgId: data.organizationId ?? null,
-        targetType: "notification",
-        targetId: created.id,
-        targetOrgId: data.organizationId ?? null,
-      });
-    }
+    const { getCurrentSession, requireRecentAuth } =
+      await import("~/lib/auth/guards/step-up");
+    const session = await getCurrentSession();
+    await requireRecentAuth(sessionUser.id, session);
 
-    return created ?? null;
+    const { enqueueNotification } = await import("~/lib/notifications/queue");
+
+    return enqueueNotification({
+      actorUserId: sessionUser.id,
+      userId: data.userId,
+      organizationId: data.organizationId ?? null,
+      type: data.type,
+      category: data.category,
+      title: data.title,
+      body: data.body,
+      link: data.link ?? null,
+      metadata: data.metadata ?? {},
+    });
   });
 
 export const createNotificationTemplate = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(createNotificationTemplateSchema))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_admin_notifications");
-    const userId = await getSessionUserId();
-    if (!userId) return null;
+    const sessionUser = requireUser(context);
+
+    const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+    await requireAdmin(sessionUser.id);
 
     const { getDb } = await import("~/db/server-helpers");
     const { notificationTemplates } = await import("~/db/schema");
@@ -175,7 +172,7 @@ export const createNotificationTemplate = createServerFn({ method: "POST" })
         subject: data.subject,
         bodyTemplate: data.bodyTemplate,
         isSystem: data.isSystem ?? false,
-        createdBy: userId,
+        createdBy: sessionUser.id,
       })
       .returning();
 
@@ -183,7 +180,7 @@ export const createNotificationTemplate = createServerFn({ method: "POST" })
       const { logAdminAction } = await import("~/lib/audit");
       await logAdminAction({
         action: "NOTIFICATION_TEMPLATE_CREATE",
-        actorUserId: userId,
+        actorUserId: sessionUser.id,
         targetType: "notification_template",
         targetId: created.id,
       });
@@ -193,14 +190,14 @@ export const createNotificationTemplate = createServerFn({ method: "POST" })
   });
 
 export const updateNotificationTemplate = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(updateNotificationTemplateSchema))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_admin_notifications");
-    const userId = await getSessionUserId();
-    if (!userId) return null;
+    const sessionUser = requireUser(context);
 
     const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-    await requireAdmin(userId);
+    await requireAdmin(sessionUser.id);
 
     const { getDb } = await import("~/db/server-helpers");
     const { notificationTemplates } = await import("~/db/schema");
@@ -223,14 +220,14 @@ export const updateNotificationTemplate = createServerFn({ method: "POST" })
   });
 
 export const deleteNotificationTemplate = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(deleteNotificationTemplateSchema))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_admin_notifications");
-    const userId = await getSessionUserId();
-    if (!userId) return null;
+    const sessionUser = requireUser(context);
 
     const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-    await requireAdmin(userId);
+    await requireAdmin(sessionUser.id);
 
     const { getDb } = await import("~/db/server-helpers");
     const { notificationTemplates } = await import("~/db/schema");
@@ -246,11 +243,14 @@ export const deleteNotificationTemplate = createServerFn({ method: "POST" })
   });
 
 export const scheduleNotification = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(scheduleNotificationSchema))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_admin_notifications");
-    const userId = await getSessionUserId();
-    if (!userId) return null;
+    const sessionUser = requireUser(context);
+
+    const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+    await requireAdmin(sessionUser.id);
 
     const { getDb } = await import("~/db/server-helpers");
     const { scheduledNotifications } = await import("~/db/schema");
@@ -272,7 +272,7 @@ export const scheduleNotification = createServerFn({ method: "POST" })
       const { logDataChange } = await import("~/lib/audit");
       await logDataChange({
         action: "NOTIFICATION_SCHEDULE_CREATE",
-        actorUserId: userId,
+        actorUserId: sessionUser.id,
         targetType: "scheduled_notification",
         targetId: created.id,
       });

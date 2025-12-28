@@ -1,29 +1,11 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.utils";
-import type { JsonRecord } from "~/shared/lib/json";
-
-const streamToBuffer = async (body: unknown) => {
-  if (!body) return Buffer.alloc(0);
-  if (body instanceof Uint8Array) return Buffer.from(body);
-  if (body instanceof ArrayBuffer) return Buffer.from(body);
-  if (typeof body === "object" && "transformToByteArray" in (body as object)) {
-    const byteArray = await (
-      body as { transformToByteArray: () => Promise<Uint8Array> }
-    ).transformToByteArray();
-    return Buffer.from(byteArray);
-  }
-  if (typeof body === "object" && "pipe" in (body as object)) {
-    const stream = body as NodeJS.ReadableStream;
-    return new Promise<Buffer>((resolve, reject) => {
-      const chunks: Buffer[] = [];
-      stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-      stream.on("end", () => resolve(Buffer.concat(chunks)));
-      stream.on("error", reject);
-    });
-  }
-  return Buffer.alloc(0);
-};
+import {
+  buildImportFieldLookup,
+  getMappedFileFields,
+  parseImportRow,
+} from "~/features/imports/imports.utils";
 
 export const runBatchImportJob = createServerOnlyFn(
   async (params: { jobId: string; actorUserId?: string | null }) => {
@@ -54,8 +36,8 @@ export const runBatchImportJob = createServerOnlyFn(
       throw unauthorized("Import job missing actor user");
     }
 
-    const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-    await requireOrganizationMembership({
+    const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+    await requireOrganizationAccess({
       userId: actorUserId,
       organizationId: job.organizationId,
     });
@@ -89,44 +71,55 @@ export const runBatchImportJob = createServerOnlyFn(
       throw notFound("Form has no published versions");
     }
 
-    await db
-      .update(importJobs)
-      .set({ status: "importing" })
-      .where(eq(importJobs.id, job.id));
+    const mapping = template.mappings as Record<string, string>;
+    const definition = latestVersion.definition as FormDefinition;
+    const fieldLookup = buildImportFieldLookup(definition);
 
-    const { GetObjectCommand, PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const mappedFileFields = getMappedFileFields(mapping, fieldLookup);
+    if (mappedFileFields.length > 0) {
+      await db
+        .update(importJobs)
+        .set({
+          status: "failed",
+          errorSummary: {
+            reason: "file_fields_not_supported",
+            fields: mappedFileFields,
+          },
+          completedAt: new Date(),
+        })
+        .where(eq(importJobs.id, job.id));
+      throw forbidden("File field imports are not supported yet.");
+    }
+
+    const { loadImportFile } = await import("~/lib/imports/file-utils");
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
     const { getArtifactsBucketName, getS3Client } =
       await import("~/lib/storage/artifacts");
 
-    const bucket = await getArtifactsBucketName();
-    const client = await getS3Client();
-    const response = await client.send(
-      new GetObjectCommand({
-        Bucket: bucket,
-        Key: job.sourceFileKey,
-      }),
+    const { rows, hash } = await loadImportFile(
+      job.sourceFileKey,
+      job.type as "csv" | "excel",
     );
 
-    const buffer = await streamToBuffer(response.Body);
-    const mapping = template.mappings as Record<string, string>;
-    const definition = latestVersion.definition as FormDefinition;
-    const fieldLookup = new Map(definition.fields.map((field) => [field.key, field]));
-
-    let rows: JsonRecord[] = [];
-    if (job.type === "csv") {
-      const Papa = await import("papaparse");
-      const parsed = Papa.parse(buffer.toString("utf8"), {
-        header: true,
-        skipEmptyLines: true,
-      });
-      rows = (parsed.data ?? []) as JsonRecord[];
-    } else {
-      const { read, utils } = await import("xlsx");
-      const workbook = read(buffer, { type: "buffer" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      rows = utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
+    if (hash !== job.sourceFileHash) {
+      await db
+        .update(importJobs)
+        .set({
+          status: "failed",
+          errorSummary: { reason: "source_file_hash_mismatch" },
+          completedAt: new Date(),
+        })
+        .where(eq(importJobs.id, job.id));
+      throw forbidden("Import source file hash mismatch.");
     }
+
+    await db
+      .update(importJobs)
+      .set({ status: "importing", startedAt: new Date() })
+      .where(eq(importJobs.id, job.id));
+
+    const bucket = await getArtifactsBucketName();
+    const client = await getS3Client();
 
     const errors: Array<{
       rowNumber: number;
@@ -140,59 +133,54 @@ export const runBatchImportJob = createServerOnlyFn(
     const chunkSize = 1000;
     let inserted = 0;
     let processed = startIndex;
+    const failedRows = new Set<number>();
 
     for (let i = startIndex; i < rows.length; i += chunkSize) {
       const chunk = rows.slice(i, i + chunkSize);
 
       for (const [index, row] of chunk.entries()) {
-        const payload: JsonRecord = {};
-        Object.entries(mapping).forEach(([sourceColumn, targetFieldKey]) => {
-          if (!targetFieldKey) return;
-          const field = fieldLookup.get(targetFieldKey);
-          const rawValue = row[sourceColumn];
-          if (!field) return;
-
-          if (field.type === "number") {
-            payload[targetFieldKey] = rawValue === "" ? null : Number(rawValue);
-            return;
-          }
-
-          if (field.type === "checkbox") {
-            const normalized = String(rawValue ?? "").toLowerCase();
-            payload[targetFieldKey] = ["true", "1", "yes", "y"].includes(normalized);
-            return;
-          }
-
-          if (field.type === "multiselect") {
-            payload[targetFieldKey] =
-              typeof rawValue === "string"
-                ? rawValue.split(",").map((val) => val.trim())
-                : [];
-            return;
-          }
-
-          payload[targetFieldKey] = rawValue ?? null;
-        });
-
+        const { payload, parseErrors } = parseImportRow(row, mapping, fieldLookup);
         const sanitizedPayload = await sanitizePayload(definition, payload);
         const validation = validateFormPayload(definition, sanitizedPayload);
 
+        const parseErrorFields = new Set(parseErrors.map((error) => error.fieldKey));
+        const validationErrors = validation.validationErrors.filter(
+          (error) => !parseErrorFields.has(error.field),
+        );
+        const missingFields = validation.missingFields.filter(
+          (fieldKey) => !parseErrorFields.has(fieldKey),
+        );
+
         if (
-          validation.validationErrors.length > 0 ||
-          validation.missingFields.length > 0
+          parseErrors.length > 0 ||
+          validationErrors.length > 0 ||
+          missingFields.length > 0
         ) {
-          validation.validationErrors.forEach((error) => {
+          const rowNumber = i + index + 1;
+          failedRows.add(rowNumber);
+
+          parseErrors.forEach((error) => {
             errors.push({
-              rowNumber: i + index + 1,
+              rowNumber,
+              fieldKey: error.fieldKey,
+              errorType: error.errorType,
+              errorMessage: error.message,
+              rawValue: error.rawValue,
+            });
+          });
+
+          validationErrors.forEach((error) => {
+            errors.push({
+              rowNumber,
               fieldKey: error.field,
               errorType: "validation",
               errorMessage: error.message,
               rawValue: String(payload[error.field] ?? ""),
             });
           });
-          validation.missingFields.forEach((fieldKey) => {
+          missingFields.forEach((fieldKey) => {
             errors.push({
-              rowNumber: i + index + 1,
+              rowNumber,
               fieldKey,
               errorType: "required",
               errorMessage: "Missing required field",
@@ -240,7 +228,8 @@ export const runBatchImportJob = createServerOnlyFn(
             rows_total: rows.length,
             rows_processed: processed,
             rows_succeeded: inserted,
-            rows_failed: errors.length,
+            rows_failed: failedRows.size,
+            error_count: errors.length,
           },
         })
         .where(eq(importJobs.id, job.id));
@@ -275,12 +264,16 @@ export const runBatchImportJob = createServerOnlyFn(
       .set({
         status: "completed",
         errorReportKey,
-        errorSummary: errors.length > 0 ? { errors: errors.length } : {},
+        errorSummary:
+          errors.length > 0
+            ? { errorCount: errors.length, failedRows: failedRows.size }
+            : {},
         stats: {
           rows_total: rows.length,
           rows_processed: rows.length,
           rows_succeeded: inserted,
-          rows_failed: errors.length,
+          rows_failed: failedRows.size,
+          error_count: errors.length,
         },
         completedAt: new Date(),
       })
@@ -296,7 +289,8 @@ export const runBatchImportJob = createServerOnlyFn(
       metadata: {
         rowsTotal: rows.length,
         rowsSucceeded: inserted,
-        rowsFailed: errors.length,
+        rowsFailed: failedRows.size,
+        errorCount: errors.length,
         errorReportKey,
       },
     });
@@ -306,7 +300,9 @@ export const runBatchImportJob = createServerOnlyFn(
       stats: {
         processed: rows.length,
         inserted,
-        failed: errors.length,
+        failed: failedRows.size,
+        failedRows: failedRows.size,
+        errorCount: errors.length,
       },
       errorReportKey,
     };

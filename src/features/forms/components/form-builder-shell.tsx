@@ -58,6 +58,12 @@ const fieldTypeOptions = [
   { value: "rich_text", label: "Rich text" },
 ];
 
+const dataClassificationOptions = [
+  { value: "none", label: "None (non-PII)" },
+  { value: "personal", label: "Personal PII" },
+  { value: "sensitive", label: "Sensitive PII" },
+];
+
 const validationTypes = [
   { value: "", label: "None" },
   { value: "min_length", label: "Min length" },
@@ -106,6 +112,7 @@ type FieldDraft = {
   description: string;
   placeholder: string;
   required: boolean;
+  dataClassification: string;
   optionsText: string;
   validationType: string;
   validationValue: string;
@@ -133,6 +140,7 @@ const emptyFieldDraft: FieldDraft = {
   description: "",
   placeholder: "",
   required: false,
+  dataClassification: "none",
   optionsText: "",
   validationType: "",
   validationValue: "",
@@ -294,7 +302,12 @@ async function normalizePayload(
     const value = values[field.key];
 
     if (field.type === "number") {
-      payload[field.key] = value === "" ? null : Number(value);
+      if (value === "" || value === null || value === undefined) {
+        payload[field.key] = null;
+        return;
+      }
+      const parsed = Number(value);
+      payload[field.key] = Number.isNaN(parsed) ? null : parsed;
       return;
     }
 
@@ -313,6 +326,9 @@ async function normalizePayload(
     }
 
     const value = values[field.key];
+    if (Array.isArray(value)) {
+      throw new Error("Multiple files are not supported.");
+    }
     if (!(value instanceof File)) {
       if (value) {
         payload[field.key] = value;
@@ -431,11 +447,29 @@ export function DynamicFormRenderer(props: {
                   if (!isVisible) return undefined;
                 }
 
+                if (field.type === "file" && Array.isArray(value)) {
+                  return "Multiple files are not supported";
+                }
+
+                if (
+                  field.type === "number" &&
+                  typeof value === "number" &&
+                  Number.isNaN(value)
+                ) {
+                  return "Enter a valid number";
+                }
+
+                const isFileValue =
+                  value instanceof File ||
+                  (value && typeof value === "object" && !Array.isArray(value));
                 const isEmpty =
                   value === null ||
                   value === undefined ||
                   (typeof value === "string" && value.trim() === "") ||
-                  (Array.isArray(value) && value.length === 0);
+                  (field.type === "multiselect" &&
+                    (!Array.isArray(value) || value.length === 0)) ||
+                  (field.type === "checkbox" && value !== true) ||
+                  (field.type === "file" && !isFileValue);
 
                 if (field.required && isEmpty) {
                   return "This field is required";
@@ -449,15 +483,27 @@ export function DynamicFormRenderer(props: {
                     if (rule.type === "max_length" && typeof value === "string") {
                       if (value.length > Number(rule.value)) return rule.message;
                     }
-                    if (rule.type === "min" && typeof value === "number") {
+                    if (
+                      rule.type === "min" &&
+                      typeof value === "number" &&
+                      !Number.isNaN(value)
+                    ) {
                       if (value < Number(rule.value)) return rule.message;
                     }
-                    if (rule.type === "max" && typeof value === "number") {
+                    if (
+                      rule.type === "max" &&
+                      typeof value === "number" &&
+                      !Number.isNaN(value)
+                    ) {
                       if (value > Number(rule.value)) return rule.message;
                     }
                     if (rule.type === "pattern" && typeof value === "string") {
-                      const regex = new RegExp(String(rule.value));
-                      if (!regex.test(value)) return rule.message;
+                      try {
+                        const regex = new RegExp(String(rule.value));
+                        if (!regex.test(value)) return rule.message;
+                      } catch {
+                        return "Invalid regex pattern";
+                      }
                     }
                   }
                 }
@@ -819,7 +865,7 @@ export function FormBuilderShell() {
               .map((item) => item.trim())
               .filter(Boolean),
             maxSizeBytes: Math.max(1, Number(value.maxSizeMb || 5)) * 1024 * 1024,
-            maxFiles: Math.max(1, Number(value.maxFiles || 1)),
+            maxFiles: 1,
           }
         : undefined;
 
@@ -830,6 +876,9 @@ export function FormBuilderShell() {
         description: value.description || undefined,
         placeholder: value.placeholder || undefined,
         required: value.required,
+        dataClassification:
+          (value.dataClassification as FormDefinition["fields"][number]["dataClassification"]) ??
+          "none",
         ...(validation ? { validation } : {}),
         ...(options.length ? { options } : {}),
         ...(conditional ? { conditional } : {}),
@@ -892,6 +941,7 @@ export function FormBuilderShell() {
       description: selected.description ?? "",
       placeholder: selected.placeholder ?? "",
       required: selected.required,
+      dataClassification: selected.dataClassification ?? "none",
       optionsText: selected.options?.map((item) => item.value).join(", ") ?? "",
       validationType: selected.validation?.[0]?.type ?? "",
       validationValue: selected.validation?.[0]?.value?.toString() ?? "",
@@ -903,7 +953,7 @@ export function FormBuilderShell() {
       maxSizeMb: selected.fileConfig?.maxSizeBytes
         ? String(Math.round(selected.fileConfig.maxSizeBytes / (1024 * 1024)))
         : "5",
-      maxFiles: selected.fileConfig?.maxFiles?.toString() ?? "1",
+      maxFiles: "1",
     };
 
     fieldForm.reset(draft);
@@ -1170,6 +1220,15 @@ export function FormBuilderShell() {
                       field={field}
                       label="Required field"
                       description="Submission cannot be completed without this value."
+                    />
+                  )}
+                </fieldForm.Field>
+                <fieldForm.Field name="dataClassification">
+                  {(field) => (
+                    <ValidatedSelect
+                      field={field}
+                      label="Data classification"
+                      options={dataClassificationOptions}
                     />
                   )}
                 </fieldForm.Field>

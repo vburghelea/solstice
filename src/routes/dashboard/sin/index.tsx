@@ -1,8 +1,50 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { getAppNavSections } from "~/features/layouts/app-nav";
+import { useOrgContext } from "~/features/organizations/org-context";
+import { TutorialPanel } from "~/features/tutorials/components/tutorial-panel";
+import { filterNavItems, requireFeatureInRoute } from "~/tenant/feature-gates";
+
+const portalCardConfig = {
+  "/dashboard/sin/reporting": {
+    description: "Submit required reporting tasks.",
+    cta: "Open Reporting",
+    variant: "default" as const,
+  },
+  "/dashboard/sin/forms": {
+    description: "Complete organization forms and surveys.",
+    cta: "View Forms",
+    variant: "outline" as const,
+  },
+  "/dashboard/sin/imports": {
+    description: "Track data imports and status updates.",
+    cta: "View Imports",
+    variant: "outline" as const,
+  },
+  "/dashboard/sin/analytics": {
+    description: "Build reports and export insights.",
+    cta: "Open Analytics",
+    variant: "outline" as const,
+  },
+  "/dashboard/sin/templates": {
+    description: "Download the latest reporting and import templates.",
+    cta: "View Templates",
+    variant: "outline" as const,
+  },
+  "/dashboard/sin/help": {
+    description: "Browse guides and FAQs for common tasks.",
+    cta: "Open Help",
+    variant: "outline" as const,
+  },
+  "/dashboard/sin/support": {
+    description: "Send support requests and feedback.",
+    cta: "Open Support",
+    variant: "outline" as const,
+  },
+};
 
 export const Route = createFileRoute("/dashboard/sin/")({
   beforeLoad: () => {
@@ -12,6 +54,27 @@ export const Route = createFileRoute("/dashboard/sin/")({
 });
 
 function SinPortalHome() {
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
+  const { organizationRole } = useOrgContext();
+
+  const cards = useMemo(() => {
+    const navItems = getAppNavSections()
+      .flatMap((section) => section.items)
+      .filter((item) => Object.prototype.hasOwnProperty.call(portalCardConfig, item.to));
+
+    return filterNavItems(navItems, { user, organizationRole }).map((item) => {
+      const config = portalCardConfig[item.to as keyof typeof portalCardConfig]!;
+      return {
+        to: item.to,
+        title: item.label,
+        description: config.description,
+        cta: config.cta,
+        variant: config.variant,
+      };
+    });
+  }, [organizationRole, user]);
+
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="space-y-2">
@@ -22,43 +85,20 @@ function SinPortalHome() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle>Reporting</CardTitle>
-            <CardDescription>Submit required reporting tasks.</CardDescription>
-            <Button asChild className="w-fit">
-              <Link to="/dashboard/sin/reporting">Open Reporting</Link>
-            </Button>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle>Forms</CardTitle>
-            <CardDescription>Complete organization forms and surveys.</CardDescription>
-            <Button asChild className="w-fit" variant="outline">
-              <Link to="/dashboard/sin/forms">View Forms</Link>
-            </Button>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle>Imports</CardTitle>
-            <CardDescription>Track data imports and status updates.</CardDescription>
-            <Button asChild className="w-fit" variant="outline">
-              <Link to="/dashboard/sin/imports">View Imports</Link>
-            </Button>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle>Analytics</CardTitle>
-            <CardDescription>Build reports and export insights.</CardDescription>
-            <Button asChild className="w-fit" variant="outline">
-              <Link to="/dashboard/sin/analytics">Open Analytics</Link>
-            </Button>
-          </CardHeader>
-        </Card>
+        {cards.map((card) => (
+          <Card key={card.to}>
+            <CardHeader className="space-y-2">
+              <CardTitle>{card.title}</CardTitle>
+              <CardDescription>{card.description}</CardDescription>
+              <Button asChild className="w-fit" variant={card.variant}>
+                <Link to={card.to}>{card.cta}</Link>
+              </Button>
+            </CardHeader>
+          </Card>
+        ))}
       </div>
+
+      <TutorialPanel />
     </div>
   );
 }

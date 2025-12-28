@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -172,9 +173,7 @@ export const eventPaymentSessions = pgTable(
     id: varchar("id", { length: 255 })
       .$defaultFn(() => createId())
       .primaryKey(),
-    registrationId: uuid("registration_id")
-      .notNull()
-      .references(() => eventRegistrations.id, { onDelete: "cascade" }),
+    registrationId: uuid("registration_id").notNull(),
     eventId: uuid("event_id")
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
@@ -199,6 +198,11 @@ export const eventPaymentSessions = pgTable(
     index("event_payment_sessions_registration_idx").on(table.registrationId),
     index("event_payment_sessions_event_idx").on(table.eventId),
     index("event_payment_sessions_user_idx").on(table.userId),
+    foreignKey({
+      columns: [table.registrationId],
+      foreignColumns: [eventRegistrations.id],
+      name: "event_payment_sessions_registration_fk",
+    }).onDelete("cascade"),
   ],
 );
 

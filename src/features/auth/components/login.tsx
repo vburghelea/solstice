@@ -8,7 +8,6 @@ import { Button } from "~/components/ui/button";
 import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
-import { recordSecurityEvent } from "~/features/security/security.mutations";
 import { getAccountLockStatus } from "~/features/security/security.queries";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
@@ -29,6 +28,12 @@ export default function LoginForm(props?: LoginFormProps) {
   const safeRedirectPath = props?.redirectPath?.startsWith("/")
     ? props.redirectPath
     : "/dashboard";
+  const inviteToken = safeRedirectPath.startsWith("/join/")
+    ? safeRedirectPath.replace("/join/", "")
+    : undefined;
+  const signupHref = inviteToken
+    ? `/auth/signup?invite=${encodeURIComponent(inviteToken)}`
+    : "/auth/signup";
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,9 +63,6 @@ export default function LoginForm(props?: LoginFormProps) {
         const result = await auth.signIn.email(value);
 
         if (result?.error) {
-          void recordSecurityEvent({
-            data: { eventType: "login_fail", identifier: value.email },
-          });
           throw new Error(result.error.message || "Invalid email or password");
         }
 
@@ -77,9 +79,6 @@ export default function LoginForm(props?: LoginFormProps) {
         // Success path
         if (result?.data && "user" in result.data && result.data.user?.id) {
           const userId = result.data.user.id;
-          void recordSecurityEvent({
-            data: { eventType: "login_success", userId: result.data.user.id },
-          });
           const lock = await getAccountLockStatus({ data: { userId } });
           if (lock) {
             await auth.signOut();
@@ -120,16 +119,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   : await auth.twoFactor.verifyTotp({ code: twoFactorCode });
 
               if (result?.error) {
-                void recordSecurityEvent({
-                  data: { eventType: "mfa_fail" },
-                });
                 throw new Error(result.error.message || "Invalid authentication code");
-              }
-
-              if (result?.data?.user?.id) {
-                void recordSecurityEvent({
-                  data: { eventType: "mfa_success", userId: result.data.user.id },
-                });
               }
 
               await queryClient.invalidateQueries({ queryKey: authQueryKey });
@@ -358,7 +348,7 @@ export default function LoginForm(props?: LoginFormProps) {
 
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <Link to="/auth/signup" className="underline underline-offset-4">
+        <Link to={signupHref} className="underline underline-offset-4">
           Sign up
         </Link>
       </div>

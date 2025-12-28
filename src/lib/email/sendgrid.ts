@@ -1,6 +1,5 @@
 /**
- * SendGrid email service wrapper
- * Provides type-safe methods for sending transactional emails
+ * Transactional email service wrapper (SES-backed).
  */
 
 import { z } from "zod";
@@ -81,62 +80,61 @@ class MockEmailService {
   }
 }
 
-// Real SendGrid service
-class SendGridEmailService {
-  private client: unknown;
-  private initialized = false;
-
-  async initialize(): Promise<void> {
-    if (this.initialized) return;
-
-    try {
-      const sgMail = await import("@sendgrid/mail");
-      this.client = sgMail.default;
-
-      const apiKey = process.env["SENDGRID_API_KEY"];
-      if (!apiKey) {
-        throw new Error("SENDGRID_API_KEY environment variable is not set");
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.client as any).setApiKey(apiKey);
-      this.initialized = true;
-    } catch (error) {
-      console.error("Failed to initialize SendGrid:", error);
-      throw error;
-    }
-  }
-
+// SES email service (default)
+class SesEmailService {
   async send(data: EmailData): Promise<SendEmailResult> {
     try {
-      await this.initialize();
-
-      // Validate email data
       const validatedData = EmailDataSchema.parse(data);
 
-      // Convert to SendGrid format
-      const msg = {
-        to: validatedData.to,
-        from: validatedData.from,
-        subject: validatedData.subject,
-        text: validatedData.text,
-        html: validatedData.html,
-        templateId: validatedData.templateId,
-        dynamicTemplateData: validatedData.dynamicTemplateData,
-        replyTo: validatedData.replyTo,
-        attachments: validatedData.attachments,
-      };
+      if (validatedData.attachments?.length) {
+        return {
+          success: false,
+          error: "SES email service does not support attachments",
+        };
+      }
 
-      // Send email
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const [response] = await (this.client as any).send(msg);
+      const recipients = Array.isArray(validatedData.to)
+        ? validatedData.to
+        : [validatedData.to];
 
-      return {
-        success: true,
-        messageId: response.headers["x-message-id"],
-      };
+      const body: { Text?: { Data: string }; Html?: { Data: string } } = {};
+      if (validatedData.text) {
+        body.Text = { Data: validatedData.text };
+      }
+      if (validatedData.html) {
+        body.Html = { Data: validatedData.html };
+      }
+
+      if (!body.Text && !body.Html) {
+        return { success: false, error: "Email body is required" };
+      }
+
+      const region = process.env["AWS_REGION"] ?? "ca-central-1";
+      const { SESClient, SendEmailCommand } = await import("@aws-sdk/client-ses");
+      const client = new SESClient({ region });
+
+      const response = await client.send(
+        new SendEmailCommand({
+          Source: validatedData.from.name
+            ? `${validatedData.from.name} <${validatedData.from.email}>`
+            : validatedData.from.email,
+          Destination: {
+            ToAddresses: recipients.map((recipient) => recipient.email),
+          },
+          ReplyToAddresses: validatedData.replyTo
+            ? [validatedData.replyTo.email]
+            : undefined,
+          Message: {
+            Subject: { Data: validatedData.subject },
+            Body: body,
+          },
+        }),
+      );
+
+      const messageId = response?.MessageId;
+      return messageId ? { success: true, messageId } : { success: true };
     } catch (error) {
-      console.error("SendGrid error:", error);
+      console.error("SES email error:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Failed to send email",
@@ -146,7 +144,7 @@ class SendGridEmailService {
 }
 
 // Factory function to get the appropriate email service
-type EmailService = MockEmailService | SendGridEmailService;
+type EmailService = MockEmailService | SesEmailService;
 
 let cachedEmailService: EmailService | null = null;
 
@@ -155,10 +153,8 @@ const resolveEmailService = async (): Promise<EmailService> => {
     return cachedEmailService;
   }
 
-  const useSendGrid =
-    process.env["SENDGRID_API_KEY"] && process.env["NODE_ENV"] !== "test";
-
-  cachedEmailService = useSendGrid ? new SendGridEmailService() : new MockEmailService();
+  const useMock = process.env["NODE_ENV"] === "test";
+  cachedEmailService = useMock ? new MockEmailService() : new SesEmailService();
   return cachedEmailService;
 };
 

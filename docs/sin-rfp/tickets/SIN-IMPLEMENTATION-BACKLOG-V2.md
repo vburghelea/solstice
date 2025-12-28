@@ -272,16 +272,16 @@ All tenant-owned entities have organization_id FK
 
 ### Security Controls Mapped to SIN Requirements
 
-| Requirement                          | Control                                      | Status   |
-| ------------------------------------ | -------------------------------------------- | -------- |
-| SEC-AGG-001: MFA                     | Better Auth 2FA plugin (TOTP + backup codes) | To Build |
-| SEC-AGG-001: Role/affiliation access | Organization-scoped RBAC                     | To Build |
-| SEC-AGG-001: Leader admission        | Org membership approval workflow             | To Build |
-| SEC-AGG-002: Anomaly detection       | Security events + risk scoring               | To Build |
-| SEC-AGG-002: Account lockout         | Threshold-based auto-lock                    | To Build |
-| SEC-AGG-003: PIPEDA compliance       | Consent tracking, retention, DSAR            | To Build |
-| SEC-AGG-004: Immutable audit         | Append-only table + hash chain               | To Build |
-| SEC-AGG-004: Export                  | Audit log filtering + CSV export             | To Build |
+| Requirement                          | Control                                      | Status         | Evidence                                                                                                                        |
+| ------------------------------------ | -------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| SEC-AGG-001: MFA                     | Better Auth 2FA plugin (TOTP + backup codes) | ✅ Implemented | `src/features/auth/mfa`, `src/lib/auth/session.ts`, `docs/sin-rfp/worklogs/stream-a.md`                                         |
+| SEC-AGG-001: Role/affiliation access | Organization-scoped RBAC                     | ✅ Implemented | `src/features/organizations/organizations.access.ts`, `src/lib/auth/guards/org-guard.ts`, `docs/sin-rfp/worklogs/stream-c.md`   |
+| SEC-AGG-001: Leader admission        | Org membership approval workflow             | ✅ Implemented | `src/features/organizations/organizations.mutations.ts`, `src/features/organizations/components/organization-admin-panel.tsx`   |
+| SEC-AGG-002: Anomaly detection       | Security events + risk scoring               | ✅ Implemented | `src/lib/security/detection.ts`, `src/features/security/security.mutations.ts`, `docs/sin-rfp/worklogs/stream-g.md`             |
+| SEC-AGG-002: Account lockout         | Threshold-based auto-lock                    | ✅ Implemented | `src/db/schema/security.schema.ts`, `src/features/security/security.mutations.ts`, `docs/sin-rfp/worklogs/stream-g.md`          |
+| SEC-AGG-003: PIPEDA compliance       | Consent tracking, retention, DSAR            | 🟡 Partial     | `src/features/privacy`, `src/lib/privacy/retention.ts`, `docs/sin-rfp/phase-0/audit-retention-policy.md`                        |
+| SEC-AGG-004: Immutable audit         | Append-only table + hash chain               | ✅ Implemented | `src/lib/audit/index.ts`, `src/db/migrations/0013_audit_security_hardening.sql`, `scripts/verify-audit-immutability.ts`         |
+| SEC-AGG-004: Export                  | Audit log filtering + CSV export             | ✅ Implemented | `src/features/audit/audit.queries.ts`, `src/features/audit/components/audit-log-table.tsx`, `docs/sin-rfp/worklogs/stream-g.md` |
 
 ---
 

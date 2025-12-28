@@ -10,13 +10,13 @@
 
 ## Scope (from consolidated backlog)
 
-- [ ] K1 Update docs/sin-rfp/route-tree-implementation-review.md with per-item
+- [x] K1 Update docs/sin-rfp/route-tree-implementation-review.md with per-item
       status and evidence links.
-- [ ] K2 Update docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md security
+- [x] K2 Update docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md security
       controls table to reflect current implementation and evidence.
-- [ ] K3 Add docs/sin-rfp/requirements-coverage-matrix.md mapping requirements
+- [x] K3 Add docs/sin-rfp/requirements-coverage-matrix.md mapping requirements
       to modules, tests, and evidence.
-- [ ] K4 Add implementation-status callouts in Phase 0 docs to distinguish
+- [x] K4 Add implementation-status callouts in Phase 0 docs to distinguish
       planned vs implemented items.
 
 ## Dependencies
@@ -31,8 +31,49 @@
 
 ## Files Modified This Session
 
+- `docs/sin-rfp/worklogs/stream-k-context.md`
+- `docs/sin-rfp/route-tree-implementation-review.md`
+- `docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md`
+- `docs/sin-rfp/requirements-coverage-matrix.md`
+- `docs/sin-rfp/phase-0/architecture-reference.md`
+- `docs/sin-rfp/phase-0/data-residency.md`
+- `docs/sin-rfp/phase-0/security-controls.md`
+- `docs/sin-rfp/phase-0/backup-dr-plan.md`
+- `docs/sin-rfp/phase-0/audit-retention-policy.md`
+- `docs/sin-rfp/phase-0/import-batch-worker.md`
+- `docs/sin-rfp/phase-0/migration-strategy.md`
+- `docs/sin-rfp/phase-0/data-classification-guide.md`
+- `docs/sin-rfp/phase-0/phased-delivery-plan.md`
+
 ## Session Log
 
 ### 2025-12-27: Session Start
 
 - Initialized worklog.
+
+### 2025-12-27: Context capture
+
+- Created `docs/sin-rfp/worklogs/stream-k-context.md` with Stream K context from
+  implementation review docs.
+
+### 2025-12-27: Documentation alignment pass
+
+- Updated `docs/sin-rfp/route-tree-implementation-review.md` with per-finding
+  status + evidence (Streams B/C/G fixes captured; open items flagged).
+- Updated the security controls table in
+  `docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md` to reflect current
+  implementation with evidence links.
+
+### 2025-12-27: Requirements and Phase 0 alignment
+
+- Added `docs/sin-rfp/requirements-coverage-matrix.md` mapping each SIN
+  requirement to modules, tests, and evidence.
+- Added implementation-status callouts across Phase 0 docs to clarify what is
+  implemented vs planned (backup/DR, archival, batch import infra, and data
+  classification gaps).
+
+### 2025-12-27: Validation
+
+- `pnpm lint` failed on pre-existing unused vars in forms/imports/privacy/
+  reporting modules; see terminal output for file list.
+- `pnpm check-types` passed.

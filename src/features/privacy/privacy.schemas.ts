@@ -20,6 +20,13 @@ export const privacyRequestStatusSchema = z.enum([
   "rejected",
 ]);
 
+export const legalHoldScopeSchema = z.enum(["user", "organization", "record"]);
+
+export const privacyRequestDetailsSchema = z.object({
+  correction: z.string().trim().min(1).max(2000),
+  fields: z.array(z.string().trim().min(1)).optional(),
+});
+
 export const createPolicyDocumentSchema = z.object({
   type: policyTypeSchema,
   version: z.string().min(1),
@@ -34,9 +41,20 @@ export const acceptPolicySchema = z.object({
 });
 export type AcceptPolicyInput = z.infer<typeof acceptPolicySchema>;
 
-export const createPrivacyRequestSchema = z.object({
-  type: privacyRequestTypeSchema,
-});
+export const createPrivacyRequestSchema = z
+  .object({
+    type: privacyRequestTypeSchema,
+    details: privacyRequestDetailsSchema.optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.type === "correction" && !value.details) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Correction requests require details.",
+        path: ["details"],
+      });
+    }
+  });
 export type CreatePrivacyRequestInput = z.infer<typeof createPrivacyRequestSchema>;
 
 export const updatePrivacyRequestSchema = z.object({
@@ -68,7 +86,55 @@ export const applyPrivacyErasureSchema = z.object({
 });
 export type ApplyPrivacyErasureInput = z.infer<typeof applyPrivacyErasureSchema>;
 
+export const applyPrivacyCorrectionSchema = z.object({
+  requestId: z.uuid(),
+  corrections: z
+    .object({
+      name: z.string().trim().min(1).optional(),
+      email: z.email().optional(),
+      dateOfBirth: z.string().optional(),
+      emergencyContact: z
+        .object({
+          name: z.string().trim().min(1),
+          relationship: z.string().trim().min(1),
+          phone: z.string().trim().optional(),
+          email: z.email().optional(),
+        })
+        .optional(),
+      gender: z.string().trim().optional(),
+      pronouns: z.string().trim().optional(),
+      phone: z.string().trim().optional(),
+      privacySettings: z
+        .object({
+          showEmail: z.boolean(),
+          showPhone: z.boolean(),
+          showBirthYear: z.boolean(),
+          allowTeamInvitations: z.boolean(),
+        })
+        .optional(),
+    })
+    .refine((value) => Object.keys(value).length > 0, {
+      message: "At least one correction is required.",
+    }),
+  notes: z.string().trim().max(500).optional(),
+});
+export type ApplyPrivacyCorrectionInput = z.infer<typeof applyPrivacyCorrectionSchema>;
+
 export const getPrivacyExportUrlSchema = z.object({
   requestId: z.uuid(),
 });
 export type GetPrivacyExportUrlInput = z.infer<typeof getPrivacyExportUrlSchema>;
+
+export const createLegalHoldSchema = z.object({
+  scopeType: legalHoldScopeSchema,
+  scopeId: z.string().trim().min(1),
+  dataType: z.string().trim().min(1).optional(),
+  reason: z.string().trim().min(1).max(500),
+});
+export type CreateLegalHoldInput = z.infer<typeof createLegalHoldSchema>;
+
+export const releaseLegalHoldSchema = z.object({
+  holdId: z.uuid(),
+  reason: z.string().trim().max(500).optional(),
+});
+export type ReleaseLegalHoldInput = z.infer<typeof releaseLegalHoldSchema>;

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
+import { badRequest, forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { JsonRecord, JsonValue } from "~/shared/lib/json";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
@@ -15,6 +15,8 @@ import {
 } from "./forms.schemas";
 import {
   getFileConfigForField,
+  isValidStorageKeyPrefix,
+  parseFileFieldValue,
   sanitizePayload,
   validateFileUpload,
   validateFormPayload,
@@ -116,6 +118,25 @@ const buildSubmissionFiles = (
     .filter((value): value is NonNullable<typeof value> => Boolean(value));
 };
 
+const assertValidFileStorageKeys = (
+  definition: FormDefinition,
+  payload: JsonRecord,
+  expectedPrefix: string,
+) => {
+  for (const field of definition.fields) {
+    if (field.type !== "file") continue;
+    const files = parseFileFieldValue(payload[field.key]);
+    for (const file of files) {
+      if (!file.storageKey) {
+        throw badRequest("File upload is missing storage key.");
+      }
+      if (!isValidStorageKeyPrefix(file.storageKey, expectedPrefix)) {
+        throw badRequest("File storage key is not valid for this form.");
+      }
+    }
+  }
+};
+
 const insertSubmissionFiles = async (
   definition: FormDefinition,
   payload: JsonRecord,
@@ -193,14 +214,25 @@ export const updateForm = createServerFn({ method: "POST" })
       roles: ORG_ADMIN_ROLES,
     });
 
+    const updateData: Partial<typeof forms.$inferInsert> = {};
+    if (data.data.name !== undefined) {
+      updateData.name = data.data.name;
+    }
+    if (data.data.slug !== undefined) {
+      updateData.slug = data.data.slug;
+    }
+    if (data.data.description !== undefined) {
+      updateData.description = data.data.description ?? null;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return existing;
+    }
+
     const db = await getDb();
     const [updated] = await db
       .update(forms)
-      .set({
-        name: data.data.name,
-        slug: data.data.slug,
-        description: data.data.description ?? null,
-      })
+      .set(updateData)
       .where(eq(forms.id, data.formId))
       .returning();
 
@@ -328,8 +360,36 @@ export const submitForm = createServerFn({ method: "POST" })
     }
 
     const definition = latestVersion.definition as FormDefinition;
+    const settings = definition.settings ?? {
+      allowDraft: true,
+      requireApproval: false,
+      notifyOnSubmit: [],
+    };
     const sanitizedPayload = await sanitizePayload(definition, data.payload);
-    const validation = validateFormPayload(definition, sanitizedPayload);
+    const storageKeyPrefix = `forms/${form.id}/`;
+    const validation = validateFormPayload(definition, sanitizedPayload, {
+      storageKeyPrefix,
+    });
+    const hasFileArray = definition.fields.some(
+      (field) => field.type === "file" && Array.isArray(sanitizedPayload[field.key]),
+    );
+    if (hasFileArray) {
+      throw badRequest("Multiple files are not supported.");
+    }
+    assertValidFileStorageKeys(definition, sanitizedPayload, storageKeyPrefix);
+
+    const requestedStatus = data.status ?? "draft";
+    const isSubmissionAttempt = requestedStatus === "submitted";
+    const nextStatus =
+      isSubmissionAttempt && settings.requireApproval ? "under_review" : requestedStatus;
+    const isFinalSubmission = nextStatus !== "draft";
+
+    if (
+      isFinalSubmission &&
+      (validation.missingFields.length > 0 || validation.validationErrors.length > 0)
+    ) {
+      throw badRequest("Submission is missing required fields or has errors.");
+    }
 
     const [submission] = await db
       .insert(formSubmissions)
@@ -338,12 +398,12 @@ export const submitForm = createServerFn({ method: "POST" })
         formVersionId: latestVersion.id,
         organizationId,
         submitterId: actorUserId,
-        status: data.status ?? "draft",
+        status: nextStatus,
         payload: sanitizedPayload,
         completenessScore: validation.completenessScore,
         missingFields: validation.missingFields,
         validationErrors: validation.validationErrors,
-        submittedAt: data.status === "submitted" ? new Date() : null,
+        submittedAt: isFinalSubmission ? new Date() : null,
         importJobId: data.importJobId ?? null,
       })
       .returning();
@@ -371,6 +431,29 @@ export const submitForm = createServerFn({ method: "POST" })
       targetOrgId: submission.organizationId,
     });
 
+    if (isFinalSubmission && settings.notifyOnSubmit.length > 0) {
+      const { enqueueNotification } = await import("~/lib/notifications/queue");
+      const recipients = Array.from(new Set(settings.notifyOnSubmit.filter(Boolean)));
+
+      await Promise.all(
+        recipients.map((recipientId) =>
+          enqueueNotification({
+            userId: recipientId,
+            organizationId,
+            type: "form_submission",
+            category: "system",
+            title: `New form submission: ${form.name}`,
+            body: `A new submission was received for ${form.name}.`,
+            link: `/dashboard/sin/submissions/${submission.id}`,
+            metadata: {
+              formId: form.id,
+              submissionId: submission.id,
+            },
+          }),
+        ),
+      );
+    }
+
     return submission;
   });
 
@@ -385,7 +468,6 @@ export const createFormUpload = createServerFn({ method: "POST" })
     const { getDb } = await import("~/db/server-helpers");
     const { formVersions } = await import("~/db/schema");
     const { desc, eq } = await import("drizzle-orm");
-    const { badRequest } = await import("~/lib/server/errors");
 
     const db = await getDb();
     const [latestVersion] = await db
@@ -396,21 +478,28 @@ export const createFormUpload = createServerFn({ method: "POST" })
       .limit(1);
 
     // Validate file against field configuration if form has a published version
-    if (latestVersion) {
-      const definition = latestVersion.definition as FormDefinition;
-      const config = getFileConfigForField(definition, data.fieldKey);
-      const validation = validateFileUpload(
-        {
-          fileName: data.fileName,
-          mimeType: data.mimeType,
-          size: data.sizeBytes,
-        },
-        config,
-      );
+    if (!latestVersion) {
+      throw badRequest("Form has no published versions.");
+    }
 
-      if (!validation.valid) {
-        throw badRequest(validation.error ?? "File validation failed");
-      }
+    const definition = latestVersion.definition as FormDefinition;
+    const field = definition.fields.find((entry) => entry.key === data.fieldKey);
+    if (!field || field.type !== "file") {
+      throw badRequest("Invalid file field for upload.");
+    }
+
+    const config = getFileConfigForField(definition, data.fieldKey);
+    const validation = validateFileUpload(
+      {
+        fileName: data.fileName,
+        mimeType: data.mimeType,
+        size: data.sizeBytes,
+      },
+      config,
+    );
+
+    if (!validation.valid) {
+      throw badRequest(validation.error ?? "File validation failed");
     }
 
     const { createId } = await import("@paralleldrive/cuid2");
@@ -473,7 +562,12 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
       throw notFound("Submission not found");
     }
 
-    await requireOrgAccess(actorUserId, submission.organizationId);
+    if (submission.submitterId !== actorUserId) {
+      const { ORG_ADMIN_ROLES } = await import("~/lib/auth/guards/org-guard");
+      await requireOrgAccess(actorUserId, submission.organizationId, {
+        roles: ORG_ADMIN_ROLES,
+      });
+    }
 
     const [version] = await db
       .select()
@@ -486,9 +580,41 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
     }
 
     const definition = version.definition as FormDefinition;
+    const settings = definition.settings ?? {
+      allowDraft: true,
+      requireApproval: false,
+      notifyOnSubmit: [],
+    };
     const sanitizedPayload = await sanitizePayload(definition, data.payload);
-    const validation = validateFormPayload(definition, sanitizedPayload);
-    const nextStatus = data.status ?? submission.status;
+    const storageKeyPrefix = `forms/${submission.formId}/`;
+    const validation = validateFormPayload(definition, sanitizedPayload, {
+      storageKeyPrefix,
+    });
+    const hasFileArray = definition.fields.some(
+      (field) => field.type === "file" && Array.isArray(sanitizedPayload[field.key]),
+    );
+    if (hasFileArray) {
+      throw badRequest("Multiple files are not supported.");
+    }
+    assertValidFileStorageKeys(definition, sanitizedPayload, storageKeyPrefix);
+
+    const requestedStatus = data.status ?? submission.status;
+    const isSubmissionAttempt = requestedStatus === "submitted";
+    const nextStatus =
+      isSubmissionAttempt && settings.requireApproval ? "under_review" : requestedStatus;
+    const isFinalSubmission = nextStatus !== "draft";
+    const wasFinalSubmission = ["submitted", "under_review"].includes(submission.status);
+
+    if (
+      isFinalSubmission &&
+      (validation.missingFields.length > 0 || validation.validationErrors.length > 0)
+    ) {
+      throw badRequest("Submission is missing required fields or has errors.");
+    }
+
+    const shouldUpdateSubmittedAt =
+      isFinalSubmission &&
+      (submission.status === "draft" || submission.status === "changes_requested");
 
     const [updated] = await db
       .update(formSubmissions)
@@ -498,7 +624,7 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
         missingFields: validation.missingFields,
         validationErrors: validation.validationErrors,
         status: nextStatus,
-        submittedAt: nextStatus === "submitted" ? new Date() : submission.submittedAt,
+        submittedAt: shouldUpdateSubmittedAt ? new Date() : submission.submittedAt,
         updatedAt: new Date(),
       })
       .where(eq(formSubmissions.id, data.submissionId))
@@ -533,6 +659,29 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
       targetId: updated.id,
       targetOrgId: updated.organizationId,
     });
+
+    if (isFinalSubmission && !wasFinalSubmission && settings.notifyOnSubmit.length > 0) {
+      const { enqueueNotification } = await import("~/lib/notifications/queue");
+      const recipients = Array.from(new Set(settings.notifyOnSubmit.filter(Boolean)));
+
+      await Promise.all(
+        recipients.map((recipientId) =>
+          enqueueNotification({
+            userId: recipientId,
+            organizationId: updated.organizationId,
+            type: "form_submission",
+            category: "system",
+            title: "Form submission received",
+            body: "A form submission was received and is ready for review.",
+            link: `/dashboard/sin/submissions/${updated.id}`,
+            metadata: {
+              formId: updated.formId,
+              submissionId: updated.id,
+            },
+          }),
+        ),
+      );
+    }
 
     return updated;
   });

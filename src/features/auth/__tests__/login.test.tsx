@@ -71,10 +71,6 @@ vi.mock("~/components/ui/SafeLink", () => ({
   ),
 }));
 
-vi.mock("~/features/security/security.mutations", () => ({
-  recordSecurityEvent: vi.fn(),
-}));
-
 vi.mock("~/features/security/security.queries", () => ({
   getAccountLockStatus: vi.fn().mockResolvedValue(null),
 }));

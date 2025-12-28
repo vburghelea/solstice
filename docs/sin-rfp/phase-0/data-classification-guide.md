@@ -3,6 +3,9 @@
 This guide defines how viaSport SIN data is classified, handled, and protected.
 It aligns with PIPEDA requirements and the SIN RFP expectations.
 
+> Implementation status (2025-12-27): Partial. Classification guidance exists,
+> but field-level PII classification enforcement is still pending (D0.6).
+
 ## Classification Levels
 
 ### 1) Sensitive PII

@@ -2,8 +2,6 @@ import { z } from "zod";
 import { jsonRecordSchema } from "~/shared/lib/json";
 
 export const recordSecurityEventSchema = z.object({
-  userId: z.string().optional(),
-  identifier: z.string().optional(),
   eventType: z.string().min(1),
   metadata: jsonRecordSchema.optional(),
 });

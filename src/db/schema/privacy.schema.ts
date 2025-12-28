@@ -1,7 +1,9 @@
 import {
   boolean,
   date,
+  index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -9,6 +11,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import type { JsonRecord } from "~/shared/lib/json";
 import { user } from "./auth.schema";
 
 export const policyTypeEnum = pgEnum("policy_type", [
@@ -29,6 +32,12 @@ export const privacyRequestStatusEnum = pgEnum("privacy_request_status", [
   "processing",
   "completed",
   "rejected",
+]);
+
+export const legalHoldScopeEnum = pgEnum("legal_hold_scope", [
+  "user",
+  "organization",
+  "record",
 ]);
 
 export const policyDocuments = pgTable(
@@ -77,8 +86,10 @@ export const privacyRequests = pgTable("privacy_requests", {
   processedBy: text("processed_by").references(() => user.id),
   processedAt: timestamp("processed_at", { withTimezone: true }),
   resultUrl: text("result_url"),
+  resultExpiresAt: timestamp("result_expires_at", { withTimezone: true }),
   resultNotes: text("result_notes"),
   rejectionReason: text("rejection_reason"),
+  details: jsonb("details").$type<JsonRecord>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
@@ -104,6 +115,26 @@ export const retentionPolicies = pgTable(
   (table) => [uniqueIndex("retention_policies_unique").on(table.dataType)],
 );
 
+export const legalHolds = pgTable(
+  "legal_holds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    scopeType: legalHoldScopeEnum("scope_type").notNull(),
+    scopeId: text("scope_id").notNull(),
+    dataType: text("data_type"),
+    reason: text("reason").notNull(),
+    appliedBy: text("applied_by").references(() => user.id),
+    appliedAt: timestamp("applied_at", { withTimezone: true }).notNull().defaultNow(),
+    releasedBy: text("released_by").references(() => user.id),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("legal_holds_scope_idx").on(table.scopeType, table.scopeId),
+    index("legal_holds_data_type_idx").on(table.dataType),
+  ],
+);
+
 export type PolicyDocument = typeof policyDocuments.$inferSelect;
 export type NewPolicyDocument = typeof policyDocuments.$inferInsert;
 export type UserPolicyAcceptance = typeof userPolicyAcceptances.$inferSelect;
@@ -112,3 +143,5 @@ export type PrivacyRequest = typeof privacyRequests.$inferSelect;
 export type NewPrivacyRequest = typeof privacyRequests.$inferInsert;
 export type RetentionPolicy = typeof retentionPolicies.$inferSelect;
 export type NewRetentionPolicy = typeof retentionPolicies.$inferInsert;
+export type LegalHold = typeof legalHolds.$inferSelect;
+export type NewLegalHold = typeof legalHolds.$inferInsert;

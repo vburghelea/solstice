@@ -61,7 +61,7 @@ import type {
   EventWithDetails,
   UpdateEventInput,
 } from "~/features/events/events.types";
-import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
@@ -86,9 +86,7 @@ export const Route = createFileRoute("/dashboard/events/$eventId/manage")({
       });
     }
 
-    if (!isAdminClient(user)) {
-      throw redirect({ to: "/dashboard/events" });
-    }
+    await requireGlobalAdmin(user, "/dashboard/events", "/dashboard/settings");
   },
   component: EventManagementPage,
 });

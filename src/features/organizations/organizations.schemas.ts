@@ -61,6 +61,8 @@ export const createOrganizationSchema = z.object({
   parentOrgId: z.uuid().optional().nullable(),
   settings: jsonRecordSchema.optional(),
   metadata: jsonRecordSchema.optional(),
+  isDiscoverable: z.boolean().optional(),
+  joinRequestsEnabled: z.boolean().optional(),
 });
 export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>;
 

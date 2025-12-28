@@ -610,6 +610,31 @@ Use Playwright to verify UI changes on localhost:5173.
 2. If browser already in use, close first: `mcp__playwright__browser_close`
 3. Always verify UI behavior with MCP before writing/updating E2E tests
 
+### MFA Authentication for Agents
+
+When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-dev), use **TOTP codes** instead of backup codes. TOTP codes regenerate every 30 seconds and are reusable.
+
+**Test Users with MFA:**
+
+- `admin@example.com` / `testpassword123` (Platform Admin)
+- `viasport-staff@example.com` / `testpassword123` (viaSport Staff)
+
+**TOTP Secret:** `JBSWY3DPEHPK3PXP`
+
+**Login Flow:**
+
+1. Navigate to `/auth/login`
+2. Enter email and password
+3. Click Login → 2FA prompt appears
+4. Select "Authenticator code" tab (NOT backup code)
+5. Generate a fresh TOTP code:
+   ```bash
+   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"
+   ```
+6. Enter the 6-digit code and click "Verify code"
+
+**Important:** TOTP codes are time-based (~30 second validity). Generate a fresh code immediately before entering it. If verification fails, generate a new code and retry.
+
 ## Additional Resources
 
 - **Project docs**: `docs/quadball-plan/*`

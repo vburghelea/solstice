@@ -16,6 +16,7 @@ export const reportingSubmissionStatusSchema = z.enum([
   "changes_requested",
   "approved",
   "overdue",
+  "rejected",
 ]);
 
 export const reportingOrganizationTypeSchema = z.enum([

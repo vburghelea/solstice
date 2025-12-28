@@ -1,61 +1,18 @@
+import { extractSessionTimes, getSessionFromHeaders } from "~/lib/auth/session";
 import { forbidden } from "~/lib/server/errors";
 
 // Default re-auth window: 15 minutes
 const REAUTH_WINDOW_MS = 15 * 60 * 1000;
+const STEP_UP_REASONS = {
+  REAUTH_REQUIRED: "REAUTH_REQUIRED",
+  MFA_REVERIFY_REQUIRED: "MFA_REVERIFY_REQUIRED",
+  MFA_REQUIRED: "MFA_REQUIRED",
+} as const;
 
-/**
- * Extract session timestamps from Better Auth session.
- * Better Auth stores timestamps in various formats depending on version/config.
- * This function attempts to extract the most recent auth time.
- */
-const extractSessionTimes = (session: Record<string, unknown> | null | undefined) => {
-  if (!session) return { authenticatedAt: null, lastMfaVerifiedAt: null };
+type StepUpReason = (typeof STEP_UP_REASONS)[keyof typeof STEP_UP_REASONS];
 
-  const getTimestamp = (value: unknown): Date | null => {
-    if (value instanceof Date) return value;
-    if (typeof value === "string") {
-      const parsed = Date.parse(value);
-      return isNaN(parsed) ? null : new Date(parsed);
-    }
-    if (typeof value === "number") return new Date(value);
-    return null;
-  };
-
-  // Try common session property names for auth time
-  const authTimeKeys = [
-    "authenticatedAt",
-    "createdAt",
-    "iat",
-    "created_at",
-    "signedInAt",
-  ];
-  let authenticatedAt: Date | null = null;
-  for (const key of authTimeKeys) {
-    const val = getTimestamp(session[key]);
-    if (val) {
-      authenticatedAt = val;
-      break;
-    }
-  }
-
-  // Try common session property names for MFA verification time
-  const mfaTimeKeys = [
-    "lastMfaVerifiedAt",
-    "mfaVerifiedAt",
-    "last_mfa_verified_at",
-    "mfa_verified_at",
-  ];
-  let lastMfaVerifiedAt: Date | null = null;
-  for (const key of mfaTimeKeys) {
-    const val = getTimestamp(session[key]);
-    if (val) {
-      lastMfaVerifiedAt = val;
-      break;
-    }
-  }
-
-  return { authenticatedAt, lastMfaVerifiedAt };
-};
+const stepUpForbidden = (message: string, reason: StepUpReason) =>
+  forbidden(message, { reason });
 
 /**
  * Checks if user has MFA enabled when required.
@@ -74,7 +31,10 @@ export const requireMfaEnabled = async (userId: string) => {
   }
 
   if (record.mfaRequired && !record.twoFactorEnabled) {
-    throw forbidden("Multi-factor authentication required");
+    throw stepUpForbidden(
+      "Multi-factor authentication required",
+      STEP_UP_REASONS.MFA_REQUIRED,
+    );
   }
 };
 
@@ -105,32 +65,47 @@ export const requireRecentAuth = async (
   }
 
   if (record.mfaRequired && !record.twoFactorEnabled) {
-    throw forbidden("Multi-factor authentication required");
+    throw stepUpForbidden(
+      "Multi-factor authentication required",
+      STEP_UP_REASONS.MFA_REQUIRED,
+    );
   }
 
   const reAuthWindowMs = options?.reAuthWindowMs ?? REAUTH_WINDOW_MS;
   const now = Date.now();
   const { authenticatedAt, lastMfaVerifiedAt } = extractSessionTimes(session);
 
+  if (!authenticatedAt) {
+    throw stepUpForbidden(
+      "Re-authentication required for this action",
+      STEP_UP_REASONS.REAUTH_REQUIRED,
+    );
+  }
+
   // Check if session was created recently
-  if (authenticatedAt) {
-    const sessionAge = now - authenticatedAt.getTime();
-    if (sessionAge > reAuthWindowMs) {
-      throw forbidden("Re-authentication required for this action");
-    }
+  const sessionAge = now - authenticatedAt.getTime();
+  if (sessionAge > reAuthWindowMs) {
+    throw stepUpForbidden(
+      "Re-authentication required for this action",
+      STEP_UP_REASONS.REAUTH_REQUIRED,
+    );
   }
 
   // For MFA-enabled users, also require recent MFA verification
   if (record.twoFactorEnabled) {
-    // If we have MFA verification time, check it's recent
-    if (lastMfaVerifiedAt) {
-      const mfaAge = now - lastMfaVerifiedAt.getTime();
-      if (mfaAge > reAuthWindowMs) {
-        throw forbidden("MFA re-verification required for this action");
-      }
-    } else if (!authenticatedAt) {
-      // No auth time and no MFA time - require re-auth
-      throw forbidden("Re-authentication required for this action");
+    if (!lastMfaVerifiedAt) {
+      throw stepUpForbidden(
+        "MFA re-verification required for this action",
+        STEP_UP_REASONS.MFA_REVERIFY_REQUIRED,
+      );
+    }
+
+    const mfaAge = now - lastMfaVerifiedAt.getTime();
+    if (mfaAge > reAuthWindowMs) {
+      throw stepUpForbidden(
+        "MFA re-verification required for this action",
+        STEP_UP_REASONS.MFA_REVERIFY_REQUIRED,
+      );
     }
   }
 };
@@ -140,10 +115,7 @@ export const requireRecentAuth = async (
  * Call this and pass result to requireRecentAuth().
  */
 export const getCurrentSession = async () => {
-  const { getAuth } = await import("~/lib/auth/server-helpers");
   const { getRequest } = await import("@tanstack/react-start/server");
-  const auth = await getAuth();
   const { headers } = getRequest();
-  const session = await auth.api.getSession({ headers });
-  return session;
+  return getSessionFromHeaders(headers);
 };

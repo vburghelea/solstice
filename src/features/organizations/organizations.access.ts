@@ -4,7 +4,7 @@ import { getDb } from "~/db/server-helpers";
 import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
 import type { AccessibleOrganization } from "./organizations.types";
 
-const rolePriority: Record<OrganizationRole, number> = {
+export const rolePriority: Record<OrganizationRole, number> = {
   owner: 5,
   admin: 4,
   reporter: 3,
@@ -12,7 +12,7 @@ const rolePriority: Record<OrganizationRole, number> = {
   member: 1,
 };
 
-const pickHighestRole = (roles: Array<OrganizationRole | null | undefined>) => {
+export const pickHighestRole = (roles: Array<OrganizationRole | null | undefined>) => {
   let highest: OrganizationRole | null = null;
   let max = 0;
   for (const role of roles) {
@@ -26,14 +26,14 @@ const pickHighestRole = (roles: Array<OrganizationRole | null | undefined>) => {
   return highest;
 };
 
-const deriveRoleFromScopes = (scopes: string[]): OrganizationRole | null => {
+export const deriveRoleFromScopes = (scopes: string[]): OrganizationRole | null => {
   if (scopes.includes("admin")) return "admin";
   if (scopes.includes("reporting")) return "reporter";
   if (scopes.includes("analytics")) return "viewer";
   return null;
 };
 
-const buildOrgMaps = (orgs: Array<{ id: string; parentOrgId: string | null }>) => {
+export const buildOrgMaps = (orgs: Array<{ id: string; parentOrgId: string | null }>) => {
   const parentById = new Map<string, string | null>();
   const childrenByParent = new Map<string | null, string[]>();
 
@@ -48,7 +48,7 @@ const buildOrgMaps = (orgs: Array<{ id: string; parentOrgId: string | null }>) =
   return { parentById, childrenByParent };
 };
 
-const collectDescendants = (
+export const collectDescendants = (
   childrenByParent: Map<string | null, string[]>,
   rootIds: Iterable<string>,
 ) => {
@@ -67,6 +67,30 @@ const collectDescendants = (
   }
 
   return result;
+};
+
+export const resolveOrganizationRole = (params: {
+  organizationId: string;
+  parentById: Map<string, string | null>;
+  membershipByOrg: Map<string, OrganizationRole>;
+  delegatedScopesByOrg: Map<string, string[]>;
+}) => {
+  const { organizationId, parentById, membershipByOrg, delegatedScopesByOrg } = params;
+  const roles: OrganizationRole[] = [];
+  let currentId: string | null | undefined = organizationId;
+
+  while (currentId) {
+    const membershipRole = membershipByOrg.get(currentId);
+    if (membershipRole) roles.push(membershipRole);
+    const scopes = delegatedScopesByOrg.get(currentId);
+    if (scopes && scopes.length > 0) {
+      const delegatedRole = deriveRoleFromScopes(scopes);
+      if (delegatedRole) roles.push(delegatedRole);
+    }
+    currentId = parentById.get(currentId) ?? null;
+  }
+
+  return pickHighestRole(roles);
 };
 
 export const listAccessibleOrganizationsForUser = async (
@@ -150,22 +174,13 @@ export const listAccessibleOrganizationsForUser = async (
   const { parentById, childrenByParent } = buildOrgMaps(orgRows);
   const accessibleIds = collectDescendants(childrenByParent, baseOrgIds);
 
-  const resolveRole = (orgId: string) => {
-    const roles: OrganizationRole[] = [];
-    let currentId: string | null | undefined = orgId;
-    while (currentId) {
-      const membershipRole = membershipByOrg.get(currentId);
-      if (membershipRole) roles.push(membershipRole);
-      const scopes = delegatedScopesByOrg.get(currentId);
-      if (scopes && scopes.length > 0) {
-        const delegatedRole = deriveRoleFromScopes(scopes);
-        if (delegatedRole) roles.push(delegatedRole);
-      }
-      currentId = parentById.get(currentId) ?? null;
-    }
-
-    return pickHighestRole(roles);
-  };
+  const resolveRole = (orgId: string) =>
+    resolveOrganizationRole({
+      organizationId: orgId,
+      parentById,
+      membershipByOrg,
+      delegatedScopesByOrg,
+    });
 
   return orgRows
     .filter((org) => accessibleIds.has(org.id))
@@ -240,20 +255,12 @@ export const resolveOrganizationAccess = async (params: {
     delegatedScopesByOrg.set(entry.organizationId, scopes);
   });
 
-  const roles: OrganizationRole[] = [];
-  let currentId: string | null | undefined = organizationId;
-  while (currentId) {
-    const membershipRole = membershipByOrg.get(currentId);
-    if (membershipRole) roles.push(membershipRole);
-    const scopes = delegatedScopesByOrg.get(currentId);
-    if (scopes && scopes.length > 0) {
-      const delegatedRole = deriveRoleFromScopes(scopes);
-      if (delegatedRole) roles.push(delegatedRole);
-    }
-    currentId = parentById.get(currentId) ?? null;
-  }
-
-  const role = pickHighestRole(roles);
+  const role = resolveOrganizationRole({
+    organizationId,
+    parentById,
+    membershipByOrg,
+    delegatedScopesByOrg,
+  });
   if (!role) {
     return null;
   }

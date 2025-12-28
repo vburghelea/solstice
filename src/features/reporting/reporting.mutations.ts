@@ -1,11 +1,31 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
+import type { JsonRecord } from "~/shared/lib/json";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createReportingCycleSchema,
   createReportingTaskSchema,
   updateReportingSubmissionSchema,
 } from "./reporting.schemas";
+
+const MAX_REMINDER_DAYS = 365;
+const REVIEW_STATUSES = new Set([
+  "under_review",
+  "changes_requested",
+  "approved",
+  "rejected",
+]);
+const SUBMITTED_STATUSES = new Set(["submitted", ...REVIEW_STATUSES]);
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  not_started: ["in_progress", "overdue"],
+  in_progress: ["submitted", "overdue"],
+  overdue: ["in_progress", "submitted"],
+  submitted: ["under_review"],
+  under_review: ["approved", "changes_requested", "rejected"],
+  changes_requested: ["in_progress", "submitted"],
+  approved: [],
+  rejected: [],
+};
 
 const getSession = async () => {
   const { getAuth } = await import("~/lib/auth/server-helpers");
@@ -94,6 +114,27 @@ export const createReportingTask = createServerFn({ method: "POST" })
     } = await import("~/db/schema");
     const { and, eq, inArray } = await import("drizzle-orm");
 
+    const reminderConfig = data.reminderConfig ?? {};
+    const daysBeforeRaw = Array.isArray(reminderConfig["days_before"])
+      ? reminderConfig["days_before"]
+      : Array.isArray(reminderConfig["daysBefore"])
+        ? reminderConfig["daysBefore"]
+        : [14, 7, 3, 1];
+    const daysBefore = Array.from(
+      new Set(
+        daysBeforeRaw
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value))
+          .map((value) => Math.trunc(value))
+          .filter((value) => value > 0 && value <= MAX_REMINDER_DAYS),
+      ),
+    ).sort((left, right) => right - left);
+    const normalizedReminderConfig: Record<string, unknown> = {
+      ...(reminderConfig as Record<string, unknown>),
+      days_before: daysBefore,
+    };
+    delete normalizedReminderConfig["daysBefore"];
+
     const db = await getDb();
     const [created] = await db
       .insert(reportingTasks)
@@ -105,7 +146,7 @@ export const createReportingTask = createServerFn({ method: "POST" })
         title: data.title,
         description: data.description ?? null,
         dueDate: data.dueDate,
-        reminderConfig: data.reminderConfig ?? {},
+        reminderConfig: normalizedReminderConfig as Record<string, unknown> as JsonRecord,
       })
       .returning();
 
@@ -158,15 +199,6 @@ export const createReportingTask = createServerFn({ method: "POST" })
         });
       }
 
-      const reminderConfig = data.reminderConfig ?? {};
-      const daysBeforeRaw = Array.isArray(reminderConfig["days_before"])
-        ? reminderConfig["days_before"]
-        : Array.isArray(reminderConfig["daysBefore"])
-          ? reminderConfig["daysBefore"]
-          : [14, 7, 3, 1];
-      const daysBefore = daysBeforeRaw
-        .map((value) => Number(value))
-        .filter((value) => !Number.isNaN(value));
       const dueDate = new Date(data.dueDate);
 
       const { scheduleNotification } = await import("~/lib/notifications/scheduler");
@@ -232,9 +264,15 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
     const session = await requireSession();
     const actorUserId = session.user.id;
     const { getDb } = await import("~/db/server-helpers");
-    const { reportingSubmissionHistory, reportingSubmissions } =
-      await import("~/db/schema");
+    const {
+      formSubmissionVersions,
+      formSubmissions,
+      reportingSubmissionHistory,
+      reportingSubmissions,
+      reportingTasks,
+    } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
+    const { badRequest } = await import("~/lib/server/errors");
 
     const db = await getDb();
 
@@ -243,8 +281,17 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
       .select({
         id: reportingSubmissions.id,
         organizationId: reportingSubmissions.organizationId,
+        status: reportingSubmissions.status,
+        submittedAt: reportingSubmissions.submittedAt,
+        submittedBy: reportingSubmissions.submittedBy,
+        reviewedAt: reportingSubmissions.reviewedAt,
+        reviewedBy: reportingSubmissions.reviewedBy,
+        reviewNotes: reportingSubmissions.reviewNotes,
+        formSubmissionId: reportingSubmissions.formSubmissionId,
+        formId: reportingTasks.formId,
       })
       .from(reportingSubmissions)
+      .innerJoin(reportingTasks, eq(reportingSubmissions.taskId, reportingTasks.id))
       .where(eq(reportingSubmissions.id, data.submissionId))
       .limit(1);
 
@@ -259,13 +306,7 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
       const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
         await import("~/lib/auth/guards/org-guard");
 
-      const reviewStatuses = new Set([
-        "under_review",
-        "changes_requested",
-        "approved",
-        "rejected",
-      ]);
-      const adminOnlyStatuses = new Set(["overdue", ...reviewStatuses]);
+      const adminOnlyStatuses = new Set(["overdue", ...REVIEW_STATUSES]);
 
       if (adminOnlyStatuses.has(data.status)) {
         await requireOrganizationAccess(
@@ -280,28 +321,107 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
       }
     }
 
-    const isReviewStatus = [
-      "under_review",
-      "changes_requested",
-      "approved",
-      "rejected",
-    ].includes(data.status);
-    const isSubmitStatus = data.status === "submitted";
+    const isStatusChange = existing.status !== data.status;
+    if (isStatusChange) {
+      const allowedNext = VALID_TRANSITIONS[existing.status] ?? [];
+      if (!allowedNext.includes(data.status)) {
+        throw badRequest(
+          `Cannot transition from "${existing.status}" to "${data.status}"`,
+        );
+      }
+    }
+
+    if (data.status === "rejected" && isStatusChange && !data.reviewNotes?.trim()) {
+      throw badRequest("Rejection reason is required");
+    }
+
+    if (data.formSubmissionId) {
+      const [submission] = await db
+        .select({
+          id: formSubmissions.id,
+          formId: formSubmissions.formId,
+          organizationId: formSubmissions.organizationId,
+        })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.id, data.formSubmissionId))
+        .limit(1);
+
+      if (!submission) {
+        throw badRequest("Form submission not found");
+      }
+
+      if (submission.formId !== existing.formId) {
+        throw badRequest("Form submission does not match reporting task form");
+      }
+
+      if (submission.organizationId !== existing.organizationId) {
+        throw badRequest("Form submission does not belong to submission organization");
+      }
+    }
+
+    if (data.formSubmissionVersionId) {
+      const linkedSubmissionId = data.formSubmissionId ?? existing.formSubmissionId;
+      if (!linkedSubmissionId) {
+        throw badRequest("Form submission is required for submission version links");
+      }
+
+      const [version] = await db
+        .select({
+          id: formSubmissionVersions.id,
+          submissionId: formSubmissionVersions.submissionId,
+        })
+        .from(formSubmissionVersions)
+        .where(eq(formSubmissionVersions.id, data.formSubmissionVersionId))
+        .limit(1);
+
+      if (!version) {
+        throw badRequest("Form submission version not found");
+      }
+
+      if (version.submissionId !== linkedSubmissionId) {
+        throw badRequest(
+          "Submission version does not belong to the linked form submission",
+        );
+      }
+    }
+
+    const isReviewStatus = REVIEW_STATUSES.has(data.status);
+    const shouldKeepSubmitted = SUBMITTED_STATUSES.has(data.status);
+
+    const updates: Record<string, unknown> = {
+      status: data.status,
+      ...(data.formSubmissionId ? { formSubmissionId: data.formSubmissionId } : {}),
+    };
+
+    if (isStatusChange) {
+      if (data.status === "submitted") {
+        updates["submittedAt"] = new Date();
+        updates["submittedBy"] = actorUserId;
+      }
+
+      if (!shouldKeepSubmitted) {
+        updates["submittedAt"] = null;
+        updates["submittedBy"] = null;
+      }
+
+      if (isReviewStatus) {
+        updates["reviewedBy"] = actorUserId;
+        updates["reviewedAt"] = new Date();
+        updates["reviewNotes"] = data.reviewNotes ?? null;
+      } else {
+        updates["reviewedBy"] = null;
+        updates["reviewedAt"] = null;
+        updates["reviewNotes"] = null;
+      }
+    } else if (isReviewStatus && data.reviewNotes !== undefined) {
+      updates["reviewedBy"] = actorUserId;
+      updates["reviewedAt"] = new Date();
+      updates["reviewNotes"] = data.reviewNotes ?? null;
+    }
 
     const [updated] = await db
       .update(reportingSubmissions)
-      .set({
-        status: data.status,
-        ...(isSubmitStatus ? { submittedAt: new Date(), submittedBy: actorUserId } : {}),
-        ...(isReviewStatus
-          ? {
-              reviewedBy: actorUserId,
-              reviewedAt: new Date(),
-              reviewNotes: data.reviewNotes ?? null,
-            }
-          : {}),
-        ...(data.formSubmissionId ? { formSubmissionId: data.formSubmissionId } : {}),
-      })
+      .set(updates)
       .where(eq(reportingSubmissions.id, data.submissionId))
       .returning();
 

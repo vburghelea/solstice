@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { authenticator } from "otplib";
 
 /** Clears every trace of a previous session (cookies *and* storage). */
 export async function clearAuthState(page: Page) {
@@ -76,6 +77,66 @@ export async function uiLogin(
   }
 }
 
+export async function uiLoginWithMfa(
+  page: Page,
+  options: {
+    email: string;
+    password: string;
+    redirect?: string;
+    mfaCode?: string;
+    mfaMethod?: "totp" | "backup";
+  },
+) {
+  const {
+    email,
+    password,
+    redirect = "/dashboard",
+    mfaCode,
+    mfaMethod = "totp",
+  } = options;
+
+  await page.goto(`/auth/login?redirect=${redirect}`);
+  await page.waitForLoadState("domcontentloaded");
+  await expect(page.getByTestId("login-form")).toHaveAttribute("data-hydrated", "true", {
+    timeout: 10_000,
+  });
+
+  const emailField = page.getByLabel("Email");
+  await expect(emailField).toBeVisible({ timeout: 10_000 });
+  await emailField.fill(email);
+
+  const passwordField = page.getByLabel("Password");
+  await expect(passwordField).toBeEnabled({ timeout: 10_000 });
+  await passwordField.fill(password);
+
+  const loginButton = page.getByRole("button", { name: "Login", exact: true });
+  await expect(loginButton).toBeEnabled({ timeout: 10_000 });
+  await loginButton.click();
+
+  const twoFactorForm = page.getByTestId("login-2fa-form");
+  const needsMfa = await twoFactorForm
+    .waitFor({ state: "visible", timeout: 3_000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (needsMfa) {
+    if (!mfaCode) {
+      throw new Error("MFA required but no code provided.");
+    }
+
+    if (mfaMethod === "backup") {
+      await page.getByRole("button", { name: "Backup code" }).click();
+    }
+
+    await page.getByLabel(/Authentication code|Backup code/i).fill(mfaCode);
+    await page.getByRole("button", { name: "Verify code" }).click();
+  }
+
+  await page.waitForURL((url) => !url.toString().includes("/auth/login"), {
+    timeout: 30_000,
+  });
+}
+
 export async function login(page: Page, email: string, password: string) {
   await page.goto("/auth/login");
   await page.getByLabel("Email").fill(email);
@@ -133,7 +194,15 @@ export async function gotoWithAuth(
 
   // If we ended up on login page, authenticate
   if (expectRedirect && urlAfterGoto.includes("/auth/login")) {
-    await uiLogin(page, email, password, path);
+    const adminEmail = process.env["E2E_TEST_ADMIN_EMAIL"];
+    const adminSecret = process.env["E2E_TEST_ADMIN_TOTP_SECRET"];
+
+    if (adminEmail && adminSecret && email === adminEmail) {
+      const mfaCode = authenticator.generate(adminSecret);
+      await uiLoginWithMfa(page, { email, password, redirect: path, mfaCode });
+    } else {
+      await uiLogin(page, email, password, path);
+    }
     // After login, check if we're on dashboard (redirect might be stripped)
     await page.waitForLoadState("networkidle");
     const currentUrl = page.url();

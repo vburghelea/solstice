@@ -105,7 +105,7 @@ vi.mock("@tanstack/react-start", async (importOriginal) => {
           this._handler = handlerFn as (args: unknown) => Promise<unknown>;
 
           // Return a function that can be called like the real server function
-          const serverFn = async (args?: { data?: unknown }) => {
+          const serverFn = async (args?: { data?: unknown; context?: unknown }) => {
             let validatedData = args?.data;
 
             // Run validator if present
@@ -114,7 +114,7 @@ vi.mock("@tanstack/react-start", async (importOriginal) => {
             }
 
             // Call the handler with validated data
-            return handlerFn({ data: validatedData, context: {} });
+            return handlerFn({ data: validatedData, context: args?.context ?? {} });
           };
 
           // Preserve the builder methods for chaining inspection in tests

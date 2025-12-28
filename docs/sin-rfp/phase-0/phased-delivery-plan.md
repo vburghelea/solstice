@@ -2,6 +2,9 @@
 
 This plan aligns delivery to the SIN critical path:
 
+> Implementation status (2025-12-27): Planned. Phases reflect the intended
+> sequence; delivery progress is tracked in stream worklogs.
+
 1. **Phase 0: Architecture & Docs**
    - Architecture reference
    - Data residency statement

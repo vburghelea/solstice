@@ -31,9 +31,12 @@ const createError = (
   details?: ServerError["details"],
 ) => new TypedServerError({ code, message, ...(details ? { details } : {}) });
 
-export const unauthorized = (message = "Unauthorized") =>
-  createError("UNAUTHORIZED", message);
-export const forbidden = (message = "Forbidden") => createError("FORBIDDEN", message);
+export const unauthorized = (
+  message = "Unauthorized",
+  details?: ServerError["details"],
+) => createError("UNAUTHORIZED", message, details);
+export const forbidden = (message = "Forbidden", details?: ServerError["details"]) =>
+  createError("FORBIDDEN", message, details);
 export const notFound = (message = "Resource not found") =>
   createError("NOT_FOUND", message);
 export const badRequest = (message = "Bad request") =>

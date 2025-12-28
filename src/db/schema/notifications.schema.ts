@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -38,6 +39,20 @@ export const notifications = pgTable(
   ],
 );
 
+export const notificationEmailDeliveries = pgTable(
+  "notification_email_deliveries",
+  {
+    notificationId: uuid("notification_id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    messageId: text("message_id"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("notification_email_deliveries_user_idx").on(table.userId)],
+);
+
 export const notificationPreferences = pgTable(
   "notification_preferences",
   {
@@ -60,32 +75,26 @@ export const notificationPreferences = pgTable(
   ],
 );
 
-export const notificationTemplates = pgTable(
-  "notification_templates",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    key: text("key").notNull(),
-    category: text("category").notNull(),
-    subject: text("subject").notNull(),
-    bodyTemplate: text("body_template").notNull(),
-    isSystem: boolean("is_system").notNull().default(false),
-    createdBy: text("created_by").references(() => user.id),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [uniqueIndex("notification_templates_key_unique").on(table.key)],
-);
+export const notificationTemplates = pgTable("notification_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(),
+  category: text("category").notNull(),
+  subject: text("subject").notNull(),
+  bodyTemplate: text("body_template").notNull(),
+  isSystem: boolean("is_system").notNull().default(false),
+  createdBy: text("created_by").references(() => user.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
 
 export const scheduledNotifications = pgTable(
   "scheduled_notifications",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    templateKey: text("template_key")
-      .notNull()
-      .references(() => notificationTemplates.key),
+    templateKey: text("template_key").notNull(),
     userId: text("user_id").references(() => user.id),
     organizationId: uuid("organization_id").references(() => organizations.id),
     roleFilter: text("role_filter"),
@@ -101,11 +110,19 @@ export const scheduledNotifications = pgTable(
     index("scheduled_notifications_pending_idx")
       .on(table.scheduledFor)
       .where(sql`${table.sentAt} IS NULL AND ${table.failedAt} IS NULL`),
+    foreignKey({
+      columns: [table.templateKey],
+      foreignColumns: [notificationTemplates.key],
+      name: "scheduled_notifications_template_fk",
+    }),
   ],
 );
 
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
+export type NotificationEmailDelivery = typeof notificationEmailDeliveries.$inferSelect;
+export type NewNotificationEmailDelivery =
+  typeof notificationEmailDeliveries.$inferInsert;
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type NewNotificationPreference = typeof notificationPreferences.$inferInsert;
 export type NotificationTemplate = typeof notificationTemplates.$inferSelect;

@@ -20,6 +20,13 @@ const listSecurityEventsSchema = z
   .nullish()
   .transform((value) => value ?? {});
 
+const listAccountLocksSchema = z
+  .object({
+    includeHistory: z.boolean().optional(),
+  })
+  .nullish()
+  .transform((value) => value ?? {});
+
 export const listSecurityEvents = createServerFn({ method: "GET" })
   .inputValidator(zod$(listSecurityEventsSchema))
   .handler(async ({ data }) => {
@@ -104,57 +111,75 @@ export const listSecurityEvents = createServerFn({ method: "GET" })
       .orderBy(desc(securityEvents.createdAt));
   });
 
-export const listAccountLocks = createServerFn({ method: "GET" }).handler(async () => {
-  await assertFeatureEnabled("sin_admin_security");
-  const sessionUserId = await getSessionUserId();
-  const { unauthorized, forbidden } = await import("~/lib/server/errors");
-  if (!sessionUserId) {
-    throw unauthorized("User not authenticated");
-  }
+export const listAccountLocks = createServerFn({ method: "GET" })
+  .inputValidator(zod$(listAccountLocksSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_security");
+    const sessionUserId = await getSessionUserId();
+    const { unauthorized, forbidden } = await import("~/lib/server/errors");
+    if (!sessionUserId) {
+      throw unauthorized("User not authenticated");
+    }
 
-  const { PermissionService } = await import("~/features/roles/permission.service");
-  const isGlobalAdmin = await PermissionService.isGlobalAdmin(sessionUserId);
+    const { PermissionService } = await import("~/features/roles/permission.service");
+    const isGlobalAdmin = await PermissionService.isGlobalAdmin(sessionUserId);
 
-  const { getDb } = await import("~/db/server-helpers");
-  const { accountLocks, organizationMembers } = await import("~/db/schema");
-  const { and, desc, eq, inArray } = await import("drizzle-orm");
+    const { getDb } = await import("~/db/server-helpers");
+    const { accountLocks, organizationMembers } = await import("~/db/schema");
+    const { and, desc, eq, gt, inArray, isNull, or } = await import("drizzle-orm");
 
-  const db = await getDb();
-  if (isGlobalAdmin) {
-    return db.select().from(accountLocks).orderBy(desc(accountLocks.lockedAt));
-  }
-
-  const { getRequest } = await import("@tanstack/react-start/server");
-  const organizationId = getRequest().headers.get("x-organization-id");
-  if (!organizationId) {
-    throw forbidden("Organization context required");
-  }
-
-  const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
-    await import("~/lib/auth/guards/org-guard");
-  await requireOrganizationMembership(
-    { userId: sessionUserId, organizationId },
-    { roles: ORG_ADMIN_ROLES },
-  );
-
-  const memberRows = await db
-    .select({ userId: organizationMembers.userId })
-    .from(organizationMembers)
-    .where(
-      and(
-        eq(organizationMembers.organizationId, organizationId),
-        eq(organizationMembers.status, "active"),
-      ),
+    const db = await getDb();
+    const includeHistory = data.includeHistory ?? false;
+    const now = new Date();
+    const activeFilter = and(
+      isNull(accountLocks.unlockedAt),
+      or(isNull(accountLocks.unlockAt), gt(accountLocks.unlockAt, now)),
     );
-  const memberUserIds = memberRows.map((row) => row.userId);
-  if (memberUserIds.length === 0) return [];
 
-  return db
-    .select()
-    .from(accountLocks)
-    .where(inArray(accountLocks.userId, memberUserIds))
-    .orderBy(desc(accountLocks.lockedAt));
-});
+    if (isGlobalAdmin) {
+      return db
+        .select()
+        .from(accountLocks)
+        .where(includeHistory ? undefined : activeFilter)
+        .orderBy(desc(accountLocks.lockedAt));
+    }
+
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const organizationId = getRequest().headers.get("x-organization-id");
+    if (!organizationId) {
+      throw forbidden("Organization context required");
+    }
+
+    const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
+      await import("~/lib/auth/guards/org-guard");
+    await requireOrganizationMembership(
+      { userId: sessionUserId, organizationId },
+      { roles: ORG_ADMIN_ROLES },
+    );
+
+    const memberRows = await db
+      .select({ userId: organizationMembers.userId })
+      .from(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.status, "active"),
+        ),
+      );
+    const memberUserIds = memberRows.map((row) => row.userId);
+    if (memberUserIds.length === 0) return [];
+
+    const memberFilter = inArray(accountLocks.userId, memberUserIds);
+    const whereCondition = includeHistory
+      ? memberFilter
+      : and(memberFilter, activeFilter);
+
+    return db
+      .select()
+      .from(accountLocks)
+      .where(whereCondition)
+      .orderBy(desc(accountLocks.lockedAt));
+  });
 
 export const getAccountLockStatus = createServerFn({ method: "GET" })
   .inputValidator(zod$(accountLockStatusSchema))

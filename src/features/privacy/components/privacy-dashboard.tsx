@@ -9,12 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { createPrivacyRequest } from "../privacy.mutations";
 import { listPrivacyRequests } from "../privacy.queries";
 
 export function PrivacyDashboard() {
   const queryClient = useQueryClient();
   const [requestType, setRequestType] = useState("access");
+  const [requestDetails, setRequestDetails] = useState("");
+  const isCorrection = requestType === "correction";
 
   const { data = [] } = useQuery({
     queryKey: ["privacy", "requests"],
@@ -22,8 +25,17 @@ export function PrivacyDashboard() {
   });
 
   const requestMutation = useMutation({
-    mutationFn: () => createPrivacyRequest({ data: { type: requestType } }),
+    mutationFn: () =>
+      createPrivacyRequest({
+        data: {
+          type: requestType,
+          ...(isCorrection && requestDetails.trim()
+            ? { details: { correction: requestDetails.trim() } }
+            : {}),
+        },
+      }),
     onSuccess: () => {
+      setRequestDetails("");
       void queryClient.invalidateQueries({ queryKey: ["privacy", "requests"] });
     },
   });
@@ -49,10 +61,23 @@ export function PrivacyDashboard() {
               </SelectContent>
             </Select>
           </div>
+          {isCorrection ? (
+            <div className="min-w-[260px] flex-1">
+              <label className="text-sm font-medium">Correction details</label>
+              <Textarea
+                className="mt-2"
+                value={requestDetails}
+                onChange={(event) => setRequestDetails(event.target.value)}
+                placeholder="Describe what needs to be corrected."
+              />
+            </div>
+          ) : null}
           <Button
             type="button"
             onClick={() => requestMutation.mutate()}
-            disabled={requestMutation.isPending}
+            disabled={
+              requestMutation.isPending || (isCorrection && !requestDetails.trim())
+            }
           >
             {requestMutation.isPending ? "Submitting..." : "Submit request"}
           </Button>
@@ -60,20 +85,39 @@ export function PrivacyDashboard() {
         {data.length === 0 ? (
           <p className="text-muted-foreground text-sm">No privacy requests yet.</p>
         ) : (
-          data.map((request) => (
-            <div
-              key={request.id}
-              className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2"
-            >
-              <div>
-                <p className="text-sm font-semibold">{request.type}</p>
-                <p className="text-muted-foreground text-xs">{request.status}</p>
+          data.map((request) => {
+            const correctionDetails =
+              request.type === "correction" &&
+              request.details &&
+              typeof request.details === "object" &&
+              "correction" in request.details
+                ? String(
+                    (
+                      request.details as {
+                        correction?: unknown;
+                      }
+                    ).correction ?? "",
+                  )
+                : "";
+
+            return (
+              <div
+                key={request.id}
+                className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2"
+              >
+                <div>
+                  <p className="text-sm font-semibold">{request.type}</p>
+                  <p className="text-muted-foreground text-xs">{request.status}</p>
+                  {correctionDetails ? (
+                    <p className="text-muted-foreground text-xs">{correctionDetails}</p>
+                  ) : null}
+                </div>
+                <span className="text-muted-foreground text-xs">
+                  {new Date(request.createdAt).toLocaleDateString()}
+                </span>
               </div>
-              <span className="text-muted-foreground text-xs">
-                {new Date(request.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </CardContent>
     </Card>

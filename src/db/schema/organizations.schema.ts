@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   foreignKey,
   index,
   jsonb,
@@ -58,6 +59,8 @@ export const organizations = pgTable(
     type: organizationTypeEnum("type").notNull(),
     parentOrgId: uuid("parent_org_id"),
     status: organizationStatusEnum("status").notNull().default("active"),
+    isDiscoverable: boolean("is_discoverable").notNull().default(false),
+    joinRequestsEnabled: boolean("join_requests_enabled").notNull().default(false),
     settings: jsonb("settings").$type<JsonRecord>().notNull().default({}),
     metadata: jsonb("metadata").$type<JsonRecord>().notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

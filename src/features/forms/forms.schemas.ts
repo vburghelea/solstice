@@ -15,11 +15,34 @@ export const formFieldTypeSchema = z.enum([
   "rich_text",
 ]);
 
-export const validationRuleSchema = z.object({
-  type: z.enum(["min_length", "max_length", "pattern", "min", "max", "custom"]),
-  value: z.union([z.string(), z.number()]),
-  message: z.string(),
-});
+export const validationRuleSchema = z
+  .object({
+    type: z.enum(["min_length", "max_length", "pattern", "min", "max", "custom"]),
+    value: z.union([z.string(), z.number()]),
+    message: z.string(),
+  })
+  .superRefine((rule, ctx) => {
+    if (rule.type !== "pattern") return;
+
+    if (typeof rule.value !== "string") {
+      ctx.addIssue({
+        code: "custom",
+        message: "Pattern rule requires a string value",
+        path: ["value"],
+      });
+      return;
+    }
+
+    try {
+      new RegExp(rule.value);
+    } catch {
+      ctx.addIssue({
+        code: "custom",
+        message: "Invalid regex pattern",
+        path: ["value"],
+      });
+    }
+  });
 
 export const formFieldSchema = z.object({
   key: z.string().min(1),
@@ -28,6 +51,7 @@ export const formFieldSchema = z.object({
   description: z.string().optional(),
   placeholder: z.string().optional(),
   required: z.boolean(),
+  dataClassification: z.enum(["none", "personal", "sensitive"]).default("none"),
   validation: z.array(validationRuleSchema).optional(),
   options: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
   conditional: z

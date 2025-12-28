@@ -1,9 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.utils";
-import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
+import {
+  buildImportFieldLookup,
+  getMappedFileFields,
+  parseImportRow,
+} from "~/features/imports/imports.utils";
+import { badRequest, forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
-import type { JsonRecord } from "~/shared/lib/json";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createImportJobSchema,
@@ -108,6 +112,20 @@ export const updateImportJobStatus = createServerFn({ method: "POST" })
       .where(eq(importJobs.id, data.jobId))
       .returning();
 
+    if (updated) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_JOB_STATUS_UPDATE",
+        actorUserId,
+        targetType: "import_job",
+        targetId: updated.id,
+        targetOrgId: updated.organizationId,
+        metadata: {
+          status: data.status,
+        },
+      });
+    }
+
     return updated ?? null;
   });
 
@@ -140,6 +158,17 @@ export const createMappingTemplate = createServerFn({ method: "POST" })
         createdBy: actorUserId,
       })
       .returning();
+
+    if (created) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_MAPPING_TEMPLATE_CREATE",
+        actorUserId,
+        targetType: "import_mapping_template",
+        targetId: created.id,
+        targetOrgId: created.organizationId ?? null,
+      });
+    }
 
     return created ?? null;
   });
@@ -185,6 +214,17 @@ export const updateMappingTemplate = createServerFn({ method: "POST" })
       .where(eq(importMappingTemplates.id, data.templateId))
       .returning();
 
+    if (updated) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_MAPPING_TEMPLATE_UPDATE",
+        actorUserId,
+        targetType: "import_mapping_template",
+        targetId: updated.id,
+        targetOrgId: updated.organizationId ?? null,
+      });
+    }
+
     return updated ?? null;
   });
 
@@ -221,6 +261,16 @@ export const deleteMappingTemplate = createServerFn({ method: "POST" })
     await db
       .delete(importMappingTemplates)
       .where(eq(importMappingTemplates.id, data.templateId));
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "IMPORT_MAPPING_TEMPLATE_DELETE",
+      actorUserId,
+      targetType: "import_mapping_template",
+      targetId: existing.id,
+      targetOrgId: existing.organizationId ?? null,
+    });
+
     return { success: true };
   });
 
@@ -272,6 +322,7 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
     const {
       formSubmissionVersions,
       formSubmissions,
+      forms,
       formVersions,
       importJobErrors,
       importJobs,
@@ -289,7 +340,29 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
       throw notFound("Import job not found");
     }
 
+    if (job.lane !== "interactive") {
+      throw badRequest("Interactive import requires a lane 1 job.");
+    }
+
     await requireOrgAccess(actorUserId, job.organizationId);
+
+    if (job.targetFormId && job.targetFormId !== data.formId) {
+      throw badRequest("Import job target form does not match.");
+    }
+
+    const [form] = await db
+      .select({ organizationId: forms.organizationId })
+      .from(forms)
+      .where(eq(forms.id, data.formId))
+      .limit(1);
+
+    if (!form) {
+      throw notFound("Form not found");
+    }
+
+    if (!form.organizationId || form.organizationId !== job.organizationId) {
+      throw forbidden("Import job organization does not match form.");
+    }
 
     const [latestVersion] = await db
       .select()
@@ -303,9 +376,49 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
     }
 
     const definition = latestVersion.definition as FormDefinition;
-    const fieldLookup = new Map(definition.fields.map((field) => [field.key, field]));
+    const fieldLookup = buildImportFieldLookup(definition);
 
     const mapping = data.mapping as Record<string, string>;
+    const mappedFileFields = getMappedFileFields(mapping, fieldLookup);
+    if (mappedFileFields.length > 0) {
+      await db
+        .update(importJobs)
+        .set({
+          status: "failed",
+          errorSummary: {
+            reason: "file_fields_not_supported",
+            fields: mappedFileFields,
+          },
+          completedAt: new Date(),
+        })
+        .where(eq(importJobs.id, job.id));
+      throw badRequest("File field imports are not supported yet.");
+    }
+
+    if (!job.targetFormId) {
+      await db
+        .update(importJobs)
+        .set({ targetFormId: data.formId })
+        .where(eq(importJobs.id, job.id));
+    }
+
+    const { loadImportFile } = await import("~/lib/imports/file-utils");
+    const { rows, hash } = await loadImportFile(
+      job.sourceFileKey,
+      job.type as "csv" | "excel",
+    );
+
+    if (hash !== job.sourceFileHash) {
+      await db
+        .update(importJobs)
+        .set({
+          status: "failed",
+          errorSummary: { reason: "source_file_hash_mismatch" },
+          completedAt: new Date(),
+        })
+        .where(eq(importJobs.id, job.id));
+      throw forbidden("Import source file hash mismatch.");
+    }
     const errors: Array<{
       rowNumber: number;
       fieldKey: string | null;
@@ -315,52 +428,50 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
     }> = [];
 
     let inserted = 0;
+    const failedRows = new Set<number>();
 
-    for (const [rowIndex, row] of data.rows.entries()) {
-      const payload: JsonRecord = {};
-
-      Object.entries(mapping).forEach(([sourceColumn, targetFieldKey]) => {
-        if (!targetFieldKey) return;
-        const field = fieldLookup.get(targetFieldKey);
-        const rawValue = (row as JsonRecord)[sourceColumn];
-        if (!field) return;
-
-        if (field.type === "number") {
-          payload[targetFieldKey] = rawValue === "" ? null : Number(rawValue);
-          return;
-        }
-
-        if (field.type === "checkbox") {
-          const normalized = String(rawValue).toLowerCase();
-          payload[targetFieldKey] = ["true", "1", "yes", "y"].includes(normalized);
-          return;
-        }
-
-        if (field.type === "multiselect") {
-          payload[targetFieldKey] =
-            typeof rawValue === "string" ? rawValue.split(",").map((v) => v.trim()) : [];
-          return;
-        }
-
-        payload[targetFieldKey] = rawValue ?? null;
-      });
-
+    for (const [rowIndex, row] of rows.entries()) {
+      const { payload, parseErrors } = parseImportRow(row, mapping, fieldLookup);
       const sanitizedPayload = await sanitizePayload(definition, payload);
       const validation = validateFormPayload(definition, sanitizedPayload);
 
-      if (validation.validationErrors.length > 0 || validation.missingFields.length > 0) {
-        validation.validationErrors.forEach((error) => {
+      const parseErrorFields = new Set(parseErrors.map((error) => error.fieldKey));
+      const validationErrors = validation.validationErrors.filter(
+        (error) => !parseErrorFields.has(error.field),
+      );
+      const missingFields = validation.missingFields.filter(
+        (fieldKey) => !parseErrorFields.has(fieldKey),
+      );
+
+      if (
+        parseErrors.length > 0 ||
+        validationErrors.length > 0 ||
+        missingFields.length > 0
+      ) {
+        const rowNumber = rowIndex + 1;
+        failedRows.add(rowNumber);
+
+        parseErrors.forEach((error) => {
           errors.push({
-            rowNumber: rowIndex + 1,
+            rowNumber,
+            fieldKey: error.fieldKey,
+            errorType: error.errorType,
+            errorMessage: error.message,
+            rawValue: error.rawValue,
+          });
+        });
+        validationErrors.forEach((error) => {
+          errors.push({
+            rowNumber,
             fieldKey: error.field,
             errorType: "validation",
             errorMessage: error.message,
             rawValue: String(payload[error.field] ?? ""),
           });
         });
-        validation.missingFields.forEach((fieldKey) => {
+        missingFields.forEach((fieldKey) => {
           errors.push({
-            rowNumber: rowIndex + 1,
+            rowNumber,
             fieldKey,
             errorType: "required",
             errorMessage: "Missing required field",
@@ -413,9 +524,11 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
     }
 
     const stats = {
-      processed: data.rows.length,
+      processed: rows.length,
       inserted,
-      failed: errors.length,
+      failed: failedRows.size,
+      failedRows: failedRows.size,
+      errorCount: errors.length,
     };
 
     await db
@@ -423,7 +536,10 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
       .set({
         status: "completed",
         stats,
-        errorSummary: errors.length > 0 ? { errors: errors.length } : {},
+        errorSummary:
+          errors.length > 0
+            ? { errorCount: errors.length, failedRows: failedRows.size }
+            : {},
         completedAt: new Date(),
       })
       .where(eq(importJobs.id, job.id));
@@ -438,7 +554,12 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
       metadata: stats,
     });
 
-    return { success: true, stats, errorCount: errors.length };
+    return {
+      success: true,
+      stats,
+      errorCount: errors.length,
+      failedRows: failedRows.size,
+    };
   });
 
 export const runBatchImport = createServerFn({ method: "POST" })
@@ -446,9 +567,32 @@ export const runBatchImport = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
-    const { runBatchImportJob } = await import("~/lib/imports/batch-runner");
+    const { Resource } = await import("sst");
 
-    return runBatchImportJob({ jobId: data.jobId, actorUserId });
+    type ImportTaskResource = {
+      cluster: string;
+      taskDefinition: string;
+      subnets: string[];
+      securityGroups: string[];
+      assignPublicIp: boolean;
+      containers: string[];
+    };
+
+    const resources = Resource as unknown as Record<string, unknown>;
+    const importTask = resources["SinImportBatchTask"] as ImportTaskResource | undefined;
+
+    if (!importTask?.taskDefinition) {
+      const { runBatchImportJob } = await import("~/lib/imports/batch-runner");
+      return runBatchImportJob({ jobId: data.jobId, actorUserId });
+    }
+
+    const { task } = await import("sst/aws/task");
+    const runResult = await task.run(importTask, {
+      SIN_IMPORT_JOB_ID: data.jobId,
+      SIN_IMPORT_ACTOR_USER_ID: actorUserId,
+    });
+
+    return { success: true, taskArn: runResult.arn };
   });
 
 export const rollbackImportJob = createServerFn({ method: "POST" })
@@ -457,7 +601,7 @@ export const rollbackImportJob = createServerFn({ method: "POST" })
     await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
     const { getDb } = await import("~/db/server-helpers");
-    const { formSubmissions, importJobs } = await import("~/db/schema");
+    const { formSubmissions, importJobErrors, importJobs } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
 
     const db = await getDb();
@@ -481,19 +625,29 @@ export const rollbackImportJob = createServerFn({ method: "POST" })
       throw forbidden("Rollback window has expired.");
     }
 
-    const deleted = await db
-      .delete(formSubmissions)
-      .where(eq(formSubmissions.importJobId, job.id))
-      .returning();
+    let deletedCount = 0;
+    await db.transaction(async (tx) => {
+      const deleted = await tx
+        .delete(formSubmissions)
+        .where(eq(formSubmissions.importJobId, job.id))
+        .returning();
 
-    await db
-      .update(importJobs)
-      .set({
-        status: "rolled_back",
-        canRollback: false,
-        completedAt: new Date(),
-      })
-      .where(eq(importJobs.id, job.id));
+      deletedCount = deleted.length;
+
+      await tx
+        .update(importJobErrors)
+        .set({ rawValue: null })
+        .where(eq(importJobErrors.jobId, job.id));
+
+      await tx
+        .update(importJobs)
+        .set({
+          status: "rolled_back",
+          canRollback: false,
+          completedAt: new Date(),
+        })
+        .where(eq(importJobs.id, job.id));
+    });
 
     const { logAdminAction } = await import("~/lib/audit");
     await logAdminAction({
@@ -503,10 +657,11 @@ export const rollbackImportJob = createServerFn({ method: "POST" })
       targetId: job.id,
       targetOrgId: job.organizationId,
       metadata: {
-        deletedCount: deleted.length,
+        deletedCount,
         reason: data.reason ?? null,
+        rawValuesSanitized: true,
       },
     });
 
-    return { success: true, deletedCount: deleted.length };
+    return { success: true, deletedCount };
   });

@@ -78,6 +78,7 @@ export const env = createEnv({
     AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
     AWS_EXECUTION_ENV: z.string().optional(),
     SIN_ARTIFACTS_BUCKET: z.string().optional(),
+    SIN_ARTIFACTS_KMS_KEY_ID: z.string().optional(),
 
     // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
     VITE_BASE_URL: z.url().optional(),

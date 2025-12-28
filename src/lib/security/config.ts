@@ -24,10 +24,10 @@ export const securityConfig = {
 
   // Session configuration
   session: {
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    updateAge: 60 * 60 * 24, // Update session if older than 1 day
+    maxAge: 60 * 60 * 8, // 8 hours
+    updateAge: 60 * 30, // 30 minutes
     cookieCache: {
-      enabled: true,
+      enabled: false,
       maxAge: 60 * 5, // 5 minutes
     },
   },
@@ -37,7 +37,7 @@ export const securityConfig = {
     credentials: true,
     origin: getBaseUrl(),
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Organization-Id"],
   },
 
   // Rate limiting defaults
@@ -63,6 +63,27 @@ export const securityConfig = {
     // Allowed email domains for OAuth sign-ups (comma-separated in env)
     // Example: OAUTH_ALLOWED_DOMAINS=company.com,partner.com
     allowedDomains: env.OAUTH_ALLOWED_DOMAINS,
+  },
+} as const;
+
+export const SECURITY_THRESHOLDS = {
+  loginFailures: {
+    flagThreshold: 3,
+    flagWindowMs: 15 * 60 * 1000,
+    lockThreshold: 5,
+    lockWindowMs: 15 * 60 * 1000,
+    lockDurationMs: 30 * 60 * 1000,
+  },
+  mfaFailures: {
+    flagThreshold: 2,
+    flagWindowMs: 5 * 60 * 1000,
+    lockThreshold: 3,
+    lockWindowMs: 5 * 60 * 1000,
+    lockDurationMs: 15 * 60 * 1000,
+  },
+  newContext: {
+    riskScoreThreshold: 50,
+    lookbackLimit: 10,
   },
 } as const;
 

@@ -12,12 +12,19 @@ import { getBrand } from "~/tenant";
 import { authQueryKey } from "../auth.queries";
 import { signupFormFields } from "../auth.schemas";
 
-export default function SignupForm() {
+type SignupFormProps = {
+  inviteToken?: string;
+};
+
+export default function SignupForm({ inviteToken }: SignupFormProps) {
   const brand = getBrand();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
-  const redirectUrl = "/dashboard"; // Default redirect after signup
+  const redirectUrl = inviteToken ? `/join/${inviteToken}` : "/dashboard";
+  const loginHref = inviteToken
+    ? `/auth/login?redirect=${encodeURIComponent(`/join/${inviteToken}`)}`
+    : "/auth/login";
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -209,7 +216,7 @@ export default function SignupForm() {
 
       <div className="text-center text-sm">
         Already have an account?{" "}
-        <Link to="/auth/login" className="underline underline-offset-4">
+        <Link to={loginHref} className="underline underline-offset-4">
           Login
         </Link>
       </div>

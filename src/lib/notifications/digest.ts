@@ -107,10 +107,11 @@ export const processNotificationDigests = createServerOnlyFn(async () => {
 
     await logDataChange({
       action: "NOTIFICATION_DIGEST_SENT",
-      actorUserId: preference.userId,
+      actorUserId: null,
       targetType: "notification_digest",
       targetId: preference.userId,
       metadata: {
+        recipientUserId: preference.userId,
         category: preference.category,
         count: rows.length,
         window: preference.emailFrequency,

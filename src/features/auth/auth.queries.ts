@@ -8,13 +8,13 @@ import type { User } from "~/lib/auth/types";
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(
   async (): Promise<User | null> => {
     // Import server-only modules inside the handler
-    const { getDb } = await import("~/db/server-helpers");
-    const { getAuth } = await import("~/lib/auth/server-helpers");
-    const auth = await getAuth();
-    const { getRequest } = await import("@tanstack/react-start/server");
+    const [{ getDb }, { getSessionFromHeaders }, { getRequest }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("~/lib/auth/session"),
+      import("@tanstack/react-start/server"),
+    ]);
     const { headers } = getRequest();
-
-    const session = await auth.api.getSession({ headers });
+    const session = await getSessionFromHeaders(headers);
 
     if (!session?.user) {
       return null;

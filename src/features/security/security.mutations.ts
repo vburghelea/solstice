@@ -7,41 +7,40 @@ import {
   unlockUserSchema,
 } from "./security.schemas";
 
+const getSessionUserId = async () => {
+  const { getAuth } = await import("~/lib/auth/server-helpers");
+  const { getRequest } = await import("@tanstack/react-start/server");
+  const auth = await getAuth();
+  const { headers } = getRequest();
+  const session = await auth.api.getSession({ headers });
+  return session?.user?.id ?? null;
+};
+
 export const recordSecurityEvent = createServerFn({ method: "POST" })
   .inputValidator(zod$(recordSecurityEventSchema))
   .handler(async ({ data }) => {
     await assertFeatureEnabled("security_core");
+    const { unauthorized, forbidden } = await import("~/lib/server/errors");
     const { recordSecurityEvent: recordEvent } = await import("~/lib/security/events");
-    const { applySecurityRules } = await import("~/lib/security/detection");
 
-    let resolvedUserId = data.userId ?? null;
+    const trustedEventTypes = new Set(["logout"]);
+    const untrustedEventTypes = new Set<string>();
+    const normalizedEventType = data.eventType.toLowerCase();
+    const sessionUserId = await getSessionUserId();
 
-    if (!resolvedUserId && data.identifier) {
-      const { getDb } = await import("~/db/server-helpers");
-      const { user } = await import("~/db/schema");
-      const { eq } = await import("drizzle-orm");
-
-      const db = await getDb();
-      const [record] = await db
-        .select({ id: user.id })
-        .from(user)
-        .where(eq(user.email, data.identifier.toLowerCase()))
-        .limit(1);
-
-      resolvedUserId = record?.id ?? null;
+    if (!sessionUserId && !untrustedEventTypes.has(normalizedEventType)) {
+      throw unauthorized("User not authenticated");
     }
 
-    const event = await recordEvent({
-      userId: resolvedUserId,
-      eventType: data.eventType,
+    if (sessionUserId && !trustedEventTypes.has(normalizedEventType)) {
+      throw forbidden("Security event type not permitted");
+    }
+
+    return recordEvent({
+      userId: sessionUserId ?? null,
+      eventType: normalizedEventType,
       ...(data.metadata !== undefined ? { metadata: data.metadata } : {}),
     });
-
-    if (resolvedUserId) {
-      await applySecurityRules({ userId: resolvedUserId, eventType: data.eventType });
-    }
-
-    return event;
   });
 
 export const lockUserAccount = createServerFn({ method: "POST" })

@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
@@ -16,22 +18,23 @@ import type {
   OrganizationSummary,
 } from "./organizations.types";
 
-const getSessionUserId = async () => {
-  const { getAuth } = await import("~/lib/auth/server-helpers");
-  const { getRequest } = await import("@tanstack/react-start/server");
-  const auth = await getAuth();
-  const { headers } = getRequest();
-  const session = await auth.api.getSession({ headers });
-
-  return session?.user?.id ?? null;
-};
-
 const listAccessibleOrganizationsSchema = z.void().nullish();
+const validateActiveOrganizationSchema = z.object({
+  organizationId: z.string().nullable().optional(),
+});
 
 export const getOrganization = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(getOrganizationSchema))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_portal");
+    const user = requireUser(context);
+    const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+    await requireOrganizationAccess({
+      userId: user.id,
+      organizationId: data.organizationId,
+    });
+
     const { getDb } = await import("~/db/server-helpers");
     const { organizations } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
@@ -47,11 +50,11 @@ export const getOrganization = createServerFn({ method: "GET" })
   });
 
 export const listOrganizations = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(listOrganizationsSchema))
-  .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+  .handler(async ({ data, context }): Promise<OrganizationSummary[]> => {
     await assertFeatureEnabled("sin_portal");
-    const userId = await getSessionUserId();
-    if (!userId) return [];
+    const user = requireUser(context);
 
     const { getDb } = await import("~/db/server-helpers");
     const { organizationMembers, organizations } = await import("~/db/schema");
@@ -59,8 +62,15 @@ export const listOrganizations = createServerFn({ method: "GET" })
 
     const db = await getDb();
     const conditions = data?.includeArchived
-      ? eq(organizationMembers.userId, userId)
-      : and(eq(organizationMembers.userId, userId), eq(organizations.status, "active"));
+      ? and(
+          eq(organizationMembers.userId, user.id),
+          eq(organizationMembers.status, "active"),
+        )
+      : and(
+          eq(organizationMembers.userId, user.id),
+          eq(organizationMembers.status, "active"),
+          eq(organizations.status, "active"),
+        );
 
     const rows = await db
       .select({
@@ -81,20 +91,54 @@ export const listOrganizations = createServerFn({ method: "GET" })
   });
 
 export const listAccessibleOrganizations = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(listAccessibleOrganizationsSchema))
-  .handler(async (): Promise<AccessibleOrganization[]> => {
+  .handler(async ({ context }): Promise<AccessibleOrganization[]> => {
     await assertFeatureEnabled("sin_portal");
-    const userId = await getSessionUserId();
-    if (!userId) return [];
+    const user = requireUser(context);
 
     const { listAccessibleOrganizationsForUser } = await import("./organizations.access");
-    return listAccessibleOrganizationsForUser(userId);
+    return listAccessibleOrganizationsForUser(user.id);
   });
 
+export const validateActiveOrganization = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(zod$(validateActiveOrganizationSchema))
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{ organizationId: string; role: OrganizationRole } | null> => {
+      const user = requireUser(context);
+      const organizationId = data?.organizationId ?? null;
+      if (!organizationId) return null;
+
+      const parsedOrganizationId = z.uuid().safeParse(organizationId);
+      if (!parsedOrganizationId.success) return null;
+
+      const { resolveOrganizationAccess } = await import("./organizations.access");
+      const access = await resolveOrganizationAccess({
+        userId: user.id,
+        organizationId: parsedOrganizationId.data,
+      });
+      if (!access) return null;
+
+      return {
+        organizationId: access.organizationId,
+        role: access.role as OrganizationRole,
+      };
+    },
+  );
+
 export const searchOrganizations = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(searchOrganizationsSchema))
-  .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+  .handler(async ({ data, context }): Promise<OrganizationSummary[]> => {
     await assertFeatureEnabled("sin_admin_orgs");
+    const user = requireUser(context);
+    const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+    await requireAdmin(user.id);
+
     const { getDb } = await import("~/db/server-helpers");
     const { organizations } = await import("~/db/schema");
     const { ilike } = await import("drizzle-orm");
@@ -115,6 +159,13 @@ export const searchOrganizations = createServerFn({ method: "GET" })
       .where(ilike(organizations.name, `%${data.query}%`))
       .limit(25);
 
+    const { logAdminAction } = await import("~/lib/audit");
+    await logAdminAction({
+      action: "ORG_SEARCH",
+      actorUserId: user.id,
+      metadata: { query: data.query, resultCount: rows.length },
+    });
+
     return rows;
   });
 
@@ -123,9 +174,13 @@ export const searchOrganizations = createServerFn({ method: "GET" })
  * Requires sin_admin_orgs feature flag.
  */
 export const listAllOrganizations = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(listOrganizationsSchema))
-  .handler(async ({ data }): Promise<OrganizationSummary[]> => {
+  .handler(async ({ data, context }): Promise<OrganizationSummary[]> => {
     await assertFeatureEnabled("sin_admin_orgs");
+    const user = requireUser(context);
+    const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+    await requireAdmin(user.id);
 
     const { getDb } = await import("~/db/server-helpers");
     const { organizations } = await import("~/db/schema");
@@ -150,24 +205,35 @@ export const listAllOrganizations = createServerFn({ method: "GET" })
       .from(organizations)
       .where(conditions);
 
+    const { logAdminAction } = await import("~/lib/audit");
+    await logAdminAction({
+      action: "ORG_LIST_ALL",
+      actorUserId: user.id,
+      metadata: {
+        includeArchived: Boolean(data?.includeArchived),
+        resultCount: rows.length,
+      },
+    });
+
     return rows;
   });
 
 export const listOrganizationMembers = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(listOrganizationMembersSchema))
-  .handler(async ({ data }): Promise<OrganizationMemberRow[]> => {
+  .handler(async ({ data, context }): Promise<OrganizationMemberRow[]> => {
     await assertFeatureEnabled("sin_admin_orgs");
-    const userId = await getSessionUserId();
-    if (!userId) return [];
+    const user = requireUser(context);
 
-    const { requireOrganizationMembership } = await import("~/lib/auth/guards/org-guard");
-    await requireOrganizationMembership({
-      userId,
-      organizationId: data.organizationId,
-    });
+    const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
+      await import("~/lib/auth/guards/org-guard");
+    await requireOrganizationAccess(
+      { userId: user.id, organizationId: data.organizationId },
+      { roles: ORG_ADMIN_ROLES },
+    );
 
     const { getDb } = await import("~/db/server-helpers");
-    const { organizationMembers, user } = await import("~/db/schema");
+    const { organizationMembers, user: userTable } = await import("~/db/schema");
     const { and, eq } = await import("drizzle-orm");
 
     const db = await getDb();
@@ -183,8 +249,8 @@ export const listOrganizationMembers = createServerFn({ method: "GET" })
         id: organizationMembers.id,
         organizationId: organizationMembers.organizationId,
         userId: organizationMembers.userId,
-        userName: user.name,
-        userEmail: user.email,
+        userName: userTable.name,
+        userEmail: userTable.email,
         role: organizationMembers.role,
         status: organizationMembers.status,
         invitedBy: organizationMembers.invitedBy,
@@ -195,28 +261,28 @@ export const listOrganizationMembers = createServerFn({ method: "GET" })
         updatedAt: organizationMembers.updatedAt,
       })
       .from(organizationMembers)
-      .innerJoin(user, eq(organizationMembers.userId, user.id))
+      .innerJoin(userTable, eq(organizationMembers.userId, userTable.id))
       .where(conditions);
 
     return rows;
   });
 
 export const listDelegatedAccess = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(zod$(listDelegatedAccessSchema))
-  .handler(async ({ data }): Promise<DelegatedAccessRow[]> => {
+  .handler(async ({ data, context }): Promise<DelegatedAccessRow[]> => {
     await assertFeatureEnabled("sin_admin_orgs");
-    const userId = await getSessionUserId();
-    if (!userId) return [];
+    const user = requireUser(context);
 
-    const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
+    const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
       await import("~/lib/auth/guards/org-guard");
-    await requireOrganizationMembership(
-      { userId, organizationId: data.organizationId },
+    await requireOrganizationAccess(
+      { userId: user.id, organizationId: data.organizationId },
       { roles: ORG_ADMIN_ROLES },
     );
 
     const { getDb } = await import("~/db/server-helpers");
-    const { delegatedAccess, user } = await import("~/db/schema");
+    const { delegatedAccess, user: userTable } = await import("~/db/schema");
     const { eq } = await import("drizzle-orm");
 
     const db = await getDb();
@@ -225,7 +291,7 @@ export const listDelegatedAccess = createServerFn({ method: "GET" })
         id: delegatedAccess.id,
         organizationId: delegatedAccess.organizationId,
         delegateUserId: delegatedAccess.delegateUserId,
-        delegateEmail: user.email,
+        delegateEmail: userTable.email,
         scope: delegatedAccess.scope,
         grantedBy: delegatedAccess.grantedBy,
         grantedAt: delegatedAccess.grantedAt,
@@ -235,7 +301,7 @@ export const listDelegatedAccess = createServerFn({ method: "GET" })
         notes: delegatedAccess.notes,
       })
       .from(delegatedAccess)
-      .innerJoin(user, eq(delegatedAccess.delegateUserId, user.id))
+      .innerJoin(userTable, eq(delegatedAccess.delegateUserId, userTable.id))
       .where(eq(delegatedAccess.organizationId, data.organizationId));
 
     return rows;

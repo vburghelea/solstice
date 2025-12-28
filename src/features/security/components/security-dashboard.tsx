@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { lockUserAccount, unlockUserAccount } from "../security.mutations";
 import { listAccountLocks, listSecurityEvents } from "../security.queries";
@@ -11,6 +12,7 @@ export function SecurityDashboard() {
   const [targetUserId, setTargetUserId] = useState("");
   const [lockReason, setLockReason] = useState("");
   const [unlockReason, setUnlockReason] = useState("");
+  const [includeHistory, setIncludeHistory] = useState(false);
 
   const { data: events = [] } = useQuery({
     queryKey: ["security", "events"],
@@ -18,8 +20,8 @@ export function SecurityDashboard() {
   });
 
   const { data: locks = [] } = useQuery({
-    queryKey: ["security", "locks"],
-    queryFn: () => listAccountLocks(),
+    queryKey: ["security", "locks", { includeHistory }],
+    queryFn: () => listAccountLocks({ data: { includeHistory } }),
   });
 
   const lockMutation = useMutation({
@@ -116,9 +118,21 @@ export function SecurityDashboard() {
         <CardHeader>
           <CardTitle>Account Locks</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+        <CardContent className="space-y-3 text-sm">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="security-lock-history"
+              checked={includeHistory}
+              onCheckedChange={(value) => setIncludeHistory(Boolean(value))}
+            />
+            <label htmlFor="security-lock-history" className="text-sm">
+              Include history
+            </label>
+          </div>
           {locks.length === 0 ? (
-            <p className="text-muted-foreground">No active locks.</p>
+            <p className="text-muted-foreground">
+              {includeHistory ? "No locks recorded." : "No active locks."}
+            </p>
           ) : (
             locks.slice(0, 8).map((lock) => (
               <div key={lock.id} className="flex items-center justify-between">

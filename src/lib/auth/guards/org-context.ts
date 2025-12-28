@@ -1,9 +1,8 @@
 import { createMiddleware } from "@tanstack/react-start";
 
 const getSessionUserId = async (headers: Headers) => {
-  const { getAuth } = await import("~/lib/auth/server-helpers");
-  const auth = await getAuth();
-  const session = await auth.api.getSession({ headers });
+  const { getSessionFromHeaders } = await import("~/lib/auth/session");
+  const session = await getSessionFromHeaders(headers);
   return session?.user?.id ?? null;
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { getBrand } from "~/tenant";
 
 interface LogoProps {
@@ -19,19 +19,19 @@ const logoSources = {
 
 export function Logo({ className, alt }: LogoProps) {
   const brand = getBrand();
-  const source = brand.logoVariant === "viasport" ? logoSources.viasport : logoSources.qc;
-  const [src, setSrc] = useState<string>(source.src);
-
-  useEffect(() => {
-    setSrc(source.src);
-  }, [source.src]);
+  const source = useMemo(
+    () => (brand.logoVariant === "viasport" ? logoSources.viasport : logoSources.qc),
+    [brand.logoVariant],
+  );
+  const [hasError, setHasError] = useState(false);
+  const src = hasError ? source.fallback : source.src;
 
   return (
     <img
       src={src}
       alt={alt ?? `${brand.name} logo`}
       className={"object-contain " + (className ?? "")}
-      onError={() => setSrc(source.fallback)}
+      onError={() => setHasError(true)}
     />
   );
 }

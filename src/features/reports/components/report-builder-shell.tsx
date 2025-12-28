@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
 import { getStepUpErrorMessage, useStepUpPrompt } from "~/features/auth/step-up";
 import { listOrganizations } from "~/features/organizations/organizations.queries";
@@ -32,6 +33,7 @@ import {
   updateSavedReport,
 } from "../reports.mutations";
 import { listSavedReports } from "../reports.queries";
+import { ReportPivotBuilder } from "./report-pivot-builder";
 
 const dataSourceOptions = [
   { value: "organizations", label: "Organizations" },
@@ -42,7 +44,6 @@ const dataSourceOptions = [
 const exportTypeOptions = [
   { value: "csv", label: "CSV" },
   { value: "excel", label: "Excel" },
-  { value: "pdf", label: "PDF" },
 ];
 
 const parseJsonInput = (value: string) => {
@@ -300,21 +301,20 @@ export function ReportBuilderShell() {
 
   const exportMutation = useMutation({
     mutationFn: exportReport,
-    onSuccess: (result, variables) => {
+    onSuccess: (result) => {
       if (!result?.data) return;
-      const exportType =
-        typeof variables === "object" && variables && "data" in variables
-          ? (variables as { data?: { exportType?: "csv" | "excel" | "pdf" } }).data
-              ?.exportType
-          : undefined;
-      const extension = exportType === "pdf" ? "pdf" : "csv";
-      const blob = new Blob([result.data], {
-        type: exportType === "pdf" ? "application/pdf" : "text/csv",
+      const encoding = result.encoding ?? "utf-8";
+      const blobData =
+        encoding === "base64"
+          ? Uint8Array.from(atob(result.data), (char) => char.charCodeAt(0))
+          : result.data;
+      const blob = new Blob([blobData], {
+        type: result.mimeType ?? "text/csv",
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `report-export.${extension}`;
+      link.download = result.fileName ?? "report-export.csv";
       link.click();
       URL.revokeObjectURL(url);
     },
@@ -376,20 +376,23 @@ export function ReportBuilderShell() {
       exportType: "csv",
       filters: "",
       columns: "",
+      sort: "",
     },
     onSubmit: async ({ value }) => {
       const filters = parseJsonInput(value.filters);
-      if (filters === null) {
-        toast.error("Filters JSON is invalid.");
+      const sort = parseJsonInput(value.sort);
+      if (filters === null || sort === null) {
+        toast.error("Filters or sort JSON is invalid.");
         return;
       }
 
       exportMutation.mutate({
         data: {
           dataSource: value.dataSource,
-          exportType: value.exportType as "csv" | "excel" | "pdf",
+          exportType: value.exportType as "csv" | "excel",
           filters: filters ?? undefined,
           columns: parseListInput(value.columns),
+          sort: sort ?? undefined,
         },
       });
     },
@@ -398,250 +401,290 @@ export function ReportBuilderShell() {
   const normalizedReports = useMemo(() => reports, [reports]);
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Export data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              void exportForm.handleSubmit();
-            }}
-            className="space-y-3"
-          >
-            <div className="grid gap-3 md:grid-cols-2">
-              <exportForm.Field name="dataSource">
-                {(field) => (
-                  <Select value={field.state.value} onValueChange={field.handleChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Data source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dataSourceOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </exportForm.Field>
-              <exportForm.Field name="exportType">
-                {(field) => (
-                  <Select value={field.state.value} onValueChange={field.handleChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Export type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {exportTypeOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </exportForm.Field>
-            </div>
-            <exportForm.Field name="columns">
-              {(field) => (
-                <Input
-                  placeholder="Columns (comma-separated)"
-                  value={(field.state.value as string) ?? ""}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                  onBlur={field.handleBlur}
-                />
-              )}
-            </exportForm.Field>
-            <exportForm.Field name="filters">
-              {(field) => (
-                <Textarea
-                  rows={3}
-                  placeholder='Filters JSON (e.g., {"status":"active"})'
-                  value={(field.state.value as string) ?? ""}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                  onBlur={field.handleBlur}
-                />
-              )}
-            </exportForm.Field>
-            <FormSubmitButton className="w-fit">
-              {exportMutation.isPending ? "Exporting..." : "Export"}
-            </FormSubmitButton>
-          </form>
-        </CardContent>
-      </Card>
+    <Tabs defaultValue="saved" className="space-y-6">
+      <TabsList>
+        <TabsTrigger value="saved">Saved reports</TabsTrigger>
+        <TabsTrigger value="pivot">Pivot & charts</TabsTrigger>
+      </TabsList>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Saved reports</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {normalizedReports.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No saved reports yet.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Sharing</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {normalizedReports.map((report) => (
-                  <SavedReportRow
-                    key={report.id}
-                    report={report}
-                    onUpdated={() =>
-                      queryClient.invalidateQueries({ queryKey: ["reports", "saved"] })
-                    }
-                    onDeleted={async () => {
-                      await deleteSavedReport({ data: { reportId: report.id } });
-                      await queryClient.invalidateQueries({
-                        queryKey: ["reports", "saved"],
-                      });
-                    }}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <TabsContent value="saved">
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Export data</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  void exportForm.handleSubmit();
+                }}
+                className="space-y-3"
+              >
+                <div className="grid gap-3 md:grid-cols-2">
+                  <exportForm.Field name="dataSource">
+                    {(field) => (
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Data source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dataSourceOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </exportForm.Field>
+                  <exportForm.Field name="exportType">
+                    {(field) => (
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Export type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {exportTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </exportForm.Field>
+                </div>
+                <exportForm.Field name="columns">
+                  {(field) => (
+                    <Input
+                      placeholder="Columns (comma-separated)"
+                      value={(field.state.value as string) ?? ""}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </exportForm.Field>
+                <exportForm.Field name="filters">
+                  {(field) => (
+                    <Textarea
+                      rows={3}
+                      placeholder='Filters JSON (e.g., {"status":"active"})'
+                      value={(field.state.value as string) ?? ""}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </exportForm.Field>
+                <exportForm.Field name="sort">
+                  {(field) => (
+                    <Textarea
+                      rows={2}
+                      placeholder='Sort JSON (e.g., {"createdAt":"desc"})'
+                      value={(field.state.value as string) ?? ""}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </exportForm.Field>
+                <FormSubmitButton className="w-fit">
+                  {exportMutation.isPending ? "Exporting..." : "Export"}
+                </FormSubmitButton>
+              </form>
+            </CardContent>
+          </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create saved report</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              void createForm.handleSubmit();
-            }}
-            className="space-y-3"
-          >
-            <div className="grid gap-3 md:grid-cols-2">
-              <createForm.Field name="name">
-                {(field) => (
-                  <Input
-                    placeholder="Report name"
-                    value={(field.state.value as string) ?? ""}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </createForm.Field>
-              <createForm.Field name="dataSource">
-                {(field) => (
-                  <Select value={field.state.value} onValueChange={field.handleChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Data source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dataSourceOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </createForm.Field>
-            </div>
-            <createForm.Field name="description">
-              {(field) => (
-                <Input
-                  placeholder="Description (optional)"
-                  value={(field.state.value as string) ?? ""}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                  onBlur={field.handleBlur}
-                />
+          <Card>
+            <CardHeader>
+              <CardTitle>Saved reports</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {normalizedReports.length === 0 ? (
+                <p className="text-muted-foreground text-sm">No saved reports yet.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Sharing</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {normalizedReports.map((report) => (
+                      <SavedReportRow
+                        key={report.id}
+                        report={report}
+                        onUpdated={() =>
+                          queryClient.invalidateQueries({
+                            queryKey: ["reports", "saved"],
+                          })
+                        }
+                        onDeleted={async () => {
+                          await deleteSavedReport({ data: { reportId: report.id } });
+                          await queryClient.invalidateQueries({
+                            queryKey: ["reports", "saved"],
+                          });
+                        }}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
               )}
-            </createForm.Field>
-            <div className="grid gap-3 md:grid-cols-2">
-              <createForm.Field name="organizationId">
-                {(field) => (
-                  <Select value={field.state.value} onValueChange={field.handleChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Organization scope" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__all__">All organizations</SelectItem>
-                      {organizations.map((org) => (
-                        <SelectItem key={org.id} value={org.id}>
-                          {org.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </createForm.Field>
-              <createForm.Field name="sharedWith">
-                {(field) => (
-                  <Input
-                    placeholder="Share with (comma-separated IDs)"
-                    value={(field.state.value as string) ?? ""}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </createForm.Field>
-            </div>
-            <createForm.Field name="filters">
-              {(field) => (
-                <Textarea
-                  rows={3}
-                  placeholder='Filters JSON (e.g., {"status":"active"})'
-                  value={(field.state.value as string) ?? ""}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                  onBlur={field.handleBlur}
-                />
-              )}
-            </createForm.Field>
-            <div className="grid gap-3 md:grid-cols-2">
-              <createForm.Field name="columns">
-                {(field) => (
-                  <Input
-                    placeholder="Columns (comma-separated)"
-                    value={(field.state.value as string) ?? ""}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </createForm.Field>
-              <createForm.Field name="sort">
-                {(field) => (
-                  <Textarea
-                    rows={3}
-                    placeholder='Sort JSON (e.g., {"created_at":"desc"})'
-                    value={(field.state.value as string) ?? ""}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </createForm.Field>
-            </div>
-            <createForm.Field name="isOrgWide">
-              {(field) => (
-                <label className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={Boolean(field.state.value)}
-                    onCheckedChange={(checked) => field.handleChange(Boolean(checked))}
-                  />
-                  Org-wide (share with all org members)
-                </label>
-              )}
-            </createForm.Field>
-            <FormSubmitButton className="w-fit">Save report</FormSubmitButton>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Create saved report</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  void createForm.handleSubmit();
+                }}
+                className="space-y-3"
+              >
+                <div className="grid gap-3 md:grid-cols-2">
+                  <createForm.Field name="name">
+                    {(field) => (
+                      <Input
+                        placeholder="Report name"
+                        value={(field.state.value as string) ?? ""}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                      />
+                    )}
+                  </createForm.Field>
+                  <createForm.Field name="dataSource">
+                    {(field) => (
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Data source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dataSourceOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </createForm.Field>
+                </div>
+                <createForm.Field name="description">
+                  {(field) => (
+                    <Input
+                      placeholder="Description (optional)"
+                      value={(field.state.value as string) ?? ""}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </createForm.Field>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <createForm.Field name="organizationId">
+                    {(field) => (
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Organization scope" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All organizations</SelectItem>
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </createForm.Field>
+                  <createForm.Field name="sharedWith">
+                    {(field) => (
+                      <Input
+                        placeholder="Share with (comma-separated IDs)"
+                        value={(field.state.value as string) ?? ""}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                      />
+                    )}
+                  </createForm.Field>
+                </div>
+                <createForm.Field name="filters">
+                  {(field) => (
+                    <Textarea
+                      rows={3}
+                      placeholder='Filters JSON (e.g., {"status":"active"})'
+                      value={(field.state.value as string) ?? ""}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </createForm.Field>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <createForm.Field name="columns">
+                    {(field) => (
+                      <Input
+                        placeholder="Columns (comma-separated)"
+                        value={(field.state.value as string) ?? ""}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                      />
+                    )}
+                  </createForm.Field>
+                  <createForm.Field name="sort">
+                    {(field) => (
+                      <Textarea
+                        rows={3}
+                        placeholder='Sort JSON (e.g., {"created_at":"desc"})'
+                        value={(field.state.value as string) ?? ""}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                      />
+                    )}
+                  </createForm.Field>
+                </div>
+                <createForm.Field name="isOrgWide">
+                  {(field) => (
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={Boolean(field.state.value)}
+                        onCheckedChange={(checked) =>
+                          field.handleChange(Boolean(checked))
+                        }
+                      />
+                      Org-wide (share with all org members)
+                    </label>
+                  )}
+                </createForm.Field>
+                <FormSubmitButton className="w-fit">Save report</FormSubmitButton>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="pivot">
+        <ReportPivotBuilder />
+      </TabsContent>
+    </Tabs>
   );
 }

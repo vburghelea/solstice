@@ -4,6 +4,7 @@ import type { JsonRecord } from "~/shared/lib/json";
 export type NotificationDispatch = {
   // stable id for idempotency across retries
   notificationId?: string;
+  actorUserId?: string | null;
 
   userId: string;
   organizationId?: string | null;
@@ -119,7 +120,8 @@ export const sendNotification = createServerOnlyFn(
     const notificationId = payload.notificationId ?? randomUUID();
 
     const { getDb } = await import("~/db/server-helpers");
-    const { notificationPreferences, notifications, user } = await import("~/db/schema");
+    const { notificationEmailDeliveries, notificationPreferences, notifications, user } =
+      await import("~/db/schema");
     const { and, eq } = await import("drizzle-orm");
 
     const db = await getDb();
@@ -141,6 +143,7 @@ export const sendNotification = createServerOnlyFn(
     const sendImmediateEmail = emailEnabled && emailFrequency === "immediate";
 
     let existingMetadata: JsonRecord | null = null;
+    let existingEmailLog: { sentAt: Date | null; messageId: string | null } | null = null;
 
     // In-app insert is idempotent when notificationId is stable
     if (allowInApp) {
@@ -168,14 +171,26 @@ export const sendNotification = createServerOnlyFn(
       existingMetadata = (existing?.metadata as JsonRecord) ?? null;
     }
 
-    // Email idempotency: if we recorded emailSentAt, do not re-send on retries
-    const alreadyEmailSent =
-      !!existingMetadata && typeof existingMetadata["emailSentAt"] === "string";
-
     let emailSent = false;
     let emailMessageId: string | null = null;
 
     if (sendImmediateEmail) {
+      const [existingEmail] = await db
+        .select({
+          sentAt: notificationEmailDeliveries.sentAt,
+          messageId: notificationEmailDeliveries.messageId,
+        })
+        .from(notificationEmailDeliveries)
+        .where(eq(notificationEmailDeliveries.notificationId, notificationId))
+        .limit(1);
+
+      existingEmailLog = existingEmail ?? null;
+
+      // Email idempotency: if we recorded emailSentAt, do not re-send on retries
+      const alreadyEmailSent =
+        (!!existingMetadata && typeof existingMetadata["emailSentAt"] === "string") ||
+        !!existingEmailLog?.sentAt;
+
       const [recipient] = await db
         .select({ email: user.email })
         .from(user)
@@ -195,12 +210,13 @@ export const sendNotification = createServerOnlyFn(
 
           emailSent = true;
           emailMessageId = resp?.MessageId ?? null;
+          const sentAt = new Date();
 
           if (allowInApp) {
             const nextMetadata: JsonRecord = {
               ...(existingMetadata ?? {}),
               ...(payload.metadata ?? {}),
-              emailSentAt: new Date().toISOString(),
+              emailSentAt: sentAt.toISOString(),
               ...(emailMessageId ? { emailMessageId } : {}),
             };
 
@@ -209,6 +225,16 @@ export const sendNotification = createServerOnlyFn(
               .set({ metadata: nextMetadata })
               .where(eq(notifications.id, notificationId));
           }
+
+          await db
+            .insert(notificationEmailDeliveries)
+            .values({
+              notificationId,
+              userId: payload.userId,
+              sentAt,
+              messageId: emailMessageId,
+            })
+            .onConflictDoNothing();
         } catch (error) {
           console.error("[Notifications] Email send failed", {
             userId: payload.userId,
@@ -219,19 +245,26 @@ export const sendNotification = createServerOnlyFn(
         }
       } else if (alreadyEmailSent) {
         emailSent = true;
+        emailMessageId = existingEmailLog?.messageId ?? null;
       }
     }
 
     const { logDataChange } = await import("~/lib/audit");
+
+    const target = allowInApp
+      ? { targetType: "notification", targetId: notificationId }
+      : { targetType: "user", targetId: payload.userId };
+
     await logDataChange({
       action: "NOTIFICATION_DISPATCH",
-      actorUserId: payload.userId,
+      actorUserId: payload.actorUserId ?? null,
       actorOrgId: payload.organizationId ?? null,
-      targetType: "notification",
-      targetId: allowInApp ? notificationId : null,
+      targetType: target.targetType,
+      targetId: target.targetId,
       targetOrgId: payload.organizationId ?? null,
       metadata: {
         notificationId,
+        recipientUserId: payload.userId,
         category: payload.category,
         type: payload.type,
         channels: { inApp: allowInApp, email: emailEnabled },

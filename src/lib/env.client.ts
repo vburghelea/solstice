@@ -6,6 +6,9 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
+const runtimeEnv: Record<string, string | boolean | undefined> =
+  typeof import.meta !== "undefined" && "env" in import.meta ? import.meta.env : {};
+
 export const env = createEnv({
   clientPrefix: "VITE_",
   client: {
@@ -16,11 +19,11 @@ export const env = createEnv({
     VITE_SENTRY_DSN: z.string().optional(),
     VITE_TENANT_KEY: z.enum(["qc", "viasport"]).optional(),
   },
-  runtimeEnv: import.meta.env,
+  runtimeEnv,
   emptyStringAsUndefined: true,
   // Workaround for VITE_BASE_URL validation during SSR
   // See: https://github.com/t3-oss/t3-env/issues/110
-  skipValidation: !!import.meta.env["SKIP_ENV_VALIDATION"],
+  skipValidation: !!runtimeEnv["SKIP_ENV_VALIDATION"],
 });
 
 // Helper functions for client-side feature flags

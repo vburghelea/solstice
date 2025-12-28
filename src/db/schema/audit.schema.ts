@@ -1,4 +1,13 @@
-import { index, inet, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  index,
+  inet,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import type { JsonRecord, JsonValue } from "~/shared/lib/json";
 import { user } from "./auth.schema";
 import { organizations } from "./organizations.schema";
@@ -40,5 +49,25 @@ export const auditLogs = pgTable(
   ],
 );
 
+export const auditLogArchives = pgTable(
+  "audit_log_archives",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fromOccurredAt: timestamp("from_occurred_at", { withTimezone: true }).notNull(),
+    toOccurredAt: timestamp("to_occurred_at", { withTimezone: true }).notNull(),
+    objectKey: text("object_key").notNull(),
+    bucket: text("bucket").notNull(),
+    rowCount: integer("row_count").notNull(),
+    storageClass: text("storage_class").notNull().default("DEEP_ARCHIVE"),
+    archivedAt: timestamp("archived_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("audit_log_archives_range_idx").on(table.fromOccurredAt, table.toOccurredAt),
+  ],
+);
+
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
+export type AuditLogArchive = typeof auditLogArchives.$inferSelect;
+export type NewAuditLogArchive = typeof auditLogArchives.$inferInsert;

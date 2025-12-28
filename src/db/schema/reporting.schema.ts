@@ -1,5 +1,6 @@
 import {
   date,
+  foreignKey,
   jsonb,
   pgEnum,
   pgTable,
@@ -28,6 +29,7 @@ export const reportingSubmissionStatusEnum = pgEnum("reporting_submission_status
   "changes_requested",
   "approved",
   "overdue",
+  "rejected",
 ]);
 
 export const reportingCycles = pgTable("reporting_cycles", {
@@ -94,19 +96,30 @@ export const reportingSubmissions = pgTable(
   ],
 );
 
-export const reportingSubmissionHistory = pgTable("reporting_submission_history", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  reportingSubmissionId: uuid("reporting_submission_id")
-    .notNull()
-    .references(() => reportingSubmissions.id, { onDelete: "cascade" }),
-  action: text("action").notNull(),
-  actorId: text("actor_id").references(() => user.id),
-  notes: text("notes"),
-  formSubmissionVersionId: uuid("form_submission_version_id").references(
-    () => formSubmissionVersions.id,
-  ),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const reportingSubmissionHistory = pgTable(
+  "reporting_submission_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reportingSubmissionId: uuid("reporting_submission_id").notNull(),
+    action: text("action").notNull(),
+    actorId: text("actor_id").references(() => user.id),
+    notes: text("notes"),
+    formSubmissionVersionId: uuid("form_submission_version_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.reportingSubmissionId],
+      foreignColumns: [reportingSubmissions.id],
+      name: "reporting_submission_history_reporting_submission_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.formSubmissionVersionId],
+      foreignColumns: [formSubmissionVersions.id],
+      name: "reporting_submission_history_form_submission_version_fk",
+    }),
+  ],
+);
 
 export type ReportingCycle = typeof reportingCycles.$inferSelect;
 export type NewReportingCycle = typeof reportingCycles.$inferInsert;

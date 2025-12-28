@@ -3,6 +3,10 @@
 This document outlines the migration approach for legacy data into SIN.
 It is aligned with the v2 backlog migration checklist.
 
+> Implementation status (2025-12-27): Partial. Migration plan exists, but
+> production data migration tooling and runbook evidence are pending Streams
+> E/L.
+
 ## Pre-Migration Checklist
 
 - Inventory legacy tables, row counts, and relationships.

@@ -13,6 +13,17 @@ const getSessionUserId = async () => {
   return session?.user?.id ?? null;
 };
 
+const parseAuditDateFilter = (value: string, boundary: "start" | "end") => {
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+  if (!isDateOnly) return new Date(value);
+
+  const base = new Date(`${value}T00:00:00.000Z`);
+  if (boundary === "end") {
+    return new Date(base.getTime() + 24 * 60 * 60 * 1000 - 1);
+  }
+  return base;
+};
+
 export const listAuditLogs = createServerFn({ method: "GET" })
   .inputValidator(zod$(listAuditLogsSchema))
   .handler(async ({ data }): Promise<AuditLog[]> => {
@@ -75,11 +86,13 @@ export const listAuditLogs = createServerFn({ method: "GET" })
     }
 
     if (data.from) {
-      conditions.push(gte(auditLogs.occurredAt, new Date(data.from)));
+      conditions.push(
+        gte(auditLogs.occurredAt, parseAuditDateFilter(data.from, "start")),
+      );
     }
 
     if (data.to) {
-      conditions.push(lte(auditLogs.occurredAt, new Date(data.to)));
+      conditions.push(lte(auditLogs.occurredAt, parseAuditDateFilter(data.to, "end")));
     }
 
     const rows = await db

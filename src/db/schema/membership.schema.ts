@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { sql } from "drizzle-orm";
 import {
   date,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -83,9 +84,7 @@ export const membershipPaymentSessions = pgTable(
     userId: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    membershipTypeId: varchar("membership_type_id", { length: 255 })
-      .notNull()
-      .references(() => membershipTypes.id),
+    membershipTypeId: varchar("membership_type_id", { length: 255 }).notNull(),
     squareCheckoutId: varchar("square_checkout_id", { length: 255 }).notNull(),
     squarePaymentLinkUrl: varchar("square_payment_link_url", { length: 2048 }).notNull(),
     squareOrderId: varchar("square_order_id", { length: 255 }),
@@ -107,6 +106,11 @@ export const membershipPaymentSessions = pgTable(
     index("membership_payment_sessions_order_idx").on(table.squareOrderId),
     index("membership_payment_sessions_payment_idx").on(table.squarePaymentId),
     index("membership_payment_sessions_type_idx").on(table.membershipTypeId),
+    foreignKey({
+      columns: [table.membershipTypeId],
+      foreignColumns: [membershipTypes.id],
+      name: "membership_payment_sessions_type_fk",
+    }),
   ],
 );
 

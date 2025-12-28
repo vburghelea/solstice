@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
-import { createContext, use, useEffect, useMemo, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { listAccessibleOrganizations } from "~/features/organizations/organizations.queries";
 import type { AccessibleOrganization } from "~/features/organizations/organizations.types";
 import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
@@ -18,27 +18,36 @@ const OrgContext = createContext<OrgContextValue | null>(null);
 
 export function OrgContextProvider({ children }: { children: React.ReactNode }) {
   const context = useRouteContext({ strict: false }) as
-    | { activeOrganizationId?: string | null }
+    | { activeOrganizationId?: string | null; user?: { id?: string } | null }
     | undefined;
   const initialOrgId = context?.activeOrganizationId ?? null;
-  const [activeOrganizationId, setActiveOrganizationId] = useState<string | null>(
+  const [activeOrganizationId, setActiveOrganizationIdState] = useState<string | null>(
     initialOrgId,
   );
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (activeOrganizationId) {
-      window.localStorage.setItem("active_org_id", activeOrganizationId);
-    } else {
-      window.localStorage.removeItem("active_org_id");
+  const setActiveOrganizationId = useCallback((organizationId: string | null) => {
+    if (typeof window !== "undefined") {
+      if (organizationId) {
+        window.localStorage.setItem("active_org_id", organizationId);
+      } else {
+        window.localStorage.removeItem("active_org_id");
+      }
     }
-  }, [activeOrganizationId]);
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setActiveOrganizationIdState(organizationId);
+  }, []);
+
+  useEffect(() => {
+    // Sync local org selection when route context changes.
+    setActiveOrganizationId(initialOrgId);
+  }, [initialOrgId, setActiveOrganizationId]);
 
   const isSinPortalEnabled = isFeatureEnabled("sin_portal");
+  const userId = context?.user?.id ?? null;
   const { data = [], isLoading } = useQuery({
-    queryKey: ["organizations", "accessible"],
+    queryKey: ["organizations", "accessible", userId],
     queryFn: () => listAccessibleOrganizations({ data: null }),
-    enabled: isSinPortalEnabled,
+    enabled: isSinPortalEnabled && Boolean(userId),
   });
 
   const activeOrganization = useMemo(
@@ -47,20 +56,18 @@ export function OrgContextProvider({ children }: { children: React.ReactNode }) 
   );
 
   const organizationRole = activeOrganization?.role ?? null;
-
-  return (
-    <OrgContext
-      value={{
-        activeOrganizationId,
-        organizationRole,
-        accessibleOrganizations: data,
-        setActiveOrganizationId,
-        isLoading,
-      }}
-    >
-      {children}
-    </OrgContext>
+  const contextValue = useMemo(
+    () => ({
+      activeOrganizationId,
+      organizationRole,
+      accessibleOrganizations: data,
+      setActiveOrganizationId,
+      isLoading,
+    }),
+    [activeOrganizationId, organizationRole, data, setActiveOrganizationId, isLoading],
   );
+
+  return <OrgContext value={contextValue}>{children}</OrgContext>;
 }
 
 export const useOrgContext = () => {

@@ -4,7 +4,7 @@
  * Run with: pnpm tsx scripts/seed-e2e-data.ts
  */
 
-import { hashPassword } from "better-auth/crypto";
+import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import dotenv from "dotenv";
 import { eq, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -24,12 +24,31 @@ import {
   session,
   teamMembers,
   teams,
+  twoFactor,
   user,
   userRoles,
 } from "../src/db/schema";
 
 // Load environment variables
 dotenv.config({ path: ".env.e2e" });
+
+const FAKE_MFA_SECRET = "JBSWY3DPEHPK3PXP";
+const FAKE_BACKUP_CODES = [
+  "backup-testcode1",
+  "backup-testcode2",
+  "backup-testcode3",
+  "backup-testcode4",
+  "backup-testcode5",
+  "backup-testcode6",
+  "backup-testcode7",
+  "backup-testcode8",
+  "backup-testcode9",
+  "backup-testcode10",
+];
+
+const encryptBackupCodes = async (codes: string[], secretKey: string) => {
+  return symmetricEncrypt({ data: JSON.stringify(codes), key: secretKey });
+};
 
 async function seed() {
   console.log("🌱 Seeding E2E test data...");
@@ -40,6 +59,12 @@ async function seed() {
 
   if (!connectionString) {
     throw new Error("No database URL found. Please set E2E_DATABASE_URL or DATABASE_URL");
+  }
+  const authSecret = process.env["BETTER_AUTH_SECRET"];
+  if (!authSecret) {
+    console.warn(
+      "⚠️  BETTER_AUTH_SECRET not set - MFA backup codes may not decrypt correctly.",
+    );
   }
   const sql = postgres(connectionString, { max: 1 }); // open exactly one connection
   const db = drizzle(sql);
@@ -85,6 +110,9 @@ async function seed() {
 
     console.log("Clearing user roles...");
     await db.delete(userRoles);
+
+    console.log("Clearing 2FA records...");
+    await db.delete(twoFactor).where(like(twoFactor.userId, "clxpfz4jn%"));
 
     // 2. Clear sessions and accounts before users
     console.log("Clearing sessions...");
@@ -134,6 +162,7 @@ async function seed() {
         email: "admin@example.com",
         name: "Admin User",
         emailVerified: true,
+        mfaRequired: true,
         profileComplete: true,
         dateOfBirth: new Date("1985-05-15"),
         phone: "+1234567891",
@@ -399,6 +428,34 @@ async function seed() {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+
+      if (userData.id === adminUserId) {
+        let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES);
+        if (authSecret) {
+          try {
+            encryptedBackupCodes = await encryptBackupCodes(
+              FAKE_BACKUP_CODES,
+              authSecret,
+            );
+          } catch (error) {
+            console.warn(`⚠️  Could not encrypt backup codes: ${error}`);
+          }
+        }
+
+        await db.insert(twoFactor).values({
+          id: `${userData.id}-2fa`,
+          userId: userData.id,
+          secret: FAKE_MFA_SECRET,
+          backupCodes: encryptedBackupCodes,
+        });
+
+        await db
+          .update(user)
+          .set({ twoFactorEnabled: true, mfaEnrolledAt: new Date() })
+          .where(eq(user.id, userData.id));
+
+        console.log(`✅ Enrolled MFA for user: ${userData.email}`);
+      }
 
       console.log(`✅ Created user: ${userData.email}`);
     }

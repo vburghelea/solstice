@@ -9,6 +9,13 @@
 | Version  | 1.0                         |
 | Scope    | Production SIN platform     |
 
+> Implementation status (2025-12-27): Partial. Audit logging and hash-chain
+> integrity are implemented; Glacier/Object Lock archival and retention
+> automation are pending Stream L.
+>
+> Delivery timeline: Object Lock + dedicated audit archive bucket targeted for
+> 2026-02 (post-Phase 0, before production cutover).
+
 ## 1.0 Purpose
 
 This policy defines what is logged in the SIN platform, how audit data is

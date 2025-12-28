@@ -5,9 +5,15 @@ export const Route = createFileRoute("/dashboard/sin")({
   beforeLoad: ({ context, location }) => {
     requireFeatureInRoute("sin_portal");
     if (!context.activeOrganizationId) {
+      // location.search is an object in TanStack Router, serialize it properly
+      const searchString =
+        Object.keys(location.search).length > 0
+          ? "?" +
+            new URLSearchParams(location.search as Record<string, string>).toString()
+          : "";
       throw redirect({
         to: "/dashboard/select-org",
-        search: { redirect: location.href },
+        search: { redirect: `${location.pathname}${searchString}` },
       });
     }
   },

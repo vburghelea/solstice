@@ -17,9 +17,9 @@
  * - member@example.com - Regular member
  */
 
-import { hashPassword } from "better-auth/crypto";
+import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import dotenv from "dotenv";
-import { like, or } from "drizzle-orm";
+import { like, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -38,9 +38,43 @@ import {
   retentionPolicies,
   roles,
   session,
+  twoFactor,
   user,
   userRoles,
 } from "../src/db/schema";
+
+// ============================================================================
+// FAKE MFA CONFIGURATION FOR TESTING
+// ============================================================================
+// These are KNOWN values that can be used by coding agents and E2E tests
+// to authenticate through MFA-protected flows.
+//
+// TOTP Secret (base32 encoded): JBSWY3DPEHPK3PXP
+// - Use any TOTP generator with this secret to generate valid 6-digit codes
+// - The secret decodes to "Hello!HelloWorld" (32 bytes)
+//
+// Backup Codes (for use with verifyBackupCode):
+// - These are encrypted in the database but documented here for testing
+// - backup-testcode1
+// - backup-testcode2
+// - backup-testcode3
+// - backup-testcode4
+// - backup-testcode5
+// ============================================================================
+
+const FAKE_MFA_SECRET = "JBSWY3DPEHPK3PXP"; // Well-known TOTP secret for testing
+const FAKE_BACKUP_CODES = [
+  "backup-testcode1",
+  "backup-testcode2",
+  "backup-testcode3",
+  "backup-testcode4",
+  "backup-testcode5",
+  "backup-testcode6",
+  "backup-testcode7",
+  "backup-testcode8",
+  "backup-testcode9",
+  "backup-testcode10",
+];
 
 // Load environment variables (don't override SST-provided vars)
 // When running via SST shell, DATABASE_URL is already set correctly
@@ -50,75 +84,112 @@ if (!process.env["DATABASE_URL"]) {
 }
 
 // Static IDs for predictable test data
+// UUIDs must be RFC 4122 compliant (version nibble at pos 13, variant nibble at pos 17)
+// Format: xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx (v4, variant 8/9/a/b)
 const IDS = {
-  // Users
+  // Users (non-UUID format is fine for user IDs)
   platformAdminId: "sin-user-platform-admin-001",
   viasportStaffId: "sin-user-viasport-staff-001",
   psoAdminId: "sin-user-pso-admin-001",
   clubReporterId: "sin-user-club-reporter-001",
   memberId: "sin-user-member-001",
 
-  // Organizations
-  viasportBcId: "00000000-0000-0000-0001-000000000001",
-  bcHockeyId: "00000000-0000-0000-0001-000000000002",
-  bcSoccerId: "00000000-0000-0000-0001-000000000003",
-  bcAthleticsId: "00000000-0000-0000-0001-000000000004",
-  vanMinorHockeyId: "00000000-0000-0000-0001-000000000005",
-  victoriaHockeyId: "00000000-0000-0000-0001-000000000006",
-  whitecapsAcademyId: "00000000-0000-0000-0001-000000000007",
-  bcSoccerDevLeagueId: "00000000-0000-0000-0001-000000000008",
-  vanThunderbirdsId: "00000000-0000-0000-0001-000000000009",
-  northShoreClubId: "00000000-0000-0000-0001-000000000010",
+  // Organizations (RFC 4122 compliant UUIDs)
+  viasportBcId: "a0000000-0000-4000-8001-000000000001",
+  bcHockeyId: "a0000000-0000-4000-8001-000000000002",
+  bcSoccerId: "a0000000-0000-4000-8001-000000000003",
+  bcAthleticsId: "a0000000-0000-4000-8001-000000000004",
+  vanMinorHockeyId: "a0000000-0000-4000-8001-000000000005",
+  victoriaHockeyId: "a0000000-0000-4000-8001-000000000006",
+  whitecapsAcademyId: "a0000000-0000-4000-8001-000000000007",
+  bcSoccerDevLeagueId: "a0000000-0000-4000-8001-000000000008",
+  vanThunderbirdsId: "a0000000-0000-4000-8001-000000000009",
+  northShoreClubId: "a0000000-0000-4000-8001-000000000010",
 
-  // Forms
-  annualStatsFormId: "00000000-0000-0000-0002-000000000001",
-  quarterlyFinFormId: "00000000-0000-0000-0002-000000000002",
-  demographicsFormId: "00000000-0000-0000-0002-000000000003",
-  coachingFormId: "00000000-0000-0000-0002-000000000004",
+  // Forms (RFC 4122 compliant UUIDs)
+  annualStatsFormId: "a0000000-0000-4000-8002-000000000001",
+  quarterlyFinFormId: "a0000000-0000-4000-8002-000000000002",
+  demographicsFormId: "a0000000-0000-4000-8002-000000000003",
+  coachingFormId: "a0000000-0000-4000-8002-000000000004",
 
-  // Form Versions
-  annualStatsFormV1Id: "00000000-0000-0000-0003-000000000001",
-  quarterlyFinFormV1Id: "00000000-0000-0000-0003-000000000002",
-  demographicsFormV1Id: "00000000-0000-0000-0003-000000000003",
-  coachingFormV1Id: "00000000-0000-0000-0003-000000000004",
+  // Form Versions (RFC 4122 compliant UUIDs)
+  annualStatsFormV1Id: "a0000000-0000-4000-8003-000000000001",
+  quarterlyFinFormV1Id: "a0000000-0000-4000-8003-000000000002",
+  demographicsFormV1Id: "a0000000-0000-4000-8003-000000000003",
+  coachingFormV1Id: "a0000000-0000-4000-8003-000000000004",
 
-  // Reporting Cycles
-  fy2425CycleId: "00000000-0000-0000-0004-000000000001",
-  q42024CycleId: "00000000-0000-0000-0004-000000000002",
-  q12025CycleId: "00000000-0000-0000-0004-000000000003",
+  // Reporting Cycles (RFC 4122 compliant UUIDs)
+  fy2425CycleId: "a0000000-0000-4000-8004-000000000001",
+  q42024CycleId: "a0000000-0000-4000-8004-000000000002",
+  q12025CycleId: "a0000000-0000-4000-8004-000000000003",
 
-  // Reporting Tasks
-  annualTask1Id: "00000000-0000-0000-0005-000000000001",
-  annualTask2Id: "00000000-0000-0000-0005-000000000002",
-  annualTask3Id: "00000000-0000-0000-0005-000000000003",
-  quarterlyTask1Id: "00000000-0000-0000-0005-000000000004",
+  // Reporting Tasks (RFC 4122 compliant UUIDs)
+  annualTask1Id: "a0000000-0000-4000-8005-000000000001",
+  annualTask2Id: "a0000000-0000-4000-8005-000000000002",
+  annualTask3Id: "a0000000-0000-4000-8005-000000000003",
+  quarterlyTask1Id: "a0000000-0000-4000-8005-000000000004",
 
-  // Policy Documents
-  privacyPolicyId: "00000000-0000-0000-0006-000000000001",
-  tosId: "00000000-0000-0000-0006-000000000002",
+  // Policy Documents (RFC 4122 compliant UUIDs)
+  privacyPolicyId: "a0000000-0000-4000-8006-000000000001",
+  tosId: "a0000000-0000-4000-8006-000000000002",
 } as const;
+
+/**
+ * Encrypt backup codes using Better Auth's symmetric encryption
+ * This matches how Better Auth stores backup codes in the twoFactor table
+ */
+async function encryptBackupCodes(codes: string[], secretKey: string): Promise<string> {
+  const encrypted = await symmetricEncrypt({
+    data: JSON.stringify(codes),
+    key: secretKey,
+  });
+  return encrypted;
+}
 
 async function seed() {
   console.log("🌱 Seeding viaSport SIN test data...");
   console.log("   This creates a realistic org hierarchy and reporting environment.\n");
 
-  const connectionString =
-    process.env["E2E_DATABASE_URL"] || process.env["DATABASE_URL"] || "";
-
-  if (!connectionString) {
-    throw new Error("No database URL found. Set DATABASE_URL or E2E_DATABASE_URL");
+  if (process.env["NODE_ENV"] === "production") {
+    throw new Error("Refusing to run seed-sin-data in production.");
   }
 
-  const sql = postgres(connectionString, { max: 1 });
-  const db = drizzle(sql);
+  const forceDatabaseUrl = process.argv.includes("--force");
+  const connectionString =
+    process.env["E2E_DATABASE_URL"] ||
+    (forceDatabaseUrl ? process.env["DATABASE_URL"] : "") ||
+    "";
+
+  if (!connectionString) {
+    throw new Error(
+      "No database URL found. Set E2E_DATABASE_URL or pass --force to use DATABASE_URL.",
+    );
+  }
+
+  // Get BETTER_AUTH_SECRET for encrypting backup codes
+  const authSecret = process.env["BETTER_AUTH_SECRET"];
+  if (!authSecret) {
+    console.warn(
+      "⚠️  BETTER_AUTH_SECRET not set - backup codes will not be properly encrypted.",
+    );
+    console.warn("   MFA backup code verification may not work in this environment.\n");
+  }
+
+  const sqlConnection = postgres(connectionString, { max: 1 });
+  const db = drizzle(sqlConnection);
 
   try {
     // ========================================
-    // PHASE 1: Clean up existing SIN test data
+    // PHASE 1: Clean up ALL existing data
     // ========================================
-    console.log("Phase 1: Cleaning up existing SIN test data...");
+    console.log("Phase 1: Cleaning up existing data (including orphaned records)...");
 
-    // Delete in correct order for FK constraints
+    // First, clear parent_org_id references to break circular FK dependencies
+    // This is necessary because organizations may have orphaned parent_org_id values
+    console.log("   → Clearing organization parent references...");
+    await db.execute(sql`UPDATE organizations SET parent_org_id = NULL`);
+
+    // Now delete in correct order for FK constraints
     await db.delete(reportingSubmissions);
     await db.delete(reportingTasks);
     await db.delete(reportingCycles);
@@ -132,6 +203,11 @@ async function seed() {
     await db.delete(policyDocuments);
     await db.delete(notificationTemplates);
     await db.delete(userRoles);
+
+    // Delete twoFactor records for test users
+    console.log("   → Cleaning up 2FA records...");
+    await db.execute(sql`DELETE FROM "twoFactor" WHERE user_id LIKE 'sin-user-%'`);
+
     await db.delete(session).where(like(session.userId, "sin-user-%"));
     await db.delete(account).where(like(account.userId, "sin-user-%"));
     await db
@@ -237,6 +313,9 @@ async function seed() {
     ];
 
     for (const userData of testUsers) {
+      const isGlobalAdmin =
+        userData.roleId === "solstice-admin" || userData.roleId === "viasport-admin";
+
       await db.insert(user).values({
         id: userData.id,
         email: userData.email,
@@ -246,6 +325,7 @@ async function seed() {
         profileVersion: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
+        mfaRequired: isGlobalAdmin,
       });
 
       await db.insert(account).values({
@@ -254,15 +334,6 @@ async function seed() {
         providerId: "credential",
         accountId: userData.email,
         password: hashedPassword,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      await db.insert(session).values({
-        id: `${userData.id}-session`,
-        userId: userData.id,
-        token: `sin-test-token-${userData.id}`,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -277,7 +348,37 @@ async function seed() {
         });
       }
 
-      console.log(`   ✓ Created user: ${userData.email}`);
+      // Enroll MFA for global admins (fake MFA for testing)
+      if (isGlobalAdmin) {
+        // Encrypt backup codes if auth secret is available
+        let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES); // Fallback: store as JSON
+        if (authSecret) {
+          try {
+            encryptedBackupCodes = await encryptBackupCodes(
+              FAKE_BACKUP_CODES,
+              authSecret,
+            );
+          } catch (err) {
+            console.warn(`   ⚠️  Could not encrypt backup codes: ${err}`);
+          }
+        }
+
+        await db.insert(twoFactor).values({
+          id: `${userData.id}-2fa`,
+          userId: userData.id,
+          secret: FAKE_MFA_SECRET,
+          backupCodes: encryptedBackupCodes,
+        });
+
+        // Update user to mark as 2FA enabled
+        await db.execute(
+          sql`UPDATE "user" SET two_factor_enabled = TRUE, mfa_enrolled_at = NOW() WHERE id = ${userData.id}`,
+        );
+
+        console.log(`   ✓ Created user: ${userData.email} (with MFA enrolled)`);
+      } else {
+        console.log(`   ✓ Created user: ${userData.email}`);
+      }
     }
     console.log("");
 
@@ -758,7 +859,7 @@ async function seed() {
     console.log("Phase 9: Creating sample form submissions...");
 
     // Create a submission for BC Hockey
-    const bcHockeySubmissionId = "00000000-0000-0000-0007-000000000001";
+    const bcHockeySubmissionId = "a0000000-0000-4000-8007-000000000001";
     await db.insert(formSubmissions).values({
       id: bcHockeySubmissionId,
       formId: IDS.annualStatsFormId,
@@ -875,11 +976,11 @@ async function seed() {
     // ========================================
     // COMPLETE
     // ========================================
-    console.log("=".repeat(50));
+    console.log("=".repeat(60));
     console.log("✅ viaSport SIN test data seeded successfully!\n");
     console.log("Test Users (password: testpassword123):");
-    console.log("  • admin@example.com - Platform Admin");
-    console.log("  • viasport-staff@example.com - viaSport Staff");
+    console.log("  • admin@example.com - Platform Admin (MFA enrolled)");
+    console.log("  • viasport-staff@example.com - viaSport Staff (MFA enrolled)");
     console.log("  • pso-admin@example.com - PSO Administrator");
     console.log("  • club-reporter@example.com - Club Reporter");
     console.log("  • member@example.com - Regular Member\n");
@@ -887,14 +988,21 @@ async function seed() {
       "Organizations created: 10 (1 governing body, 3 PSOs, 2 leagues, 4 clubs)",
     );
     console.log("Forms created: 4 (3 published, 1 draft)");
-    console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)");
-    console.log("=".repeat(50));
+    console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)\n");
+    console.log("-".repeat(60));
+    console.log("🔐 FAKE MFA FOR TESTING (admin users only):");
+    console.log("   TOTP Secret: JBSWY3DPEHPK3PXP");
+    console.log("   → Add this to any authenticator app to generate valid codes");
+    console.log("   → Or use otpauth CLI: otpauth -b JBSWY3DPEHPK3PXP");
+    console.log("\n   Backup Codes (use with 'Use backup code' option):");
+    console.log("   → backup-testcode1 through backup-testcode10");
+    console.log("-".repeat(60));
+    console.log("=".repeat(60));
   } catch (error) {
     console.error("❌ Error seeding SIN data:", error);
     throw error;
   } finally {
-    await sql.end({ timeout: 3 });
-    process.exit(0);
+    await sqlConnection.end({ timeout: 3 });
   }
 }
 

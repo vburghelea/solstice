@@ -29,13 +29,52 @@ type StepUpContextValue = {
 
 const StepUpContext = createContext<StepUpContextValue | null>(null);
 
-const STEP_UP_MESSAGES = [
-  "Re-authentication required for this action",
-  "MFA re-verification required for this action",
-];
+const STEP_UP_REASON_MESSAGES = {
+  REAUTH_REQUIRED: "Re-authentication required for this action",
+  MFA_REVERIFY_REQUIRED: "MFA re-verification required for this action",
+} as const;
+
+type StepUpReason = keyof typeof STEP_UP_REASON_MESSAGES;
+
+const isStepUpReason = (value: unknown): value is StepUpReason =>
+  value === "REAUTH_REQUIRED" || value === "MFA_REVERIFY_REQUIRED";
+
+const getStepUpReason = (error: unknown): StepUpReason | null => {
+  if (!error || typeof error !== "object") return null;
+
+  const candidate = error as {
+    error?: { details?: { reason?: unknown } };
+    details?: { reason?: unknown };
+    data?: { details?: { reason?: unknown } };
+    cause?: {
+      details?: { reason?: unknown };
+      error?: { details?: { reason?: unknown } };
+    };
+  };
+
+  const possibleReasons = [
+    candidate.error?.details?.reason,
+    candidate.details?.reason,
+    candidate.data?.details?.reason,
+    candidate.cause?.details?.reason,
+    candidate.cause?.error?.details?.reason,
+  ];
+
+  for (const reason of possibleReasons) {
+    if (isStepUpReason(reason)) {
+      return reason;
+    }
+  }
+
+  return null;
+};
 
 export const getStepUpErrorMessage = (error: unknown) => {
   if (!error) return null;
+  const reason = getStepUpReason(error);
+  if (reason) {
+    return STEP_UP_REASON_MESSAGES[reason];
+  }
   const message =
     error instanceof Error
       ? error.message
@@ -46,7 +85,10 @@ export const getStepUpErrorMessage = (error: unknown) => {
           : "";
 
   if (!message) return null;
-  return STEP_UP_MESSAGES.find((match) => message.includes(match)) ?? null;
+  return (
+    Object.values(STEP_UP_REASON_MESSAGES).find((match) => message.includes(match)) ??
+    null
+  );
 };
 
 export function StepUpProvider({ children }: { readonly children: ReactNode }) {
@@ -97,6 +139,7 @@ function StepUpDialog({
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"password" | "mfa">("password");
+  const [mfaMethod, setMfaMethod] = useState<"totp" | "backup">("totp");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -104,6 +147,7 @@ function StepUpDialog({
     setPassword("");
     setCode("");
     setStep("password");
+    setMfaMethod("totp");
     setIsSubmitting(false);
     setErrorMessage("");
   }, []);
@@ -199,7 +243,10 @@ function StepUpDialog({
     }
 
     try {
-      const result = await auth.twoFactor.verifyTotp({ code: code.trim() });
+      const result =
+        mfaMethod === "backup"
+          ? await auth.twoFactor.verifyBackupCode({ code: code.trim() })
+          : await auth.twoFactor.verifyTotp({ code: code.trim() });
       if (result?.error) {
         throw new Error(result.error.message || "Invalid authentication code");
       }
@@ -262,14 +309,37 @@ function StepUpDialog({
         ) : (
           <form onSubmit={handleMfaSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="step-up-code">Authentication code</Label>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant={mfaMethod === "totp" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMfaMethod("totp")}
+                  disabled={isSubmitting}
+                >
+                  Authenticator code
+                </Button>
+                <Button
+                  type="button"
+                  variant={mfaMethod === "backup" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMfaMethod("backup")}
+                  disabled={isSubmitting}
+                >
+                  Backup code
+                </Button>
+              </div>
+              <Label htmlFor="step-up-code">
+                {mfaMethod === "backup" ? "Backup code" : "Authentication code"}
+              </Label>
               <Input
                 id="step-up-code"
-                inputMode="numeric"
+                inputMode={mfaMethod === "backup" ? "text" : "numeric"}
                 autoComplete="one-time-code"
                 value={code}
                 disabled={isSubmitting}
-                onChange={(event) => setCode(event.target.value)}
+                placeholder={mfaMethod === "backup" ? "backup-xxxxxx" : "123456"}
+                onChange={(event) => setCode(event.target.value.trim())}
               />
             </div>
             {errorMessage ? (

@@ -90,6 +90,12 @@ const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
   ...SCOPED_ADMIN_ROLES,
 ];
 
+const GLOBAL_ADMIN_ROLE_IDS = new Set(
+  [PLATFORM_ADMIN_ROLE.id, TENANT_ADMIN_ROLE.id].filter((roleId): roleId is string =>
+    Boolean(roleId),
+  ),
+);
+
 const roleNameToId = new Map(DEFAULT_ROLES.map((role) => [role.name, role.id]));
 
 function parseCommaList(value: string | undefined): string[] {
@@ -326,7 +332,16 @@ async function assignRoles(
       )
       .limit(1);
 
+    const isGlobalAdminRole =
+      resolvedRoleId !== undefined && GLOBAL_ADMIN_ROLE_IDS.has(resolvedRoleId);
+
     if (existingAssignment) {
+      if (isGlobalAdminRole) {
+        await db
+          .update(user)
+          .set({ mfaRequired: true })
+          .where(eq(user.id, userRecord.id));
+      }
       console.log(
         `ℹ️  ${assignment.email} already has ${assignment.roleName}. Skipping.`,
       );
@@ -341,6 +356,10 @@ async function assignRoles(
       assignedBy,
       notes: `Seeded via seed-global-admins.ts on ${timestamp}`,
     });
+
+    if (isGlobalAdminRole) {
+      await db.update(user).set({ mfaRequired: true }).where(eq(user.id, userRecord.id));
+    }
 
     console.log(`✅ Assigned ${assignment.roleName} to ${assignment.email}`);
   }

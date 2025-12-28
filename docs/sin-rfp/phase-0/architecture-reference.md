@@ -9,6 +9,10 @@
 | Version  | 1.0                         |
 | Scope    | Production SIN platform     |
 
+> Implementation status (2025-12-27): Partial. Core tenant routing and app
+> stack align to this architecture; production infra wiring, batch ECS runtime,
+> alarms, and restore evidence remain in Stream L.
+
 ## 1.0 Purpose and Scope
 
 This document describes the proposed production architecture for the viaSport

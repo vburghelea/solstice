@@ -50,12 +50,20 @@ export async function requireRole({
 /**
  * Convenience function for requiring global admin access
  */
-export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashboard") {
+export async function requireGlobalAdmin(
+  user: User | null,
+  redirectTo = "/dashboard",
+  mfaRedirectTo = "/dashboard/settings",
+) {
   if (!user) {
     throw redirect({ to: "/auth/login" });
   }
 
   if (!isAdminClient(user)) {
     throw redirect({ to: redirectTo });
+  }
+
+  if (user.mfaRequired && !user.twoFactorEnabled) {
+    throw redirect({ to: mfaRedirectTo });
   }
 }

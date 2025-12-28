@@ -26,6 +26,12 @@ Use SES for all tenants/environments and remove SendGrid usage.
 - Unblocks Stream I work.
 - Requires implementation updates and tests per the consolidated backlog.
 
+## Implementation
+
+- `src/lib/email/sendgrid.ts` routes transactional email through SES.
+- SendGrid API keys are ignored; SendGrid is not used in any environment.
+- Tests use the mock email service.
+
 ## Links
 
 - `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`

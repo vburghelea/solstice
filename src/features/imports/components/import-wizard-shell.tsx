@@ -1,6 +1,5 @@
 import { useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ParseResult } from "papaparse";
 import { useEffect, useMemo, useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedFileUpload } from "~/components/form-fields/ValidatedFileUpload";
@@ -28,6 +27,11 @@ import { Textarea } from "~/components/ui/textarea";
 import { getLatestFormVersion, listForms } from "~/features/forms/forms.queries";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { validateFormPayload } from "~/features/forms/forms.utils";
+import {
+  buildImportFieldLookup,
+  getMappedFileFields,
+  parseImportRow,
+} from "~/features/imports/imports.utils";
 import { listOrganizations } from "~/features/organizations/organizations.queries";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import type { JsonRecord } from "~/shared/lib/json";
@@ -46,6 +50,7 @@ import {
   listImportJobs,
   listMappingTemplates,
 } from "../imports.queries";
+import { parseImportFile } from "../imports.utils";
 
 const laneOptions = [
   { value: "interactive", label: "Lane 1 (interactive)" },
@@ -60,76 +65,6 @@ const hashFile = async (file: File) => {
   return Array.from(new Uint8Array(hashBuffer))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
-};
-
-const parseCsvFile = async (file: File) => {
-  const Papa = await import("papaparse");
-  return new Promise<JsonRecord[]>((resolve, reject) => {
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (result: ParseResult<JsonRecord>) => resolve(result.data as JsonRecord[]),
-      error: (error: Error) => reject(error),
-    });
-  });
-};
-
-const parseExcelFile = async (file: File) => {
-  const { read, utils } = await import("xlsx");
-  const data = new Uint8Array(await file.arrayBuffer());
-  const workbook = read(data, { type: "array" });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  return utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
-};
-
-const parseImportFile = async (file: File) => {
-  if (file.name.toLowerCase().endsWith(".csv")) {
-    return { type: "csv" as const, rows: await parseCsvFile(file) };
-  }
-  if (
-    file.name.toLowerCase().endsWith(".xlsx") ||
-    file.name.toLowerCase().endsWith(".xls")
-  ) {
-    return { type: "excel" as const, rows: await parseExcelFile(file) };
-  }
-  throw new Error("Unsupported file type. Please upload CSV or Excel.");
-};
-
-const buildPayloadFromRow = (
-  row: JsonRecord,
-  mapping: Record<string, string>,
-  fieldLookup: Map<string, FormDefinition["fields"][number]>,
-) => {
-  const payload: JsonRecord = {};
-
-  Object.entries(mapping).forEach(([sourceColumn, targetFieldKey]) => {
-    if (!targetFieldKey) return;
-    const field = fieldLookup.get(targetFieldKey);
-    if (!field) return;
-    const rawValue = row[sourceColumn];
-
-    if (field.type === "number") {
-      payload[targetFieldKey] = rawValue === "" ? null : Number(rawValue);
-      return;
-    }
-
-    if (field.type === "checkbox") {
-      const normalized = String(rawValue ?? "").toLowerCase();
-      payload[targetFieldKey] = ["true", "1", "yes", "y"].includes(normalized);
-      return;
-    }
-
-    if (field.type === "multiselect") {
-      payload[targetFieldKey] =
-        typeof rawValue === "string" ? rawValue.split(",").map((val) => val.trim()) : [];
-      return;
-    }
-
-    payload[targetFieldKey] = rawValue ?? null;
-  });
-
-  return payload;
 };
 
 const autoMapHeaders = (
@@ -236,14 +171,26 @@ export function ImportWizardShell() {
   });
 
   const definition = latestVersion?.definition as FormDefinition | undefined;
+  const supportedFields = useMemo(
+    () => (definition?.fields ?? []).filter((field) => field.type !== "file"),
+    [definition],
+  );
+  const fieldLookup = useMemo(
+    () => (definition ? buildImportFieldLookup(definition) : null),
+    [definition],
+  );
   const fieldOptions = useMemo(
     () =>
-      (definition?.fields ?? []).map((field) => ({
+      supportedFields.map((field) => ({
         value: field.key,
         label: field.label,
       })),
-    [definition],
+    [supportedFields],
   );
+  const mappedFileFields = useMemo(() => {
+    if (!fieldLookup) return [];
+    return getMappedFileFields(mapping, fieldLookup);
+  }, [fieldLookup, mapping]);
 
   const { data: mappingTemplates = [] } = useQuery({
     queryKey: ["imports", "templates", selectedOrganizationId],
@@ -356,8 +303,8 @@ export function ImportWizardShell() {
   useEffect(() => {
     if (!definition || headers.length === 0) return;
     // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
-    setMapping((prev) => ({ ...autoMapHeaders(headers, definition.fields), ...prev }));
-  }, [definition, headers]);
+    setMapping((prev) => ({ ...autoMapHeaders(headers, supportedFields), ...prev }));
+  }, [definition, headers, supportedFields]);
 
   useEffect(() => {
     if (!selectedTemplateId) return;
@@ -421,18 +368,30 @@ export function ImportWizardShell() {
 
   const previewRows = rows.slice(0, 10);
   const validationPreview = useMemo(() => {
-    if (!definition) return [];
-    const fieldLookup = new Map(definition.fields.map((field) => [field.key, field]));
+    if (!definition || !fieldLookup) return [];
     return previewRows.map((row, index) => {
-      const payload = buildPayloadFromRow(row, mapping, fieldLookup);
+      const { payload, parseErrors } = parseImportRow(row, mapping, fieldLookup);
       const validation = validateFormPayload(definition, payload);
+      const parseErrorFields = new Set(parseErrors.map((error) => error.fieldKey));
+      const validationErrors = validation.validationErrors.filter(
+        (error) => !parseErrorFields.has(error.field),
+      );
+      const missingFields = validation.missingFields.filter(
+        (fieldKey) => !parseErrorFields.has(fieldKey),
+      );
+
       return {
         rowIndex: index + 1,
-        missingFields: validation.missingFields,
-        errors: validation.validationErrors,
+        missingFields,
+        errors: [
+          ...parseErrors.map((error) => ({
+            message: `${error.fieldKey}: ${error.message}`,
+          })),
+          ...validationErrors,
+        ],
       };
     });
-  }, [definition, mapping, previewRows]);
+  }, [definition, fieldLookup, mapping, previewRows]);
 
   const validationErrorCount = validationPreview.reduce(
     (total, row) => total + row.errors.length + row.missingFields.length,
@@ -561,7 +520,7 @@ export function ImportWizardShell() {
                     variant="outline"
                     onClick={() => {
                       if (!definition) return;
-                      setMapping(autoMapHeaders(headers, definition.fields));
+                      setMapping(autoMapHeaders(headers, supportedFields));
                     }}
                   >
                     Re-run auto-map
@@ -609,6 +568,12 @@ export function ImportWizardShell() {
                   ))}
                 </TableBody>
               </Table>
+              {mappedFileFields.length > 0 ? (
+                <p className="text-destructive text-xs">
+                  File field imports are not supported yet. Remove mappings for:{" "}
+                  {mappedFileFields.join(", ")}.
+                </p>
+              ) : null}
 
               <div className="rounded-md border border-gray-200 p-3 text-sm">
                 <p className="font-semibold">Save mapping template</p>
@@ -673,7 +638,10 @@ export function ImportWizardShell() {
                 <Button
                   type="button"
                   disabled={
-                    !importJobId || !selectedFormId || runImportMutation.isPending
+                    !importJobId ||
+                    !selectedFormId ||
+                    runImportMutation.isPending ||
+                    mappedFileFields.length > 0
                   }
                   onClick={() => runImportMutation.mutate()}
                 >
@@ -682,7 +650,11 @@ export function ImportWizardShell() {
               ) : (
                 <Button
                   type="button"
-                  disabled={!importJobId || runBatchMutation.isPending}
+                  disabled={
+                    !importJobId ||
+                    runBatchMutation.isPending ||
+                    mappedFileFields.length > 0
+                  }
                   onClick={() => runBatchMutation.mutate()}
                 >
                   {runBatchMutation.isPending ? "Importing..." : "Run batch import"}

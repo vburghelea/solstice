@@ -9,6 +9,10 @@
 | Version  | 1.0                         |
 | Scope    | Production SIN platform     |
 
+> Implementation status (2025-12-27): Partial. AWS ca-central-1 is the target
+> region in SST configs, but SES-only enforcement and optional processor DPAs
+> require Stream L verification.
+
 ## 1.0 Statement of Compliance
 
 We confirm that all production SIN data will be stored and processed in Canada,

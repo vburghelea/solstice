@@ -6,10 +6,26 @@ const readArgValue = (flag: string) => {
   return process.argv[index + 1] ?? null;
 };
 
+const readJobIdFromEvent = () => {
+  const raw = process.env["SST_EVENT"];
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as { detail?: { jobId?: string }; jobId?: string };
+    return parsed.detail?.jobId ?? parsed.jobId ?? null;
+  } catch {
+    return null;
+  }
+};
+
 const main = async () => {
-  const jobId = readArgValue("--job-id") ?? readArgValue("--jobId");
+  const jobId =
+    readArgValue("--job-id") ??
+    readArgValue("--jobId") ??
+    process.env["SIN_IMPORT_JOB_ID"] ??
+    readJobIdFromEvent();
   if (!jobId) {
-    console.error("Missing --job-id argument.");
+    console.error("Missing import job id. Provide --job-id or set SIN_IMPORT_JOB_ID.");
     process.exit(1);
   }
 

@@ -86,22 +86,110 @@ const isFieldActive = (
   return meetsCondition(field.conditional, payload);
 };
 
-export const validateFormPayload = (definition: FormDefinition, payload: JsonRecord) => {
+export const isFieldEmpty = (
+  _definition: FormDefinition,
+  field: FormDefinition["fields"][number],
+  payload: JsonRecord,
+) => {
+  const hasValue = Object.prototype.hasOwnProperty.call(payload, field.key);
+  if (!hasValue) return true;
+
+  const value = payload[field.key];
+
+  if (value === null || value === undefined) return true;
+
+  if (field.type === "checkbox") {
+    return value !== true;
+  }
+
+  if (field.type === "multiselect") {
+    return !Array.isArray(value) || value.length === 0;
+  }
+
+  if (field.type === "file") {
+    return parseFileFieldValue(value).length === 0;
+  }
+
+  if (field.type === "number" && typeof value === "number") {
+    return Number.isNaN(value);
+  }
+
+  if (typeof value === "string") {
+    return value.trim() === "";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+
+  return false;
+};
+
+export const validateFormPayload = (
+  definition: FormDefinition,
+  payload: JsonRecord,
+  options?: { storageKeyPrefix?: string },
+) => {
   const missingFields: string[] = [];
   const validationErrors: Array<{ field: string; message: string }> = [];
+  let activeRequiredFields = 0;
 
   for (const field of definition.fields) {
     if (field.conditional && !isFieldActive(definition, field.key, payload)) {
       continue;
     }
 
-    const hasValue = Object.prototype.hasOwnProperty.call(payload, field.key);
     const value = payload[field.key];
-    const isEmpty =
-      !hasValue || value === null || (typeof value === "string" && value.trim() === "");
+    const isEmpty = isFieldEmpty(definition, field, payload);
+
+    if (field.required) {
+      activeRequiredFields += 1;
+    }
 
     if (field.required && isEmpty) {
       missingFields.push(field.key);
+    }
+
+    if (field.type === "number" && typeof value === "number" && Number.isNaN(value)) {
+      validationErrors.push({ field: field.key, message: "Invalid number" });
+      continue;
+    }
+
+    if (field.type === "file") {
+      const isArrayValue = Array.isArray(value);
+      if (isArrayValue) {
+        validationErrors.push({
+          field: field.key,
+          message: "Multiple files are not supported.",
+        });
+      }
+
+      const files = parseFileFieldValue(value);
+      if (files.length > 0) {
+        const fileValidation = validateFileField(definition, field.key, files);
+        fileValidation.errors.forEach((error) => {
+          validationErrors.push({ field: field.key, message: error });
+        });
+
+        if (options?.storageKeyPrefix) {
+          for (const file of files) {
+            if (!file.storageKey) {
+              validationErrors.push({
+                field: field.key,
+                message: "File upload is missing storage key",
+              });
+              continue;
+            }
+
+            if (!isValidStorageKeyPrefix(file.storageKey, options.storageKeyPrefix)) {
+              validationErrors.push({
+                field: field.key,
+                message: "File storage key is not valid for this form",
+              });
+            }
+          }
+        }
+      }
     }
 
     if (field.validation && !isEmpty) {
@@ -131,16 +219,23 @@ export const validateFormPayload = (definition: FormDefinition, payload: JsonRec
         }
 
         if (rule.type === "pattern" && typeof value === "string") {
-          const regex = new RegExp(String(rule.value));
-          if (!regex.test(value)) {
-            validationErrors.push({ field: field.key, message: rule.message });
+          try {
+            const regex = new RegExp(String(rule.value));
+            if (!regex.test(value)) {
+              validationErrors.push({ field: field.key, message: rule.message });
+            }
+          } catch {
+            validationErrors.push({
+              field: field.key,
+              message: "Invalid regex pattern",
+            });
           }
         }
       }
     }
   }
 
-  const totalFields = definition.fields.length || 1;
+  const totalFields = activeRequiredFields || 1;
   const completenessScore = Math.max(
     0,
     Math.round(100 - (missingFields.length / totalFields) * 100),
@@ -199,7 +294,7 @@ const DEFAULT_FILE_CONFIG: FileConfig = {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ],
   maxSizeBytes: 10 * 1024 * 1024, // 10MB
-  maxFiles: 5,
+  maxFiles: 1,
 };
 
 /**
@@ -214,13 +309,19 @@ export const parseFileFieldValue = (value: JsonValue): FilePayload[] => {
     const fileName = obj["fileName"];
     const mimeType = obj["mimeType"];
     const size = obj["size"];
+    const sizeBytes = obj["sizeBytes"];
     const storageKey = obj["storageKey"];
     if (typeof fileName === "string" && typeof mimeType === "string") {
       return [
         {
           fileName,
           mimeType,
-          size: typeof size === "number" ? size : 0,
+          size:
+            typeof size === "number"
+              ? size
+              : typeof sizeBytes === "number"
+                ? sizeBytes
+                : 0,
           ...(typeof storageKey === "string" ? { storageKey } : {}),
         },
       ];
@@ -244,11 +345,12 @@ export const parseFileFieldValue = (value: JsonValue): FilePayload[] => {
         const fn = item["fileName"] as string;
         const mt = item["mimeType"] as string;
         const sz = item["size"];
+        const szBytes = item["sizeBytes"];
         const sk = item["storageKey"];
         return {
           fileName: fn,
           mimeType: mt,
-          size: typeof sz === "number" ? sz : 0,
+          size: typeof sz === "number" ? sz : typeof szBytes === "number" ? szBytes : 0,
           ...(typeof sk === "string" ? { storageKey: sk } : {}),
         };
       });
@@ -277,7 +379,7 @@ export const getFileConfigForField = (
   return {
     allowedTypes: fileConfig.allowedTypes ?? DEFAULT_FILE_CONFIG.allowedTypes,
     maxSizeBytes: fileConfig.maxSizeBytes ?? DEFAULT_FILE_CONFIG.maxSizeBytes,
-    maxFiles: fileConfig.maxFiles ?? DEFAULT_FILE_CONFIG.maxFiles,
+    maxFiles: 1,
   };
 };
 

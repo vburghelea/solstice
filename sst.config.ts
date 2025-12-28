@@ -204,6 +204,9 @@ export default $config({
       },
     });
 
+    // DSAR exports bucket with Object Lock for compliance retention
+    // Object Lock provides WORM (Write Once Read Many) protection for DSAR exports
+    // and audit archives per ADR D0.13 (14-day DSAR retention)
     const sinArtifacts = new sst.aws.Bucket("SinArtifacts", {
       cors: [
         {
@@ -218,6 +221,13 @@ export default $config({
           maxAge: "1 day",
         },
       ],
+      versioning: true, // Required for Object Lock
+      transform: {
+        bucket: (args) => ({
+          ...args,
+          objectLockEnabled: true,
+        }),
+      },
     });
 
     const notificationsDlq = new sst.aws.Queue("SinNotificationsDlq");
@@ -230,8 +240,10 @@ export default $config({
     });
 
     // Define secrets - set via: npx sst secret set <NAME> <value> --stage qc-prod|sin-prod
+    // Note: BaseUrl should be updated after deploy if CloudFront URL changes.
+    // For production, use a custom domain for stable URL.
     const secrets = {
-      baseUrl: new sst.Secret("BaseUrl"), // CloudFront URL
+      baseUrl: new sst.Secret("BaseUrl"),
       betterAuthSecret: new sst.Secret("BetterAuthSecret"),
       googleClientId: new sst.Secret("GoogleClientId"),
       googleClientSecret: new sst.Secret("GoogleClientSecret"),
@@ -260,6 +272,40 @@ export default $config({
       SIN_NOTIFICATIONS_REPLY_TO_EMAIL: secrets.sinNotificationsReplyToEmail.value,
     };
 
+    const importCluster = new sst.aws.Cluster("SinImportCluster", {
+      vpc: {
+        id: vpc.id,
+        securityGroups: vpc.securityGroups,
+        containerSubnets: vpc.privateSubnets,
+        loadBalancerSubnets: vpc.publicSubnets,
+        cloudmapNamespaceId: vpc.nodes.cloudmapNamespace.id,
+        cloudmapNamespaceName: vpc.nodes.cloudmapNamespace.name,
+      },
+    });
+
+    const importBatchTask = new sst.aws.Task("SinImportBatchTask", {
+      cluster: importCluster,
+      cpu: "2 vCPU",
+      memory: "4 GB",
+      storage: "50 GB",
+      publicIp: false,
+      image: {
+        context: ".",
+        dockerfile: "docker/import-batch.Dockerfile",
+      },
+      command: ["pnpm", "exec", "tsx", "src/workers/import-batch.ts"],
+      dev: {
+        command: "pnpm exec tsx src/workers/import-batch.ts",
+      },
+      link: [database, sinArtifacts],
+      environment: {
+        ...runtimeEnv,
+        TENANT_KEY: tenantKey,
+        VITE_TENANT_KEY: viteTenantKey,
+        SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+      },
+    });
+
     // Deploy TanStack Start app
     const web = new sst.aws.TanStackStart("Web", {
       buildCommand: "pnpm build",
@@ -267,7 +313,13 @@ export default $config({
         command: "pnpm dev",
         url: devBaseUrl,
       },
-      link: [database, sinArtifacts, notificationsQueue, ...Object.values(secrets)],
+      link: [
+        database,
+        sinArtifacts,
+        notificationsQueue,
+        importBatchTask,
+        ...Object.values(secrets),
+      ],
       vpc,
       environment: {
         // Runtime environment detection
@@ -310,6 +362,20 @@ export default $config({
       schedule: "rate(1 day)",
       job: {
         handler: "src/cron/enforce-retention.handler",
+        link: [database, sinArtifacts, ...Object.values(secrets)],
+        environment: {
+          ...runtimeEnv,
+          TENANT_KEY: tenantKey,
+          VITE_TENANT_KEY: viteTenantKey,
+          SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+        },
+      },
+    });
+
+    new sst.aws.Cron("DataQualityMonitor", {
+      schedule: "rate(1 day)",
+      job: {
+        handler: "src/cron/data-quality-monitor.handler",
         link: [database, sinArtifacts, ...Object.values(secrets)],
         environment: {
           ...runtimeEnv,
@@ -496,6 +562,84 @@ export default $config({
       },
     });
 
+    const notificationsQueueName = notificationsQueue.nodes.queue.name;
+    const notificationsDlqName = notificationsDlq.nodes.queue.name;
+
+    // Notifications Queue - Backlog depth
+    new aws.cloudwatch.MetricAlarm("NotificationsQueueDepthAlarm", {
+      alarmName: `solstice-${stage}-notifications-queue-depth`,
+      alarmDescription: "Notifications queue backlog is growing",
+      namespace: "AWS/SQS",
+      metricName: "ApproximateNumberOfMessagesVisible",
+      statistic: "Maximum",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 100,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        QueueName: notificationsQueueName,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "notifications-queue",
+      },
+    });
+
+    // Notifications Queue - Oldest message age
+    new aws.cloudwatch.MetricAlarm("NotificationsQueueAgeAlarm", {
+      alarmName: `solstice-${stage}-notifications-queue-age`,
+      alarmDescription: "Notifications queue has stale messages",
+      namespace: "AWS/SQS",
+      metricName: "ApproximateAgeOfOldestMessage",
+      statistic: "Maximum",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 900,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        QueueName: notificationsQueueName,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "notifications-queue",
+      },
+    });
+
+    // Notifications DLQ - Any message indicates failure
+    new aws.cloudwatch.MetricAlarm("NotificationsDlqAlarm", {
+      alarmName: `solstice-${stage}-notifications-dlq`,
+      alarmDescription: "Notifications DLQ has messages",
+      namespace: "AWS/SQS",
+      metricName: "ApproximateNumberOfMessagesVisible",
+      statistic: "Maximum",
+      period: 300,
+      evaluationPeriods: 1,
+      threshold: 1,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        QueueName: notificationsDlqName,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "notifications-dlq",
+      },
+    });
+
     // CloudWatch Dashboard for quick visibility
     new aws.cloudwatch.Dashboard("MonitoringDashboard", {
       dashboardName: `solstice-${stage}`,
@@ -604,6 +748,13 @@ export default $config({
       url: web.url,
       alarmTopicArn: alarmTopic?.arn,
       dashboardUrl: `https://ca-central-1.console.aws.amazon.com/cloudwatch/home?region=ca-central-1#dashboards:name=solstice-${stage}`,
+      importBatchClusterArn: importBatchTask.cluster,
+      importBatchTaskDefinitionArn: importBatchTask.taskDefinition,
+      importBatchTaskContainers: importBatchTask.containers,
+      notificationsQueueUrl: notificationsQueue.url,
+      notificationsQueueArn: notificationsQueue.arn,
+      notificationsDlqArn: notificationsDlq.arn,
+      // Note: If url changes, update BaseUrl secret: npx sst secret set BaseUrl "<url>" --stage <stage>
     };
   },
 });

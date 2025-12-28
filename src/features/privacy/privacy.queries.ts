@@ -28,13 +28,20 @@ export const getLatestPolicyDocument = createServerFn({ method: "GET" })
     await assertFeatureEnabled("security_core");
     const { getDb } = await import("~/db/server-helpers");
     const { policyDocuments } = await import("~/db/schema");
-    const { desc, eq } = await import("drizzle-orm");
+    const { and, desc, eq, isNotNull, lte } = await import("drizzle-orm");
 
     const db = await getDb();
+    const today = new Date().toISOString().slice(0, 10);
     const [policy] = await db
       .select()
       .from(policyDocuments)
-      .where(eq(policyDocuments.type, data))
+      .where(
+        and(
+          eq(policyDocuments.type, data),
+          isNotNull(policyDocuments.publishedAt),
+          lte(policyDocuments.effectiveDate, today),
+        ),
+      )
       .orderBy(desc(policyDocuments.effectiveDate))
       .limit(1);
 
@@ -112,6 +119,22 @@ export const listRetentionPolicies = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export const listLegalHolds = createServerFn({ method: "GET" }).handler(async () => {
+  await assertFeatureEnabled("sin_admin_privacy");
+  const userId = await getSessionUserId();
+  if (!userId) return [];
+
+  const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+  await requireAdmin(userId);
+
+  const { getDb } = await import("~/db/server-helpers");
+  const { legalHolds } = await import("~/db/schema");
+  const { desc } = await import("drizzle-orm");
+
+  const db = await getDb();
+  return db.select().from(legalHolds).orderBy(desc(legalHolds.appliedAt));
+});
+
 export const getPrivacyExportDownloadUrl = createServerFn({ method: "GET" })
   .inputValidator(zod$(getPrivacyExportUrlSchema))
   .handler(async ({ data }) => {
@@ -132,9 +155,24 @@ export const getPrivacyExportDownloadUrl = createServerFn({ method: "GET" })
 
     if (!request?.resultUrl) return null;
 
+    if (request.type !== "access" && request.type !== "export") {
+      return null;
+    }
+
+    if (request.status !== "completed") return null;
+
+    if (request.resultExpiresAt && request.resultExpiresAt < new Date()) {
+      return null;
+    }
+
     if (request.userId !== userId) {
       const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
       await requireAdmin(userId);
+
+      const { getCurrentSession, requireRecentAuth } =
+        await import("~/lib/auth/guards/step-up");
+      const currentSession = await getCurrentSession();
+      await requireRecentAuth(userId, currentSession);
     }
 
     const { GetObjectCommand } = await import("@aws-sdk/client-s3");
@@ -152,5 +190,20 @@ export const getPrivacyExportDownloadUrl = createServerFn({ method: "GET" })
     const client = await getS3Client();
     const command = new GetObjectCommand({ Bucket: bucket, Key: key });
     const url = await getSignedUrl(client, command, { expiresIn: 900 });
+
+    const { logExportEvent } = await import("~/lib/audit");
+    await logExportEvent({
+      action: "PRIVACY_EXPORT_DOWNLOAD",
+      actorUserId: userId,
+      targetType: "privacy_request",
+      targetId: request.id,
+      metadata: {
+        subjectUserId: request.userId,
+        bucket,
+        key,
+        expiresAt: request.resultExpiresAt ? request.resultExpiresAt.toISOString() : null,
+      },
+    });
+
     return url;
   });

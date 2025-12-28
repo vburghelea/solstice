@@ -2,11 +2,36 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import type { JsonRecord } from "~/shared/lib/json";
 import { enqueueNotification } from "./queue";
 
+type OrganizationMemberRole = "owner" | "admin" | "reporter" | "viewer" | "member";
+
+const ORGANIZATION_MEMBER_ROLES: OrganizationMemberRole[] = [
+  "owner",
+  "admin",
+  "reporter",
+  "viewer",
+  "member",
+];
+
 const applyTemplate = (template: string, variables: JsonRecord) =>
   template.replace(/{{\s*([^}]+)\s*}}/g, (_match, key) => {
     const value = variables[key.trim()];
     return value === undefined || value === null ? "" : String(value);
   });
+
+const parseRoleFilter = (roleFilter?: string | null) =>
+  (roleFilter ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+const buildStableNotificationId = async (jobId: string, userId: string) => {
+  const { createHash } = await import("crypto");
+  const hash = createHash("sha256").update(`${jobId}:${userId}`).digest("hex");
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(
+    12,
+    16,
+  )}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
+};
 
 export const scheduleNotification = createServerOnlyFn(
   async (params: {
@@ -39,8 +64,9 @@ export const scheduleNotification = createServerOnlyFn(
 
 export const processScheduledNotifications = createServerOnlyFn(async () => {
   const { getDb } = await import("~/db/server-helpers");
-  const { notificationTemplates, scheduledNotifications } = await import("~/db/schema");
-  const { and, eq, isNull, lte } = await import("drizzle-orm");
+  const { notificationTemplates, organizationMembers, scheduledNotifications } =
+    await import("~/db/schema");
+  const { and, eq, inArray, isNull, lte } = await import("drizzle-orm");
 
   const db = await getDb();
   const now = new Date();
@@ -69,15 +95,43 @@ export const processScheduledNotifications = createServerOnlyFn(async () => {
         throw new Error("Template not found");
       }
 
-      if (!job.userId) {
-        throw new Error("Scheduled notifications without userId are not supported yet.");
+      const roleFilters = parseRoleFilter(job.roleFilter).filter(
+        (role): role is OrganizationMemberRole =>
+          ORGANIZATION_MEMBER_ROLES.includes(role as OrganizationMemberRole),
+      );
+
+      if (!job.userId && !job.organizationId && roleFilters.length === 0) {
+        throw new Error(
+          "Scheduled notifications without userId require an organization or role.",
+        );
+      }
+
+      const recipients = job.userId
+        ? [job.userId]
+        : (
+            await db
+              .select({ userId: organizationMembers.userId })
+              .from(organizationMembers)
+              .where(
+                and(
+                  eq(organizationMembers.status, "active"),
+                  ...(job.organizationId
+                    ? [eq(organizationMembers.organizationId, job.organizationId)]
+                    : []),
+                  ...(roleFilters.length > 0
+                    ? [inArray(organizationMembers.role, roleFilters)]
+                    : []),
+                ),
+              )
+              .groupBy(organizationMembers.userId)
+          ).map((member) => member.userId);
+
+      if (recipients.length === 0) {
+        throw new Error("No recipients found for scheduled notification.");
       }
 
       const variables = job.variables ?? {};
-      await enqueueNotification({
-        // Use job.id as stable notificationId for idempotency across retries
-        notificationId: job.id,
-        userId: job.userId,
+      const basePayload = {
         organizationId: job.organizationId ?? null,
         type: job.templateKey,
         category: template.category,
@@ -87,7 +141,39 @@ export const processScheduledNotifications = createServerOnlyFn(async () => {
           scheduledNotificationId: job.id,
           templateKey: job.templateKey,
         },
-      });
+      };
+
+      const results = await Promise.allSettled(
+        recipients.map(async (userId) => {
+          const notificationId = job.userId
+            ? job.id
+            : await buildStableNotificationId(job.id, userId);
+          await enqueueNotification({
+            ...basePayload,
+            notificationId,
+            userId,
+          });
+        }),
+      );
+
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        failures.forEach((failure) => {
+          console.error("Scheduled notification recipient failed", {
+            jobId: job.id,
+            error:
+              failure.status === "rejected"
+                ? failure.reason instanceof Error
+                  ? failure.reason.message
+                  : String(failure.reason)
+                : "Unknown error",
+          });
+        });
+
+        throw new Error(
+          `Failed to enqueue ${failures.length} of ${recipients.length} notifications`,
+        );
+      }
 
       await db
         .update(scheduledNotifications)

@@ -25,6 +25,7 @@ const requireSessionUserId = async () => {
 const requireOrgAccess = async (
   userId: string,
   organizationId: string | null | undefined,
+  options?: { roles?: Array<"owner" | "admin" | "reporter" | "viewer" | "member"> },
 ) => {
   if (!organizationId) {
     const { PermissionService } = await import("~/features/roles/permission.service");
@@ -36,7 +37,18 @@ const requireOrgAccess = async (
   }
 
   const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
-  return requireOrganizationAccess({ userId, organizationId });
+  return requireOrganizationAccess({ userId, organizationId }, options);
+};
+
+const requireSubmissionAccess = async (
+  userId: string,
+  submission: { organizationId: string; submitterId: string | null },
+) => {
+  if (submission.submitterId === userId) return;
+  const { ORG_ADMIN_ROLES } = await import("~/lib/auth/guards/org-guard");
+  await requireOrgAccess(userId, submission.organizationId, {
+    roles: ORG_ADMIN_ROLES,
+  });
 };
 
 const getFormSchema = z.object({
@@ -179,7 +191,10 @@ export const listFormSubmissions = createServerFn({ method: "GET" })
     if (!form) {
       throw notFound("Form not found");
     }
-    await requireOrgAccess(userId, form.organizationId);
+    const { ORG_ADMIN_ROLES } = await import("~/lib/auth/guards/org-guard");
+    await requireOrgAccess(userId, form.organizationId, {
+      roles: ORG_ADMIN_ROLES,
+    });
 
     return db
       .select()
@@ -203,6 +218,7 @@ export const getFormSubmission = createServerFn({ method: "GET" })
         id: formSubmissions.id,
         formId: formSubmissions.formId,
         organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
         status: formSubmissions.status,
         createdAt: formSubmissions.createdAt,
         submittedAt: formSubmissions.submittedAt,
@@ -218,9 +234,18 @@ export const getFormSubmission = createServerFn({ method: "GET" })
       return null;
     }
 
-    await requireOrgAccess(userId, submission.organizationId);
+    await requireSubmissionAccess(userId, submission);
 
-    return submission;
+    return {
+      id: submission.id,
+      formId: submission.formId,
+      organizationId: submission.organizationId,
+      status: submission.status,
+      createdAt: submission.createdAt,
+      submittedAt: submission.submittedAt,
+      reviewNotes: submission.reviewNotes,
+      formName: submission.formName,
+    };
   });
 
 export const listFormSubmissionVersions = createServerFn({ method: "GET" })
@@ -234,7 +259,10 @@ export const listFormSubmissionVersions = createServerFn({ method: "GET" })
 
     const db = await getDb();
     const [submission] = await db
-      .select({ organizationId: formSubmissions.organizationId })
+      .select({
+        organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+      })
       .from(formSubmissions)
       .where(eq(formSubmissions.id, data.submissionId))
       .limit(1);
@@ -243,7 +271,7 @@ export const listFormSubmissionVersions = createServerFn({ method: "GET" })
       return [];
     }
 
-    await requireOrgAccess(userId, submission.organizationId);
+    await requireSubmissionAccess(userId, submission);
 
     return db
       .select()
@@ -263,7 +291,10 @@ export const listSubmissionFiles = createServerFn({ method: "GET" })
 
     const db = await getDb();
     const [submission] = await db
-      .select({ organizationId: formSubmissions.organizationId })
+      .select({
+        organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+      })
       .from(formSubmissions)
       .where(eq(formSubmissions.id, data.submissionId))
       .limit(1);
@@ -272,7 +303,7 @@ export const listSubmissionFiles = createServerFn({ method: "GET" })
       return [];
     }
 
-    await requireOrgAccess(userId, submission.organizationId);
+    await requireSubmissionAccess(userId, submission);
 
     return db
       .select()
@@ -296,6 +327,8 @@ export const getSubmissionFileDownloadUrl = createServerFn({ method: "GET" })
         fileName: submissionFiles.fileName,
         mimeType: submissionFiles.mimeType,
         organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+        submissionId: formSubmissions.id,
       })
       .from(submissionFiles)
       .innerJoin(formSubmissions, eq(submissionFiles.submissionId, formSubmissions.id))
@@ -306,7 +339,7 @@ export const getSubmissionFileDownloadUrl = createServerFn({ method: "GET" })
       return null;
     }
 
-    await requireOrgAccess(userId, record.organizationId);
+    await requireSubmissionAccess(userId, record);
 
     const { GetObjectCommand } = await import("@aws-sdk/client-s3");
     const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
@@ -323,5 +356,19 @@ export const getSubmissionFileDownloadUrl = createServerFn({ method: "GET" })
     });
 
     const url = await getSignedUrl(client, command, { expiresIn: 900 });
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "FORM_FILE_DOWNLOAD_URL_ISSUED",
+      actorUserId: userId,
+      targetType: "submission_file",
+      targetId: data.submissionFileId,
+      targetOrgId: record.organizationId,
+      metadata: {
+        submissionId: record.submissionId,
+        fileName: record.fileName,
+      },
+    });
+
     return { url, fileName: record.fileName };
   });

@@ -4,6 +4,10 @@ This document captures the intended ECS task definition and runtime contract for
 Lane 2 batch imports. It is a draft scaffold to satisfy the SIN backlog item and
 can be updated with concrete infrastructure when the ECS worker is provisioned.
 
+> Implementation status (2025-12-27): In progress. Worker entrypoint exists and
+> ECS task + trigger wiring is defined in `sst.config.ts`; deployment verification
+> is pending staging.
+
 ## ECS Task Definition (Draft)
 
 ```yaml
@@ -20,7 +24,7 @@ containerDefinitions:
   - name: import-worker
     image: <artifact-registry>/solstice-import-worker:<tag>
     essential: true
-    command: ["node", "dist/workers/import-batch.js", "--job-id", "<job-id>"]
+    command: ["pnpm", "exec", "tsx", "src/workers/import-batch.ts"]
     environment:
       - name: NODE_ENV
         value: production
@@ -28,6 +32,8 @@ containerDefinitions:
         value: dev
       - name: SIN_ARTIFACTS_BUCKET
         value: <bucket>
+      - name: SIN_IMPORT_JOB_ID
+        value: <job-id>
       - name: SIN_IMPORT_ACTOR_USER_ID
         value: <optional-user-id>
     secrets:
@@ -56,8 +62,8 @@ containerDefinitions:
 - The current batch implementation exists as a server function:
   - `runBatchImport` in `src/features/imports/imports.mutations.ts`
 - ECS entrypoint now exists at `src/workers/import-batch.ts`, which calls the
-  shared batch runner helper and accepts `--job-id` plus optional
-  `SIN_IMPORT_ACTOR_USER_ID`.
+  shared batch runner helper and accepts `--job-id` or `SIN_IMPORT_JOB_ID` plus
+  optional `SIN_IMPORT_ACTOR_USER_ID`.
 - Worker is expected to:
   1. Fetch job metadata
   2. Stream the import file from S3
@@ -67,6 +73,29 @@ containerDefinitions:
 
 ## TODOs Before Production
 
-- Create container build (`src/workers/import-batch.ts` or similar entrypoint).
-- Wire EventBridge → SQS → ECS RunTask for job execution.
+- Create container build (`docker/import-batch.Dockerfile` added; validate in
+  staging).
+- Wire EventBridge → SQS → ECS RunTask for job execution (current trigger uses
+  SST Task SDK from `runBatchImport`).
 - Add observability (CloudWatch logs + metrics).
+
+## Required outputs and secrets
+
+Infrastructure outputs (SST `Resource` or stack outputs):
+
+- `SinImportBatchTask` (task definition ARN, cluster ARN, container names)
+- `SinImportCluster` (cluster ARN)
+- `SinArtifacts` bucket name
+
+Runtime environment variables:
+
+- `SIN_ARTIFACTS_BUCKET` (S3 bucket name for import artifacts)
+- `SIN_IMPORT_JOB_ID` (job id to process; supplied by trigger)
+- `SIN_IMPORT_ACTOR_USER_ID` (optional override; otherwise uses job creator)
+- `SST_STAGE`, `TENANT_KEY`, `VITE_TENANT_KEY`, `NODE_ENV`
+
+Secrets/credentials:
+
+- Database credentials from SST-linked `Database` resource (RDS + proxy)
+- IAM task role with `s3:GetObject`, `s3:PutObject`, `secretsmanager:GetSecretValue`,
+  `logs:CreateLogStream`, `logs:PutLogEvents`, `sqs:SendMessage` (status updates)

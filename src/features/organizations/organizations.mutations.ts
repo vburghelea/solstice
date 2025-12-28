@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { zod$ } from "~/lib/server/fn-utils";
 import { getOrgHierarchy } from "~/tenant";
-import { assertFeatureEnabled } from "~/tenant/feature-gates";
+import { assertFeatureEnabled, isFeatureEnabled } from "~/tenant/feature-gates";
 import type { OrganizationType } from "~/tenant/tenant.types";
 import {
   approveOrganizationMemberSchema,
@@ -128,6 +128,9 @@ export const createOrganization = createServerFn({ method: "POST" })
       }
 
       try {
+        const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+        await requireAdmin(sessionUser.id);
+
         const { getDb } = await import("~/db/server-helpers");
         const { organizationMembers, organizations } = await import("~/db/schema");
 
@@ -139,6 +142,7 @@ export const createOrganization = createServerFn({ method: "POST" })
         if (hierarchyError) {
           return hierarchyError;
         }
+        const isDiscoverableDefault = isFeatureEnabled("org_discoverable_default");
         const [organization] = await db.transaction(async (tx) => {
           const [org] = await tx
             .insert(organizations)
@@ -149,6 +153,8 @@ export const createOrganization = createServerFn({ method: "POST" })
               parentOrgId: data.parentOrgId ?? null,
               settings: data.settings ?? {},
               metadata: data.metadata ?? {},
+              isDiscoverable: data.isDiscoverable ?? isDiscoverableDefault,
+              joinRequestsEnabled: data.joinRequestsEnabled ?? false,
             })
             .returning();
 
@@ -196,6 +202,15 @@ export const createOrganization = createServerFn({ method: "POST" })
           },
         };
       } catch (error) {
+        const { isTypedServerError } = await import("~/lib/server/errors");
+        if (isTypedServerError(error)) {
+          if (error.error.code === "UNAUTHORIZED") {
+            return errorResult("UNAUTHORIZED", error.error.message);
+          }
+          if (error.error.code === "FORBIDDEN") {
+            return errorResult("FORBIDDEN", error.error.message);
+          }
+        }
         console.error("Failed to create organization", error);
         return errorResult("DATABASE_ERROR", "Failed to create organization");
       }
@@ -212,12 +227,17 @@ export const updateOrganization = createServerFn({ method: "POST" })
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
 
-      const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
-        await import("~/lib/auth/guards/org-guard");
-      await requireOrganizationMembership(
-        { userId: sessionUser.id, organizationId: data.organizationId },
-        { roles: ORG_ADMIN_ROLES },
-      );
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isGlobalAdmin = await PermissionService.isGlobalAdmin(sessionUser.id);
+
+      if (!isGlobalAdmin) {
+        const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
+          await import("~/lib/auth/guards/org-guard");
+        await requireOrganizationAccess(
+          { userId: sessionUser.id, organizationId: data.organizationId },
+          { roles: ORG_ADMIN_ROLES },
+        );
+      }
 
       try {
         const { getDb } = await import("~/db/server-helpers");
@@ -235,17 +255,22 @@ export const updateOrganization = createServerFn({ method: "POST" })
           return errorResult("NOT_FOUND", "Organization not found");
         }
 
-        const nextType = data.data.type ?? existing.type;
-        const nextParentOrgId = Object.prototype.hasOwnProperty.call(
+        const hasParentOrgUpdate = Object.prototype.hasOwnProperty.call(
           data.data,
           "parentOrgId",
-        )
+        );
+        const nextType = data.data.type ?? existing.type;
+        const nextParentOrgId = hasParentOrgUpdate
           ? (data.data.parentOrgId ?? null)
           : existing.parentOrgId;
 
-        const shouldValidate =
-          data.data.type !== undefined ||
-          Object.prototype.hasOwnProperty.call(data.data, "parentOrgId");
+        const shouldValidate = data.data.type !== undefined || hasParentOrgUpdate;
+        if (shouldValidate && !isGlobalAdmin) {
+          return errorResult(
+            "FORBIDDEN",
+            "Global admin access required to update organization type or parent",
+          );
+        }
 
         if (shouldValidate) {
           const hierarchyError = await validateOrgHierarchy({
@@ -257,17 +282,21 @@ export const updateOrganization = createServerFn({ method: "POST" })
           }
         }
 
+        const updateValues = {
+          name: data.data.name,
+          slug: data.data.slug,
+          type: data.data.type,
+          status: data.data.status,
+          settings: data.data.settings,
+          metadata: data.data.metadata,
+          isDiscoverable: data.data.isDiscoverable,
+          joinRequestsEnabled: data.data.joinRequestsEnabled,
+          ...(hasParentOrgUpdate ? { parentOrgId: nextParentOrgId } : {}),
+        };
+
         const [updated] = await db
           .update(organizations)
-          .set({
-            name: data.data.name,
-            slug: data.data.slug,
-            type: data.data.type,
-            parentOrgId: data.data.parentOrgId ?? null,
-            status: data.data.status,
-            settings: data.data.settings,
-            metadata: data.data.metadata,
-          })
+          .set(updateValues)
           .where(eq(organizations.id, data.organizationId))
           .returning();
 

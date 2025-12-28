@@ -9,6 +9,9 @@
 | Version  | 1.0                         |
 | Scope    | Production SIN platform     |
 
+> Implementation status (2025-12-27): Planned. Strategy is documented; restore
+> drill evidence and Glacier/Object Lock archival are pending Stream L.
+
 ## 1.0 Purpose
 
 This document describes the backup and disaster recovery (DR) strategy for the
@@ -78,6 +81,7 @@ Application restore:
 - Quarterly DR restore test in a controlled environment
 - Documented test report with RPO/RTO achieved
 - Post-test remediation tracked to closure
+- Latest drill results: `docs/sin-rfp/backup-restore-test-results.md`
 
 ## 7.0 Roles and Communications
 

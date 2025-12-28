@@ -1,17 +1,21 @@
 import {
   BarChart3,
+  BookOpen,
   Calendar,
   ClipboardList,
   CreditCard,
   FileText,
+  Files,
   Home,
   LayoutGrid,
+  LifeBuoy,
   LineChart,
   Settings,
   ShieldCheck,
   UploadCloud,
   User,
   UserCheck,
+  UserPlus,
   Users,
 } from "lucide-react";
 import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
@@ -89,6 +93,31 @@ const portalItems: NavItem[] = [
     to: "/dashboard/sin/analytics",
     feature: "sin_analytics",
     requiresOrgRole: analyticsRoles,
+  },
+  {
+    icon: Files,
+    label: "Templates",
+    to: "/dashboard/sin/templates",
+    feature: "sin_templates",
+  },
+  {
+    icon: BookOpen,
+    label: "Help Center",
+    to: "/dashboard/sin/help",
+    feature: "sin_help_center",
+  },
+  {
+    icon: LifeBuoy,
+    label: "Support",
+    to: "/dashboard/sin/support",
+    feature: "sin_support",
+  },
+  {
+    icon: UserPlus,
+    label: "Organization Access",
+    to: "/dashboard/sin/organization-access",
+    feature: "org_join_requests",
+    requiresOrgRole: ["owner", "admin"],
   },
 ];
 

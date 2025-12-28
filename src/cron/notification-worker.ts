@@ -10,6 +10,7 @@ import type { JsonRecord } from "~/shared/lib/json";
 
 export type NotificationQueueMessage = {
   notificationId: string;
+  actorUserId?: string | null;
   userId: string;
   organizationId?: string | null;
   type: string;
@@ -28,6 +29,7 @@ const processRecord = async (record: SQSRecord): Promise<void> => {
 
     await sendNotification({
       notificationId: message.notificationId,
+      actorUserId: message.actorUserId ?? null,
       userId: message.userId,
       organizationId: message.organizationId ?? null,
       type: message.type,

@@ -5,85 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1753743708004,
-      "tag": "0000_wealthy_anthem",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1753825402952,
-      "tag": "0001_luxuriant_chamber",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1753825710888,
-      "tag": "0002_wealthy_galactus",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1758270273511,
-      "tag": "0003_tiny_the_captain",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1758327667987,
-      "tag": "0004_team_invitation_metadata",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1758417064402,
-      "tag": "0005_event_payments",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1766296615636,
-      "tag": "0006_ambitious_mandrill",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1766304186248,
-      "tag": "0007_magical_firebird",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1766345466324,
-      "tag": "0008_demonic_groot",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1766514827183,
-      "tag": "0009_magical_alex_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1766515192121,
-      "tag": "0010_audit_immutable",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1766648670018,
-      "tag": "0011_curly_iron_man",
+      "when": 1766904498735,
+      "tag": "0000_secret_stingray",
       "breakpoints": true
     }
   ]

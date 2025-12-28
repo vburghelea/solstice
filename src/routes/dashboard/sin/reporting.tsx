@@ -57,11 +57,18 @@ function SinReportingPage() {
 
   return (
     <div className="container mx-auto space-y-6 p-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Reporting Tasks</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Track upcoming reporting submissions and review your history.
-        </p>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Reporting Tasks
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Track upcoming reporting submissions and review your history.
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/dashboard/sin/templates?context=reporting">View templates</Link>
+        </Button>
       </div>
 
       {isLoading ? (

@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { listImportJobs } from "~/features/imports/imports.queries";
 import { useOrgContext } from "~/features/organizations/org-context";
+import { TutorialPanel } from "~/features/tutorials/components/tutorial-panel";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/sin/imports")({
@@ -44,12 +45,19 @@ function SinImportsPage() {
 
   return (
     <div className="container mx-auto space-y-6 p-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Imports</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Review recent import activity for your organization.
-        </p>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Imports</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Review recent import activity for your organization.
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/dashboard/sin/templates?context=imports">View templates</Link>
+        </Button>
       </div>
+
+      <TutorialPanel title="Data upload walkthrough" tutorialIds={["data_upload"]} />
 
       {isLoading ? (
         <div className="text-muted-foreground">Loading import jobs…</div>

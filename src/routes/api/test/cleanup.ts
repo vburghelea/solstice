@@ -9,10 +9,15 @@ const cleanupSchema = z.object({
     "delete-team",
     "clear-user-teams",
     "clear-user-memberships",
+    "expire-session",
+    "set-mfa",
   ]),
   userId: z.string().optional(),
   teamId: z.string().optional(),
   userEmail: z.email().optional(),
+  ageMinutes: z.number().int().positive().optional(),
+  mfaRequired: z.boolean().optional(),
+  twoFactorEnabled: z.boolean().optional(),
 });
 
 export const Route = createFileRoute("/api/test/cleanup")({
@@ -27,11 +32,20 @@ export const Route = createFileRoute("/api/test/cleanup")({
 
         try {
           const body = await request.json();
-          const { action, userId, teamId, userEmail } = cleanupSchema.parse(body);
+          const {
+            action,
+            userId,
+            teamId,
+            userEmail,
+            ageMinutes,
+            mfaRequired,
+            twoFactorEnabled,
+          } = cleanupSchema.parse(body);
 
           // Import server-only modules inside the handler
           const { getDb } = await import("~/db/server-helpers");
-          const { teams, teamMembers, user, memberships } = await import("~/db/schema");
+          const { teams, teamMembers, user, memberships, session } =
+            await import("~/db/schema");
 
           const db = await getDb();
 
@@ -134,6 +148,64 @@ export const Route = createFileRoute("/api/test/cleanup")({
                   await db
                     .delete(memberships)
                     .where(eq(memberships.userId, targetUserId));
+                }
+              }
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "expire-session": {
+              if (userId || userEmail) {
+                const targetUserId =
+                  userId ||
+                  (await db
+                    .select({ id: user.id })
+                    .from(user)
+                    .where(eq(user.email, userEmail!))
+                    .then((rows) => rows[0]?.id));
+
+                if (targetUserId) {
+                  const offsetMinutes = Math.max(1, ageMinutes ?? 20);
+                  const targetTime = new Date(Date.now() - offsetMinutes * 60 * 1000);
+                  await db
+                    .update(session)
+                    .set({
+                      createdAt: targetTime,
+                      updatedAt: targetTime,
+                      lastActivityAt: targetTime,
+                    })
+                    .where(eq(session.userId, targetUserId));
+                }
+              }
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "set-mfa": {
+              if (userId || userEmail) {
+                const targetUserId =
+                  userId ||
+                  (await db
+                    .select({ id: user.id })
+                    .from(user)
+                    .where(eq(user.email, userEmail!))
+                    .then((rows) => rows[0]?.id));
+
+                if (targetUserId) {
+                  const nextMfaRequired = mfaRequired ?? false;
+                  const nextTwoFactorEnabled = twoFactorEnabled ?? false;
+                  await db
+                    .update(user)
+                    .set({
+                      mfaRequired: nextMfaRequired,
+                      twoFactorEnabled: nextTwoFactorEnabled,
+                      mfaEnrolledAt: nextTwoFactorEnabled ? new Date() : null,
+                    })
+                    .where(eq(user.id, targetUserId));
                 }
               }
               return new Response(JSON.stringify({ success: true }), {

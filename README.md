@@ -163,7 +163,7 @@ AWS_PROFILE=techprod npx sst deploy --stage sin-prod
 - **Region**: `ca-central-1` (Canada) for PIPEDA compliance
 - **Infrastructure**: Lambda + CloudFront + S3
 
-See [SST Migration Plan](./docs/sin-rfp/sst-migration-plan.md) for deployment details and secrets configuration.
+See [SST Migration Plan](./docs/sin-rfp/archive/completed/sst-migration-plan.md) for deployment details and secrets configuration.
 
 ## CI/CD
 

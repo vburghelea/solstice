@@ -184,6 +184,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   placeholder={twoFactorMethod === "backup" ? "backup-xxxxxx" : "123456"}
                   value={twoFactorCode}
                   onChange={(event) => setTwoFactorCode(event.target.value.trim())}
+                  data-testid="login-2fa-code"
                 />
               </div>
 
@@ -269,6 +270,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   placeholder="hello@example.com"
                   autoComplete="email"
                   autoFocus
+                  data-testid="login-email"
                 />
               )}
             </form.Field>
@@ -295,6 +297,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   type="password"
                   placeholder="Password"
                   autoComplete="current-password"
+                  data-testid="login-password"
                 />
               )}
             </form.Field>

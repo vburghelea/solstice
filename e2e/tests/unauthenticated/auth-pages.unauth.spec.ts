@@ -16,7 +16,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
     // Check form elements using labels and roles
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Login", exact: true })).toBeVisible();
 
     // Check OAuth buttons

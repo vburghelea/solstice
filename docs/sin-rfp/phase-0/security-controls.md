@@ -92,6 +92,6 @@ Session management:
 
 ## 10.0 References
 
-- `docs/sin-rfp/SIN-REQUIREMENTS.md`
-- `docs/sin-rfp/hosting-compliance.md`
+- `docs/sin-rfp/requirements/SIN-REQUIREMENTS.md`
+- `docs/sin-rfp/archive/completed/hosting-compliance.md`
 - `docs/sin-rfp/phase-0/audit-retention-policy.md`

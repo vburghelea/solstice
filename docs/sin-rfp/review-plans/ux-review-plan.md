@@ -36,7 +36,7 @@ This plan outlines a systematic approach to reviewing the UX and design of the S
 
 ### Issue Tracking
 
-- Log P0/P1 items in `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+- Log P0/P1 items in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`
 - Link each backlog item to the UX findings entry
 
 ---

@@ -80,6 +80,6 @@ Any exception to this residency policy requires:
 
 ## 8.0 References
 
-- `docs/sin-rfp/hosting-compliance.md`
-- `docs/sin-rfp/sst-migration-plan.md`
-- `docs/sin-rfp/SIN-REQUIREMENTS.md`
+- `docs/sin-rfp/archive/completed/hosting-compliance.md`
+- `docs/sin-rfp/archive/completed/sst-migration-plan.md`
+- `docs/sin-rfp/requirements/SIN-REQUIREMENTS.md`

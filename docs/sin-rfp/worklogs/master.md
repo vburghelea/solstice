@@ -4,25 +4,25 @@
 
 - Keep stream status and owners up to date.
 - Log cross-stream decisions or blockers here.
-- Link to ADRs in `docs/sin-rfp/decision-register.md` as they are applied.
+- Link to ADRs in `docs/sin-rfp/decisions/decision-register.md` as they are applied.
 
 ## Streams
 
-| Stream   | Scope                                               | Status   | Owner | Worklog                             |
-| -------- | --------------------------------------------------- | -------- | ----- | ----------------------------------- |
-| Stream A | Auth, session, and MFA foundations                  | Complete | Codex | `docs/sin-rfp/worklogs/stream-a.md` |
-| Stream B | Org context and client routing safety               | Complete | Codex | `docs/sin-rfp/worklogs/stream-b.md` |
-| Stream C | Access control and org gating                       | Complete | Codex | `docs/sin-rfp/worklogs/stream-c.md` |
-| Stream D | Forms integrity and file security                   | Complete | Codex | `docs/sin-rfp/worklogs/stream-d.md` |
-| Stream E | Imports hardening                                   | Complete | Codex | `docs/sin-rfp/worklogs/stream-e.md` |
-| Stream F | Reporting and report correctness                    | Complete | Codex | `docs/sin-rfp/worklogs/stream-f.md` |
-| Stream G | Audit log integrity and security events             | Complete | Codex | `docs/sin-rfp/worklogs/stream-g.md` |
-| Stream H | Privacy, DSAR, and retention                        | Complete | Codex | `docs/sin-rfp/worklogs/stream-h.md` |
-| Stream I | Notifications and email integrity                   | Complete | Codex | `docs/sin-rfp/worklogs/stream-i.md` |
-| Stream J | Tests, verification, and E2E coverage               | Complete | Codex | `docs/sin-rfp/worklogs/stream-j.md` |
-| Stream K | Documentation, requirements, and evidence alignment | Complete | Codex | `docs/sin-rfp/worklogs/stream-k.md` |
-| Stream L | Production readiness and infra                      | Complete | Codex | `docs/sin-rfp/worklogs/stream-l.md` |
-| Stream M | Missing requirement features                        | Complete | Codex | `docs/sin-rfp/worklogs/stream-m.md` |
+| Stream   | Scope                                               | Status   | Owner | Worklog                                    |
+| -------- | --------------------------------------------------- | -------- | ----- | ------------------------------------------ |
+| Stream A | Auth, session, and MFA foundations                  | Complete | Codex | `docs/sin-rfp/archive/streams/stream-a.md` |
+| Stream B | Org context and client routing safety               | Complete | Codex | `docs/sin-rfp/archive/streams/stream-b.md` |
+| Stream C | Access control and org gating                       | Complete | Codex | `docs/sin-rfp/archive/streams/stream-c.md` |
+| Stream D | Forms integrity and file security                   | Complete | Codex | `docs/sin-rfp/archive/streams/stream-d.md` |
+| Stream E | Imports hardening                                   | Complete | Codex | `docs/sin-rfp/archive/streams/stream-e.md` |
+| Stream F | Reporting and report correctness                    | Complete | Codex | `docs/sin-rfp/archive/streams/stream-f.md` |
+| Stream G | Audit log integrity and security events             | Complete | Codex | `docs/sin-rfp/archive/streams/stream-g.md` |
+| Stream H | Privacy, DSAR, and retention                        | Complete | Codex | `docs/sin-rfp/archive/streams/stream-h.md` |
+| Stream I | Notifications and email integrity                   | Complete | Codex | `docs/sin-rfp/archive/streams/stream-i.md` |
+| Stream J | Tests, verification, and E2E coverage               | Complete | Codex | `docs/sin-rfp/archive/streams/stream-j.md` |
+| Stream K | Documentation, requirements, and evidence alignment | Complete | Codex | `docs/sin-rfp/archive/streams/stream-k.md` |
+| Stream L | Production readiness and infra                      | Complete | Codex | `docs/sin-rfp/archive/streams/stream-l.md` |
+| Stream M | Missing requirement features                        | Complete | Codex | `docs/sin-rfp/archive/streams/stream-m.md` |
 
 ## Dependencies (from consolidated backlog)
 
@@ -41,7 +41,7 @@
 
 ## Decisions
 
-- Decision register: `docs/sin-rfp/decision-register.md`
+- Decision register: `docs/sin-rfp/decisions/decision-register.md`
 
 ## Global Blockers
 
@@ -87,7 +87,7 @@ For coding agents and E2E tests that need to authenticate through MFA-protected 
 
 Backup codes (`backup-testcode1` through `backup-testcode10`) are single-use and require tracking. **Prefer TOTP codes instead.**
 
-See `docs/sin-rfp/worklogs/stream-a.md` and `CLAUDE.md` for additional details.
+See `docs/sin-rfp/archive/streams/stream-a.md` and `CLAUDE.md` for additional details.
 
 ## Session Log
 
@@ -110,12 +110,12 @@ See `docs/sin-rfp/worklogs/stream-a.md` and `CLAUDE.md` for additional details.
 
 ### 2025-12-27: Stream B complete
 
-- Completed org context + routing hardening (B1-B9). See `docs/sin-rfp/worklogs/stream-b.md`.
+- Completed org context + routing hardening (B1-B9). See `docs/sin-rfp/archive/streams/stream-b.md`.
 - `pnpm check-types` still failing due to pre-existing errors in `src/features/organizations/organizations.queries.ts` and `src/features/reports/reports.mutations.ts`.
 
 ### 2025-12-27: Stream C complete
 
-- Completed Stream C access-control hardening (C1-C11). See `docs/sin-rfp/worklogs/stream-c.md`.
+- Completed Stream C access-control hardening (C1-C11). See `docs/sin-rfp/archive/streams/stream-c.md`.
 - `pnpm lint` warning remains in `src/components/ui/logo.tsx` (pre-existing).
 - `pnpm check-types` now fails only on `src/lib/audit/index.ts:292` (audit chain; Stream G).
 
@@ -148,14 +148,14 @@ See `docs/sin-rfp/worklogs/stream-a.md` and `CLAUDE.md` for additional details.
   observability; added migrations for legal holds + audit archive tracking.
 - `pnpm lint`/`pnpm check-types` currently failing due to pre-existing issues in
   org test unused var + forms/imports/reporting/reports type errors (see
-  `docs/sin-rfp/worklogs/stream-h.md`).
+  `docs/sin-rfp/archive/streams/stream-h.md`).
 
 ### 2025-12-27: Stream K documentation alignment complete
 
-- Added `docs/sin-rfp/requirements-coverage-matrix.md` and updated the route-tree
+- Added `docs/sin-rfp/requirements/requirements-coverage-matrix.md` and updated the route-tree
   implementation review with per-finding status + evidence.
 - Updated security controls table in
-  `docs/sin-rfp/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md`.
+  `docs/sin-rfp/requirements/tickets/SIN-IMPLEMENTATION-BACKLOG-V2.md`.
 - Added implementation-status callouts across Phase 0 docs to distinguish
   planned vs implemented items.
 
@@ -172,7 +172,7 @@ See `docs/sin-rfp/worklogs/stream-a.md` and `CLAUDE.md` for additional details.
 ### 2025-12-27: Stream D complete
 
 - Completed Stream D form integrity + file security hardening (D1-D10). See
-  `docs/sin-rfp/worklogs/stream-d.md`.
+  `docs/sin-rfp/archive/streams/stream-d.md`.
 - Follow-up: optional `form_uploads` table still pending for upload intent
   tracking (D7).
 - `pnpm lint` and `pnpm check-types` fail due to pre-existing issues in

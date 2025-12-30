@@ -18,7 +18,7 @@ This plan outlines a methodology for systematically reviewing implemented capabi
 
 ### Output
 
-- **Requirements Verification Report**: `docs/sin-rfp/requirements-verification-report.md`
+- **Requirements Verification Report**: `docs/sin-rfp/review-plans/requirements-verification-report-2025-12-28.md`
 
 ### Entry Criteria
 
@@ -137,7 +137,7 @@ For each requirement:
 8. LOG ISSUES
    - Create backlog items with severity and owner
    - Link evidence and reproduction steps
-   - Track in `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+   - Track in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`
 ```
 
 ### Severity Guide
@@ -475,17 +475,17 @@ Document scope for Stream M requirements:
 
 **Requirements Sources:**
 
-- `docs/sin-rfp/system-requirements-addendum.md`
-- `docs/sin-rfp/viasport-sin-rfp.md`
+- `docs/sin-rfp/source/VIASPORT-PROVIDED-system-requirements-addendum.md`
+- `docs/sin-rfp/source/VIASPORT-PROVIDED-viasport-sin-rfp.md`
 
 **Tracking Documents:**
 
-- `docs/sin-rfp/requirements-coverage-matrix.md`
-- `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+- `docs/sin-rfp/requirements/requirements-coverage-matrix.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`
 
 **Implementation Evidence:**
 
-- `docs/sin-rfp/worklogs/stream-*.md`
+- `docs/sin-rfp/archive/streams/stream-*.md`
 - `docs/sin-rfp/decisions/ADR-*.md`
 
 **Code Modules by Category:**

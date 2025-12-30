@@ -15,7 +15,7 @@ test.describe("Authentication Form Validation (Unauthenticated)", () => {
 
     // Make sure fields are empty (in case of autofill)
     const emailField = page.getByLabel("Email");
-    const passwordField = page.getByLabel("Password");
+    const passwordField = page.getByLabel("Password", { exact: true });
 
     await emailField.clear();
     await passwordField.clear();
@@ -56,7 +56,7 @@ test.describe("Authentication Form Validation (Unauthenticated)", () => {
 
     // Try invalid email format
     await page.getByLabel("Email").fill("notanemail");
-    await page.getByLabel("Password").fill("password123");
+    await page.getByLabel("Password", { exact: true }).fill("password123");
 
     await page.getByRole("button", { name: "Login", exact: true }).click();
 

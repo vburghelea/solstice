@@ -9,13 +9,13 @@ Clamp file uploads to maxFiles = 1 and reject array payloads until multi-file su
 
 ## Context
 
-- This decision maps to D0.4 in `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`.
-- See `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md` for options
+- This decision maps to D0.4 in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`.
+- See `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md` for options
   and rationale.
 
 ## Options considered
 
-- See the D0.4 section in `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`.
+- See the D0.4 section in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`.
 
 ## Rationale
 
@@ -28,5 +28,5 @@ Clamp file uploads to maxFiles = 1 and reject array payloads until multi-file su
 
 ## Links
 
-- `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`
-- `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`

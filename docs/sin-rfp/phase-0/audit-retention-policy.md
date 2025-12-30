@@ -74,4 +74,4 @@ Retention periods can be adjusted with viaSport approval.
 ## 8.0 References
 
 - `docs/sin-rfp/phase-0/security-controls.md`
-- `docs/sin-rfp/SIN-REQUIREMENTS.md`
+- `docs/sin-rfp/requirements/SIN-REQUIREMENTS.md`

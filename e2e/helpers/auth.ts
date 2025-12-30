@@ -27,7 +27,9 @@ export async function ensureAuthenticated(page: Page) {
 
     // Fill in credentials
     await page.getByLabel("Email").fill(process.env["E2E_TEST_EMAIL"]!);
-    await page.getByLabel("Password").fill(process.env["E2E_TEST_PASSWORD"]!);
+    await page
+      .getByLabel("Password", { exact: true })
+      .fill(process.env["E2E_TEST_PASSWORD"]!);
 
     // Click login button
     await page.getByRole("button", { name: "Login", exact: true }).click();

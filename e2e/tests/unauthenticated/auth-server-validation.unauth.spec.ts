@@ -44,7 +44,7 @@ test.describe("Authentication Server Validation (Unauthenticated)", () => {
 
     // Try to login with wrong password
     await page.getByLabel("Email").fill("test@example.com");
-    await page.getByLabel("Password").fill("wrongpassword");
+    await page.getByLabel("Password", { exact: true }).fill("wrongpassword");
 
     await page.getByRole("button", { name: "Login", exact: true }).click();
 

@@ -31,7 +31,7 @@ export const test = base.extend<AuthFixtures>({
     // Login with the test user
     await page.goto("/auth/login");
     await page.getByLabel("Email").fill(testUser.email);
-    await page.getByLabel("Password").fill(testUser.password);
+    await page.getByLabel("Password", { exact: true }).fill(testUser.password);
     await page.getByRole("button", { name: "Login", exact: true }).click();
 
     // Wait for authentication to complete

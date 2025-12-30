@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { eq } from "drizzle-orm";
+import { and, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { debugGuard } from "~/lib/server/debug-guard";
 
@@ -9,12 +9,18 @@ const cleanupSchema = z.object({
     "delete-team",
     "clear-user-teams",
     "clear-user-memberships",
+    "ensure-org-member",
+    "remove-org-member",
+    "delete-import-jobs",
     "expire-session",
     "set-mfa",
   ]),
   userId: z.string().optional(),
   teamId: z.string().optional(),
   userEmail: z.email().optional(),
+  organizationId: z.string().optional(),
+  organizationSlug: z.string().optional(),
+  fileName: z.string().optional(),
   ageMinutes: z.number().int().positive().optional(),
   mfaRequired: z.boolean().optional(),
   twoFactorEnabled: z.boolean().optional(),
@@ -37,6 +43,9 @@ export const Route = createFileRoute("/api/test/cleanup")({
             userId,
             teamId,
             userEmail,
+            organizationId,
+            organizationSlug,
+            fileName,
             ageMinutes,
             mfaRequired,
             twoFactorEnabled,
@@ -44,8 +53,17 @@ export const Route = createFileRoute("/api/test/cleanup")({
 
           // Import server-only modules inside the handler
           const { getDb } = await import("~/db/server-helpers");
-          const { teams, teamMembers, user, memberships, session } =
-            await import("~/db/schema");
+          const {
+            forms,
+            importJobs,
+            organizationMembers,
+            organizations,
+            teams,
+            teamMembers,
+            user,
+            memberships,
+            session,
+          } = await import("~/db/schema");
 
           const db = await getDb();
 
@@ -150,6 +168,236 @@ export const Route = createFileRoute("/api/test/cleanup")({
                     .where(eq(memberships.userId, targetUserId));
                 }
               }
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "ensure-org-member": {
+              if (!userId && !userEmail) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User required." }),
+                  {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              const targetUserId =
+                userId ||
+                (await db
+                  .select({ id: user.id })
+                  .from(user)
+                  .where(eq(user.email, userEmail!))
+                  .then((rows) => rows[0]?.id));
+
+              if (!targetUserId) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User not found." }),
+                  {
+                    status: 404,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              let organization =
+                organizationId || organizationSlug
+                  ? await db
+                      .select({
+                        id: organizations.id,
+                        name: organizations.name,
+                        slug: organizations.slug,
+                      })
+                      .from(organizations)
+                      .where(
+                        organizationId
+                          ? eq(organizations.id, organizationId)
+                          : eq(organizations.slug, organizationSlug!),
+                      )
+                      .then((rows) => rows[0])
+                  : undefined;
+
+              if (!organization) {
+                const [withForms] = await db
+                  .select({
+                    id: organizations.id,
+                    name: organizations.name,
+                    slug: organizations.slug,
+                  })
+                  .from(organizations)
+                  .innerJoin(forms, eq(forms.organizationId, organizations.id))
+                  .where(eq(organizations.status, "active"))
+                  .limit(1);
+                organization = withForms;
+              }
+
+              if (!organization) {
+                const [fallback] = await db
+                  .select({
+                    id: organizations.id,
+                    name: organizations.name,
+                    slug: organizations.slug,
+                  })
+                  .from(organizations)
+                  .where(eq(organizations.status, "active"))
+                  .limit(1);
+                organization = fallback;
+              }
+
+              if (!organization) {
+                return new Response(
+                  JSON.stringify({
+                    success: false,
+                    error: "No organization available.",
+                  }),
+                  {
+                    status: 404,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              const now = new Date();
+              await db
+                .insert(organizationMembers)
+                .values({
+                  userId: targetUserId,
+                  organizationId: organization.id,
+                  role: "admin",
+                  status: "active",
+                  approvedBy: targetUserId,
+                  approvedAt: now,
+                })
+                .onConflictDoUpdate({
+                  target: [
+                    organizationMembers.userId,
+                    organizationMembers.organizationId,
+                  ],
+                  set: {
+                    role: "admin",
+                    status: "active",
+                    approvedBy: targetUserId,
+                    approvedAt: now,
+                  },
+                });
+
+              return new Response(JSON.stringify({ success: true, organization }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "remove-org-member": {
+              if (!userId && !userEmail) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User required." }),
+                  {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              const targetUserId =
+                userId ||
+                (await db
+                  .select({ id: user.id })
+                  .from(user)
+                  .where(eq(user.email, userEmail!))
+                  .then((rows) => rows[0]?.id));
+
+              if (!targetUserId) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User not found." }),
+                  {
+                    status: 404,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              let targetOrganizationId = organizationId;
+              if (!targetOrganizationId && organizationSlug) {
+                const [org] = await db
+                  .select({ id: organizations.id })
+                  .from(organizations)
+                  .where(eq(organizations.slug, organizationSlug))
+                  .limit(1);
+                targetOrganizationId = org?.id;
+              }
+
+              if (!targetOrganizationId) {
+                return new Response(
+                  JSON.stringify({
+                    success: false,
+                    error: "Organization required.",
+                  }),
+                  {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              await db
+                .delete(organizationMembers)
+                .where(
+                  and(
+                    eq(organizationMembers.userId, targetUserId),
+                    eq(organizationMembers.organizationId, targetOrganizationId),
+                  ),
+                );
+
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "delete-import-jobs": {
+              if (!userId && !userEmail) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User required." }),
+                  {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              const targetUserId =
+                userId ||
+                (await db
+                  .select({ id: user.id })
+                  .from(user)
+                  .where(eq(user.email, userEmail!))
+                  .then((rows) => rows[0]?.id));
+
+              if (!targetUserId) {
+                return new Response(
+                  JSON.stringify({ success: false, error: "User not found." }),
+                  {
+                    status: 404,
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+
+              const conditions = [eq(importJobs.createdBy, targetUserId)];
+              if (organizationId) {
+                conditions.push(eq(importJobs.organizationId, organizationId));
+              }
+              if (fileName) {
+                conditions.push(ilike(importJobs.sourceFileKey, `%${fileName}%`));
+              }
+
+              await db
+                .delete(importJobs)
+                .where(conditions.length === 1 ? conditions[0] : and(...conditions));
+
               return new Response(JSON.stringify({ success: true }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },

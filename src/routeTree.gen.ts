@@ -29,7 +29,9 @@ import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members
 import { Route as DashboardForbiddenRouteImport } from "./routes/dashboard/forbidden";
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
+import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as ApiTestSquareRouteImport } from "./routes/api/test-square";
 import { Route as ApiHealthRouteImport } from "./routes/api/health";
 import { Route as ApiDebugSquareRouteImport } from "./routes/api/debug-square";
@@ -182,9 +184,19 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: "/signup",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: "/reset-password",
+  path: "/reset-password",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: "/login",
   path: "/login",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: "/forgot-password",
+  path: "/forgot-password",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 const ApiTestSquareRoute = ApiTestSquareRouteImport.update({
@@ -473,7 +485,9 @@ export interface FileRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareRoute;
   "/api/health": typeof ApiHealthRoute;
   "/api/test-square": typeof ApiTestSquareRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
@@ -544,7 +558,9 @@ export interface FileRoutesByTo {
   "/api/debug-square": typeof ApiDebugSquareRoute;
   "/api/health": typeof ApiHealthRoute;
   "/api/test-square": typeof ApiTestSquareRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
@@ -613,7 +629,9 @@ export interface FileRoutesById {
   "/api/debug-square": typeof ApiDebugSquareRoute;
   "/api/health": typeof ApiHealthRoute;
   "/api/test-square": typeof ApiTestSquareRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
@@ -689,7 +707,9 @@ export interface FileRouteTypes {
     | "/api/debug-square"
     | "/api/health"
     | "/api/test-square"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/events"
     | "/dashboard/forbidden"
@@ -760,7 +780,9 @@ export interface FileRouteTypes {
     | "/api/debug-square"
     | "/api/health"
     | "/api/test-square"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/forbidden"
     | "/dashboard/members"
@@ -828,7 +850,9 @@ export interface FileRouteTypes {
     | "/api/debug-square"
     | "/api/health"
     | "/api/test-square"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/events"
     | "/dashboard/forbidden"
@@ -1052,11 +1076,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthSignupRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/auth/reset-password": {
+      id: "/auth/reset-password";
+      path: "/reset-password";
+      fullPath: "/auth/reset-password";
+      preLoaderRoute: typeof AuthResetPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
     "/auth/login": {
       id: "/auth/login";
       path: "/login";
       fullPath: "/auth/login";
       preLoaderRoute: typeof AuthLoginRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/forgot-password": {
+      id: "/auth/forgot-password";
+      path: "/forgot-password";
+      fullPath: "/auth/forgot-password";
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
     "/api/test-square": {
@@ -1420,12 +1458,16 @@ declare module "@tanstack/react-router" {
 }
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute;
   AuthLoginRoute: typeof AuthLoginRoute;
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute;
   AuthSignupRoute: typeof AuthSignupRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
 };
 

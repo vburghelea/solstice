@@ -31,7 +31,7 @@ export async function uiLogin(
   });
 
   // Wait for email field to be visible and enabled
-  const emailField = page.getByLabel("Email");
+  const emailField = page.getByTestId("login-email");
   await expect(emailField).toBeVisible({ timeout: 10_000 });
   await expect(emailField).toBeEnabled({ timeout: 10_000 });
 
@@ -43,7 +43,7 @@ export async function uiLogin(
   console.log(`[uiLogin] Filled email: ${filledEmail}`);
 
   // Wait for password field to be enabled
-  const passwordField = page.getByLabel("Password");
+  const passwordField = page.getByTestId("login-password");
   await expect(passwordField).toBeEnabled({ timeout: 10_000 });
 
   // Click and fill password field
@@ -101,11 +101,11 @@ export async function uiLoginWithMfa(
     timeout: 10_000,
   });
 
-  const emailField = page.getByLabel("Email");
+  const emailField = page.getByTestId("login-email");
   await expect(emailField).toBeVisible({ timeout: 10_000 });
   await emailField.fill(email);
 
-  const passwordField = page.getByLabel("Password");
+  const passwordField = page.getByTestId("login-password");
   await expect(passwordField).toBeEnabled({ timeout: 10_000 });
   await passwordField.fill(password);
 
@@ -128,7 +128,7 @@ export async function uiLoginWithMfa(
       await page.getByRole("button", { name: "Backup code" }).click();
     }
 
-    await page.getByLabel(/Authentication code|Backup code/i).fill(mfaCode);
+    await page.getByTestId("login-2fa-code").fill(mfaCode);
     await page.getByRole("button", { name: "Verify code" }).click();
   }
 
@@ -139,8 +139,8 @@ export async function uiLoginWithMfa(
 
 export async function login(page: Page, email: string, password: string) {
   await page.goto("/auth/login");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(password);
+  await page.getByTestId("login-email").fill(email);
+  await page.getByTestId("login-password").fill(password);
   const loginBtn = page.getByRole("button", { name: "Login", exact: true });
   await expect(loginBtn).toBeEnabled({ timeout: 5_000 });
   await loginBtn.click();

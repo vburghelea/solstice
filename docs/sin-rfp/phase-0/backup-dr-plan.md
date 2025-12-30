@@ -81,7 +81,7 @@ Application restore:
 - Quarterly DR restore test in a controlled environment
 - Documented test report with RPO/RTO achieved
 - Post-test remediation tracked to closure
-- Latest drill results: `docs/sin-rfp/backup-restore-test-results.md`
+- Latest drill results: `docs/sin-rfp/review-plans/backup-restore-test-results.md`
 
 ## 7.0 Roles and Communications
 
@@ -91,7 +91,7 @@ Application restore:
 
 ## 8.0 References
 
-- `docs/sin-rfp/sst-migration-plan.md`
+- `docs/sin-rfp/archive/completed/sst-migration-plan.md`
 - `docs/sin-rfp/phase-0/audit-retention-policy.md`
 
 ## Appendix A: Backup Restore Test Results (Template)

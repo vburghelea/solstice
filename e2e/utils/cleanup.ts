@@ -52,3 +52,79 @@ export async function resetTestUser(page: Page, userEmail: string) {
     throw new Error(`Failed to reset user ${userEmail}: ${response.status()} - ${body}`);
   }
 }
+
+type OrgMembershipOptions = {
+  userEmail: string;
+  organizationId?: string;
+  organizationSlug?: string;
+};
+
+type OrgMembershipResponse = {
+  success: boolean;
+  organization?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  error?: string;
+};
+
+export async function ensureOrgMembership(page: Page, options: OrgMembershipOptions) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "ensure-org-member",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(
+      `Failed to ensure org membership for ${options.userEmail}: ${response.status()} - ${body}`,
+    );
+  }
+
+  const payload = (await response.json()) as OrgMembershipResponse;
+  if (!payload.organization) {
+    throw new Error(
+      `Org membership response missing organization: ${payload.error ?? "unknown"}`,
+    );
+  }
+
+  return payload.organization;
+}
+
+export async function removeOrgMembership(page: Page, options: OrgMembershipOptions) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "remove-org-member",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(
+      `Failed to remove org membership for ${options.userEmail}: ${response.status()} - ${body}`,
+    );
+  }
+}
+
+export async function deleteImportJobs(
+  page: Page,
+  options: { userEmail: string; organizationId?: string; fileName?: string },
+) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "delete-import-jobs",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(
+      `Failed to delete import jobs for ${options.userEmail}: ${response.status()} - ${body}`,
+    );
+  }
+}

@@ -27,6 +27,13 @@ const METADATA_REDACT_KEYS = ["token", "secret", "password", "mfasecret"];
 const REDACTED_VALUE = "[REDACTED]";
 const AUDIT_CHAIN_LOCK_ID = 42;
 
+const isAuditLoggingDisabled = () => {
+  const raw =
+    process.env["SIN_DISABLE_AUDIT_LOGGING"] ?? process.env["DISABLE_AUDIT_LOGGING"];
+  if (!raw) return false;
+  return raw === "1" || raw.toLowerCase() === "true";
+};
+
 const shouldRedact = (field: string) =>
   REDACT_FIELDS.some(
     (redacted) => field === redacted || field.startsWith(`${redacted}.`),
@@ -247,6 +254,10 @@ const resolveRequestContext = async () => {
 };
 
 export const logAuditEntry = createServerOnlyFn(async (input: AuditEntryInput) => {
+  if (isAuditLoggingDisabled()) {
+    return;
+  }
+
   const { getDb } = await import("~/db/server-helpers");
   const { auditLogs } = await import("~/db/schema");
   const { randomUUID } = await import("node:crypto");

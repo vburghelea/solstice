@@ -9,13 +9,13 @@ Use tiered per-field data classification (none/personal/sensitive) to drive reda
 
 ## Context
 
-- This decision maps to D0.6 in `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`.
-- See `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md` for options
+- This decision maps to D0.6 in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`.
+- See `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md` for options
   and rationale.
 
 ## Options considered
 
-- See the D0.6 section in `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`.
+- See the D0.6 section in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`.
 
 ## Rationale
 
@@ -28,5 +28,5 @@ Use tiered per-field data classification (none/personal/sensitive) to drive reda
 
 ## Links
 
-- `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`
-- `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`

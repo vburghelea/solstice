@@ -11,13 +11,13 @@ Deliver a full pivot builder with charts and export using Apache ECharts
 
 ## Context
 
-- This decision maps to D0.16 in `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`.
-- See `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md` for options
+- This decision maps to D0.16 in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`.
+- See `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md` for options
   and rationale.
 
 ## Options considered
 
-- See the D0.16 section in `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`.
+- See the D0.16 section in `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`.
 
 ## Rationale
 
@@ -33,5 +33,5 @@ Deliver a full pivot builder with charts and export using Apache ECharts
 
 ## Links
 
-- `docs/sin-rfp/5.2-pro-review-output/d0-decision-analysis.md`
-- `docs/sin-rfp/5.2-pro-review-output/consolidated-backlog.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/d0-decision-analysis.md`
+- `docs/sin-rfp/archive/superseded/5.2-pro-review-output/consolidated-backlog.md`

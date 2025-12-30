@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - If you run into an issue that you can't solve after trying the best practices to solve it, return and let the user know _unless you have been instructed to push through obstacles and try the next thing_.
   - This includes any time you are tempted to patch something with a workaround, or log-in or the dev server isn't working.
   - If you must do a workaround, you must document the workaround and your reasoning in an external markdown file that you share with the user when you return so they can reason about the technical debt.
+- When working with SIN RFP docs, read `docs/sin-rfp/README.md` first for the current structure and canonical locations.
 
 ## Quick Reference
 

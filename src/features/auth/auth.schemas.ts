@@ -11,6 +11,28 @@ export const loginFormSchema = z.object({
 export type LoginFormData = z.infer<typeof loginFormSchema>;
 
 /**
+ * Forgot password form validation schema
+ */
+export const forgotPasswordFormSchema = z.object({
+  email: z.email("Please enter a valid email").min(1, "Email is required"),
+});
+
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordFormSchema>;
+
+/**
+ * Reset password form validation schema
+ */
+export const resetPasswordFormSchema = z.object({
+  newPassword: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+});
+
+export type ResetPasswordFormData = z.infer<typeof resetPasswordFormSchema>;
+
+/**
  * Base signup form field schemas
  */
 export const signupFormFieldSchemas = {

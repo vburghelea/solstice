@@ -58,6 +58,9 @@ export const auth = {
   get changePassword() {
     return getAuthClient().changePassword;
   },
+  get requestPasswordReset() {
+    return getAuthClient().requestPasswordReset;
+  },
   get sendVerificationEmail() {
     return getAuthClient().sendVerificationEmail;
   },

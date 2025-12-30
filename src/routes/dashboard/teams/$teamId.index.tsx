@@ -54,8 +54,7 @@ function TeamDetailsPage() {
     membershipStatus === "pending" && !membershipRecord?.invitedBy?.id;
 
   const requestMembershipMutation = useMutation({
-    mutationFn: () =>
-      unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
+    mutationFn: () => unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
     onSuccess: () => {
       setRequestState({
         type: "success",

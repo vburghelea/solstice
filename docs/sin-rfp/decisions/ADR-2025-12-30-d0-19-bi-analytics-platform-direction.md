@@ -8,7 +8,7 @@ Updated: 2025-12-30
 > capabilities from scratch to maintain full control over governance, tenancy, and
 > audit requirements.
 >
-> See consolidated BI documentation at: [docs/sin-rfp/decisions/bi/](./bi/)
+> See consolidated BI documentation at: [src/features/bi/docs/](../../../src/features/bi/docs/)
 
 ## Decision (Updated)
 

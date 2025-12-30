@@ -2,12 +2,13 @@
 
 > **ARCHIVED**: This document has been replaced by the consolidated BI documentation at:
 >
-> **[docs/sin-rfp/decisions/bi/](./bi/)**
+> **[src/features/bi/docs/](../../../src/features/bi/docs/)**
 >
-> - [SPEC-bi-platform.md](./bi/SPEC-bi-platform.md) - Consolidated specification
-> - [PLAN-bi-implementation.md](./bi/PLAN-bi-implementation.md) - Implementation approach
-> - [GUIDE-bi-testing.md](./bi/GUIDE-bi-testing.md) - Testing strategy
-> - [CHECKLIST-sql-workbench-gate.md](./bi/CHECKLIST-sql-workbench-gate.md) - SQL Workbench prerequisites
+> - [SPEC-bi-platform.md](../../../src/features/bi/docs/SPEC-bi-platform.md) - Consolidated specification
+> - [PLAN-bi-implementation.md](../../../src/features/bi/docs/PLAN-bi-implementation.md) - Implementation approach
+> - [GUIDE-bi-testing.md](../../../src/features/bi/docs/GUIDE-bi-testing.md) - Testing strategy
+> - [CHECKLIST-sql-workbench-gate.md](../../../src/features/bi/docs/CHECKLIST-sql-workbench-gate.md) - SQL Workbench prerequisites
+> - [WORKLOG-bi-implementation.md](../../../src/features/bi/docs/WORKLOG-bi-implementation.md) - Implementation worklog
 >
 > **Do not use this document for new work.** It is retained for historical reference only.
 

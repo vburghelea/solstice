@@ -124,10 +124,10 @@ function EventDetailPage() {
     : false;
   const hasLocationAddress = Boolean(
     event.venueName ||
-      event.venueAddress ||
-      event.city ||
-      event.province ||
-      event.postalCode,
+    event.venueAddress ||
+    event.city ||
+    event.province ||
+    event.postalCode,
   );
   const hasLocationDetails = hasLocationAddress || Boolean(event.locationNotes);
   const locationLine = [event.city, event.province].filter(Boolean).join(", ");

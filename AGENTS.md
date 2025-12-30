@@ -1,18 +1,6 @@
 # AGENTS.md - Coding Agent Guidelines for Solstice
 
-# Immediately also read CLAUDE.md
-
-## Build/Lint/Test Commands
-
-- `pnpm dev` - Start Vite dev server (port 5173, default to use)
-- `netlify dev` - Start with edge functions (port 8888)
-- `pnpm lint` - Run ESLint
-- `pnpm check-types` - TypeScript type checking
-- `pnpm format` - Format with Prettier
-- `pnpm test` - Run all tests
-- `pnpm test path/to/file.test.tsx` - Run single test file
-- `pnpm test -t "test name"` - Run tests matching pattern
-- `pnpm test:watch` - Run tests in watch mode
+# Immediately read and follow the root-level CLAUDE.md
 
 ## Code Style Guidelines
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "eqeqeq": ["error", { "null": "ignore" }],
+    "no-case-declarations": "error"
+  },
+  "ignorePatterns": [
+    "dist",
+    "dev-dist",
+    ".wrangler",
+    ".vercel",
+    ".netlify",
+    ".output",
+    ".sst",
+    ".nitro",
+    "node_modules",
+    "coverage",
+    "**/*.gen.ts",
+    "drizzle",
+    ".drizzle",
+    ".tanstack"
+  ]
+}

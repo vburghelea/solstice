@@ -164,12 +164,14 @@ describe("pivot-aggregator golden masters", () => {
 
 ### 2.3 Updating Golden Masters
 
-Golden masters should only be updated when:
+Golden masters should be updated when:
 
 1. A bug is fixed (document the fix)
 2. Behavior intentionally changes (document why)
+3. Output is improved (document rationale and update fixtures/tests)
 
-Never update golden masters to "make tests pass" without understanding why.
+Never update golden masters to "make tests pass" without understanding why. If a
+mismatch is a legitimate improvement, document the reason and update the fixture.
 
 ---
 
@@ -593,13 +595,16 @@ describe("aggregation invariants", () => {
 
 Use an AST parser, not regex. Test these categories exhaustively:
 
+SQL Workbench allows only a single SELECT statement (including WITH/CTE). Everything else
+must be rejected.
+
 ```typescript
 // engine/__tests__/sql-parser.test.ts
 import { describe, it, expect } from "vitest";
 import { parseAndValidateSql, validateAgainstDataset } from "../sql-parser";
 
 describe("SQL parser", () => {
-  describe("blocked statements", () => {
+  describe("non-select statements", () => {
     const blockedCases = [
       { sql: "INSERT INTO users VALUES (1, 'test')", reason: "INSERT" },
       { sql: "UPDATE users SET name = 'hacked'", reason: "UPDATE" },
@@ -610,15 +615,23 @@ describe("SQL parser", () => {
       { sql: "CREATE TABLE evil (id INT)", reason: "CREATE" },
       { sql: "GRANT ALL ON users TO public", reason: "GRANT" },
       { sql: "REVOKE ALL ON users FROM admin", reason: "REVOKE" },
+      { sql: "SET ROLE admin", reason: "SET ROLE" },
+      { sql: "RESET ROLE", reason: "RESET" },
+      { sql: "COPY users TO '/tmp/evil.csv'", reason: "COPY" },
+      { sql: "DO $$ BEGIN RAISE NOTICE 'x'; END $$;", reason: "DO" },
+      { sql: "CALL run_admin_task()", reason: "CALL" },
+      { sql: "BEGIN", reason: "BEGIN" },
+      { sql: "COMMIT", reason: "COMMIT" },
+      { sql: "ROLLBACK", reason: "ROLLBACK" },
+      { sql: "VACUUM", reason: "VACUUM" },
+      { sql: "ANALYZE", reason: "ANALYZE" },
     ];
 
     for (const { sql, reason } of blockedCases) {
       it(`rejects ${reason} statement`, () => {
         const result = parseAndValidateSql(sql);
         expect(result.isValid).toBe(false);
-        expect(
-          result.errors.some((e) => e.includes(reason) || e.includes("not allowed")),
-        ).toBe(true);
+        expect(result.errors.some((e) => e.includes("SELECT"))).toBe(true);
       });
     }
   });
@@ -669,14 +682,14 @@ describe("SQL parser", () => {
   describe("parameter extraction", () => {
     it("extracts {{param}} placeholders", () => {
       const result = parseAndValidateSql(
-        "SELECT * FROM orgs WHERE id = {{org_id}} AND type = {{type}}",
+        "SELECT * FROM organizations WHERE id = {{organization_id}} AND type = {{type}}",
       );
       expect(result.parameters).toHaveLength(2);
-      expect(result.parameters.map((p) => p.name)).toEqual(["org_id", "type"]);
+      expect(result.parameters.map((p) => p.name)).toEqual(["organization_id", "type"]);
     });
 
     it("handles query with no parameters", () => {
-      const result = parseAndValidateSql("SELECT * FROM orgs");
+      const result = parseAndValidateSql("SELECT * FROM organizations");
       expect(result.parameters).toHaveLength(0);
     });
   });
@@ -686,11 +699,11 @@ describe("SQL parser", () => {
       "SELECT * FROM organizations",
       "SELECT name, type FROM organizations WHERE status = 'active'",
       "SELECT COUNT(*) FROM organizations GROUP BY type",
-      "SELECT o.name, COUNT(m.id) FROM orgs o LEFT JOIN members m ON m.org_id = o.id GROUP BY o.name",
+      "SELECT o.name, COUNT(m.id) FROM organizations o LEFT JOIN members m ON m.organization_id = o.id GROUP BY o.name",
       "SELECT * FROM organizations ORDER BY created_at DESC LIMIT 100",
       "SELECT DISTINCT type FROM organizations",
       "SELECT name, COALESCE(description, 'N/A') FROM organizations",
-      "WITH active_orgs AS (SELECT * FROM orgs WHERE status = 'active') SELECT * FROM active_orgs",
+      "WITH active_orgs AS (SELECT * FROM organizations WHERE status = 'active') SELECT * FROM active_orgs",
     ];
 
     for (const sql of validCases) {
@@ -707,7 +720,7 @@ describe("dataset validation", () => {
   const allowedTables = new Set(["bi_v_organizations", "bi_v_members"]);
   const allowedColumns = new Map([
     ["bi_v_organizations", new Set(["id", "name", "type", "status"])],
-    ["bi_v_members", new Set(["id", "org_id", "user_id", "role"])],
+    ["bi_v_members", new Set(["id", "organization_id", "user_id", "role"])],
   ]);
 
   it("allows query using only allowed tables", () => {
@@ -748,28 +761,39 @@ Test against common SQL injection patterns:
 
 ```typescript
 describe("SQL injection prevention", () => {
-  const injectionCases = [
+  const parserRejects = [
+    "SELECT * FROM users; DROP TABLE users; --", // Multi-statement
+    "SET ROLE admin", // Session tampering
+    "SET app.org_id = '00000000-0000-0000-0000-000000000001'", // Session tampering
+    "COPY users TO '/tmp/evil.csv'", // COPY
+    "BEGIN", // Transaction control
+  ];
+
+  for (const sql of parserRejects) {
+    it(`rejects parser-level injection: ${sql.slice(0, 40)}...`, () => {
+      const result = parseAndValidateSql(sql);
+      expect(result.isValid).toBe(false);
+    });
+  }
+
+  const datasetRejects = [
     "SELECT * FROM users WHERE id = 1 OR 1=1", // Always true
     "SELECT * FROM users WHERE id = 1 UNION SELECT * FROM secrets", // UNION injection
     "SELECT * FROM users WHERE name = '' OR ''=''", // Empty string injection
-    "SELECT * FROM users; DROP TABLE users; --", // Multi-statement
     "SELECT * FROM users WHERE id = 1/**/OR/**/1=1", // Comment bypass
     "SELECT * FROM users WHERE id = CHAR(49)", // Encoded injection
   ];
 
-  for (const sql of injectionCases) {
-    it(`handles injection attempt: ${sql.slice(0, 40)}...`, () => {
+  for (const sql of datasetRejects) {
+    it(`rejects dataset-level injection: ${sql.slice(0, 40)}...`, () => {
       const result = parseAndValidateSql(sql);
-      // These should either be rejected or, if valid syntax, should still
-      // be caught by dataset validation (no access to 'users' or 'secrets')
-      if (result.isValid) {
-        const errors = validateAgainstDataset(
-          result,
-          new Set(["bi_v_organizations"]),
-          new Map(),
-        );
-        expect(errors.length).toBeGreaterThan(0);
-      }
+      expect(result.isValid).toBe(true);
+      const errors = validateAgainstDataset(
+        result,
+        new Set(["bi_v_organizations"]),
+        new Map(),
+      );
+      expect(errors.length).toBeGreaterThan(0);
     });
   }
 });

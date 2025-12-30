@@ -30,8 +30,9 @@ export const auditLogs = pgTable(
     targetId: text("target_id"),
     targetOrgId: uuid("target_org_id").references(() => organizations.id),
 
-    changes:
-      jsonb("changes").$type<Record<string, { old?: JsonValue; new?: JsonValue }>>(),
+    changes: jsonb("changes").$type<
+      Record<string, { old?: JsonValue; new?: JsonValue }>
+    >(),
     metadata: jsonb("metadata").$type<JsonRecord>().notNull().default({}),
 
     requestId: text("request_id").notNull(),

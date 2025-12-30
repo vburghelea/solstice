@@ -56,7 +56,8 @@ const manualDescriptions = {
   "eslint.config.js": "ESLint flat config (TypeScript/React/TanStack rules).",
   "playwright.config.ts": "Playwright config for E2E projects and reporters.",
   "sst-env.d.ts": "SST environment type declarations for the app.",
-  "sst.config.ts": "SST infrastructure definition (Lambda, RDS, CloudFront, alarms, secrets).",
+  "sst.config.ts":
+    "SST infrastructure definition (Lambda, RDS, CloudFront, alarms, secrets).",
   "vite.config.ts":
     "Vite config with TanStack Start, Nitro adapter, PWA, React compiler, and browser shims.",
   "vitest.config.ts": "Vitest config for unit/integration tests (jsdom, RTL).",
@@ -84,12 +85,15 @@ const manualDescriptions = {
   "src/client.tsx":
     "Client entry: hydrates Start app, attaches router diagnostics, exposes __ROUTER__ in dev.",
   "src/server.ts": "Server entry: createStartHandler with defaultStreamHandler.",
-  "src/start.ts": "Start instance config: requestId + orgContext middleware for server functions.",
+  "src/start.ts":
+    "Start instance config: requestId + orgContext middleware for server functions.",
   "src/router.tsx":
     "Router factory: QueryClient integration + CSP nonce handling + SSR query integration.",
   "src/app/providers.tsx": "React providers: QueryClientProvider + StepUpProvider.",
-  "src/routeTree.gen.ts": "Auto-generated route tree from file-based routing (do not edit).",
-  "src/diagnostics/routerDiagnostics.ts": "Router diagnostics subscription (dev-only logging).",
+  "src/routeTree.gen.ts":
+    "Auto-generated route tree from file-based routing (do not edit).",
+  "src/diagnostics/routerDiagnostics.ts":
+    "Router diagnostics subscription (dev-only logging).",
   "src/shims/async-local-storage.browser.ts":
     "Browser shim for node:async_hooks AsyncLocalStorage.",
   "src/shims/stream.browser.ts": "Browser shim for node:stream.",
@@ -105,18 +109,22 @@ const manualDescriptions = {
   "src/lib/env/oauth-domain.ts": "OAuth domain allowlist parsing and validation.",
   "src/lib/notifications/send.ts":
     "Notification dispatch: in-app insert + SES email with retry/idempotency.",
-  "src/lib/payments/square.ts": "Square facade with mock fallback; chooses real implementation by env.",
+  "src/lib/payments/square.ts":
+    "Square facade with mock fallback; chooses real implementation by env.",
   "src/lib/payments/square-real.ts":
     "Square SDK implementation: checkout, verification, webhooks, refunds.",
   "src/lib/server/auth.ts": "Server auth helpers: middleware list + requireUser.",
-  "src/lib/security/utils/password-validator.ts": "Password validation + strength scoring helpers.",
+  "src/lib/security/utils/password-validator.ts":
+    "Password validation + strength scoring helpers.",
   "src/lib/storage/artifacts.ts": "S3 client + artifacts bucket resolution.",
   "src/routes/__root.tsx":
     "Root route: loads auth + privacy acceptance, sets head/meta, wires devtools.",
   "src/routes/api/auth/$.ts": "Better Auth catch-all API route handler.",
-  "src/routes/api/auth/$action/$provider.ts": "Dynamic Better Auth provider/action handler.",
+  "src/routes/api/auth/$action/$provider.ts":
+    "Dynamic Better Auth provider/action handler.",
   "src/routes/api/health.ts": "Health check API (DB + Square config).",
-  "src/routes/api/payments/square/callback.ts": "Square callback handler for payment finalization.",
+  "src/routes/api/payments/square/callback.ts":
+    "Square callback handler for payment finalization.",
   "src/routes/api/webhooks/square.ts": "Square webhook handler (payment events/refunds).",
   "src/routes/api/test/cleanup.ts": "E2E cleanup API route.",
   "src/routes/api/test-square.ts": "Square sandbox test route.",
@@ -129,7 +137,8 @@ const manualDescriptions = {
   "src/routes/onboarding/route.tsx": "Onboarding route config/guard wrapper.",
   "src/features/membership/membership.finalize.ts":
     "Idempotent membership finalization from payment sessions.",
-  "src/features/roles/permission.service.ts": "Permission checks shared with client helpers.",
+  "src/features/roles/permission.service.ts":
+    "Permission checks shared with client helpers.",
   "src/features/roles/permission.server.ts": "Server-only PermissionService wrapper.",
   "src/features/dashboard/MemberDashboard.tsx": "Member dashboard view and stats.",
   "src/features/dashboard/PublicPortalPage.tsx":
@@ -141,9 +150,7 @@ const manualDescriptions = {
 };
 
 function toTitleCase(value) {
-  return value
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return value.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function isBarrel(filePath, content) {
@@ -152,10 +159,7 @@ function isBarrel(filePath, content) {
     .map((line) => line.trim())
     .filter(
       (line) =>
-        line &&
-        !line.startsWith("//") &&
-        !line.startsWith("/*") &&
-        !line.startsWith("*"),
+        line && !line.startsWith("//") && !line.startsWith("/*") && !line.startsWith("*"),
     );
   if (lines.length === 0) return false;
   return lines.every((line) => line.startsWith("export "));
@@ -193,7 +197,9 @@ function describeTest(file) {
 
 function normalizeE2eName(baseName) {
   const parts = baseName.split(".").filter(Boolean);
-  const filtered = parts.filter((part) => !["auth", "unauth", "spec", "shared"].includes(part));
+  const filtered = parts.filter(
+    (part) => !["auth", "unauth", "spec", "shared"].includes(part),
+  );
   const merged = filtered.join(" ");
   return toTitleCase(merged || baseName);
 }
@@ -245,17 +251,23 @@ function describeFile(file) {
   }
 
   if (file.endsWith(".schemas.ts")) {
-    const feature = toTitleCase(baseName.replace(/\.schemas$/, "").replace(/schemas$/, ""));
+    const feature = toTitleCase(
+      baseName.replace(/\.schemas$/, "").replace(/schemas$/, ""),
+    );
     return `Zod schemas for ${feature}.`;
   }
 
   if (file.endsWith(".queries.ts")) {
-    const feature = toTitleCase(baseName.replace(/\.queries$/, "").replace(/queries$/, ""));
+    const feature = toTitleCase(
+      baseName.replace(/\.queries$/, "").replace(/queries$/, ""),
+    );
     return `Server-side queries for ${feature}.`;
   }
 
   if (file.endsWith(".mutations.ts")) {
-    const feature = toTitleCase(baseName.replace(/\.mutations$/, "").replace(/mutations$/, ""));
+    const feature = toTitleCase(
+      baseName.replace(/\.mutations$/, "").replace(/mutations$/, ""),
+    );
     return `Server-side mutations for ${feature}.`;
   }
 
@@ -265,7 +277,9 @@ function describeFile(file) {
   }
 
   if (file.endsWith(".db-types.ts")) {
-    const feature = toTitleCase(baseName.replace(/\.db-types$/, "").replace(/db-types$/, ""));
+    const feature = toTitleCase(
+      baseName.replace(/\.db-types$/, "").replace(/db-types$/, ""),
+    );
     return `DB-specific type overrides for ${feature}.`;
   }
 
@@ -341,16 +355,16 @@ function renderSection(title, files) {
   return `\n### ${title}\n\n${renderList(files)}\n`;
 }
 
-const generatedAt = new Date()
-  .toISOString()
-  .replace(/\.\d{3}Z$/, "Z");
+const generatedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 
 const lines = [];
 lines.push("# Solstice Codebase Guide");
 lines.push("");
 lines.push(`Generated: ${generatedAt} (UTC)`);
 lines.push("");
-lines.push("Per-file inventory of the codebase. Every code file in the scope below is listed.");
+lines.push(
+  "Per-file inventory of the codebase. Every code file in the scope below is listed.",
+);
 lines.push("");
 lines.push("## Coverage Scope");
 lines.push("");
@@ -368,7 +382,9 @@ lines.push("## Updating This File");
 lines.push("");
 lines.push("- Run: `node scripts/update-code-guide.mjs`.");
 lines.push("- Review `CODE_GUIDE.md` for expected changes and commit updates.");
-lines.push("- Adjust `excludeDirs` or `codeExts` in `scripts/update-code-guide.mjs` if scope changes.");
+lines.push(
+  "- Adjust `excludeDirs` or `codeExts` in `scripts/update-code-guide.mjs` if scope changes.",
+);
 lines.push("");
 lines.push("## Quick Reference");
 lines.push("");
@@ -392,11 +408,15 @@ lines.push(
   "- Role checks centralized in PermissionService (roles feature) + auth guards in src/lib/auth/guards.",
 );
 lines.push("- Audit log uses hash chaining and PII redaction in src/lib/audit/index.ts.");
-lines.push("- Notification emails are sent via SES with retry; in-app notifications are persisted first.");
+lines.push(
+  "- Notification emails are sent via SES with retry; in-app notifications are persisted first.",
+);
 lines.push("");
 lines.push("## Root Configuration and Tooling");
 lines.push("");
-const rootFiles = relFiles.filter((file) => !file.includes("/") && file !== "CODE_GUIDE.md");
+const rootFiles = relFiles.filter(
+  (file) => !file.includes("/") && file !== "CODE_GUIDE.md",
+);
 lines.push(renderList(rootFiles));
 
 const dotDirs = [".husky", ".netlify", ".nitro"];

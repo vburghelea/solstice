@@ -1,7 +1,7 @@
 import "#nitro-internal-pollyfills";
 import { useNitroApp } from "nitro/app";
-import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 
 const nitroApp = useNitroApp();
 
@@ -37,8 +37,7 @@ export const handler = awslambda.streamifyResponse(
       };
       responseStream = awslambda.HttpResponseStream.from(responseStream, meta);
       responseStream.end("Internal Server Error");
-      if (typeof responseStream.finished === "function")
-        await responseStream.finished();
+      if (typeof responseStream.finished === "function") await responseStream.finished();
       return;
     }
 

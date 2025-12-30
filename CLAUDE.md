@@ -41,9 +41,12 @@ For creating AI context bundles, see `repomix-configs/README.md`. Pre-configured
 - `npx sst dev --stage sin-dev` - Start SST dev mode with live Lambda (viaSport)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint
+- `pnpm lint` - Run oxlint (fast, ~30ms)
+- `pnpm lint:eslint` - Run ESLint (TypeScript-aware rules)
+- `pnpm lint:all` - Run both oxlint + ESLint
 - `pnpm check-types` - Type checking with TypeScript
-- `pnpm format` - Format code with Prettier
+- `pnpm format` - Format code with oxfmt (fast, ~1.5s)
+- `pnpm format:prettier` - Format with Prettier (legacy)
 - `pnpm test` - Run Vitest tests
 - `pnpm test:ui` - Run tests with UI
 - `pnpm test:coverage` - Generate test coverage report
@@ -66,12 +69,21 @@ For creating AI context bundles, see `repomix-configs/README.md`. Pre-configured
 **IMPORTANT**: The pre-commit hook automatically runs the following checks to ensure code quality:
 
 1. **Lint-staged** - Runs on staged files only:
-   - `eslint --fix` - Auto-fixes and checks ESLint rules
-   - `prettier --write` - Formats code consistently
+   - `oxlint --fix` - Fast linting (~30ms) with auto-fixes
+   - `eslint --fix` - TypeScript-aware rules and auto-fixes
+   - `oxfmt --write` - Fast formatting (~1.5s)
 2. **Type checking** - `pnpm check-types` on entire codebase
 3. **Tests** - `pnpm test --run` to ensure nothing is broken
 
 All checks must pass before the commit is allowed. The pre-commit hook matches what GitHub Actions CI runs, ensuring no surprises after pushing.
+
+### Linting Tools
+
+The project uses a dual-linter setup for optimal speed and coverage:
+
+- **oxlint** - Rust-based linter, extremely fast (~30ms for entire codebase). Catches common JS/TS issues.
+- **ESLint** - TypeScript-aware rules, React hooks, TanStack Query/Router plugins. Slower but more comprehensive.
+- **oxfmt** - Rust-based formatter, ~6x faster than Prettier. Reads `.prettierrc` for config.
 
 ## Architecture Overview
 

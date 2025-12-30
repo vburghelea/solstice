@@ -514,7 +514,7 @@ export interface DatasetField {
   description?: string;
   sourceColumn: string;
   sourceTable?: string;
-  dataType: "string" | "number" | "date" | "boolean" | "enum" | "json";
+  dataType: "string" | "number" | "date" | "datetime" | "boolean" | "enum" | "json" | "uuid";
   piiClassification?: "none" | "personal" | "sensitive" | "restricted";
   requiredPermission?: string;
   formatType?: "text" | "number" | "currency" | "percent" | "date" | "datetime";
@@ -540,7 +540,7 @@ export interface PivotConfig {
   rows: string[];
   columns: string[];
   measures: Array<{
-    field: string;
+    field: string | null; // null => count(*)
     aggregation: AggregationType;
     label?: string;
     format?: FormatOptions;
@@ -692,7 +692,7 @@ export class RunningStats {
     return this.n > 0 ? this.mean : null;
   }
   getVariance() {
-    return this.n > 1 ? this.m2 / (this.n - 1) : null;
+    return this.n > 1 ? this.m2 / this.n : null;
   }
   getStdDev() {
     const v = this.getVariance();
@@ -706,7 +706,8 @@ export class RunningStats {
 
 ### 7.2 SQL Parser (AST-Based)
 
-> **Note**: Use a proper AST parser (e.g., `pgsql-ast-parser`), not regex.
+> **Note**: Use a proper AST parser (e.g., `pgsql-ast-parser`), not regex. Allow only
+> a single SELECT statement (WITH/CTE ok); reject everything else.
 
 ```typescript
 // src/features/bi/engine/sql-parser.ts
@@ -722,19 +723,6 @@ export interface ParsedQuery {
   parameters: Array<{ name: string; position: number }>;
   statementType: string;
 }
-
-const BLOCKED_STATEMENTS = new Set([
-  "insert",
-  "update",
-  "delete",
-  "drop",
-  "truncate",
-  "alter",
-  "create",
-  "grant",
-  "revoke",
-  "execute",
-]);
 
 export function parseAndValidateSql(sql: string): ParsedQuery {
   const result: ParsedQuery = {
@@ -759,17 +747,16 @@ export function parseAndValidateSql(sql: string): ParsedQuery {
     const stmt = ast[0];
     result.statementType = stmt.type;
 
-    if (BLOCKED_STATEMENTS.has(stmt.type.toLowerCase())) {
+    // Allow only a single SELECT statement (including WITH/CTE)
+    if (stmt.type !== "select") {
       result.isValid = false;
-      result.errors.push(`Statement type "${stmt.type}" is not allowed`);
+      result.errors.push("Only SELECT statements are allowed");
       return result;
     }
 
     // Extract tables from FROM and JOIN clauses
-    if (stmt.type === "select") {
-      extractTables(stmt, result.tables);
-      extractColumns(stmt, result.columns);
-    }
+    extractTables(stmt, result.tables);
+    extractColumns(stmt, result.columns);
 
     // Extract {{param}} placeholders
     const paramRegex = /\{\{(\w+)\}\}/g;
@@ -813,6 +800,22 @@ export function validateAgainstDataset(
 }
 ```
 
+### 7.3 SQL Workbench Execution Order
+
+Document the execution order to avoid unsafe wiring:
+
+1. Parse SQL to AST.
+2. Reject if not a single SELECT statement (CTE allowed).
+3. Rewrite tables -> curated views (AST rewrite).
+4. Validate tables/columns against dataset allowlist (post-rewrite).
+5. Parameterize `{{param}}` placeholders (no string interpolation).
+6. Apply guardrails (timeout, limit wrapper, EXPLAIN cost).
+7. Execute in a transaction with:
+   - `SET LOCAL ROLE bi_readonly`
+   - `SET LOCAL app.org_id = ...`
+   - `SET LOCAL app.is_global_admin = ...`
+8. Log to `bi_query_log` with checksum chain.
+
 ---
 
 ## 8. Governance Model
@@ -834,7 +837,7 @@ export function validateAgainstDataset(
 │  Layer 2: DATABASE BOUNDARY (SQL Workbench)                                 │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ • SQL executes against curated views only (bi_v_*)                  │   │
-│  │ • Tenancy via RLS or session context (app.org_id)                   │   │
+│  │ • Tenancy via session context in views (RLS on tables optional)     │   │
 │  │ • Restricted columns excluded from views                            │   │
 │  │ • Read-only database role (bi_readonly)                             │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
@@ -932,6 +935,9 @@ Periodic checkpoints anchor BI chain to main audit via `audit_logs` entries.
 | View PII fields       | No         | With `pii.read`      | With `pii.read` | Yes          |
 | Define datasets       | No         | No                   | Yes             | Yes          |
 | Cross-org queries     | No         | No                   | No              | Yes          |
+
+**Note**: SQL Workbench access is also gated by a tenant feature key
+(e.g., `sin_analytics_sql_workbench`) in addition to `analytics.sql`.
 
 ### 9.2 Permission Sets
 
@@ -1042,7 +1048,7 @@ export const DEFAULT_DATASETS: DatasetDefinition[] = [
       { id: "name", name: "Name", sourceColumn: "name", dataType: "string" },
       { id: "type", name: "Type", sourceColumn: "type", dataType: "enum" },
       { id: "status", name: "Status", sourceColumn: "status", dataType: "enum" },
-      { id: "createdAt", name: "Created", sourceColumn: "created_at", dataType: "date" },
+      { id: "createdAt", name: "Created", sourceColumn: "created_at", dataType: "datetime" },
     ],
   },
   {
@@ -1069,7 +1075,7 @@ export const DEFAULT_DATASETS: DatasetDefinition[] = [
         id: "submittedAt",
         name: "Submitted",
         sourceColumn: "submitted_at",
-        dataType: "date",
+        dataType: "datetime",
       },
       {
         id: "payload",

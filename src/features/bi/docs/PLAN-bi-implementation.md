@@ -242,6 +242,13 @@ e2e/tests/authenticated/
 
 **Prerequisites**: All items in [CHECKLIST-sql-workbench-gate.md](./CHECKLIST-sql-workbench-gate.md) must be complete before this slice can ship.
 
+**Gates & Feature Keys**:
+
+- Slices 1-3 remain under existing `sin_analytics` gating.
+- SQL Workbench requires permission `analytics.sql`.
+- Add feature key `sin_analytics_sql_workbench` (default false) in tenant configs.
+- Gate route + nav + server functions via `requireFeatureInRoute`/`assertFeatureEnabled`.
+
 **Scope**:
 
 - AST-based SQL parser (not regex)
@@ -284,12 +291,13 @@ src/routes/dashboard/analytics/
 
 ```sql
 -- Create curated views (DBA task)
-CREATE VIEW bi_v_organizations AS
+CREATE VIEW bi_v_organizations
+WITH (security_barrier = true) AS
 SELECT id, name, slug, type, status, created_at, updated_at
   -- NOTE: Excludes PII columns
 FROM organizations
-WHERE organization_id = current_setting('app.org_id', true)::uuid
-   OR current_setting('app.is_global_admin', true)::boolean = true;
+WHERE id = NULLIF(current_setting('app.org_id', true), '')::uuid
+   OR COALESCE(NULLIF(current_setting('app.is_global_admin', true), ''), 'false')::boolean = true;
 
 -- Create read-only role (DBA task)
 CREATE ROLE bi_readonly NOLOGIN;
@@ -302,18 +310,18 @@ GRANT SELECT ON bi_v_form_submissions TO bi_readonly;
 
 - Unit tests for SQL parser (see GUIDE-bi-testing.md for cases)
 - Unit tests for query rewriter
-- Integration tests: RLS/view enforcement
-- Integration tests: blocked statements rejected
+- Integration tests: view scoping enforcement
+- Integration tests: non-select statements rejected
 - Integration tests: audit entries created with checksums
 - E2E: run query → view results → verify audit log
 
 **Acceptance Criteria**:
 
 - [ ] All CHECKLIST-sql-workbench-gate.md prerequisites complete
-- [ ] SQL parser rejects blocked statements (INSERT, UPDATE, etc.)
+- [ ] SQL parser rejects all non-select statements
 - [ ] SQL parser rejects tables not in dataset
 - [ ] Query rewriter substitutes raw tables with views
-- [ ] RLS enforces tenant isolation at DB level
+- [ ] DB-level scoping via curated views is enforced
 - [ ] All queries logged to `bi_query_log` with checksums
 - [ ] Query guardrails (timeout, row limit) enforced
 - [ ] E2E tests pass
@@ -355,7 +363,7 @@ GRANT SELECT ON bi_v_form_submissions TO bi_readonly;
 │  Phase 4: SQL Workbench (Slice 4) [HARD GATE]             Weeks 13-18       │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ • AST parser + query rewriter                                       │   │
-│  │ • DB views + RLS + read-only role (DBA)                             │   │
+│  │ • DB views + session scoping + read-only role (DBA)                 │   │
 │  │ • Audit logging + guardrails                                        │   │
 │  │ • Security review                                                   │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
@@ -451,24 +459,24 @@ Routes updated to use new module:
 
 ### 5.1 Dependencies
 
-| Dependency          | Required For      | Status                 | Owner    |
-| ------------------- | ----------------- | ---------------------- | -------- |
-| Postgres 15+        | RLS on views      | Verify RDS version     | DBA      |
-| `pgsql-ast-parser`  | SQL validation    | Add to package.json    | Backend  |
-| `react-grid-layout` | Dashboard canvas  | Add to package.json    | Frontend |
-| `fast-check`        | Property tests    | Add to devDependencies | Backend  |
-| DBA time            | Views, roles, RLS | Schedule               | DBA      |
-| Security review     | SQL Workbench     | Schedule               | Security |
+| Dependency          | Required For                        | Status                 | Owner    |
+| ------------------- | ----------------------------------- | ---------------------- | -------- |
+| Postgres 15+        | Session settings + security_barrier | Verify RDS version     | DBA      |
+| `pgsql-ast-parser`  | SQL validation                      | Add to package.json    | Backend  |
+| `react-grid-layout` | Dashboard canvas                    | Add to package.json    | Frontend |
+| `fast-check`        | Property tests                      | Add to devDependencies | Backend  |
+| DBA time            | Views, roles, scoping               | Schedule               | DBA      |
+| Security review     | SQL Workbench                       | Schedule               | Security |
 
 ### 5.2 Risks
 
-| Risk                                     | Likelihood | Impact | Mitigation                                             |
-| ---------------------------------------- | ---------- | ------ | ------------------------------------------------------ |
-| RDS version doesn't support RLS on views | Low        | High   | Check version early; fallback to app-level enforcement |
-| SQL parser has edge cases                | Medium     | High   | Extensive test suite; defense-in-depth with views      |
-| Dashboard canvas performance             | Medium     | Medium | Virtualization; limit widget count                     |
-| Migration breaks existing reports        | Low        | Medium | Preserve IDs; run migration in stages                  |
-| Audit chain integrity issues             | Low        | High   | Use established HMAC patterns; verify on read          |
+| Risk                                         | Likelihood | Impact | Mitigation                                                           |
+| -------------------------------------------- | ---------- | ------ | -------------------------------------------------------------------- |
+| Session context missing/mis-set scopes wrong | Medium     | High   | Fail-closed view filters + enforce SET LOCAL + missing-context tests |
+| SQL parser has edge cases                    | Medium     | High   | Extensive test suite; defense-in-depth with views                    |
+| Dashboard canvas performance                 | Medium     | Medium | Virtualization; limit widget count                                   |
+| Migration breaks existing reports            | Low        | Medium | Preserve IDs; run migration in stages                                |
+| Audit chain integrity issues                 | Low        | High   | Use established HMAC patterns; verify on read                        |
 
 ### 5.3 Mitigation Details
 
@@ -511,9 +519,9 @@ The BI platform MVP (Slices 1-3) is complete when:
 SQL Workbench (Slice 4) is complete when:
 
 - [ ] All CHECKLIST-sql-workbench-gate.md prerequisites pass
-- [ ] AST parser rejects all blocked patterns
+- [ ] AST parser enforces single SELECT rule
 - [ ] Query rewriter enforces dataset-only access
-- [ ] RLS proven via integration tests
+- [ ] DB scoping proven via integration tests (views + session context)
 - [ ] Audit chain integrity verified
 - [ ] Security review complete with sign-off
 - [ ] E2E tests pass

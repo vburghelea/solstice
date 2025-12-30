@@ -166,4 +166,3 @@ function toBuffer(data) {
       .catch(reject);
   });
 }
-

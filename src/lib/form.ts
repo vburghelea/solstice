@@ -12,8 +12,10 @@ export interface FieldComponentProps {
 }
 
 // Props for form submit button components
-export interface FormSubmitButtonProps
-  extends Omit<React.ComponentProps<"button">, "type" | "children"> {
+export interface FormSubmitButtonProps extends Omit<
+  React.ComponentProps<"button">,
+  "type" | "children"
+> {
   children?: React.ReactNode;
 }
 

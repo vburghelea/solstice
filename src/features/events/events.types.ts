@@ -38,14 +38,18 @@ export type EventRegistrationInput = {
     userId: string;
     role: string;
   }[];
+  groupType?: "individual" | "pair" | "relay" | "team" | "family";
+  invites?: Array<{
+    email: string;
+    role?: "member" | "captain";
+  }>;
 };
 
 // Response types
-export interface EventWithDetails
-  extends Omit<
-    Event,
-    "rules" | "schedule" | "divisions" | "amenities" | "requirements" | "metadata"
-  > {
+export interface EventWithDetails extends Omit<
+  Event,
+  "rules" | "schedule" | "divisions" | "amenities" | "requirements" | "metadata"
+> {
   rules: EventRules;
   schedule: EventSchedule;
   divisions: EventDivisions;
@@ -62,8 +66,10 @@ export interface EventWithDetails
   availableSpots: number | undefined;
 }
 
-export interface EventRegistrationWithDetails
-  extends Omit<EventRegistration, "roster" | "paymentMetadata"> {
+export interface EventRegistrationWithDetails extends Omit<
+  EventRegistration,
+  "roster" | "paymentMetadata"
+> {
   roster: EventRegistrationRoster;
   paymentMetadata: EventPaymentMetadata | null;
   event: EventWithDetails;
@@ -146,6 +152,7 @@ export type EventErrorCode =
   | "REGISTRATION_CLOSED"
   | "EVENT_FULL"
   | "ALREADY_REGISTERED"
+  | "MEMBERSHIP_REQUIRED"
   | "INVALID_DATES"
   | "DATABASE_ERROR";
 

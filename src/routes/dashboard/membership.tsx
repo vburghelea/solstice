@@ -32,7 +32,7 @@ import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/membership")({
   beforeLoad: () => {
-    requireFeatureInRoute("qc_membership");
+    requireFeatureInRoute("membership");
   },
   component: MembershipPage,
 });

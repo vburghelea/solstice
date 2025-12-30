@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { and, eq, ilike } from "drizzle-orm";
+import { and, desc, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import { debugGuard } from "~/lib/server/debug-guard";
 
@@ -14,6 +14,8 @@ const cleanupSchema = z.object({
     "delete-import-jobs",
     "expire-session",
     "set-mfa",
+    "reset-mfa",
+    "accept-policy",
   ]),
   userId: z.string().optional(),
   teamId: z.string().optional(),
@@ -24,6 +26,9 @@ const cleanupSchema = z.object({
   ageMinutes: z.number().int().positive().optional(),
   mfaRequired: z.boolean().optional(),
   twoFactorEnabled: z.boolean().optional(),
+  mfaSecret: z.string().optional(),
+  backupCodes: z.array(z.string().min(1)).optional(),
+  policyType: z.enum(["privacy_policy", "terms_of_service", "data_agreement"]).optional(),
 });
 
 export const Route = createFileRoute("/api/test/cleanup")({
@@ -49,6 +54,9 @@ export const Route = createFileRoute("/api/test/cleanup")({
             ageMinutes,
             mfaRequired,
             twoFactorEnabled,
+            mfaSecret,
+            backupCodes,
+            policyType,
           } = cleanupSchema.parse(body);
 
           // Import server-only modules inside the handler
@@ -63,6 +71,9 @@ export const Route = createFileRoute("/api/test/cleanup")({
             user,
             memberships,
             session,
+            twoFactor,
+            policyDocuments,
+            userPolicyAcceptances,
           } = await import("~/db/schema");
 
           const db = await getDb();
@@ -456,6 +467,131 @@ export const Route = createFileRoute("/api/test/cleanup")({
                     .where(eq(user.id, targetUserId));
                 }
               }
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "reset-mfa": {
+              if (userId || userEmail) {
+                const targetUserId =
+                  userId ||
+                  (await db
+                    .select({ id: user.id })
+                    .from(user)
+                    .where(eq(user.email, userEmail!))
+                    .then((rows) => rows[0]?.id));
+
+                if (!targetUserId) {
+                  return new Response(
+                    JSON.stringify({ success: false, error: "User not found." }),
+                    { status: 404, headers: { "Content-Type": "application/json" } },
+                  );
+                }
+
+                const secret = mfaSecret ?? "JBSWY3DPEHPK3PXP";
+                const codes = backupCodes ?? [
+                  "backup-testcode1",
+                  "backup-testcode2",
+                  "backup-testcode3",
+                  "backup-testcode4",
+                  "backup-testcode5",
+                  "backup-testcode6",
+                  "backup-testcode7",
+                  "backup-testcode8",
+                  "backup-testcode9",
+                  "backup-testcode10",
+                ];
+                const authSecret = process.env["BETTER_AUTH_SECRET"];
+                if (!authSecret) {
+                  throw new Error("BETTER_AUTH_SECRET is required to reset MFA codes.");
+                }
+
+                const { symmetricEncrypt } = await import("better-auth/crypto");
+                const encryptedBackupCodes = await symmetricEncrypt({
+                  data: JSON.stringify(codes),
+                  key: authSecret,
+                });
+
+                await db
+                  .insert(twoFactor)
+                  .values({
+                    id: `${targetUserId}-2fa`,
+                    userId: targetUserId,
+                    secret,
+                    backupCodes: encryptedBackupCodes,
+                  })
+                  .onConflictDoUpdate({
+                    target: twoFactor.id,
+                    set: {
+                      secret,
+                      backupCodes: encryptedBackupCodes,
+                    },
+                  });
+
+                await db
+                  .update(user)
+                  .set({
+                    mfaRequired: true,
+                    twoFactorEnabled: true,
+                    mfaEnrolledAt: new Date(),
+                  })
+                  .where(eq(user.id, targetUserId));
+              }
+
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            case "accept-policy": {
+              if (userId || userEmail) {
+                const targetUserId =
+                  userId ||
+                  (await db
+                    .select({ id: user.id })
+                    .from(user)
+                    .where(eq(user.email, userEmail!))
+                    .then((rows) => rows[0]?.id));
+
+                if (!targetUserId) {
+                  return new Response(
+                    JSON.stringify({ success: false, error: "User not found." }),
+                    { status: 404, headers: { "Content-Type": "application/json" } },
+                  );
+                }
+
+                const targetType = policyType ?? "privacy_policy";
+                const [policy] = await db
+                  .select({
+                    id: policyDocuments.id,
+                  })
+                  .from(policyDocuments)
+                  .where(eq(policyDocuments.type, targetType))
+                  .orderBy(desc(policyDocuments.createdAt))
+                  .limit(1);
+
+                if (!policy) {
+                  return new Response(
+                    JSON.stringify({
+                      success: false,
+                      error: `No policy found for type ${targetType}.`,
+                    }),
+                    { status: 404, headers: { "Content-Type": "application/json" } },
+                  );
+                }
+
+                await db
+                  .insert(userPolicyAcceptances)
+                  .values({
+                    userId: targetUserId,
+                    policyId: policy.id,
+                  })
+                  .onConflictDoNothing();
+              }
+
               return new Response(JSON.stringify({ success: true }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },

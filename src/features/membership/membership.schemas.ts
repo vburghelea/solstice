@@ -6,6 +6,14 @@ export const getMembershipTypeSchema = z.object({
 });
 export type GetMembershipTypeInput = z.infer<typeof getMembershipTypeSchema>;
 
+export const membershipEligibilitySchema = z
+  .object({
+    eventId: z.uuid().optional(),
+  })
+  .optional()
+  .prefault({});
+export type MembershipEligibilityInput = z.infer<typeof membershipEligibilitySchema>;
+
 // Mutation schemas
 export const purchaseMembershipSchema = z.object({
   membershipTypeId: z.string(),

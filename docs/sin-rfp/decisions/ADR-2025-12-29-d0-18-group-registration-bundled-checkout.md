@@ -1,12 +1,19 @@
 # ADR-2025-12-29-d0-18-group-registration-bundled-checkout: Group registration and bundled checkout model
 
-Status: Proposed
+Status: Accepted
 Date: 2025-12-29
 
 ## Decision
 
 Adopt a group-based registration model with a unified checkout session that can
 bundle event registrations and membership purchases (annual or day pass).
+
+Default decisions:
+
+- Registration groups are event-scoped.
+- Invites can target email addresses before account creation.
+- Group members remain pending until they accept and claim the invite.
+- Day passes are event-scoped entitlements stored as membership purchases.
 
 ## Context
 
@@ -41,11 +48,33 @@ bundle event registrations and membership purchases (annual or day pass).
 
 - New tables and API changes are required (registration groups, group members,
   invites, checkout sessions/items, membership purchases).
-- Existing registration and payment flows need a compatibility layer during
-  rollout.
-- Data migration is required to backfill groups for existing registrations.
+- Membership eligibility checks must accept either an active membership or a
+  valid event-scoped day pass.
+- Legacy payment session tables are replaced by unified checkout sessions.
+
+## Implementation Progress
+
+**Last Updated:** 2025-12-29
+
+Core implementation complete:
+
+- Registration groups schema and server functions (CRUD, invites)
+- `registerForEvent` integration with group types and invite workflows
+- Enhanced invite acceptance UI with event details and error states
+- Organizer Groups tab with roster data and CSV export
+- E2E test coverage for group registration flows
+- Membership eligibility checks (`checkMembershipEligibility`)
+- Unified checkout flow with `checkout_sessions` + `checkout_items`
+- Square callback refactor (with legacy shim fallback)
+- Square webhooks for payment finalization and refunds
+- Pending/resume payment UX (localStorage-backed)
+
+**Status:** All implementation items complete as of 2025-12-29.
+
+See `docs/sin-rfp/registration-model-migration-plan.md` for migration status.
 
 ## Links
 
-- `docs/sin-rfp/requirements/user-stories-and-flows.md`
+- `docs/sin-rfp/user-stories-and-flows.md`
 - `docs/sin-rfp/registration-model-migration-plan.md`
+- `docs/sin-rfp/square-callback-refactor-plan.md`

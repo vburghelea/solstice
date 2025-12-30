@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { baseCreateEventSchema, createEventInputSchema } from "~/db/schema/events.schema";
+import {
+  registrationGroupMemberRoleSchema,
+  registrationGroupTypeSchema,
+} from "./registration-groups.schemas";
 
 // Query schemas
 export const listEventsSchema = z
@@ -92,6 +96,16 @@ export const registerForEventSchema = z.object({
   notes: z.string().optional(),
   roster: z.union([z.array(rosterPlayerSchema), rosterObjectSchema]).optional(),
   paymentMethod: z.enum(["square", "etransfer"]).prefault("square"),
+  membershipTypeId: z.string().optional(),
+  groupType: registrationGroupTypeSchema.optional(),
+  invites: z
+    .array(
+      z.object({
+        email: z.email("Please enter a valid email address"),
+        role: registrationGroupMemberRoleSchema.optional().prefault("member"),
+      }),
+    )
+    .optional(),
 });
 export type RegisterForEventInput = z.infer<typeof registerForEventSchema>;
 

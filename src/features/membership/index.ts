@@ -1,5 +1,6 @@
 // Export queries
 export {
+  checkMembershipEligibility,
   getMembershipType,
   getUserMembershipStatus,
   listMembershipTypes,

@@ -13,9 +13,11 @@ import {
   CalendarIcon,
   CheckCircleIcon,
   MapPinIcon,
+  UserPlusIcon,
   UsersIcon,
+  X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
@@ -48,6 +50,10 @@ import type {
   EventRegistrationResultPayload,
   EventWithDetails,
 } from "~/features/events/events.types";
+import {
+  getUserMembershipStatus,
+  listMembershipTypes,
+} from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
@@ -69,6 +75,71 @@ type UserTeamEntry = {
   memberCount: number;
 };
 
+type RegistrationGroupType = "individual" | "pair" | "relay" | "team" | "family";
+type RegistrationInviteRole = "member" | "captain";
+type RegistrationInviteStatus = "pending" | "invited";
+
+type RegistrationInviteDraft = {
+  id: string;
+  email: string;
+  role: RegistrationInviteRole;
+  status: RegistrationInviteStatus;
+  addedAt: string;
+};
+
+type PendingCheckout = {
+  sessionId: string;
+  checkoutUrl: string;
+  createdAt: string;
+  totalAmount: number;
+};
+
+const groupTypeOptions: Array<{
+  value: RegistrationGroupType;
+  label: string;
+  description: string;
+  registrationType: "team" | "individual";
+}> = [
+  {
+    value: "individual",
+    label: "Individual",
+    description: "Single participant registration",
+    registrationType: "individual",
+  },
+  {
+    value: "pair",
+    label: "Pair",
+    description: "Two-person entry with shared checkout",
+    registrationType: "individual",
+  },
+  {
+    value: "relay",
+    label: "Relay",
+    description: "Multi-leg group with shared checkout",
+    registrationType: "team",
+  },
+  {
+    value: "team",
+    label: "Team",
+    description: "Full team roster with a captain",
+    registrationType: "team",
+  },
+  {
+    value: "family",
+    label: "Family",
+    description: "Household group registration",
+    registrationType: "individual",
+  },
+];
+
+const groupRoleOptions: Array<{ value: RegistrationInviteRole; label: string }> = [
+  { value: "member", label: "Member" },
+  { value: "captain", label: "Captain" },
+];
+
+const isValidInviteEmail = (email: string) =>
+  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
+
 export const Route = createFileRoute("/dashboard/events/$slug/register")({
   beforeLoad: async ({ context, location }) => {
     if (!context.user) {
@@ -85,9 +156,47 @@ function EventRegistrationPage() {
   const { slug } = Route.useParams();
   const { user } = useRouteContext({ from: "/dashboard/events/$slug/register" });
   const navigate = useNavigate();
-  const [registrationType, setRegistrationType] = useState<"team" | "individual">(
-    "individual",
-  );
+  const groupDraftStorageKey = `event:${slug}:group-registration-draft`;
+  const pendingCheckoutStorageKey = `event:${slug}:pending-checkout`;
+
+  const [groupType, setGroupType] = useState<RegistrationGroupType>(() => {
+    if (typeof window === "undefined") return "individual";
+    const stored = localStorage.getItem(groupDraftStorageKey);
+    if (!stored) return "individual";
+    try {
+      const parsed = JSON.parse(stored) as { groupType?: RegistrationGroupType };
+      return parsed.groupType ?? "individual";
+    } catch {
+      return "individual";
+    }
+  });
+  const [inviteDrafts, setInviteDrafts] = useState<RegistrationInviteDraft[]>(() => {
+    if (typeof window === "undefined") return [];
+    const stored = localStorage.getItem(groupDraftStorageKey);
+    if (!stored) return [];
+    try {
+      const parsed = JSON.parse(stored) as {
+        invites?: RegistrationInviteDraft[];
+      };
+      return parsed.invites ?? [];
+    } catch {
+      return [];
+    }
+  });
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<RegistrationInviteRole>("member");
+  const [pendingCheckout, setPendingCheckout] = useState<PendingCheckout | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem(pendingCheckoutStorageKey);
+    if (!stored) return null;
+    try {
+      const parsed = JSON.parse(stored) as PendingCheckout;
+      if (!parsed?.checkoutUrl || !parsed?.sessionId) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  });
 
   const [selectedTeamId, setSelectedTeamId] = useState<string>("__select__");
   const [additionalInfo, setAdditionalInfo] = useState("");
@@ -102,6 +211,7 @@ function EventRegistrationPage() {
   const [confirmation, setConfirmation] = useState<
     EventRegistrationResultPayload["payment"] | null
   >(null);
+  const [membershipTypeId, setMembershipTypeId] = useState<string>("");
 
   const { data: eventResult, isLoading: eventLoading } = useQuery<
     EventOperationResult<EventWithDetails>,
@@ -113,14 +223,37 @@ function EventRegistrationPage() {
 
   const eventData = eventResult?.success ? eventResult.data : null;
 
+  const groupTypeOptionsForEvent = useMemo(() => {
+    if (!eventData) return groupTypeOptions;
+    if (eventData.registrationType === "team") {
+      return groupTypeOptions.filter((option) => option.registrationType === "team");
+    }
+    if (eventData.registrationType === "individual") {
+      return groupTypeOptions.filter(
+        (option) => option.registrationType === "individual",
+      );
+    }
+    return groupTypeOptions;
+  }, [eventData]);
+
+  const resolvedGroupType = useMemo(() => {
+    const allowedValues = new Set(groupTypeOptionsForEvent.map((option) => option.value));
+    if (allowedValues.has(groupType)) return groupType;
+    return groupTypeOptionsForEvent[0]?.value ?? "individual";
+  }, [groupType, groupTypeOptionsForEvent]);
+
   // Compute effective registration type based on event's allowed types
   // This prevents wrong fee calculation for team-only or individual-only events
   const effectiveRegistrationType = useMemo(() => {
-    if (!eventData) return registrationType;
+    const selectedOption = groupTypeOptions.find(
+      (option) => option.value === resolvedGroupType,
+    );
+    const baseType = selectedOption?.registrationType ?? "individual";
+    if (!eventData) return baseType;
     if (eventData.registrationType === "team") return "team";
     if (eventData.registrationType === "individual") return "individual";
-    return registrationType; // "both" - user choice
-  }, [eventData, registrationType]);
+    return baseType; // "both" - user choice
+  }, [eventData, resolvedGroupType]);
 
   const { data: registrationStatus, isLoading: registrationLoading } = useQuery<
     { isRegistered: boolean } | undefined,
@@ -136,7 +269,50 @@ function EventRegistrationPage() {
     enabled: Boolean(eventData?.id && user?.id),
   });
 
+  useEffect(() => {
+    if (!registrationStatus?.isRegistered) return;
+    localStorage.removeItem(pendingCheckoutStorageKey);
+    localStorage.removeItem(groupDraftStorageKey);
+  }, [registrationStatus, pendingCheckoutStorageKey, groupDraftStorageKey]);
+
   const userProfile = user;
+
+  const { data: membershipStatusResult } = useQuery({
+    queryKey: ["membership-status", user?.id],
+    queryFn: () => callServerFn(getUserMembershipStatus, undefined),
+    enabled: Boolean(user?.id),
+  });
+
+  const hasActiveMembership = Boolean(
+    membershipStatusResult?.success && membershipStatusResult.data?.hasMembership,
+  );
+
+  const { data: membershipTypesResult } = useQuery({
+    queryKey: ["membership-types"],
+    queryFn: () => callServerFn(listMembershipTypes, undefined),
+    enabled: Boolean(eventData?.requireMembership && !hasActiveMembership),
+  });
+
+  const membershipTypes = useMemo(() => {
+    if (membershipTypesResult?.success && membershipTypesResult.data) {
+      return membershipTypesResult.data;
+    }
+    return [];
+  }, [membershipTypesResult]);
+
+  const selectedMembershipType = membershipTypes.find(
+    (type) => type.id === membershipTypeId,
+  );
+
+  const membershipFee = selectedMembershipType
+    ? selectedMembershipType.priceCents / 100
+    : 0;
+
+  const requiresMembershipSelection = Boolean(
+    eventData?.requireMembership && !hasActiveMembership,
+  );
+
+  const resolvedMembershipTypeId = membershipTypeId || membershipTypes[0]?.id || "";
 
   const { data: userTeams } = useQuery<UserTeamEntry[] | undefined, Error>({
     queryKey: ["user-teams", user?.id],
@@ -154,6 +330,9 @@ function EventRegistrationPage() {
       notes?: string;
       roster?: { emergencyContact?: EmergencyContact };
       paymentMethod: "square" | "etransfer";
+      membershipTypeId?: string;
+      groupType?: RegistrationGroupType;
+      invites?: Array<{ email: string; role?: RegistrationInviteRole }>;
     }
   >({
     mutationFn: (payload) =>
@@ -167,6 +346,16 @@ function EventRegistrationPage() {
       const payment = result.data.payment;
 
       if (payment?.method === "square") {
+        if (pendingCheckoutStorageKey) {
+          const draft: PendingCheckout = {
+            sessionId: payment.sessionId,
+            checkoutUrl: payment.checkoutUrl,
+            createdAt: new Date().toISOString(),
+            totalAmount: totalFee,
+          };
+          localStorage.setItem(pendingCheckoutStorageKey, JSON.stringify(draft));
+          setPendingCheckout(draft);
+        }
         toast.success("Redirecting to Square checkout...");
         window.location.assign(payment.checkoutUrl);
         return;
@@ -177,9 +366,19 @@ function EventRegistrationPage() {
         toast.success(
           "Registration submitted! Follow the e-transfer instructions below.",
         );
+        if (pendingCheckoutStorageKey) {
+          localStorage.removeItem(pendingCheckoutStorageKey);
+          setPendingCheckout(null);
+        }
+        localStorage.removeItem(groupDraftStorageKey);
         return;
       }
 
+      if (pendingCheckoutStorageKey) {
+        localStorage.removeItem(pendingCheckoutStorageKey);
+        setPendingCheckout(null);
+      }
+      localStorage.removeItem(groupDraftStorageKey);
       toast.success("Registration completed!");
       navigate({ to: "/dashboard/events" });
     },
@@ -228,7 +427,16 @@ function EventRegistrationPage() {
     };
   }, [eventData, effectiveRegistrationType]);
 
-  const requiresPayment = fee.discounted > 0;
+  const totalFee = fee.discounted + (requiresMembershipSelection ? membershipFee : 0);
+  const requiresPayment = totalFee > 0;
+
+  useEffect(() => {
+    const draftPayload = JSON.stringify({
+      groupType: resolvedGroupType,
+      invites: inviteDrafts,
+    });
+    localStorage.setItem(groupDraftStorageKey, draftPayload);
+  }, [groupDraftStorageKey, resolvedGroupType, inviteDrafts]);
 
   if (eventLoading || registrationLoading) {
     return <RegistrationSkeleton />;
@@ -255,7 +463,12 @@ function EventRegistrationPage() {
 
   const event = eventData;
   const effectivePaymentMethod =
-    event.allowEtransfer && requiresPayment ? paymentMethod : "square";
+    event.allowEtransfer && requiresPayment && !requiresMembershipSelection
+      ? paymentMethod
+      : "square";
+  const visiblePendingCheckout = registrationStatus?.isRegistered
+    ? null
+    : pendingCheckout;
   const submitDisabled =
     registrationMutation.isPending || confirmation?.method === "etransfer";
 
@@ -278,12 +491,20 @@ function EventRegistrationPage() {
       return;
     }
 
+    if (requiresMembershipSelection && !resolvedMembershipTypeId) {
+      toast.error("Please select a membership option");
+      return;
+    }
+
     const payload: {
       eventId: string;
       teamId?: string;
       notes?: string;
       roster?: { emergencyContact?: EmergencyContact };
       paymentMethod: "square" | "etransfer";
+      membershipTypeId?: string;
+      groupType?: RegistrationGroupType;
+      invites?: Array<{ email: string; role?: RegistrationInviteRole }>;
     } = {
       eventId: event.id,
       paymentMethod: effectivePaymentMethod,
@@ -305,8 +526,62 @@ function EventRegistrationPage() {
       payload.roster = { emergencyContact };
     }
 
+    if (requiresMembershipSelection && resolvedMembershipTypeId) {
+      payload.membershipTypeId = resolvedMembershipTypeId;
+    }
+
+    if (resolvedGroupType && resolvedGroupType !== "individual") {
+      payload.groupType = resolvedGroupType;
+      payload.invites = inviteDrafts.map((invite) => ({
+        email: invite.email,
+        role: invite.role,
+      }));
+    }
+
     setConfirmation(null);
     registrationMutation.mutate(payload);
+  };
+
+  const handleAddInvite = () => {
+    const trimmedEmail = inviteEmail.trim().toLowerCase();
+    if (!isValidInviteEmail(trimmedEmail)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+
+    if (inviteDrafts.some((invite) => invite.email === trimmedEmail)) {
+      toast.error("That email is already invited");
+      return;
+    }
+
+    const newInvite: RegistrationInviteDraft = {
+      id: `invite-${Date.now()}`,
+      email: trimmedEmail,
+      role: inviteRole,
+      status: "pending",
+      addedAt: new Date().toISOString(),
+    };
+
+    setInviteDrafts((prev) => [...prev, newInvite]);
+    setInviteEmail("");
+    setInviteRole("member");
+  };
+
+  const handleRemoveInvite = (id: string) => {
+    setInviteDrafts((prev) => prev.filter((invite) => invite.id !== id));
+  };
+
+  const handleResumeCheckout = () => {
+    if (!pendingCheckout?.checkoutUrl) return;
+    window.location.assign(pendingCheckout.checkoutUrl);
+  };
+
+  const handleClearPendingCheckout = () => {
+    if (pendingCheckoutStorageKey) {
+      localStorage.removeItem(pendingCheckoutStorageKey);
+    }
+    setPendingCheckout(null);
+    toast.message("Cleared pending checkout");
   };
 
   if (registrationStatus?.isRegistered) {
@@ -352,64 +627,48 @@ function EventRegistrationPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {(event.registrationType === "individual" ||
-                event.registrationType === "team" ||
-                event.registrationType === "both") && (
-                <div className="space-y-3">
-                  <Label>Registration Type</Label>
-                  <RadioGroup
-                    value={effectiveRegistrationType}
-                    onValueChange={(value) =>
-                      setRegistrationType(value as "team" | "individual")
-                    }
-                    disabled={event.registrationType !== "both"}
-                  >
-                    {(event.registrationType === "individual" ||
-                      event.registrationType === "both") && (
-                      <div className="flex items-start space-x-2">
-                        <RadioGroupItem value="individual" id="individual" />
-                        <div className="grid gap-1.5 leading-none">
-                          <Label
-                            htmlFor="individual"
-                            className="cursor-pointer font-normal"
-                          >
-                            Individual Registration
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              ${fee.discounted.toFixed(2)}
-                              {fee.hasDiscount && (
+              <div className="space-y-3">
+                <Label>Group Type</Label>
+                <RadioGroup
+                  value={resolvedGroupType}
+                  onValueChange={(value) => setGroupType(value as RegistrationGroupType)}
+                  className="grid gap-3"
+                  disabled={groupTypeOptionsForEvent.length === 1}
+                >
+                  {groupTypeOptionsForEvent.map((option) => (
+                    <div key={option.value} className="flex items-start space-x-2">
+                      <RadioGroupItem value={option.value} id={option.value} />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor={option.value}
+                          className="cursor-pointer font-normal"
+                        >
+                          {option.label}
+                          <span className="text-muted-foreground ml-2 text-sm">
+                            {option.registrationType === "team"
+                              ? `$${((event.teamRegistrationFee ?? 0) / 100).toFixed(2)}`
+                              : `$${fee.discounted.toFixed(2)}`}
+                            {option.registrationType === "individual" &&
+                              fee.hasDiscount && (
                                 <span className="ml-1 line-through">
                                   ${fee.original.toFixed(2)}
                                 </span>
                               )}
-                            </span>
-                          </Label>
-                          <p className="text-muted-foreground text-sm">
-                            Register as an individual player
-                          </p>
-                        </div>
+                          </span>
+                        </Label>
+                        <p className="text-muted-foreground text-sm">
+                          {option.description}
+                        </p>
                       </div>
-                    )}
-
-                    {(event.registrationType === "team" ||
-                      event.registrationType === "both") && (
-                      <div className="flex items-start space-x-2">
-                        <RadioGroupItem value="team" id="team" />
-                        <div className="grid gap-1.5 leading-none">
-                          <Label htmlFor="team" className="cursor-pointer font-normal">
-                            Team Registration
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              ${((event.teamRegistrationFee ?? 0) / 100).toFixed(2)}
-                            </span>
-                          </Label>
-                          <p className="text-muted-foreground text-sm">
-                            Register your entire team
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </RadioGroup>
-                </div>
-              )}
+                    </div>
+                  ))}
+                </RadioGroup>
+                {event.registrationType !== "both" && (
+                  <p className="text-muted-foreground text-sm">
+                    This event supports {event.registrationType} registrations only.
+                  </p>
+                )}
+              </div>
 
               {effectiveRegistrationType === "team" && (
                 <div className="space-y-3">
@@ -443,6 +702,98 @@ function EventRegistrationPage() {
                     </Alert>
                   )}
                 </div>
+              )}
+
+              {resolvedGroupType !== "individual" && (
+                <>
+                  <Separator />
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold">Invite Group Members</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Add participant emails to share the registration details. Invites
+                        will remain pending until members accept.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-[1fr_200px_auto] md:items-end">
+                      <div className="space-y-2">
+                        <Label htmlFor="invite-email">Email</Label>
+                        <Input
+                          id="invite-email"
+                          type="email"
+                          placeholder="teammate@example.com"
+                          value={inviteEmail}
+                          onChange={(event) => setInviteEmail(event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="invite-role">Role</Label>
+                        <Select
+                          value={inviteRole}
+                          onValueChange={(value) =>
+                            setInviteRole(value as RegistrationInviteRole)
+                          }
+                        >
+                          <SelectTrigger id="invite-role">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {groupRoleOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        type="button"
+                        className="mt-2 md:mt-0"
+                        onClick={handleAddInvite}
+                        disabled={!inviteEmail.trim()}
+                      >
+                        <UserPlusIcon className="mr-2 h-4 w-4" />
+                        Add Invite
+                      </Button>
+                    </div>
+
+                    {inviteDrafts.length > 0 ? (
+                      <div className="space-y-2">
+                        {inviteDrafts.map((invite) => (
+                          <div
+                            key={invite.id}
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm"
+                          >
+                            <div className="space-y-1">
+                              <div className="font-medium">{invite.email}</div>
+                              <div className="text-muted-foreground">
+                                Role: {invite.role}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge variant="secondary">Pending invite</Badge>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveInvite(invite.id)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <Alert>
+                        <AlertDescription>
+                          No invites added yet. You can finish registration now and invite
+                          members later.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                </>
               )}
 
               <Separator />
@@ -510,9 +861,77 @@ function EventRegistrationPage() {
 
               <Separator />
 
+              {event.requireMembership && (
+                <>
+                  <div className="space-y-3">
+                    <h3 className="font-semibold">Membership Requirement</h3>
+                    {hasActiveMembership ? (
+                      <Alert>
+                        <AlertTitle>Active membership on file</AlertTitle>
+                        <AlertDescription>
+                          Your membership is active, so no additional purchase is needed
+                          to register for this event.
+                        </AlertDescription>
+                      </Alert>
+                    ) : (
+                      <div className="space-y-2">
+                        <Label htmlFor="membership-type">Select membership</Label>
+                        <Select
+                          value={resolvedMembershipTypeId}
+                          onValueChange={(value) => setMembershipTypeId(value)}
+                        >
+                          <SelectTrigger id="membership-type">
+                            <SelectValue placeholder="Choose a membership option" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {membershipTypes.map((type) => (
+                              <SelectItem key={type.id} value={type.id}>
+                                {type.name} — ${(type.priceCents / 100).toFixed(2)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-muted-foreground text-sm">
+                          Membership is required for this event and will be included in
+                          checkout.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <Separator />
+                </>
+              )}
+
               {requiresPayment ? (
                 <div className="space-y-3">
                   <h3 className="font-semibold">Payment Method</h3>
+                  {visiblePendingCheckout && (
+                    <Alert>
+                      <AlertTitle>Pending checkout detected</AlertTitle>
+                      <AlertDescription className="space-y-3">
+                        <p>
+                          You have a pending checkout from{" "}
+                          {format(
+                            new Date(visiblePendingCheckout.createdAt),
+                            "MMM d, yyyy h:mm a",
+                          )}
+                          . Resume to avoid creating a duplicate payment.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Button type="button" onClick={handleResumeCheckout}>
+                            Resume Checkout
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleClearPendingCheckout}
+                          >
+                            Clear Pending Checkout
+                          </Button>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <RadioGroup
                     value={effectivePaymentMethod}
                     onValueChange={(value) =>
@@ -529,7 +948,7 @@ function EventRegistrationPage() {
                         >
                           Square Checkout
                           <span className="text-muted-foreground ml-2 text-sm">
-                            ${fee.discounted.toFixed(2)}
+                            ${totalFee.toFixed(2)}
                           </span>
                         </Label>
                         <p className="text-muted-foreground text-sm">
@@ -548,7 +967,7 @@ function EventRegistrationPage() {
                           >
                             Interac e-Transfer
                             <span className="text-muted-foreground ml-2 text-sm">
-                              ${fee.discounted.toFixed(2)}
+                              ${totalFee.toFixed(2)}
                             </span>
                           </Label>
                           <p className="text-muted-foreground text-sm">
@@ -744,6 +1163,18 @@ function EventRegistrationPage() {
                   <span>Current Fee</span>
                   <span className="font-semibold">${fee.discounted.toFixed(2)}</span>
                 </div>
+                {requiresMembershipSelection && (
+                  <div className="flex items-center justify-between">
+                    <span>Membership</span>
+                    <span className="font-semibold">${membershipFee.toFixed(2)}</span>
+                  </div>
+                )}
+                {requiresMembershipSelection && (
+                  <div className="flex items-center justify-between">
+                    <span>Total</span>
+                    <span className="font-semibold">${totalFee.toFixed(2)}</span>
+                  </div>
+                )}
                 {fee.hasDiscount && (
                   <p className="text-muted-foreground text-sm">
                     Early bird discount applied ({fee.discountPercentage}% off)

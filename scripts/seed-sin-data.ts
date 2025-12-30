@@ -19,7 +19,7 @@
 
 import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import dotenv from "dotenv";
-import { like, or, sql } from "drizzle-orm";
+import { like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -30,7 +30,6 @@ import {
   formVersions,
   notificationTemplates,
   organizationMembers,
-  organizations,
   policyDocuments,
   reportingCycles,
   reportingSubmissions,
@@ -40,6 +39,7 @@ import {
   session,
   twoFactor,
   user,
+  userPolicyAcceptances,
   userRoles,
 } from "../src/db/schema";
 
@@ -198,8 +198,8 @@ async function seed() {
     await db.delete(forms);
     await db.delete(delegatedAccess);
     await db.delete(organizationMembers);
-    await db.delete(organizations);
     await db.delete(retentionPolicies);
+    await db.delete(userPolicyAcceptances);
     await db.delete(policyDocuments);
     await db.delete(notificationTemplates);
     await db.delete(userRoles);
@@ -210,16 +210,7 @@ async function seed() {
 
     await db.delete(session).where(like(session.userId, "sin-user-%"));
     await db.delete(account).where(like(account.userId, "sin-user-%"));
-    await db
-      .delete(user)
-      .where(
-        or(
-          like(user.id, "sin-user-%"),
-          like(user.email, "%-staff@example.com"),
-          like(user.email, "pso-%@example.com"),
-          like(user.email, "club-%@example.com"),
-        ),
-      );
+    console.log("   → Skipping test user deletion (fixed users preserved)...");
     await db.delete(roles);
 
     console.log("   ✓ Cleaned existing data\n");
@@ -316,27 +307,52 @@ async function seed() {
       const isGlobalAdmin =
         userData.roleId === "solstice-admin" || userData.roleId === "viasport-admin";
 
-      await db.insert(user).values({
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        emailVerified: true,
-        profileComplete: true,
-        profileVersion: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        mfaRequired: isGlobalAdmin,
-      });
+      const now = new Date();
+      await db
+        .insert(user)
+        .values({
+          id: userData.id,
+          email: userData.email,
+          name: userData.name,
+          emailVerified: true,
+          profileComplete: true,
+          profileVersion: 1,
+          createdAt: now,
+          updatedAt: now,
+          mfaRequired: isGlobalAdmin,
+        })
+        .onConflictDoUpdate({
+          target: user.id,
+          set: {
+            email: userData.email,
+            name: userData.name,
+            emailVerified: true,
+            profileComplete: true,
+            profileVersion: 1,
+            mfaRequired: isGlobalAdmin,
+            updatedAt: now,
+          },
+        });
 
-      await db.insert(account).values({
-        id: `${userData.id}-account`,
-        userId: userData.id,
-        providerId: "credential",
-        accountId: userData.email,
-        password: hashedPassword,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await db
+        .insert(account)
+        .values({
+          id: `${userData.id}-account`,
+          userId: userData.id,
+          providerId: "credential",
+          accountId: userData.email,
+          password: hashedPassword,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: account.id,
+          set: {
+            accountId: userData.email,
+            password: hashedPassword,
+            updatedAt: now,
+          },
+        });
 
       if (userData.roleId) {
         await db.insert(userRoles).values({
@@ -363,12 +379,21 @@ async function seed() {
           }
         }
 
-        await db.insert(twoFactor).values({
-          id: `${userData.id}-2fa`,
-          userId: userData.id,
-          secret: FAKE_MFA_SECRET,
-          backupCodes: encryptedBackupCodes,
-        });
+        await db
+          .insert(twoFactor)
+          .values({
+            id: `${userData.id}-2fa`,
+            userId: userData.id,
+            secret: FAKE_MFA_SECRET,
+            backupCodes: encryptedBackupCodes,
+          })
+          .onConflictDoUpdate({
+            target: twoFactor.id,
+            set: {
+              secret: FAKE_MFA_SECRET,
+              backupCodes: encryptedBackupCodes,
+            },
+          });
 
         // Update user to mark as 2FA enabled
         await db.execute(
@@ -387,8 +412,55 @@ async function seed() {
     // ========================================
     console.log("Phase 4: Creating organization hierarchy...");
 
+    const upsertOrg = async (data: {
+      id: string;
+      name: string;
+      slug: string;
+      type: "governing_body" | "pso" | "league" | "club" | "affiliate";
+      parentOrgId?: string;
+      status?: "pending" | "active" | "suspended" | "archived";
+      settings?: Record<string, unknown>;
+      metadata?: Record<string, unknown>;
+    }) => {
+      const now = new Date();
+      await db.execute(sql`
+        INSERT INTO organizations (
+          id,
+          name,
+          slug,
+          type,
+          parent_org_id,
+          status,
+          settings,
+          metadata,
+          created_at,
+          updated_at
+        ) VALUES (
+          ${data.id},
+          ${data.name},
+          ${data.slug},
+          ${data.type},
+          ${data.parentOrgId ?? null},
+          ${data.status ?? "active"},
+          ${data.settings ?? {}},
+          ${data.metadata ?? {}},
+          ${now},
+          ${now}
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          name = EXCLUDED.name,
+          slug = EXCLUDED.slug,
+          type = EXCLUDED.type,
+          parent_org_id = EXCLUDED.parent_org_id,
+          status = EXCLUDED.status,
+          settings = EXCLUDED.settings,
+          metadata = EXCLUDED.metadata,
+          updated_at = ${now}
+      `);
+    };
+
     // Root: viaSport BC (governing body)
-    await db.insert(organizations).values({
+    await upsertOrg({
       id: IDS.viasportBcId,
       name: "viaSport BC",
       slug: "viasport-bc",
@@ -407,7 +479,7 @@ async function seed() {
     ];
 
     for (const pso of psos) {
-      await db.insert(organizations).values({
+      await upsertOrg({
         ...pso,
         type: "pso",
         parentOrgId: IDS.viasportBcId,
@@ -435,7 +507,7 @@ async function seed() {
     ];
 
     for (const league of leagues) {
-      await db.insert(organizations).values({
+      await upsertOrg({
         id: league.id,
         name: league.name,
         slug: league.slug,
@@ -477,7 +549,7 @@ async function seed() {
     ];
 
     for (const club of clubs) {
-      await db.insert(organizations).values({
+      await upsertOrg({
         id: club.id,
         name: club.name,
         slug: club.slug,

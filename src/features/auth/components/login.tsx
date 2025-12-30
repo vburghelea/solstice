@@ -301,6 +301,11 @@ export default function LoginForm(props?: LoginFormProps) {
                 />
               )}
             </form.Field>
+            <div className="text-right text-sm">
+              <Link to="/auth/forgot-password" className="underline underline-offset-4">
+                Forgot password?
+              </Link>
+            </div>
             <FormSubmitButton
               isSubmitting={form.state.isSubmitting || isLoading}
               className="mt-2 w-full"

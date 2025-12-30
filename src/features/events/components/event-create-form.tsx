@@ -91,6 +91,10 @@ const eventFormSchema = z
     maxParticipants: z.number().min(1).optional(),
     minPlayersPerTeam: z.number().min(1).prefault(7),
     maxPlayersPerTeam: z.number().min(1).prefault(21),
+    minPlayersPerPair: z.number().min(1).prefault(2),
+    maxPlayersPerPair: z.number().min(1).prefault(2),
+    minPlayersPerRelay: z.number().min(1).optional(),
+    maxPlayersPerRelay: z.number().min(1).optional(),
     teamRegistrationFee: z.number().min(0).prefault(0),
     individualRegistrationFee: z.number().min(0).prefault(0),
     earlyBirdDiscount: z.number().min(0).max(100).prefault(0),
@@ -117,6 +121,30 @@ const eventFormSchema = z
           message: "E-transfer recipient email is required when e-transfer is enabled",
         });
       }
+    }
+
+    if (
+      values.minPlayersPerPair !== undefined &&
+      values.maxPlayersPerPair !== undefined &&
+      values.minPlayersPerPair > values.maxPlayersPerPair
+    ) {
+      ctx.addIssue({
+        path: ["minPlayersPerPair"],
+        code: "custom",
+        message: "Minimum pair size cannot exceed the maximum",
+      });
+    }
+
+    if (
+      values.minPlayersPerRelay !== undefined &&
+      values.maxPlayersPerRelay !== undefined &&
+      values.minPlayersPerRelay > values.maxPlayersPerRelay
+    ) {
+      ctx.addIssue({
+        path: ["minPlayersPerRelay"],
+        code: "custom",
+        message: "Minimum relay size cannot exceed the maximum",
+      });
     }
   });
 
@@ -149,6 +177,10 @@ export function EventCreateForm() {
     maxParticipants: undefined,
     minPlayersPerTeam: 7,
     maxPlayersPerTeam: 21,
+    minPlayersPerPair: 2,
+    maxPlayersPerPair: 2,
+    minPlayersPerRelay: undefined,
+    maxPlayersPerRelay: undefined,
     teamRegistrationFee: 0,
     individualRegistrationFee: 0,
     earlyBirdDiscount: 0,
@@ -200,6 +232,10 @@ export function EventCreateForm() {
         maxParticipants: parsed.maxParticipants,
         minPlayersPerTeam: parsed.minPlayersPerTeam,
         maxPlayersPerTeam: parsed.maxPlayersPerTeam,
+        minPlayersPerPair: parsed.minPlayersPerPair,
+        maxPlayersPerPair: parsed.maxPlayersPerPair,
+        minPlayersPerRelay: parsed.minPlayersPerRelay,
+        maxPlayersPerRelay: parsed.maxPlayersPerRelay,
         status: parsed.status,
         allowEtransfer: parsed.allowEtransfer ?? false,
         etransferRecipient: parsed.etransferRecipient?.trim()
@@ -618,6 +654,70 @@ export function EventCreateForm() {
                     <ValidatedInput
                       field={field}
                       label="Maximum Players per Team"
+                      type="number"
+                      min={1}
+                      onValueChange={(value) => {
+                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        field.handleChange(nextValue as unknown as number);
+                      }}
+                    />
+                  )}
+                </form.Field>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <form.Field name="minPlayersPerPair">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Minimum Players per Pair"
+                      type="number"
+                      min={1}
+                      onValueChange={(value) => {
+                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        field.handleChange(nextValue as unknown as number);
+                      }}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="maxPlayersPerPair">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Maximum Players per Pair"
+                      type="number"
+                      min={1}
+                      onValueChange={(value) => {
+                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        field.handleChange(nextValue as unknown as number);
+                      }}
+                    />
+                  )}
+                </form.Field>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <form.Field name="minPlayersPerRelay">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Minimum Players per Relay"
+                      type="number"
+                      min={1}
+                      onValueChange={(value) => {
+                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        field.handleChange(nextValue as unknown as number);
+                      }}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="maxPlayersPerRelay">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Maximum Players per Relay"
                       type="number"
                       min={1}
                       onValueChange={(value) => {

@@ -128,3 +128,57 @@ export async function deleteImportJobs(
     );
   }
 }
+
+export async function setUserMfa(
+  page: Page,
+  options: {
+    userEmail: string;
+    mfaRequired?: boolean;
+    twoFactorEnabled?: boolean;
+  },
+) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "set-mfa",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(
+      `Failed to set MFA for ${options.userEmail}: ${response.status()} - ${body}`,
+    );
+  }
+}
+
+export async function resetMfa(page: Page, options: { userEmail: string }) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "reset-mfa",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(`Failed to reset MFA for ${options.userEmail}: ${body}`);
+  }
+}
+
+export async function acceptPolicy(
+  page: Page,
+  options: { userEmail: string; policyType?: string },
+) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "accept-policy",
+      ...options,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(`Failed to accept policy for ${options.userEmail}: ${body}`);
+  }
+}

@@ -196,10 +196,15 @@ export async function gotoWithAuth(
   if (expectRedirect && urlAfterGoto.includes("/auth/login")) {
     const adminEmail = process.env["E2E_TEST_ADMIN_EMAIL"];
     const adminSecret = process.env["E2E_TEST_ADMIN_TOTP_SECRET"];
+    const adminMfaMethod = process.env["E2E_TEST_ADMIN_MFA_METHOD"];
+    const adminBackupCode = process.env["E2E_TEST_ADMIN_BACKUP_CODE"];
 
     if (adminEmail && adminSecret && email === adminEmail) {
-      const mfaCode = authenticator.generate(adminSecret);
-      await uiLoginWithMfa(page, { email, password, redirect: path, mfaCode });
+      const useBackup =
+        adminMfaMethod?.toLowerCase() === "backup" && Boolean(adminBackupCode);
+      const mfaCode = useBackup ? adminBackupCode! : authenticator.generate(adminSecret);
+      const mfaMethod = useBackup ? "backup" : "totp";
+      await uiLoginWithMfa(page, { email, password, redirect: path, mfaCode, mfaMethod });
     } else {
       await uiLogin(page, email, password, path);
     }
@@ -210,7 +215,9 @@ export async function gotoWithAuth(
       // Navigate to the intended path since redirect was stripped
       console.log(`Redirect was stripped. Navigating from ${currentUrl} to ${path}`);
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page
+        .waitForLoadState("networkidle", { timeout: 5_000 })
+        .catch(() => undefined);
 
       // Verify we're on the correct page
       const finalUrl = page.url();

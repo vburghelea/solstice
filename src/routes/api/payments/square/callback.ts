@@ -1,27 +1,40 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
 import {
-  eventPaymentSessions,
+  checkoutItems,
+  checkoutSessions,
   eventRegistrations,
   events,
-  membershipPaymentSessions,
+  membershipPurchases,
   membershipTypes,
 } from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
+import { finalizeMembershipPurchase } from "~/features/membership/membership.finalize";
+import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/api/payments/square/callback")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        await assertFeatureEnabled("qc_payments_square");
+        await assertFeatureEnabled("payments_square");
         try {
           const url = new URL(request.url);
           const params = url.searchParams;
 
-          // Get checkout ID from Square
-          const checkoutId = params.get("checkoutId");
-          const transactionId = params.get("transactionId");
+          // Get checkout ID from Square (payment links) or fallbacks
+          const checkoutId =
+            params.get("checkoutId") ??
+            params.get("checkout_id") ??
+            params.get("session");
+          const transactionId =
+            params.get("transactionId") ??
+            params.get("paymentId") ??
+            params.get("payment_id");
+          const orderIdParam = params.get("orderId") ?? params.get("order_id");
+          const successParam = params.get("success");
+          const hasExplicitSuccess = successParam !== null;
+          const isSuccess = successParam === "true" || successParam === "1";
 
           if (!checkoutId) {
             return redirect({
@@ -34,156 +47,41 @@ export const Route = createFileRoute("/api/payments/square/callback")({
 
           const { getDb } = await import("~/db/server-helpers");
           const db = await getDb();
+          const now = new Date();
+          const nowIso = now.toISOString();
 
-          const handleEventSession = async (): Promise<Response | null> => {
-            const eventSessionResult = await db
-              .select({
-                session: eventPaymentSessions,
-                registration: eventRegistrations,
-                event: events,
-              })
-              .from(eventPaymentSessions)
-              .innerJoin(
-                eventRegistrations,
-                eq(eventPaymentSessions.registrationId, eventRegistrations.id),
-              )
-              .innerJoin(events, eq(eventPaymentSessions.eventId, events.id))
-              .where(eq(eventPaymentSessions.squareCheckoutId, checkoutId))
-              .limit(1);
+          let session = null as typeof checkoutSessions.$inferSelect | null;
 
-            if (eventSessionResult.length === 0) {
-              return null;
-            }
-
-            const [{ session, registration, event }] = eventSessionResult;
-            const now = new Date();
-            const nowIso = now.toISOString();
-
-            if (!transactionId) {
-              await db
-                .update(eventPaymentSessions)
-                .set({
-                  status: "cancelled",
-                  metadata: {
-                    ...(session.metadata ?? {}),
-                    cancelledAt: nowIso,
-                  },
-                  updatedAt: now,
-                })
-                .where(eq(eventPaymentSessions.id, session.id));
-
-              await db
-                .update(eventRegistrations)
-                .set({
-                  paymentStatus: "pending",
-                  updatedAt: now,
-                  paymentMetadata: {
-                    ...(registration.paymentMetadata ?? {}),
-                    cancelledAt: nowIso,
-                  },
-                })
-                .where(eq(eventRegistrations.id, registration.id));
-
-              return redirect({
-                to: "/dashboard/events",
-                search: {
-                  payment: "cancelled",
-                  eventId: event.id,
-                },
-              });
-            }
-
-            const { getSquarePaymentService } = await import("~/lib/payments/square");
-            const paymentService = await getSquarePaymentService();
-            const result = await paymentService.verifyPayment(checkoutId, transactionId);
-
-            if (!result.success) {
-              await db
-                .update(eventPaymentSessions)
-                .set({
-                  status: "failed",
-                  metadata: {
-                    ...(session.metadata ?? {}),
-                    lastError: result.error || "Payment verification failed",
-                    lastErrorAt: nowIso,
-                    squareTransactionId: transactionId,
-                  },
-                  updatedAt: now,
-                })
-                .where(eq(eventPaymentSessions.id, session.id));
-
-              return redirect({
-                to: "/dashboard/events",
-                search: {
-                  payment: "verification_failed",
-                  eventId: event.id,
-                },
-              });
-            }
-
-            const paymentIdentifier = result.paymentId || transactionId;
-            const amountCents =
-              typeof result.amount === "number" ? result.amount : session.amountCents;
-
-            await db
-              .update(eventPaymentSessions)
-              .set({
-                status: "completed",
-                squarePaymentId: paymentIdentifier,
-                metadata: {
-                  ...(session.metadata ?? {}),
-                  squareTransactionId: paymentIdentifier,
-                  paymentVerifiedAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(eventPaymentSessions.id, session.id));
-
-            const existingMetadata = (registration.paymentMetadata ?? {}) as Record<
-              string,
-              unknown
-            >;
-
-            await db
-              .update(eventRegistrations)
-              .set({
-                paymentStatus: "paid",
-                status:
-                  registration.status === "cancelled" ? registration.status : "confirmed",
-                paymentCompletedAt: now,
-                paymentId: paymentIdentifier,
-                amountPaidCents: amountCents,
-                paymentMetadata: {
-                  ...existingMetadata,
-                  squareTransactionId: paymentIdentifier,
-                  markedPaidAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(eventRegistrations.id, registration.id));
-
-            return redirect({
-              to: "/dashboard/events",
-              search: {
-                payment: "success",
-                eventId: event.id,
-              },
-            });
-          };
-
-          const [paymentSession] = await db
+          const [sessionRow] = await db
             .select()
-            .from(membershipPaymentSessions)
-            .where(eq(membershipPaymentSessions.squareCheckoutId, checkoutId))
+            .from(checkoutSessions)
+            .where(eq(checkoutSessions.providerCheckoutId, checkoutId))
             .limit(1);
 
-          if (!paymentSession) {
-            const eventRedirect = await handleEventSession();
-            if (eventRedirect) {
-              return eventRedirect;
-            }
+          session = sessionRow ?? null;
 
-            console.error("Membership payment session not found for Square callback", {
+          if (!session) {
+            const { ensureLegacyCheckoutSession } =
+              await import("~/lib/payments/legacy-checkout");
+            const legacyResult = await ensureLegacyCheckoutSession({
+              db,
+              checkoutId,
+              paymentId: transactionId ?? null,
+              orderId: null,
+              now,
+            });
+            session = legacyResult.session;
+
+            if (legacyResult.legacyType) {
+              console.warn("Legacy checkout session migrated during callback", {
+                checkoutId,
+                legacyType: legacyResult.legacyType,
+              });
+            }
+          }
+
+          if (!session) {
+            console.error("Checkout session not found for Square callback", {
               checkoutId,
               transactionId,
             });
@@ -195,264 +93,250 @@ export const Route = createFileRoute("/api/payments/square/callback")({
             });
           }
 
-          let sessionRecord = paymentSession;
-          const now = new Date();
-          const nowIso = now.toISOString();
+          const checkoutRows = await db
+            .select({
+              item: checkoutItems,
+              registration: eventRegistrations,
+              event: events,
+              purchase: membershipPurchases,
+              membershipType: membershipTypes,
+            })
+            .from(checkoutItems)
+            .leftJoin(
+              eventRegistrations,
+              eq(checkoutItems.eventRegistrationId, eventRegistrations.id),
+            )
+            .leftJoin(events, eq(eventRegistrations.eventId, events.id))
+            .leftJoin(
+              membershipPurchases,
+              eq(checkoutItems.membershipPurchaseId, membershipPurchases.id),
+            )
+            .leftJoin(
+              membershipTypes,
+              eq(membershipPurchases.membershipTypeId, membershipTypes.id),
+            )
+            .where(eq(checkoutItems.checkoutSessionId, session.id));
 
-          // Check if payment was cancelled
-          if (!transactionId) {
-            await db
-              .update(membershipPaymentSessions)
-              .set({
-                status: "cancelled",
-                metadata: {
-                  ...(sessionRecord.metadata ?? {}),
-                  cancelledAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(membershipPaymentSessions.id, sessionRecord.id));
-
+          if (checkoutRows.length === 0) {
+            console.error("Checkout items not found for Square callback", {
+              checkoutId,
+              transactionId,
+            });
             return redirect({
               to: "/dashboard/membership",
               search: {
-                error: "cancelled",
+                error: "processing_error",
               },
             });
           }
 
-          const callbackMetadata = {
-            ...(sessionRecord.metadata ?? {}),
-            squareTransactionId: transactionId,
-            callbackReceivedAt: nowIso,
-          } as Record<string, unknown>;
+          const firstEvent = checkoutRows.find((row) => row.event)?.event ?? null;
 
-          await db
-            .update(membershipPaymentSessions)
-            .set({
-              squarePaymentId: transactionId,
-              metadata: callbackMetadata,
-              updatedAt: now,
-            })
-            .where(eq(membershipPaymentSessions.id, sessionRecord.id));
+          const shouldCancel =
+            (hasExplicitSuccess && !isSuccess) || (!transactionId && !isSuccess);
 
-          sessionRecord = {
-            ...sessionRecord,
-            squarePaymentId: transactionId,
-            metadata: callbackMetadata,
-            updatedAt: now,
-          };
+          if (shouldCancel) {
+            await db
+              .update(checkoutSessions)
+              .set({
+                status: "cancelled",
+                metadata: atomicJsonbMerge(checkoutSessions.metadata, {
+                  cancelledAt: nowIso,
+                  squareTransactionId: transactionId ?? null,
+                }),
+                updatedAt: now,
+              })
+              .where(eq(checkoutSessions.id, session.id));
 
-          // Get the payment service
+            for (const row of checkoutRows) {
+              if (row.registration) {
+                await db
+                  .update(eventRegistrations)
+                  .set({
+                    paymentStatus: "pending",
+                    updatedAt: now,
+                    paymentMetadata: {
+                      ...(row.registration.paymentMetadata ?? {}),
+                      cancelledAt: nowIso,
+                    },
+                  })
+                  .where(eq(eventRegistrations.id, row.registration.id));
+              }
+
+              if (row.purchase) {
+                await db
+                  .update(membershipPurchases)
+                  .set({
+                    status: "cancelled",
+                    updatedAt: now,
+                    metadata: atomicJsonbMerge(membershipPurchases.metadata, {
+                      cancelledAt: nowIso,
+                    }),
+                  })
+                  .where(eq(membershipPurchases.id, row.purchase.id));
+              }
+            }
+
+            return redirect({
+              to: firstEvent ? "/dashboard/events" : "/dashboard/membership",
+              search: firstEvent
+                ? { payment: "cancelled", eventId: firstEvent.id }
+                : { error: "cancelled" },
+            });
+          }
+
           const { getSquarePaymentService } = await import("~/lib/payments/square");
           const paymentService = await getSquarePaymentService();
-
-          // Verify the payment with Square
-          const result = await paymentService.verifyPayment(checkoutId, transactionId);
+          const result = await paymentService.verifyPayment(
+            checkoutId,
+            transactionId ?? undefined,
+          );
 
           if (!result.success) {
-            console.error("Payment verification failed:", result.error);
-
             await db
-              .update(membershipPaymentSessions)
+              .update(checkoutSessions)
               .set({
                 status: "failed",
-                metadata: {
-                  ...(sessionRecord.metadata ?? {}),
+                metadata: atomicJsonbMerge(checkoutSessions.metadata, {
                   lastError: result.error || "Payment verification failed",
                   lastErrorAt: nowIso,
                   squareTransactionId: transactionId,
-                },
+                }),
                 updatedAt: now,
               })
-              .where(eq(membershipPaymentSessions.id, sessionRecord.id));
+              .where(eq(checkoutSessions.id, session.id));
 
             return redirect({
-              to: "/dashboard/membership",
-              search: {
-                error: "verification_failed",
-              },
+              to: firstEvent ? "/dashboard/events" : "/dashboard/membership",
+              search: firstEvent
+                ? { payment: "verification_failed", eventId: firstEvent.id }
+                : { error: "verification_failed" },
             });
           }
 
-          const paymentIdentifier = result.paymentId || transactionId;
+          const paymentIdentifier =
+            result.paymentId ?? transactionId ?? session.providerPaymentId;
 
-          const verifiedMetadata = {
-            ...(sessionRecord.metadata ?? {}),
-            squareTransactionId: paymentIdentifier,
-            paymentVerifiedAt: nowIso,
-          } as Record<string, unknown>;
+          if (!paymentIdentifier) {
+            await db
+              .update(checkoutSessions)
+              .set({
+                status: "failed",
+                metadata: atomicJsonbMerge(checkoutSessions.metadata, {
+                  lastError: "Missing payment identifier",
+                  lastErrorAt: nowIso,
+                }),
+                updatedAt: now,
+              })
+              .where(eq(checkoutSessions.id, session.id));
+
+            return redirect({
+              to: firstEvent ? "/dashboard/events" : "/dashboard/membership",
+              search: firstEvent
+                ? { payment: "verification_failed", eventId: firstEvent.id }
+                : { error: "verification_failed" },
+            });
+          }
 
           await db
-            .update(membershipPaymentSessions)
+            .update(checkoutSessions)
             .set({
               status: "completed",
-              squarePaymentId: paymentIdentifier,
-              metadata: verifiedMetadata,
+              providerPaymentId: paymentIdentifier,
+              providerOrderId:
+                orderIdParam ?? result.orderId ?? session.providerOrderId ?? null,
+              metadata: atomicJsonbMerge(checkoutSessions.metadata, {
+                squareTransactionId: paymentIdentifier,
+                paymentVerifiedAt: nowIso,
+                paymentConfirmedAt: nowIso,
+              }),
               updatedAt: now,
             })
-            .where(eq(membershipPaymentSessions.id, sessionRecord.id));
+            .where(eq(checkoutSessions.id, session.id));
 
-          sessionRecord = {
-            ...sessionRecord,
-            status: "completed",
-            squarePaymentId: paymentIdentifier,
-            metadata: verifiedMetadata,
-            updatedAt: now,
-          };
+          for (const row of checkoutRows) {
+            if (row.registration) {
+              const existingMetadata = (row.registration.paymentMetadata ?? {}) as Record<
+                string,
+                unknown
+              >;
+              const amountCents = row.item.amountCents * (row.item.quantity ?? 1);
 
-          const [membershipType] = await db
-            .select()
-            .from(membershipTypes)
-            .where(eq(membershipTypes.id, sessionRecord.membershipTypeId))
-            .limit(1);
-
-          if (!membershipType) {
-            await db
-              .update(membershipPaymentSessions)
-              .set({
-                status: "failed",
-                metadata: {
-                  ...(sessionRecord.metadata ?? {}),
-                  lastError: "Membership type not found",
-                  lastErrorAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(membershipPaymentSessions.id, sessionRecord.id));
-
-            return redirect({
-              to: "/dashboard/membership",
-              search: {
-                error: "processing_error",
-              },
-            });
-          }
-
-          if (
-            typeof result.amount === "number" &&
-            result.amount !== membershipType.priceCents
-          ) {
-            console.error("Payment amount mismatch", {
-              expected: membershipType.priceCents,
-              actual: result.amount,
-              paymentIdentifier,
-              checkoutId,
-            });
-
-            await db
-              .update(membershipPaymentSessions)
-              .set({
-                status: "failed",
-                metadata: {
-                  ...(sessionRecord.metadata ?? {}),
-                  lastError: "Payment amount mismatch",
-                  lastErrorAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(membershipPaymentSessions.id, sessionRecord.id));
-
-            return redirect({
-              to: "/dashboard/membership",
-              search: {
-                error: "processing_error",
-              },
-            });
-          }
-
-          if (result.currency && result.currency !== "CAD") {
-            console.error("Unsupported payment currency", {
-              expected: "CAD",
-              actual: result.currency,
-              paymentIdentifier,
-              checkoutId,
-            });
-
-            await db
-              .update(membershipPaymentSessions)
-              .set({
-                status: "failed",
-                metadata: {
-                  ...(sessionRecord.metadata ?? {}),
-                  lastError: "Unsupported payment currency",
-                  lastErrorAt: nowIso,
-                },
-                updatedAt: now,
-              })
-              .where(eq(membershipPaymentSessions.id, sessionRecord.id));
-
-            return redirect({
-              to: "/dashboard/membership",
-              search: {
-                error: "processing_error",
-              },
-            });
-          }
-
-          const { finalizeMembershipForSession } =
-            await import("~/features/membership/membership.finalize");
-
-          const finalizeTimestamp = new Date();
-          const finalizeResult = await finalizeMembershipForSession({
-            db,
-            paymentSession: sessionRecord,
-            membershipType,
-            paymentId: paymentIdentifier,
-            orderId: result.orderId ?? sessionRecord.squareOrderId ?? null,
-            sessionId: sessionRecord.squareCheckoutId,
-            now: finalizeTimestamp,
-          });
-
-          if (finalizeResult.wasCreated) {
-            const [membershipUser] = await db
-              .select({
-                id: user.id,
-                email: user.email,
-                name: user.name,
-              })
-              .from(user)
-              .where(eq(user.id, sessionRecord.userId))
-              .limit(1);
-
-            if (membershipUser?.email) {
-              try {
-                const { sendMembershipPurchaseReceipt } =
-                  await import("~/lib/email/sendgrid");
-
-                await sendMembershipPurchaseReceipt({
-                  to: {
-                    email: membershipUser.email,
-                    name: membershipUser.name || undefined,
-                  },
-                  membershipType: membershipType.name,
-                  amount: membershipType.priceCents,
+              await db
+                .update(eventRegistrations)
+                .set({
+                  paymentStatus: "paid",
+                  status:
+                    row.registration.status === "cancelled"
+                      ? row.registration.status
+                      : "confirmed",
+                  paymentCompletedAt: now,
                   paymentId: paymentIdentifier,
-                  expiresAt: new Date(finalizeResult.membership.endDate),
-                });
-              } catch (emailError) {
-                console.error("Failed to send membership receipt", emailError);
+                  amountPaidCents: amountCents,
+                  paymentMetadata: {
+                    ...existingMetadata,
+                    squareTransactionId: paymentIdentifier,
+                    markedPaidAt: nowIso,
+                  },
+                  updatedAt: now,
+                })
+                .where(eq(eventRegistrations.id, row.registration.id));
+            }
+
+            if (row.purchase && row.membershipType) {
+              const finalizeResult = await finalizeMembershipPurchase({
+                db,
+                purchase: row.purchase,
+                membershipType: row.membershipType,
+                paymentId: paymentIdentifier,
+                orderId: result.orderId ?? session.providerOrderId ?? null,
+                sessionId: checkoutId,
+                now,
+              });
+
+              if (finalizeResult.wasCreated && finalizeResult.membership) {
+                const [membershipUser] = await db
+                  .select({
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                  })
+                  .from(user)
+                  .where(eq(user.id, row.purchase.userId ?? ""))
+                  .limit(1);
+
+                if (membershipUser?.email) {
+                  try {
+                    const { sendMembershipPurchaseReceipt } =
+                      await import("~/lib/email/sendgrid");
+
+                    await sendMembershipPurchaseReceipt({
+                      to: {
+                        email: membershipUser.email,
+                        name: membershipUser.name || undefined,
+                      },
+                      membershipType: row.membershipType.name,
+                      amount: row.membershipType.priceCents,
+                      paymentId: paymentIdentifier,
+                      expiresAt: new Date(finalizeResult.membership.endDate),
+                    });
+                  } catch (emailError) {
+                    console.error("Failed to send membership receipt", emailError);
+                  }
+                }
               }
             }
           }
 
-          const searchParams: Record<string, string> = {
-            success: "true",
-            payment_id: paymentIdentifier,
-            session: checkoutId,
-          };
-
-          if (sessionRecord.membershipTypeId) {
-            searchParams["type"] = sessionRecord.membershipTypeId;
-          }
-
-          if (finalizeResult.membership?.id) {
-            searchParams["membership_id"] = finalizeResult.membership.id;
-          }
-
           return redirect({
-            to: "/dashboard/membership",
-            search: searchParams,
+            to: firstEvent ? "/dashboard/events" : "/dashboard/membership",
+            search: firstEvent
+              ? { payment: "success", eventId: firstEvent.id }
+              : {
+                  success: "true",
+                  payment_id: paymentIdentifier,
+                  session: checkoutId,
+                },
           });
         } catch (error) {
           console.error("Square callback error:", error);

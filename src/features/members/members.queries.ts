@@ -64,7 +64,7 @@ function parsePrivacySettings(
 export const listMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(listMembersSchema))
   .handler(async ({ data }): Promise<ListMembersResult> => {
-    await assertFeatureEnabled("qc_members_directory");
+    await assertFeatureEnabled("members_directory");
     try {
       const searchTerm = data.search?.trim();
       const limit = Math.min(100, Math.max(1, data.limit ?? 50));

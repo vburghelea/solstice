@@ -5,6 +5,10 @@ export {
   getUpcomingEvents,
   listEvents,
 } from "./events.queries";
+export {
+  getRegistrationGroup,
+  listRegistrationGroupsForEvent,
+} from "./registration-groups.queries";
 
 // Event mutations
 export {
@@ -14,6 +18,15 @@ export {
   registerForEvent,
   updateEvent,
 } from "./events.mutations";
+export {
+  acceptRegistrationInvite,
+  createRegistrationGroup,
+  declineRegistrationInvite,
+  inviteRegistrationGroupMember,
+  removeRegistrationGroupMember,
+  revokeRegistrationInvite,
+  updateRegistrationGroup,
+} from "./registration-groups.mutations";
 
 // Event types
 export type {
@@ -31,3 +44,9 @@ export type {
   RegistrationType,
   UpdateEventInput,
 } from "./events.types";
+export type {
+  RegistrationGroupInvitePayload,
+  RegistrationGroupMemberSummary,
+  RegistrationGroupRoster,
+  RegistrationInviteRedemptionResult,
+} from "./registration-groups.types";

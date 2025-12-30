@@ -39,7 +39,7 @@ import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/members")({
   beforeLoad: () => {
-    requireFeatureInRoute("qc_members_directory");
+    requireFeatureInRoute("members_directory");
   },
   component: MembersPage,
 });

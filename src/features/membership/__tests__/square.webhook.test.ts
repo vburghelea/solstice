@@ -1,18 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { __squareWebhookTestUtils } from "~/routes/api/webhooks/square";
 
-const sendMembershipPurchaseReceiptMock = vi.fn();
-const getEmailServiceMock = vi.fn();
-
-const finalizeMembershipForSessionMock = vi.fn();
-const getDbMock = vi.fn();
+const {
+  sendMembershipPurchaseReceiptMock,
+  getEmailServiceMock,
+  finalizeMembershipPurchaseMock,
+  getDbMock,
+} = vi.hoisted(() => ({
+  sendMembershipPurchaseReceiptMock: vi.fn(),
+  getEmailServiceMock: vi.fn(),
+  finalizeMembershipPurchaseMock: vi.fn(),
+  getDbMock: vi.fn(),
+}));
 
 vi.mock("~/db/server-helpers", () => ({
   getDb: getDbMock,
 }));
 
 vi.mock("~/features/membership/membership.finalize", () => ({
-  finalizeMembershipForSession: finalizeMembershipForSessionMock,
+  finalizeMembershipPurchase: finalizeMembershipPurchaseMock,
 }));
 
 vi.mock("~/lib/email/sendgrid", () => ({
@@ -25,17 +31,17 @@ describe("square webhook helpers", () => {
   let from: ReturnType<typeof vi.fn>;
   let where: ReturnType<typeof vi.fn>;
   let select: ReturnType<typeof vi.fn>;
+  let leftJoin: ReturnType<typeof vi.fn>;
   let updateRecords: Array<{ table: unknown; values: unknown }>;
   let update: ReturnType<typeof vi.fn>;
 
   const sessionBase = {
-    id: "session-1",
+    id: "checkout-session-1",
     userId: "user-1",
-    membershipTypeId: "type-1",
-    squareCheckoutId: "checkout-1",
-    squarePaymentId: "pay-1",
-    squareOrderId: "order-1",
-    amountCents: 4500,
+    providerCheckoutId: "checkout-1",
+    providerPaymentId: "pay-1",
+    providerOrderId: "order-1",
+    amountTotalCents: 4500,
     currency: "CAD",
     status: "pending" as const,
     metadata: {},
@@ -59,6 +65,7 @@ describe("square webhook helpers", () => {
     from,
     where,
     limit,
+    leftJoin,
   });
 
   beforeEach(() => {
@@ -66,6 +73,7 @@ describe("square webhook helpers", () => {
     from = vi.fn(() => chainFactory());
     where = vi.fn(() => chainFactory());
     select = vi.fn(() => chainFactory());
+    leftJoin = vi.fn(() => chainFactory());
 
     updateRecords = [];
     update = vi.fn((table: unknown) => ({
@@ -79,7 +87,7 @@ describe("square webhook helpers", () => {
 
     sendMembershipPurchaseReceiptMock.mockReset();
     getEmailServiceMock.mockReset();
-    finalizeMembershipForSessionMock.mockReset();
+    finalizeMembershipPurchaseMock.mockReset();
 
     getDbMock.mockResolvedValue({
       select,
@@ -91,13 +99,56 @@ describe("square webhook helpers", () => {
 
   it("finalizes membership and sends receipt on completed payment", async () => {
     const membershipSession = { ...sessionBase };
+    const membershipPurchase = {
+      id: "purchase-1",
+      membershipTypeId: membershipType.id,
+      userId: membershipSession.userId,
+      eventId: null,
+      status: "pending" as const,
+      startDate: "2025-09-20",
+      endDate: "2026-09-20",
+      paymentProvider: null,
+      paymentId: null,
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      email: null,
+      registrationGroupMemberId: null,
+      membershipId: null,
+    };
+    const checkoutItem = {
+      id: "item-1",
+      checkoutSessionId: membershipSession.id,
+      itemType: "membership_purchase" as const,
+      description: "Membership",
+      quantity: 1,
+      amountCents: membershipType.priceCents,
+      currency: "CAD",
+      membershipPurchaseId: membershipPurchase.id,
+      eventRegistrationId: null,
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
     limit
       .mockResolvedValueOnce([membershipSession]) // find session by payment id
-      .mockResolvedValueOnce([membershipType]) // fetch membership type
       .mockResolvedValueOnce([{ email: "member@example.com", name: "Jess" }]); // fetch user
 
-    finalizeMembershipForSessionMock.mockResolvedValue({
+    where
+      .mockImplementationOnce(() => chainFactory())
+      .mockResolvedValueOnce([
+        {
+          item: checkoutItem,
+          registration: null,
+          event: null,
+          purchase: membershipPurchase,
+          membershipType,
+        },
+      ])
+      .mockImplementationOnce(() => chainFactory());
+
+    finalizeMembershipPurchaseMock.mockResolvedValue({
       membership: {
         id: "membership-1",
         userId: membershipSession.userId,
@@ -114,13 +165,13 @@ describe("square webhook helpers", () => {
       wasCreated: true,
     });
 
-    await __squareWebhookTestUtils.finalizeMembershipFromWebhook({
+    await __squareWebhookTestUtils.finalizeCheckoutFromWebhook({
       paymentId: "pay-1",
       orderId: "order-1",
       eventType: "payment.updated",
     });
 
-    expect(finalizeMembershipForSessionMock).toHaveBeenCalledWith(
+    expect(finalizeMembershipPurchaseMock).toHaveBeenCalledWith(
       expect.objectContaining({
         paymentId: "pay-1",
         orderId: "order-1",
@@ -163,7 +214,10 @@ describe("square webhook helpers", () => {
       updatedAt: new Date(),
     };
 
-    limit.mockResolvedValueOnce([membership]);
+    limit
+      .mockResolvedValueOnce([]) // no checkout session
+      .mockResolvedValueOnce([membership]) // legacy membership lookup
+      .mockResolvedValueOnce([null]); // legacy purchase lookup
 
     const sendSpy = vi.fn();
     getEmailServiceMock.mockResolvedValue({ send: sendSpy });
@@ -190,7 +244,7 @@ describe("square webhook helpers", () => {
     expect(sendSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         to: { email: "ops@example.com" },
-        subject: expect.stringContaining("Membership refund"),
+        subject: expect.stringContaining("Refund processed"),
       }),
     );
   });

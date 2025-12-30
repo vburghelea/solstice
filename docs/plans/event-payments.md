@@ -3,7 +3,7 @@
 ## Context
 
 - Event registrations currently create pending records (`event_registrations`) without collecting payment.
-- Membership purchases already rely on Square checkout sessions, membership payment session tracking, and webhook finalization.
+- Membership purchases already rely on Square checkout sessions + line items and webhook finalization.
 - Product backlog calls for (a) full Square-backed payments for event registrations and (b) a manual e-transfer option that records intent and lets admins reconcile outstanding payments.
 
 ## Objectives
@@ -32,25 +32,27 @@
   - `payment_completed_at` (`timestamp`, nullable).
   - `payment_metadata` (`jsonb`, nullable) — reminders, notes, e-transfer references.
   - Normalize `payment_status` values (`pending`, `awaiting_etransfer`, `paid`, `refunded`, `cancelled`).
-- New table `event_payment_sessions`
-  - Similar to `membership_payment_sessions` but keyed by event registration ID (cuid PK, references registration & event, Square checkout info, status, metadata).
-  - Index by `square_checkout_id`, `square_payment_id` for webhook lookups.
+- Reuse `checkout_sessions` + `checkout_items`
+  - Store Square checkout data in `checkout_sessions` and attach event registration
+    items via `checkout_items.event_registration_id`.
 
 ## Backend Changes
 
 1. **Registration Flow**
    - Update `registerForEvent` schema to accept `paymentMethod` (`square` default, `etransfer`) and persist metadata.
    - Branch logic:
-     - `square`: create registration (status `pending`, payment status `pending`), create `event_payment_sessions` record via new helper `createEventCheckoutSession`, return checkout URL/session ID to client.
-     - `etransfer`: create registration (status `pending`, payment status `awaiting_etransfer`, method `etransfer`, set `amount_due_cents`), populate `payment_metadata` (instructions snapshot, optional due date), return success without checkout.
+   - `square`: create registration (status `pending`, payment status `pending`), create
+     a `checkout_sessions` record + `checkout_items` line item, return checkout
+     URL/session ID to client.
+   - `etransfer`: create registration (status `pending`, payment status `awaiting_etransfer`, method `etransfer`, set `amount_due_cents`), populate `payment_metadata` (instructions snapshot, optional due date), return success without checkout.
    - Ensure roster payload is cast safely.
 2. **Square Verification**
    - Extend `squarePaymentService.createCheckoutSession` to accept a generic payload or wrap it with an event-specific helper that stores event context in metadata.
    - Add server fn `confirmEventPayment` (similar to membership) for manual polling fallback.
    - Update Square webhook (`/api/webhooks/square`) and callback handler to recognize event sessions:
-     - Resolve owning registration via new session table.
-     - On `payment.updated` / callback success: mark registration `payment_status='paid'`, `payment_method='square'`, set `amount_paid_cents`, `payment_completed_at`, update `status='confirmed'` (and roster if necessary).
-     - Handle refunds by downgrading registration/payment status.
+   - Resolve owning registration via `checkout_items` line items.
+   - On `payment.updated` / callback success: mark registration `payment_status='paid'`, `payment_method='square'`, set `amount_paid_cents`, `payment_completed_at`, update `status='confirmed'` (and roster if necessary).
+   - Handle refunds by downgrading registration/payment status.
 3. **Admin Mutations**
    - New server fn(s) for admins:
      - `markEventEtransferPaid` — sets `payment_status='paid'`, `payment_completed_at`, updates `status='confirmed'`.

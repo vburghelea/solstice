@@ -43,7 +43,7 @@ export const createTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(createTeamSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -121,7 +121,7 @@ export const updateTeam = createServerFn({ method: "POST" })
     ),
   )
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -180,7 +180,7 @@ export const deactivateTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(z.object({ teamId: z.string() })))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -236,7 +236,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(addTeamMemberSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -367,7 +367,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(updateTeamMemberSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -444,7 +444,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(removeTeamMemberSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -517,7 +517,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(teamInviteActionSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -560,7 +560,7 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(teamInviteActionSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -600,7 +600,7 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(requestTeamMembershipSchema))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
@@ -689,7 +689,7 @@ export const leaveTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(z.object({ teamId: z.string() })))
   .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),

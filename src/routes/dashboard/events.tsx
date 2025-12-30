@@ -3,7 +3,7 @@ import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/events")({
   beforeLoad: () => {
-    requireFeatureInRoute("qc_events");
+    requireFeatureInRoute("events");
   },
   component: EventsLayout,
 });

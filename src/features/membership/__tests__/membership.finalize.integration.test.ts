@@ -1,57 +1,46 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MembershipDbClient } from "../membership.finalize";
-import { finalizeMembershipForSession } from "../membership.finalize";
+import type { MembershipDbClient, MembershipPurchaseRow } from "../membership.finalize";
+import { finalizeMembershipPurchase } from "../membership.finalize";
+
+type StoredMembership = {
+  id: string;
+  userId: string;
+  membershipTypeId: string;
+  paymentId: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  paymentProvider: string;
+  metadata: Record<string, unknown>;
+};
 
 /**
- * Integration tests for membership finalization logic.
- * These tests verify the business logic of membership creation
- * including idempotency and transaction handling.
+ * Integration tests for membership purchase finalization logic.
+ * These tests verify membership creation, idempotency, and updates.
  */
-describe("Membership Finalization Integration", () => {
-  // Mock database client that simulates real transaction behavior
+describe("Membership Purchase Finalization Integration", () => {
   let mockTx: ReturnType<typeof createMockTransaction>;
   let mockDb: MembershipDbClient;
+  let selectMembershipResult: StoredMembership[];
 
   function createMockTransaction() {
-    const membershipsTable: Array<{
-      id: string;
-      userId: string;
-      membershipTypeId: string;
-      paymentId: string;
-      startDate: string;
-      endDate: string;
-      status: string;
-      paymentProvider: string;
-      metadata: Record<string, unknown>;
-    }> = [];
-
-    const sessionsTable: Array<{
-      id: string;
-      status: string;
-      squarePaymentId: string | null;
-      squareOrderId: string | null;
-      metadata: Record<string, unknown>;
-      updatedAt: Date;
-    }> = [];
+    const membershipsTable: StoredMembership[] = [];
+    const purchaseUpdates: Array<Record<string, unknown>> = [];
 
     return {
       membershipsTable,
-      sessionsTable,
+      purchaseUpdates,
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockImplementation(() => ({
-        limit: vi.fn().mockImplementation(() => {
-          // Return existing membership if payment ID matches
-          const existingMembership = membershipsTable.find((m) => m.paymentId);
-          return Promise.resolve(existingMembership ? [existingMembership] : []);
-        }),
+        limit: vi.fn().mockResolvedValue(selectMembershipResult),
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values) => {
           const newMembership = {
-            id: `membership-${Date.now()}`,
+            id: `membership-${membershipsTable.length + 1}`,
             ...values,
-          };
+          } as StoredMembership;
           membershipsTable.push(newMembership);
           return {
             returning: vi.fn().mockResolvedValue([newMembership]),
@@ -61,10 +50,7 @@ describe("Membership Finalization Integration", () => {
       update: vi.fn().mockImplementation(() => ({
         set: vi.fn().mockImplementation((values) => ({
           where: vi.fn().mockImplementation(() => {
-            sessionsTable.push({
-              id: "session-1",
-              ...values,
-            });
+            purchaseUpdates.push(values);
             return Promise.resolve();
           }),
         })),
@@ -74,6 +60,7 @@ describe("Membership Finalization Integration", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    selectMembershipResult = [];
     mockTx = createMockTransaction();
     mockDb = {
       transaction: vi.fn().mockImplementation(async (callback) => {
@@ -82,24 +69,31 @@ describe("Membership Finalization Integration", () => {
     } as unknown as MembershipDbClient;
   });
 
+  function createPurchase(overrides: Partial<MembershipPurchaseRow> = {}) {
+    const basePurchase: MembershipPurchaseRow = {
+      id: "purchase-1",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      membershipTypeId: "type-789",
+      userId: "user-456",
+      email: null,
+      eventId: null,
+      registrationGroupMemberId: null,
+      startDate: "2025-01-15",
+      endDate: "2026-01-15",
+      status: "pending",
+      paymentProvider: null,
+      paymentId: null,
+      membershipId: null,
+      metadata: {},
+    };
+
+    return { ...basePurchase, ...overrides };
+  }
+
   describe("New Membership Creation", () => {
     it("creates a new membership when none exists for payment", async () => {
-      const paymentSession = {
-        id: "session-123",
-        userId: "user-456",
-        membershipTypeId: "type-789",
-        squareCheckoutId: "checkout-1",
-        squarePaymentId: null,
-        squareOrderId: "order-1",
-        squarePaymentLinkUrl: "https://square.link/test-payment",
-        amountCents: 4500,
-        currency: "CAD",
-        status: "pending" as const,
-        metadata: {},
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const purchase = createPurchase();
 
       const membershipType = {
         id: "type-789",
@@ -113,9 +107,9 @@ describe("Membership Finalization Integration", () => {
         updatedAt: new Date(),
       };
 
-      const result = await finalizeMembershipForSession({
+      const result = await finalizeMembershipPurchase({
         db: mockDb,
-        paymentSession,
+        purchase,
         membershipType,
         paymentId: "pay-123",
         orderId: "order-1",
@@ -135,54 +129,37 @@ describe("Membership Finalization Integration", () => {
 
     it("calculates correct end date based on membership duration", async () => {
       const now = new Date("2025-01-15");
-      const paymentSession = {
-        id: "session-123",
-        userId: "user-456",
-        membershipTypeId: "type-789",
-        squareCheckoutId: "checkout-1",
-        squarePaymentId: null,
-        squareOrderId: null,
-        squarePaymentLinkUrl: "https://square.link/test-payment",
-        amountCents: 4500,
-        currency: "CAD",
-        status: "pending" as const,
-        metadata: {},
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const purchase = createPurchase({ startDate: "2025-01-15" });
 
       const membershipType = {
         id: "type-789",
         name: "Annual Player Membership",
         description: null,
         priceCents: 4500,
-        durationMonths: 12, // 12 months
+        durationMonths: 12,
         status: "active" as const,
         metadata: {},
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      const result = await finalizeMembershipForSession({
+      const result = await finalizeMembershipPurchase({
         db: mockDb,
-        paymentSession,
+        purchase,
         membershipType,
         paymentId: "pay-123",
         sessionId: "session-123",
         now,
       });
 
-      // End date should be 12 months from start
-      expect(result.membership.startDate).toBe("2025-01-15");
-      expect(result.membership.endDate).toBe("2026-01-15");
+      expect(result.membership?.startDate).toBe("2025-01-15");
+      expect(result.membership?.endDate).toBe("2026-01-15");
     });
   });
 
   describe("Idempotency", () => {
     it("returns existing membership when payment already processed", async () => {
-      // Pre-populate with existing membership
-      const existingMembership = {
+      const existingMembership: StoredMembership = {
         id: "existing-membership-1",
         userId: "user-456",
         membershipTypeId: "type-789",
@@ -194,43 +171,9 @@ describe("Membership Finalization Integration", () => {
         metadata: {},
       };
 
-      // Override the mock to return existing membership
-      const mockTxWithExisting = {
-        ...mockTx,
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockImplementation(() => ({
-          limit: vi.fn().mockResolvedValue([existingMembership]),
-        })),
-        update: vi.fn().mockImplementation(() => ({
-          set: vi.fn().mockImplementation(() => ({
-            where: vi.fn().mockResolvedValue(undefined),
-          })),
-        })),
-      };
+      selectMembershipResult = [existingMembership];
 
-      const mockDbWithExisting = {
-        transaction: vi.fn().mockImplementation(async (callback) => {
-          return callback(mockTxWithExisting);
-        }),
-      } as unknown as MembershipDbClient;
-
-      const paymentSession = {
-        id: "session-123",
-        userId: "user-456",
-        membershipTypeId: "type-789",
-        squareCheckoutId: "checkout-1",
-        squarePaymentId: null,
-        squareOrderId: null,
-        squarePaymentLinkUrl: "https://square.link/test-payment",
-        amountCents: 4500,
-        currency: "CAD",
-        status: "pending" as const,
-        metadata: {},
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const purchase = createPurchase();
 
       const membershipType = {
         id: "type-789",
@@ -244,9 +187,9 @@ describe("Membership Finalization Integration", () => {
         updatedAt: new Date(),
       };
 
-      const result = await finalizeMembershipForSession({
-        db: mockDbWithExisting,
-        paymentSession,
+      const result = await finalizeMembershipPurchase({
+        db: mockDb,
+        purchase,
         membershipType,
         paymentId: "pay-123",
         sessionId: "session-123",
@@ -254,33 +197,19 @@ describe("Membership Finalization Integration", () => {
       });
 
       expect(result.wasCreated).toBe(false);
-      expect(result.membership.id).toBe("existing-membership-1");
+      expect(result.membership?.id).toBe("existing-membership-1");
+      expect(mockTx.purchaseUpdates[0]?.["membershipId"]).toBe("existing-membership-1");
     });
   });
 
   describe("Metadata Handling", () => {
-    it("preserves existing session metadata when finalizing", async () => {
-      const existingMetadata = {
-        referralCode: "FRIEND2025",
-        utmSource: "email",
-      };
-
-      const paymentSession = {
-        id: "session-123",
-        userId: "user-456",
-        membershipTypeId: "type-789",
-        squareCheckoutId: "checkout-1",
-        squarePaymentId: null,
-        squareOrderId: null,
-        squarePaymentLinkUrl: "https://square.link/test-payment",
-        amountCents: 4500,
-        currency: "CAD",
-        status: "pending" as const,
-        metadata: existingMetadata,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    it("preserves purchase metadata when creating membership", async () => {
+      const purchase = createPurchase({
+        metadata: {
+          referralCode: "FRIEND2025",
+          utmSource: "email",
+        },
+      });
 
       const membershipType = {
         id: "type-789",
@@ -294,9 +223,9 @@ describe("Membership Finalization Integration", () => {
         updatedAt: new Date(),
       };
 
-      const result = await finalizeMembershipForSession({
+      const result = await finalizeMembershipPurchase({
         db: mockDb,
-        paymentSession,
+        purchase,
         membershipType,
         paymentId: "pay-123",
         orderId: "order-1",
@@ -304,13 +233,44 @@ describe("Membership Finalization Integration", () => {
         now: new Date("2025-01-15"),
       });
 
-      expect(result.membership.metadata).toMatchObject({
+      expect(result.membership?.metadata).toMatchObject({
         referralCode: "FRIEND2025",
         utmSource: "email",
         sessionId: "session-123",
         squareTransactionId: "pay-123",
         squareOrderId: "order-1",
       });
+    });
+  });
+
+  describe("Event-Scoped Purchases", () => {
+    it("marks purchases active without creating memberships", async () => {
+      const purchase = createPurchase({ eventId: "event-123" });
+
+      const membershipType = {
+        id: "type-789",
+        name: "Event Day Pass",
+        description: null,
+        priceCents: 2500,
+        durationMonths: 0,
+        status: "active" as const,
+        metadata: {},
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const result = await finalizeMembershipPurchase({
+        db: mockDb,
+        purchase,
+        membershipType,
+        paymentId: "pay-123",
+        sessionId: "session-123",
+        now: new Date("2025-01-15"),
+      });
+
+      expect(result.wasCreated).toBe(false);
+      expect(result.membership).toBeNull();
+      expect(mockTx.purchaseUpdates[0]?.["status"]).toBe("active");
     });
   });
 });

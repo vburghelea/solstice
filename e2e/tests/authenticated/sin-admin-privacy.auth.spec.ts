@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { clearAuthState, gotoWithAuth } from "../../utils/auth";
+import { acceptPolicy, setUserMfa } from "../../utils/cleanup";
 
 const tenantKey = process.env["TENANT_KEY"] ?? process.env["VITE_TENANT_KEY"] ?? "qc";
 const isViaSport = tenantKey === "viasport";
@@ -13,12 +14,18 @@ test.describe("SIN admin privacy", () => {
     test.skip(!totpSecret, "Missing E2E_TEST_ADMIN_TOTP_SECRET");
 
     await clearAuthState(page);
+    await setUserMfa(page, {
+      userEmail: adminEmail,
+      mfaRequired: false,
+      twoFactorEnabled: false,
+    });
+    await acceptPolicy(page, { userEmail: adminEmail });
     await gotoWithAuth(page, "/dashboard/admin/sin/privacy", {
       email: adminEmail,
       password: adminPassword,
     });
 
-    await expect(page.getByRole("heading", { name: "Retention Policies" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Legal Holds" })).toBeVisible();
+    await expect(page.getByText("Retention Policies", { exact: true })).toBeVisible();
+    await expect(page.getByText("Legal Holds", { exact: true })).toBeVisible();
   });
 });

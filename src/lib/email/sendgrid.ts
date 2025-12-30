@@ -49,6 +49,7 @@ export const EMAIL_TEMPLATES = {
   PASSWORD_RESET: "password_reset",
   TEAM_INVITATION: "team_invitation",
   EVENT_REGISTRATION_CONFIRMATION: "event_registration_confirmation",
+  REGISTRATION_GROUP_INVITATION: "registration_group_invitation",
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
@@ -298,6 +299,63 @@ Invitation sent by ${inviterDisplay}.`;
       inviterName: inviterDisplay,
       dashboardUrl,
       invitationUrl,
+    },
+    text: textBody,
+  });
+};
+
+export const sendRegistrationGroupInviteEmail = async (params: {
+  to: EmailRecipient;
+  eventName?: string;
+  eventId: string;
+  groupType: string;
+  inviteToken: string;
+  invitedByName?: string;
+  invitedByEmail?: string;
+}) => {
+  const service = await getEmailService();
+  const { brand, fromEmail, fromName, supportEmail, supportName } = getBrandEmailConfig();
+
+  const siteUrl =
+    process.env["SITE_URL"] ||
+    process.env["URL"] ||
+    process.env["VITE_BASE_URL"] ||
+    "http://localhost:5173";
+  const normalizedSiteUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
+  const inviteUrl = `${normalizedSiteUrl}/join/registration/${params.inviteToken}`;
+
+  const inviterDisplay =
+    params.invitedByName || params.invitedByEmail || `a ${brand.name} event organizer`;
+
+  const groupLabel = params.groupType.replaceAll("_", " ");
+  const eventLabel = params.eventName ?? "an upcoming event";
+
+  const textBody = `You've been invited to join ${eventLabel} as part of a ${groupLabel} registration.
+
+Accept your invitation here: ${inviteUrl}
+
+If the link above doesn't work, copy and paste this URL into your browser: ${inviteUrl}
+
+Invitation sent by ${inviterDisplay}.
+
+If you have any questions, please contact ${supportEmail}.`;
+
+  return service.send({
+    to: params.to,
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    subject: `You're invited to join ${eventLabel}`,
+    templateId: EMAIL_TEMPLATES.REGISTRATION_GROUP_INVITATION,
+    dynamicTemplateData: {
+      eventName: eventLabel,
+      groupType: groupLabel,
+      inviterName: inviterDisplay,
+      inviteUrl,
+      supportEmail,
+      supportName,
+      brandName: brand.name,
     },
     text: textBody,
   });

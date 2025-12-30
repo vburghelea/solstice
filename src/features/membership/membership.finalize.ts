@@ -1,22 +1,18 @@
 import { eq } from "drizzle-orm";
-import type {
-  Membership,
-  MembershipPaymentSession,
-  MembershipType,
-} from "~/db/schema/membership.schema";
-import { membershipPaymentSessions, memberships } from "~/db/schema/membership.schema";
+import type { Membership, MembershipType } from "~/db/schema";
+import { membershipPurchases, memberships } from "~/db/schema";
 import type { getDb } from "~/db/server-helpers";
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 
-export type MembershipPaymentSessionRow = MembershipPaymentSession;
 export type MembershipTypeRow = MembershipType;
 export type MembershipRow = Membership;
+export type MembershipPurchaseRow = typeof membershipPurchases.$inferSelect;
 
 export type MembershipDbClient = Awaited<ReturnType<typeof getDb>>;
 
-export interface FinalizeMembershipParams {
+export interface FinalizeMembershipPurchaseParams {
   db: MembershipDbClient;
-  paymentSession: MembershipPaymentSessionRow;
+  purchase: MembershipPurchaseRow;
   membershipType: MembershipTypeRow;
   paymentId: string;
   orderId?: string | null;
@@ -24,24 +20,47 @@ export interface FinalizeMembershipParams {
   now: Date;
 }
 
-export interface FinalizeMembershipResult {
-  membership: MembershipRow;
+export interface FinalizeMembershipPurchaseResult {
+  membership: MembershipRow | null;
   wasCreated: boolean;
 }
 
-export async function finalizeMembershipForSession({
+export async function finalizeMembershipPurchase({
   db,
-  paymentSession,
+  purchase,
   membershipType,
   paymentId,
   orderId,
   sessionId,
   now,
-}: FinalizeMembershipParams): Promise<FinalizeMembershipResult> {
+}: FinalizeMembershipPurchaseParams): Promise<FinalizeMembershipPurchaseResult> {
   const nowIso = now.toISOString();
-  const resolvedOrderId = orderId ?? paymentSession.squareOrderId ?? null;
+  const resolvedOrderId = orderId ?? null;
 
   return db.transaction(async (tx) => {
+    if (purchase.eventId) {
+      await tx
+        .update(membershipPurchases)
+        .set({
+          status: "active",
+          paymentProvider: "square",
+          paymentId,
+          metadata: atomicJsonbMerge(membershipPurchases.metadata, {
+            sessionId,
+            paymentConfirmedAt: nowIso,
+            squareOrderId: resolvedOrderId,
+            squareTransactionId: paymentId,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(membershipPurchases.id, purchase.id));
+
+      return {
+        membership: null,
+        wasCreated: false,
+      } satisfies FinalizeMembershipPurchaseResult;
+    }
+
     const [existingMembershipByPayment] = await tx
       .select()
       .from(memberships)
@@ -50,12 +69,13 @@ export async function finalizeMembershipForSession({
 
     if (existingMembershipByPayment) {
       await tx
-        .update(membershipPaymentSessions)
+        .update(membershipPurchases)
         .set({
-          status: "completed",
-          squarePaymentId: paymentId,
-          squareOrderId: resolvedOrderId,
-          metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
+          status: "active",
+          membershipId: existingMembershipByPayment.id,
+          paymentProvider: "square",
+          paymentId,
+          metadata: atomicJsonbMerge(membershipPurchases.metadata, {
             membershipId: existingMembershipByPayment.id,
             paymentConfirmedAt: nowIso,
             squareOrderId: resolvedOrderId,
@@ -63,12 +83,31 @@ export async function finalizeMembershipForSession({
           }),
           updatedAt: now,
         })
-        .where(eq(membershipPaymentSessions.id, paymentSession.id));
+        .where(eq(membershipPurchases.id, purchase.id));
 
       return {
         membership: existingMembershipByPayment,
         wasCreated: false,
-      } satisfies FinalizeMembershipResult;
+      } satisfies FinalizeMembershipPurchaseResult;
+    }
+
+    if (!purchase.userId) {
+      await tx
+        .update(membershipPurchases)
+        .set({
+          status: "cancelled",
+          metadata: atomicJsonbMerge(membershipPurchases.metadata, {
+            lastError: "Missing user for membership purchase",
+            lastErrorAt: nowIso,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(membershipPurchases.id, purchase.id));
+
+      return {
+        membership: null,
+        wasCreated: false,
+      } satisfies FinalizeMembershipPurchaseResult;
     }
 
     const startDate = new Date(now);
@@ -76,7 +115,7 @@ export async function finalizeMembershipForSession({
     endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
 
     const membershipMetadata: Record<string, unknown> = {
-      ...(paymentSession.metadata ?? {}),
+      ...(purchase.metadata ?? {}),
       sessionId,
       purchasedAt: nowIso,
       squareTransactionId: paymentId,
@@ -89,7 +128,7 @@ export async function finalizeMembershipForSession({
     const [newMembership] = await tx
       .insert(memberships)
       .values({
-        userId: paymentSession.userId,
+        userId: purchase.userId,
         membershipTypeId: membershipType.id,
         startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
@@ -101,12 +140,13 @@ export async function finalizeMembershipForSession({
       .returning();
 
     await tx
-      .update(membershipPaymentSessions)
+      .update(membershipPurchases)
       .set({
-        status: "completed",
-        squarePaymentId: paymentId,
-        squareOrderId: resolvedOrderId,
-        metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
+        status: "active",
+        membershipId: newMembership.id,
+        paymentProvider: "square",
+        paymentId,
+        metadata: atomicJsonbMerge(membershipPurchases.metadata, {
           membershipId: newMembership.id,
           paymentConfirmedAt: nowIso,
           squareOrderId: resolvedOrderId,
@@ -114,11 +154,11 @@ export async function finalizeMembershipForSession({
         }),
         updatedAt: now,
       })
-      .where(eq(membershipPaymentSessions.id, paymentSession.id));
+      .where(eq(membershipPurchases.id, purchase.id));
 
     return {
       membership: newMembership,
       wasCreated: true,
-    } satisfies FinalizeMembershipResult;
+    } satisfies FinalizeMembershipPurchaseResult;
   });
 }

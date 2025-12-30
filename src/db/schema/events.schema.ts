@@ -18,6 +18,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { user } from "./auth.schema";
+import { membershipTypes, memberships } from "./membership.schema";
 import { teams } from "./teams.schema";
 
 /**
@@ -52,6 +53,63 @@ export const registrationTypeEnum = pgEnum("registration_type", [
   "team", // Teams register together
   "individual", // Individuals register and are assigned to teams
   "both", // Supports both team and individual registration
+]);
+
+export const registrationGroupTypeEnum = pgEnum("registration_group_type", [
+  "individual",
+  "pair",
+  "team",
+  "relay",
+  "family",
+]);
+
+export const registrationGroupStatusEnum = pgEnum("registration_group_status", [
+  "draft",
+  "pending",
+  "confirmed",
+  "cancelled",
+]);
+
+export const registrationGroupMemberStatusEnum = pgEnum(
+  "registration_group_member_status",
+  ["invited", "pending", "active", "declined", "removed"],
+);
+
+export const registrationGroupMemberRoleEnum = pgEnum("registration_group_member_role", [
+  "captain",
+  "member",
+]);
+
+export const registrationInviteStatusEnum = pgEnum("registration_invite_status", [
+  "pending",
+  "accepted",
+  "expired",
+  "revoked",
+]);
+
+export const checkoutSessionStatusEnum = pgEnum("checkout_session_status", [
+  "pending",
+  "completed",
+  "cancelled",
+  "failed",
+  "refunded",
+  "expired",
+]);
+
+export const checkoutItemTypeEnum = pgEnum("checkout_item_type", [
+  "event_registration",
+  "membership_purchase",
+  "addon",
+]);
+
+export const checkoutProviderEnum = pgEnum("checkout_provider", ["square", "etransfer"]);
+
+export const membershipPurchaseStatusEnum = pgEnum("membership_purchase_status", [
+  "pending",
+  "active",
+  "expired",
+  "cancelled",
+  "refunded",
 ]);
 
 /**
@@ -92,6 +150,12 @@ export const events = pgTable("events", {
   maxParticipants: integer("max_participants"),
   minPlayersPerTeam: integer("min_players_per_team").default(7),
   maxPlayersPerTeam: integer("max_players_per_team").default(21),
+  minPlayersPerPair: integer("min_players_per_pair").default(2),
+  maxPlayersPerPair: integer("max_players_per_pair").default(2),
+  minPlayersPerRelay: integer("min_players_per_relay"),
+  maxPlayersPerRelay: integer("max_players_per_relay"),
+  allowWaitlist: boolean("allow_waitlist").notNull().default(false),
+  requireMembership: boolean("require_membership").notNull().default(false),
 
   // Pricing (in cents)
   teamRegistrationFee: integer("team_registration_fee").default(0),
@@ -124,6 +188,86 @@ export const events = pgTable("events", {
   etransferRecipient: varchar("etransfer_recipient", { length: 255 }),
 });
 
+export const registrationGroups = pgTable(
+  "registration_groups",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    groupType: registrationGroupTypeEnum("group_type").notNull(),
+    status: registrationGroupStatusEnum("status").notNull().default("draft"),
+    captainUserId: text("captain_user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    teamId: text("team_id").references(() => teams.id),
+    minSize: integer("min_size"),
+    maxSize: integer("max_size"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  },
+  (table) => [
+    index("registration_groups_event_idx").on(table.eventId),
+    index("registration_groups_captain_idx").on(table.captainUserId),
+    index("registration_groups_team_idx").on(table.teamId),
+  ],
+);
+
+export const registrationGroupMembers = pgTable(
+  "registration_group_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => registrationGroups.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    email: varchar("email", { length: 255 }),
+    role: registrationGroupMemberRoleEnum("role").notNull().default("member"),
+    status: registrationGroupMemberStatusEnum("status").notNull().default("pending"),
+    rosterMetadata: jsonb("roster_metadata").$type<Record<string, unknown>>(),
+    invitedByUserId: text("invited_by_user_id").references(() => user.id),
+    invitedAt: timestamp("invited_at"),
+    joinedAt: timestamp("joined_at"),
+  },
+  (table) => [
+    index("registration_group_members_group_idx").on(table.groupId),
+    index("registration_group_members_user_idx").on(table.userId),
+    uniqueIndex("registration_group_members_group_user_idx").on(
+      table.groupId,
+      table.userId,
+    ),
+    uniqueIndex("registration_group_members_group_email_idx").on(
+      table.groupId,
+      table.email,
+    ),
+  ],
+);
+
+export const registrationInvites = pgTable(
+  "registration_invites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => registrationGroups.id, { onDelete: "cascade" }),
+    email: varchar("email", { length: 255 }).notNull(),
+    tokenHash: varchar("token_hash", { length: 255 }).notNull(),
+    status: registrationInviteStatusEnum("status").notNull().default("pending"),
+    expiresAt: timestamp("expires_at"),
+    acceptedByUserId: text("accepted_by_user_id").references(() => user.id),
+    acceptedAt: timestamp("accepted_at"),
+  },
+  (table) => [
+    index("registration_invites_group_idx").on(table.groupId),
+    uniqueIndex("registration_invites_token_idx").on(table.tokenHash),
+  ],
+);
+
 /**
  * Event registrations table - tracks team/individual registrations for events
  */
@@ -136,6 +280,9 @@ export const eventRegistrations = pgTable("event_registrations", {
   eventId: uuid("event_id")
     .notNull()
     .references(() => events.id),
+  registrationGroupId: uuid("registration_group_id").references(
+    () => registrationGroups.id,
+  ),
   teamId: text("team_id").references(() => teams.id), // Null for individual registrations
   userId: text("user_id")
     .notNull()
@@ -166,6 +313,41 @@ export const eventRegistrations = pgTable("event_registrations", {
   confirmedAt: timestamp("confirmed_at"),
   cancelledAt: timestamp("cancelled_at"),
 });
+
+export const membershipPurchases = pgTable(
+  "membership_purchases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    membershipTypeId: varchar("membership_type_id", { length: 255 })
+      .notNull()
+      .references(() => membershipTypes.id),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    email: varchar("email", { length: 255 }),
+    eventId: uuid("event_id").references(() => events.id, { onDelete: "set null" }),
+    registrationGroupMemberId: uuid("registration_group_member_id").references(
+      () => registrationGroupMembers.id,
+      { onDelete: "set null" },
+    ),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    status: membershipPurchaseStatusEnum("status").notNull().default("active"),
+    paymentProvider: varchar("payment_provider", { length: 100 }),
+    paymentId: varchar("payment_id", { length: 255 }),
+    membershipId: varchar("membership_id", { length: 255 }).references(
+      () => memberships.id,
+    ),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  },
+  (table) => [
+    index("membership_purchases_type_idx").on(table.membershipTypeId),
+    index("membership_purchases_user_idx").on(table.userId),
+    index("membership_purchases_event_idx").on(table.eventId),
+    index("membership_purchases_membership_idx").on(table.membershipId),
+    index("membership_purchases_payment_idx").on(table.paymentId),
+  ],
+);
 
 export const eventPaymentSessions = pgTable(
   "event_payment_sessions",
@@ -206,6 +388,67 @@ export const eventPaymentSessions = pgTable(
   ],
 );
 
+export const checkoutSessions = pgTable(
+  "checkout_sessions",
+  {
+    id: varchar("id", { length: 255 })
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    provider: checkoutProviderEnum("provider").notNull().default("square"),
+    providerCheckoutId: varchar("provider_checkout_id", { length: 255 }).notNull(),
+    providerCheckoutUrl: varchar("provider_checkout_url", { length: 2048 }),
+    providerOrderId: varchar("provider_order_id", { length: 255 }),
+    providerPaymentId: varchar("provider_payment_id", { length: 255 }),
+    status: checkoutSessionStatusEnum("status").notNull().default("pending"),
+    amountTotalCents: integer("amount_total_cents").notNull(),
+    currency: varchar("currency", { length: 10 }).notNull().default("CAD"),
+    expiresAt: timestamp("expires_at"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  },
+  (table) => [
+    index("checkout_sessions_user_idx").on(table.userId),
+    index("checkout_sessions_status_idx").on(table.status),
+    index("checkout_sessions_payment_idx").on(table.providerPaymentId),
+    uniqueIndex("checkout_sessions_provider_checkout_idx").on(table.providerCheckoutId),
+  ],
+);
+
+export const checkoutItems = pgTable(
+  "checkout_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    checkoutSessionId: varchar("checkout_session_id", { length: 255 })
+      .notNull()
+      .references(() => checkoutSessions.id, { onDelete: "cascade" }),
+    itemType: checkoutItemTypeEnum("item_type").notNull(),
+    description: varchar("description", { length: 500 }),
+    quantity: integer("quantity").notNull().default(1),
+    amountCents: integer("amount_cents").notNull(),
+    currency: varchar("currency", { length: 10 }).notNull().default("CAD"),
+    eventRegistrationId: uuid("event_registration_id").references(
+      () => eventRegistrations.id,
+      { onDelete: "set null" },
+    ),
+    membershipPurchaseId: uuid("membership_purchase_id").references(
+      () => membershipPurchases.id,
+      { onDelete: "set null" },
+    ),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  },
+  (table) => [
+    index("checkout_items_session_idx").on(table.checkoutSessionId),
+    index("checkout_items_event_reg_idx").on(table.eventRegistrationId),
+    index("checkout_items_membership_idx").on(table.membershipPurchaseId),
+  ],
+);
+
 /**
  * Event announcements/updates
  */
@@ -237,9 +480,61 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     fields: [events.organizerId],
     references: [user.id],
   }),
+  registrationGroups: many(registrationGroups),
   registrations: many(eventRegistrations),
   paymentSessions: many(eventPaymentSessions),
   announcements: many(eventAnnouncements),
+}));
+
+export const registrationGroupsRelations = relations(
+  registrationGroups,
+  ({ one, many }) => ({
+    event: one(events, {
+      fields: [registrationGroups.eventId],
+      references: [events.id],
+    }),
+    captain: one(user, {
+      fields: [registrationGroups.captainUserId],
+      references: [user.id],
+    }),
+    team: one(teams, {
+      fields: [registrationGroups.teamId],
+      references: [teams.id],
+    }),
+    members: many(registrationGroupMembers),
+    invites: many(registrationInvites),
+    registrations: many(eventRegistrations),
+  }),
+);
+
+export const registrationGroupMembersRelations = relations(
+  registrationGroupMembers,
+  ({ one, many }) => ({
+    group: one(registrationGroups, {
+      fields: [registrationGroupMembers.groupId],
+      references: [registrationGroups.id],
+    }),
+    user: one(user, {
+      fields: [registrationGroupMembers.userId],
+      references: [user.id],
+    }),
+    invitedBy: one(user, {
+      fields: [registrationGroupMembers.invitedByUserId],
+      references: [user.id],
+    }),
+    membershipPurchases: many(membershipPurchases),
+  }),
+);
+
+export const registrationInvitesRelations = relations(registrationInvites, ({ one }) => ({
+  group: one(registrationGroups, {
+    fields: [registrationInvites.groupId],
+    references: [registrationGroups.id],
+  }),
+  acceptedBy: one(user, {
+    fields: [registrationInvites.acceptedByUserId],
+    references: [user.id],
+  }),
 }));
 
 export const eventRegistrationsRelations = relations(
@@ -248,6 +543,10 @@ export const eventRegistrationsRelations = relations(
     event: one(events, {
       fields: [eventRegistrations.eventId],
       references: [events.id],
+    }),
+    registrationGroup: one(registrationGroups, {
+      fields: [eventRegistrations.registrationGroupId],
+      references: [registrationGroups.id],
     }),
     team: one(teams, {
       fields: [eventRegistrations.teamId],
@@ -290,19 +589,93 @@ export const eventPaymentSessionsRelations = relations(
   }),
 );
 
+export const membershipPurchasesRelations = relations(membershipPurchases, ({ one }) => ({
+  membershipType: one(membershipTypes, {
+    fields: [membershipPurchases.membershipTypeId],
+    references: [membershipTypes.id],
+  }),
+  user: one(user, {
+    fields: [membershipPurchases.userId],
+    references: [user.id],
+  }),
+  event: one(events, {
+    fields: [membershipPurchases.eventId],
+    references: [events.id],
+  }),
+  registrationGroupMember: one(registrationGroupMembers, {
+    fields: [membershipPurchases.registrationGroupMemberId],
+    references: [registrationGroupMembers.id],
+  }),
+  membership: one(memberships, {
+    fields: [membershipPurchases.membershipId],
+    references: [memberships.id],
+  }),
+}));
+
+export const checkoutSessionsRelations = relations(checkoutSessions, ({ one, many }) => ({
+  user: one(user, {
+    fields: [checkoutSessions.userId],
+    references: [user.id],
+  }),
+  items: many(checkoutItems),
+}));
+
+export const checkoutItemsRelations = relations(checkoutItems, ({ one }) => ({
+  session: one(checkoutSessions, {
+    fields: [checkoutItems.checkoutSessionId],
+    references: [checkoutSessions.id],
+  }),
+  eventRegistration: one(eventRegistrations, {
+    fields: [checkoutItems.eventRegistrationId],
+    references: [eventRegistrations.id],
+  }),
+  membershipPurchase: one(membershipPurchases, {
+    fields: [checkoutItems.membershipPurchaseId],
+    references: [membershipPurchases.id],
+  }),
+}));
+
 // Zod schemas
 export const insertEventSchema = createInsertSchema(events);
 export const selectEventSchema = createSelectSchema(events);
+export const insertRegistrationGroupSchema = createInsertSchema(registrationGroups);
+export const selectRegistrationGroupSchema = createSelectSchema(registrationGroups);
+export const insertRegistrationGroupMemberSchema = createInsertSchema(
+  registrationGroupMembers,
+);
+export const selectRegistrationGroupMemberSchema = createSelectSchema(
+  registrationGroupMembers,
+);
+export const insertRegistrationInviteSchema = createInsertSchema(registrationInvites);
+export const selectRegistrationInviteSchema = createSelectSchema(registrationInvites);
 export const insertEventRegistrationSchema = createInsertSchema(eventRegistrations);
 export const selectEventRegistrationSchema = createSelectSchema(eventRegistrations);
+export const insertMembershipPurchaseSchema = createInsertSchema(membershipPurchases);
+export const selectMembershipPurchaseSchema = createSelectSchema(membershipPurchases);
 export const insertEventAnnouncementSchema = createInsertSchema(eventAnnouncements);
 export const selectEventAnnouncementSchema = createSelectSchema(eventAnnouncements);
 export const insertEventPaymentSessionSchema = createInsertSchema(eventPaymentSessions);
 export const selectEventPaymentSessionSchema = createSelectSchema(eventPaymentSessions);
+export const insertCheckoutSessionSchema = createInsertSchema(checkoutSessions);
+export const selectCheckoutSessionSchema = createSelectSchema(checkoutSessions);
+export const insertCheckoutItemSchema = createInsertSchema(checkoutItems);
+export const selectCheckoutItemSchema = createSelectSchema(checkoutItems);
 
 // Inferred types
 export type EventPaymentSession = typeof eventPaymentSessions.$inferSelect;
 export type NewEventPaymentSession = typeof eventPaymentSessions.$inferInsert;
+export type RegistrationGroup = typeof registrationGroups.$inferSelect;
+export type NewRegistrationGroup = typeof registrationGroups.$inferInsert;
+export type RegistrationGroupMember = typeof registrationGroupMembers.$inferSelect;
+export type NewRegistrationGroupMember = typeof registrationGroupMembers.$inferInsert;
+export type RegistrationInvite = typeof registrationInvites.$inferSelect;
+export type NewRegistrationInvite = typeof registrationInvites.$inferInsert;
+export type MembershipPurchase = typeof membershipPurchases.$inferSelect;
+export type NewMembershipPurchase = typeof membershipPurchases.$inferInsert;
+export type CheckoutSession = typeof checkoutSessions.$inferSelect;
+export type NewCheckoutSession = typeof checkoutSessions.$inferInsert;
+export type CheckoutItem = typeof checkoutItems.$inferSelect;
+export type NewCheckoutItem = typeof checkoutItems.$inferInsert;
 
 // Custom validation schemas
 export const baseCreateEventSchema = z.object({
@@ -325,6 +698,10 @@ export const baseCreateEventSchema = z.object({
   registrationType: z.enum(["team", "individual", "both"]),
   maxTeams: z.int().positive().optional(),
   maxParticipants: z.int().positive().optional(),
+  minPlayersPerPair: z.int().positive().optional(),
+  maxPlayersPerPair: z.int().positive().optional(),
+  minPlayersPerRelay: z.int().positive().optional(),
+  maxPlayersPerRelay: z.int().positive().optional(),
   teamRegistrationFee: z.int().min(0).optional(),
   individualRegistrationFee: z.int().min(0).optional(),
   contactEmail: z.email().optional(),
@@ -349,6 +726,30 @@ export const createEventInputSchema = baseCreateEventSchema.superRefine((values,
         message: "E-transfer recipient email is required when e-transfer is enabled",
       });
     }
+  }
+
+  if (
+    values.minPlayersPerPair !== undefined &&
+    values.maxPlayersPerPair !== undefined &&
+    values.minPlayersPerPair > values.maxPlayersPerPair
+  ) {
+    ctx.addIssue({
+      path: ["minPlayersPerPair"],
+      code: "custom",
+      message: "Minimum pair size cannot exceed the maximum",
+    });
+  }
+
+  if (
+    values.minPlayersPerRelay !== undefined &&
+    values.maxPlayersPerRelay !== undefined &&
+    values.minPlayersPerRelay > values.maxPlayersPerRelay
+  ) {
+    ctx.addIssue({
+      path: ["minPlayersPerRelay"],
+      code: "custom",
+      message: "Minimum relay size cannot exceed the maximum",
+    });
   }
 });
 

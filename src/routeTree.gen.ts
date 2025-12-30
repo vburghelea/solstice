@@ -41,6 +41,7 @@ import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/team
 import { Route as DashboardSinIndexRouteImport } from "./routes/dashboard/sin/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardAdminIndexRouteImport } from "./routes/dashboard/admin/index";
+import { Route as JoinRegistrationTokenRouteImport } from "./routes/join/registration/$token";
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
@@ -243,6 +244,11 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardAdminRouteRoute,
+} as any);
+const JoinRegistrationTokenRoute = JoinRegistrationTokenRouteImport.update({
+  id: "/join/registration/$token",
+  path: "/join/registration/$token",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -522,6 +528,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/join/registration/$token": typeof JoinRegistrationTokenRoute;
   "/dashboard/admin/": typeof DashboardAdminIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/sin/": typeof DashboardSinIndexRoute;
@@ -589,6 +596,7 @@ export interface FileRoutesByTo {
   "/dashboard/sin/templates": typeof DashboardSinTemplatesRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/join/registration/$token": typeof JoinRegistrationTokenRoute;
   "/dashboard/admin": typeof DashboardAdminIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/sin": typeof DashboardSinIndexRoute;
@@ -666,6 +674,7 @@ export interface FileRoutesById {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/join/registration/$token": typeof JoinRegistrationTokenRoute;
   "/dashboard/admin/": typeof DashboardAdminIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/sin/": typeof DashboardSinIndexRoute;
@@ -744,6 +753,7 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/join/registration/$token"
     | "/dashboard/admin/"
     | "/dashboard/events/"
     | "/dashboard/sin/"
@@ -811,6 +821,7 @@ export interface FileRouteTypes {
     | "/dashboard/sin/templates"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/join/registration/$token"
     | "/dashboard/admin"
     | "/dashboard/events"
     | "/dashboard/sin"
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/join/registration/$token"
     | "/dashboard/admin/"
     | "/dashboard/events/"
     | "/dashboard/sin/"
@@ -930,6 +942,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute;
   ApiTestCleanupRoute: typeof ApiTestCleanupRoute;
   ApiWebhooksSquareRoute: typeof ApiWebhooksSquareRoute;
+  JoinRegistrationTokenRoute: typeof JoinRegistrationTokenRoute;
   ApiAuthActionProviderRoute: typeof ApiAuthActionProviderRoute;
   ApiPaymentsSquareCallbackRoute: typeof ApiPaymentsSquareCallbackRoute;
 }
@@ -1159,6 +1172,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/admin/";
       preLoaderRoute: typeof DashboardAdminIndexRouteImport;
       parentRoute: typeof DashboardAdminRouteRoute;
+    };
+    "/join/registration/$token": {
+      id: "/join/registration/$token";
+      path: "/join/registration/$token";
+      fullPath: "/join/registration/$token";
+      preLoaderRoute: typeof JoinRegistrationTokenRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -1696,6 +1716,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTestCleanupRoute: ApiTestCleanupRoute,
   ApiWebhooksSquareRoute: ApiWebhooksSquareRoute,
+  JoinRegistrationTokenRoute: JoinRegistrationTokenRoute,
   ApiAuthActionProviderRoute: ApiAuthActionProviderRoute,
   ApiPaymentsSquareCallbackRoute: ApiPaymentsSquareCallbackRoute,
 };

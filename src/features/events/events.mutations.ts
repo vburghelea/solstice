@@ -1,11 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
-import type { EventRegistration } from "~/db/schema";
+import type { EventRegistration, NewCheckoutItem } from "~/db/schema";
 import {
-  eventPaymentSessions,
+  checkoutItems,
+  checkoutSessions,
   eventRegistrations,
   events,
+  membershipPurchases,
+  membershipTypes,
+  registrationGroupMembers,
+  registrationGroups,
+  registrationInvites,
   teamMembers,
+  user as userTable,
 } from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
@@ -29,6 +36,13 @@ import type {
   EventRegistrationWithDetails,
   EventWithDetails,
 } from "./events.types";
+import type { RegistrationGroupMemberRole } from "./registration-groups.types";
+import {
+  generateRegistrationInviteToken,
+  hashRegistrationInviteToken,
+  normalizeInviteEmail,
+  resolveInviteExpiry,
+} from "./registration-groups.utils";
 import type { EventRegistrationWithRoster } from "./utils";
 import {
   appendCancellationNote,
@@ -51,7 +65,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
   .inputValidator(zod$(cancelEntireEventSchema))
   .handler(
     async ({ data, context }): Promise<EventOperationResult<CancelEventResult>> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       const clock = getClockFromContext(context);
       const now = currentTimestamp(clock);
       const nowIso = isoTimestamp(clock);
@@ -115,19 +129,37 @@ export const cancelEvent = createServerFn({ method: "POST" })
           .from(eventRegistrations)
           .where(eq(eventRegistrations.eventId, data.eventId));
 
-        const paymentSessions = await db
-          .select()
-          .from(eventPaymentSessions)
-          .where(eq(eventPaymentSessions.eventId, data.eventId));
+        const registrationIds = registrations.map((registration) => registration.id);
+        const checkoutItemsWithSessions =
+          registrationIds.length > 0
+            ? await db
+                .select({
+                  item: checkoutItems,
+                  session: checkoutSessions,
+                })
+                .from(checkoutItems)
+                .innerJoin(
+                  checkoutSessions,
+                  eq(checkoutItems.checkoutSessionId, checkoutSessions.id),
+                )
+                .where(inArray(checkoutItems.eventRegistrationId, registrationIds))
+            : [];
 
         const latestSessionByRegistration = new Map<
           string,
-          (typeof paymentSessions)[number]
+          {
+            item: (typeof checkoutItemsWithSessions)[number]["item"];
+            session: (typeof checkoutItemsWithSessions)[number]["session"];
+          }
         >();
-        for (const session of paymentSessions) {
-          const current = latestSessionByRegistration.get(session.registrationId);
-          if (!current || (session.createdAt ?? now) > (current.createdAt ?? now)) {
-            latestSessionByRegistration.set(session.registrationId, session);
+        for (const row of checkoutItemsWithSessions) {
+          if (!row.item.eventRegistrationId) continue;
+          const current = latestSessionByRegistration.get(row.item.eventRegistrationId);
+          if (
+            !current ||
+            (row.session.createdAt ?? now) > (current.session.createdAt ?? now)
+          ) {
+            latestSessionByRegistration.set(row.item.eventRegistrationId, row);
           }
         }
 
@@ -181,7 +213,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
 
           let finalPaymentStatus = registration.paymentStatus;
           let sessionUpdated = false;
-          const session = latestSessionByRegistration.get(registration.id);
+          const checkoutEntry = latestSessionByRegistration.get(registration.id);
           const amountPaid = registration.amountPaidCents ?? 0;
           const amountDue = registration.amountDueCents ?? 0;
           const amountToRefund = amountPaid > 0 ? amountPaid : amountDue;
@@ -193,21 +225,21 @@ export const cancelEvent = createServerFn({ method: "POST" })
               finalPaymentStatus = "refund_required";
               result.affected.etransferMarkedForRefund += 1;
             } else {
-              let paymentId = session?.squarePaymentId ?? null;
+              let paymentId = checkoutEntry?.session.providerPaymentId ?? null;
 
-              if (!paymentId && session?.squareCheckoutId) {
+              if (!paymentId && checkoutEntry?.session.providerCheckoutId) {
                 const verification = await squareService.verifyPayment(
-                  session.squareCheckoutId,
+                  checkoutEntry.session.providerCheckoutId,
                 );
                 if (verification.success && verification.paymentId) {
                   paymentId = verification.paymentId;
                   await db
-                    .update(eventPaymentSessions)
+                    .update(checkoutSessions)
                     .set({
-                      squarePaymentId: paymentId,
+                      providerPaymentId: paymentId,
                       updatedAt: now,
                     })
-                    .where(eq(eventPaymentSessions.id, session.id));
+                    .where(eq(checkoutSessions.id, checkoutEntry.session.id));
                 }
               }
 
@@ -231,19 +263,19 @@ export const cancelEvent = createServerFn({ method: "POST" })
                   if (refund.success) {
                     finalPaymentStatus = "refunded";
                     result.affected.squareRefunded += 1;
-                    if (session) {
+                    if (checkoutEntry) {
                       await db
-                        .update(eventPaymentSessions)
+                        .update(checkoutSessions)
                         .set({
                           status: "refunded",
-                          metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
+                          metadata: atomicJsonbMerge(checkoutSessions.metadata, {
                             refundedAt: nowIso,
                             refundId: refund.refundId ?? null,
                             cancelledBy: user.id,
                           }),
                           updatedAt: now,
                         })
-                        .where(eq(eventPaymentSessions.id, session.id));
+                        .where(eq(checkoutSessions.id, checkoutEntry.session.id));
                       sessionUpdated = true;
                     }
                   } else {
@@ -288,18 +320,18 @@ export const cancelEvent = createServerFn({ method: "POST" })
             .set(update)
             .where(eq(eventRegistrations.id, registration.id));
 
-          if (session && !sessionUpdated) {
+          if (checkoutEntry && !sessionUpdated) {
             await db
-              .update(eventPaymentSessions)
+              .update(checkoutSessions)
               .set({
                 status: "cancelled",
-                metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
+                metadata: atomicJsonbMerge(checkoutSessions.metadata, {
                   cancelledAt: nowIso,
                   cancelledBy: user.id,
                 }),
                 updatedAt: now,
               })
-              .where(eq(eventPaymentSessions.id, session.id));
+              .where(eq(checkoutSessions.id, checkoutEntry.session.id));
           }
 
           result.affected.cancelled += 1;
@@ -345,7 +377,7 @@ export const createEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(createEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -437,7 +469,7 @@ export const updateEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(zod$(updateEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -567,7 +599,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationResultPayload>> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -646,9 +678,12 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        const registrationType: EventRegistration["registrationType"] = data.teamId
-          ? "team"
-          : "individual";
+        const requestedGroupType =
+          data.groupType ?? (data.teamId ? "team" : "individual");
+        const registrationType: EventRegistration["registrationType"] =
+          requestedGroupType === "team" || requestedGroupType === "relay"
+            ? "team"
+            : "individual";
 
         if (event.registrationType === "team" && registrationType !== "team") {
           return {
@@ -675,6 +710,115 @@ export const registerForEvent = createServerFn({ method: "POST" })
               },
             ],
           };
+        }
+
+        if (registrationType === "team" && !data.teamId) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "A team selection is required for team registrations",
+              },
+            ],
+          };
+        }
+
+        if (requestedGroupType === "individual" && data.invites?.length) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Invites are not supported for individual registrations",
+              },
+            ],
+          };
+        }
+
+        const { resolveMembershipEligibility } =
+          await import("~/features/membership/membership.eligibility");
+        const eligibility = await resolveMembershipEligibility({
+          db,
+          userId: user.id,
+          eventId: event.id,
+          asOf: now,
+        });
+
+        const needsMembership =
+          event.requireMembership &&
+          !eligibility.hasActiveMembership &&
+          !eligibility.hasActiveDayPass;
+        const wantsMembershipPurchase = Boolean(data.membershipTypeId);
+
+        if (needsMembership && paymentMethod === "etransfer") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "Membership is required and must be paid by card",
+              },
+            ],
+          };
+        }
+
+        if (needsMembership && !wantsMembershipPurchase) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "MEMBERSHIP_REQUIRED",
+                message: "Membership is required to register for this event",
+              },
+            ],
+          };
+        }
+
+        if (
+          (needsMembership || wantsMembershipPurchase) &&
+          eligibility.hasActiveMembership
+        ) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "You already have an active membership",
+              },
+            ],
+          };
+        }
+
+        let membershipType: typeof membershipTypes.$inferSelect | null = null;
+        let membershipFeeCents = 0;
+
+        if (needsMembership || wantsMembershipPurchase) {
+          const [resolvedMembershipType] = await db
+            .select()
+            .from(membershipTypes)
+            .where(
+              and(
+                eq(membershipTypes.id, data.membershipTypeId ?? ""),
+                eq(membershipTypes.status, "active"),
+              ),
+            )
+            .limit(1);
+
+          if (!resolvedMembershipType) {
+            return {
+              success: false,
+              errors: [
+                {
+                  code: "NOT_FOUND",
+                  message: "Membership type not found or inactive",
+                },
+              ],
+            };
+          }
+
+          membershipType = resolvedMembershipType;
+          membershipFeeCents = membershipType.priceCents;
         }
 
         // Check for existing registration with any active status (pending, confirmed, waitlisted)
@@ -799,12 +943,13 @@ export const registerForEvent = createServerFn({ method: "POST" })
           registrationType,
           now,
         );
+        const totalAmountCents = amountDueCents + membershipFeeCents;
 
         let paymentStatus: EventRegistration["paymentStatus"] = "pending";
         let amountPaidCents: number | null = null;
         let paymentCompletedAt: Date | null = null;
 
-        if (amountDueCents === 0) {
+        if (totalAmountCents === 0) {
           paymentStatus = "paid";
           amountPaidCents = 0;
           paymentCompletedAt = now;
@@ -820,87 +965,344 @@ export const registerForEvent = createServerFn({ method: "POST" })
               )
             : null;
 
-        const [registration] = await db
-          .insert(eventRegistrations)
-          .values({
-            eventId: data.eventId,
+        const toDateString = (value: Date | string) =>
+          value instanceof Date
+            ? value.toISOString().split("T")[0]
+            : new Date(value).toISOString().split("T")[0];
+
+        const registrationStatus = totalAmountCents === 0 ? "confirmed" : "pending";
+        const memberStatus = registrationStatus === "confirmed" ? "active" : "pending";
+        const groupStatus = registrationStatus === "confirmed" ? "confirmed" : "pending";
+
+        const groupMinSize =
+          requestedGroupType === "pair"
+            ? (event.minPlayersPerPair ?? 2)
+            : requestedGroupType === "relay"
+              ? (event.minPlayersPerRelay ?? event.minPlayersPerTeam ?? null)
+              : registrationType === "team"
+                ? (event.minPlayersPerTeam ?? null)
+                : null;
+        const groupMaxSize =
+          requestedGroupType === "pair"
+            ? (event.maxPlayersPerPair ?? 2)
+            : requestedGroupType === "relay"
+              ? (event.maxPlayersPerRelay ?? event.maxPlayersPerTeam ?? null)
+              : registrationType === "team"
+                ? (event.maxPlayersPerTeam ?? null)
+                : null;
+
+        const rawInvites =
+          requestedGroupType === "individual" ? [] : (data.invites ?? []);
+        const normalizedInvites = rawInvites
+          .map((invite) => ({
+            email: normalizeInviteEmail(invite.email),
+            role: invite.role ?? "member",
+          }))
+          .filter((invite) => invite.email.length > 0);
+
+        const inviteMap = new Map<string, RegistrationGroupMemberRole>();
+        for (const invite of normalizedInvites) {
+          if (invite.email === normalizeInviteEmail(user.email ?? "")) {
+            continue;
+          }
+          inviteMap.set(invite.email, invite.role);
+        }
+
+        const inviteList = Array.from(inviteMap.entries()).map(([email, role]) => ({
+          email,
+          role,
+        }));
+
+        if (groupMaxSize && 1 + inviteList.length > groupMaxSize) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "This registration group exceeds the maximum size",
+              },
+            ],
+          };
+        }
+
+        if (groupMinSize && 1 + inviteList.length < groupMinSize) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: `This registration group requires at least ${groupMinSize} members`,
+              },
+            ],
+          };
+        }
+
+        const inviteEmails = inviteList.map((invite) => invite.email);
+        const existingUsers =
+          inviteEmails.length > 0
+            ? await db
+                .select({
+                  id: userTable.id,
+                  email: userTable.email,
+                  name: userTable.name,
+                })
+                .from(userTable)
+                .where(inArray(userTable.email, inviteEmails))
+            : [];
+        const userByEmail = new Map(
+          existingUsers
+            .filter((record) => Boolean(record.email))
+            .map((record) => [
+              record.email as string,
+              {
+                id: record.id,
+                email: record.email ?? null,
+                name: record.name ?? null,
+              },
+            ]),
+        );
+
+        type RegistrationInvitePayload = {
+          email: string;
+          role: RegistrationGroupMemberRole;
+          token: string;
+          tokenHash: string;
+          expiresAt: Date;
+          user?: { id: string; email: string | null; name: string | null };
+        };
+
+        const invitePayloads: RegistrationInvitePayload[] =
+          inviteList.length > 0
+            ? await Promise.all(
+                inviteList.map(async (invite) => {
+                  const token = await generateRegistrationInviteToken();
+                  const tokenHash = await hashRegistrationInviteToken(token);
+                  const matchedUser = userByEmail.get(invite.email);
+                  return {
+                    email: invite.email,
+                    role: invite.role,
+                    token,
+                    tokenHash,
+                    expiresAt: resolveInviteExpiry(),
+                    ...(matchedUser ? { user: matchedUser } : {}),
+                  };
+                }),
+              )
+            : [];
+
+        const result = await db.transaction(async (tx) => {
+          const [group] = await tx
+            .insert(registrationGroups)
+            .values({
+              eventId: event.id,
+              groupType: requestedGroupType,
+              status: groupStatus,
+              captainUserId: user.id,
+              teamId: data.teamId ?? null,
+              minSize: groupMinSize,
+              maxSize: groupMaxSize,
+            })
+            .returning();
+
+          await tx.insert(registrationGroupMembers).values({
+            groupId: group.id,
             userId: user.id,
-            teamId: data.teamId,
-            registrationType,
-            division: data.division,
-            notes: data.notes,
-            // Store directly as JSONB - Drizzle handles serialization
-            // Normalize to object format if array is passed
-            roster: data.roster
-              ? Array.isArray(data.roster)
-                ? { players: data.roster }
-                : data.roster
-              : null,
-            status: amountDueCents === 0 ? "confirmed" : "pending",
-            paymentStatus,
-            paymentMethod,
-            paymentId: null,
-            amountDueCents,
-            amountPaidCents,
-            paymentCompletedAt,
-            paymentMetadata,
-          })
-          .returning();
+            email: user.email ?? null,
+            role: "captain",
+            status: memberStatus,
+            invitedByUserId: user.id,
+            invitedAt: now,
+            joinedAt: memberStatus === "active" ? now : null,
+          });
+
+          if (invitePayloads.length > 0) {
+            await tx.insert(registrationGroupMembers).values(
+              invitePayloads.map((invite) => ({
+                groupId: group.id,
+                userId: invite.user?.id ?? null,
+                email: invite.email,
+                role: invite.role,
+                status: "invited" as const,
+                invitedByUserId: user.id,
+                invitedAt: now,
+              })),
+            );
+
+            await tx.insert(registrationInvites).values(
+              invitePayloads.map((invite) => ({
+                groupId: group.id,
+                email: invite.email,
+                tokenHash: invite.tokenHash,
+                status: "pending" as const,
+                expiresAt: invite.expiresAt,
+              })),
+            );
+          }
+
+          const [registration] = await tx
+            .insert(eventRegistrations)
+            .values({
+              eventId: data.eventId,
+              registrationGroupId: group.id,
+              userId: user.id,
+              teamId: data.teamId,
+              registrationType,
+              division: data.division,
+              notes: data.notes,
+              // Store directly as JSONB - Drizzle handles serialization
+              // Normalize to object format if array is passed
+              roster: data.roster
+                ? Array.isArray(data.roster)
+                  ? { players: data.roster }
+                  : data.roster
+                : null,
+              status: registrationStatus,
+              paymentStatus,
+              paymentMethod,
+              paymentId: null,
+              amountDueCents,
+              amountPaidCents,
+              paymentCompletedAt,
+              paymentMetadata,
+            })
+            .returning();
+
+          let membershipPurchase: typeof membershipPurchases.$inferSelect | null = null;
+
+          if (membershipType) {
+            const isDayPass = membershipType.durationMonths === 0;
+            const startDate = isDayPass ? event.startDate : now;
+            const endDate = isDayPass
+              ? event.endDate
+              : (() => {
+                  const end = new Date(now);
+                  end.setMonth(end.getMonth() + membershipType.durationMonths);
+                  return end;
+                })();
+
+            const [purchase] = await tx
+              .insert(membershipPurchases)
+              .values({
+                membershipTypeId: membershipType.id,
+                userId: user.id,
+                eventId: isDayPass ? event.id : null,
+                startDate: toDateString(startDate),
+                endDate: toDateString(endDate),
+                status: "pending",
+                metadata: {
+                  source: "event_registration",
+                  eventId: event.id,
+                  registrationId: registration.id,
+                  registrationGroupId: group.id,
+                },
+              })
+              .returning();
+
+            membershipPurchase = purchase;
+          }
+
+          return {
+            registration,
+            group,
+            membershipPurchase,
+          };
+        });
+
+        const { registration, membershipPurchase } = result;
+
+        if (invitePayloads.length > 0) {
+          const { sendRegistrationGroupInviteEmail } =
+            await import("~/lib/email/sendgrid");
+          for (const invite of invitePayloads) {
+            try {
+              await sendRegistrationGroupInviteEmail({
+                to: {
+                  email: invite.email,
+                  name: invite.user?.name ?? undefined,
+                },
+                eventId: event.id,
+                eventName: event.name,
+                groupType: requestedGroupType,
+                inviteToken: invite.token,
+                invitedByName: user.name ?? undefined,
+                invitedByEmail: user.email ?? undefined,
+              });
+            } catch (error) {
+              console.error("Failed to send registration group invite email", error);
+            }
+          }
+        }
 
         let paymentResponse: EventRegistrationResultPayload["payment"];
 
-        if (paymentMethod === "square" && amountDueCents > 0) {
+        if (paymentMethod === "square" && totalAmountCents > 0) {
           const squareService = await getSquarePaymentService();
           const checkoutSession = await squareService.createEventCheckoutSession({
             eventId: event.id,
             registrationId: registration.id,
             userId: user.id,
-            amount: amountDueCents,
+            amount: totalAmountCents,
             eventName: event.name,
           });
 
-          await db
-            .insert(eventPaymentSessions)
+          const [session] = await db
+            .insert(checkoutSessions)
             .values({
-              registrationId: registration.id,
-              eventId: event.id,
               userId: user.id,
-              squareCheckoutId: checkoutSession.id,
-              squarePaymentLinkUrl: checkoutSession.checkoutUrl,
-              squareOrderId: checkoutSession.orderId ?? null,
-              amountCents: amountDueCents,
+              provider: "square",
+              providerCheckoutId: checkoutSession.id,
+              providerCheckoutUrl: checkoutSession.checkoutUrl,
+              providerOrderId: checkoutSession.orderId ?? null,
+              amountTotalCents: totalAmountCents,
               currency: checkoutSession.currency,
+              expiresAt: checkoutSession.expiresAt ?? null,
               metadata: {
-                eventName: event.name,
+                eventId: event.id,
+                registrationId: registration.id,
                 registrationType,
-                paymentMethod,
               },
             })
-            .onConflictDoUpdate({
-              target: eventPaymentSessions.squareCheckoutId,
-              set: {
-                registrationId: registration.id,
+            .returning();
+
+          const checkoutItemRows: NewCheckoutItem[] = [
+            {
+              checkoutSessionId: session.id,
+              itemType: "event_registration",
+              description: `Event registration: ${event.name}`,
+              quantity: 1,
+              amountCents: amountDueCents,
+              currency: checkoutSession.currency,
+              eventRegistrationId: registration.id,
+              metadata: {
+                registrationType,
+              },
+            },
+          ];
+
+          if (membershipPurchase) {
+            checkoutItemRows.push({
+              checkoutSessionId: session.id,
+              itemType: "membership_purchase",
+              description: `Membership: ${membershipType?.name ?? "Membership"}`,
+              quantity: 1,
+              amountCents: membershipFeeCents,
+              currency: checkoutSession.currency,
+              membershipPurchaseId: membershipPurchase.id,
+              metadata: {
                 eventId: event.id,
-                userId: user.id,
-                squarePaymentLinkUrl: checkoutSession.checkoutUrl,
-                squareOrderId: checkoutSession.orderId ?? null,
-                amountCents: amountDueCents,
-                currency: checkoutSession.currency,
-                metadata: {
-                  eventName: event.name,
-                  registrationType,
-                  paymentMethod,
-                },
-                updatedAt: currentTimestamp(clock),
+                registrationId: registration.id,
               },
             });
+          }
+
+          await db.insert(checkoutItems).values(checkoutItemRows);
 
           paymentResponse = {
             method: "square",
             checkoutUrl: checkoutSession.checkoutUrl,
             sessionId: checkoutSession.id,
           };
-        } else if (amountDueCents === 0) {
+        } else if (totalAmountCents === 0) {
           paymentResponse = { method: "free" };
         } else {
           paymentResponse = {
@@ -952,7 +1354,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -1065,7 +1467,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
@@ -1176,7 +1578,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 

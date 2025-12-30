@@ -30,7 +30,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
   .inputValidator(zod$(getAllMembershipsSchema))
   .handler(
     async ({ data }): Promise<MembershipOperationResult<MembershipReportRow[]>> => {
-      await assertFeatureEnabled("qc_membership");
+      await assertFeatureEnabled("membership");
       try {
         // Import server-only modules inside the handler
         const [{ getDb }, { getAuth }] = await Promise.all([

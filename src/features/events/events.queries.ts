@@ -57,7 +57,7 @@ export type EventRegistrationSummary = {
 export const listEvents = createServerFn({ method: "GET" })
   .inputValidator(zod$(listEventsSchema))
   .handler(async ({ data }): Promise<EventListResult> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
@@ -206,7 +206,7 @@ export const listEvents = createServerFn({ method: "GET" })
 export const getEvent = createServerFn({ method: "GET" })
   .inputValidator(zod$(getEventSchema))
   .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     try {
       if (!data.id && !data.slug) {
         return {
@@ -315,7 +315,7 @@ export const getEvent = createServerFn({ method: "GET" })
 export const getUpcomingEvents = createServerFn({ method: "GET" })
   .inputValidator(zod$(getUpcomingEventsSchema))
   .handler(async ({ data }): Promise<EventWithDetails[]> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     const limit = Math.min(10, data.limit || 3);
 
     const result = (await listEvents({
@@ -341,7 +341,7 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
   .middleware(getAuthMiddleware())
   .inputValidator(z.object({ eventId: z.uuid() }).parse)
   .handler(async ({ data, context }): Promise<EventRegistrationSummary[]> => {
-    await assertFeatureEnabled("qc_events");
+    await assertFeatureEnabled("events");
     const authUser = requireUser(context);
     const { getDb } = await import("~/db/server-helpers");
     const { isAdmin } = await import("~/lib/auth/utils/admin-check");
@@ -412,7 +412,7 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
       isRegistered: boolean;
       registration?: EventRegistrationWithRoster;
     }> => {
-      await assertFeatureEnabled("qc_events");
+      await assertFeatureEnabled("events");
       // Get user from session - not from client input
       const { getRequest } = await import("@tanstack/react-start/server");
       const { getAuth } = await import("~/lib/auth/server-helpers");

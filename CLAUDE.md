@@ -243,7 +243,7 @@ PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "SELECT column_nam
 
 #### Database Seeding
 
-There are two seed scripts with different purposes:
+There are three seed/reset scripts with different purposes:
 
 1. **`scripts/seed-global-admins.ts`** - Creates roles and assigns admin access
    - Tenant-aware (creates viaSport Admin for sin-_, Quadball Canada Admin for qc-_)
@@ -261,13 +261,32 @@ There are two seed scripts with different purposes:
    ```
 
 2. **`scripts/seed-e2e-data.ts`** - Creates E2E test data (QC-specific)
-   - **DELETES ALL EXISTING DATA** - only use for E2E test environments
+   - Resets QC domain data but keeps fixed test users intact
    - Creates QC-specific: test users, teams, events, memberships
    - Use for `qc-dev` E2E testing, NOT for `sin-dev` (viaSport)
 
    ```bash
    # For QC E2E testing only (requires tunnel or SST dev running)
    npx tsx scripts/seed-e2e-data.ts
+   ```
+
+3. **`scripts/seed-sin-data.ts`** - Creates SIN (viaSport) test data
+   - Resets SIN domain data while preserving fixed test users + audit logs
+   - Uses stable IDs so it can be re-run without breaking log references
+   - Use for `sin-dev` local testing (requires tunnel or SST dev running)
+
+   ```bash
+   # For sin-dev only (uses DATABASE_URL via SST shell or --force)
+   npx tsx scripts/seed-sin-data.ts --force
+   ```
+
+4. **`scripts/hard-reset-dev.ts`** - Hard reset for dev databases
+   - **Truncates all tables including audit logs** (guarded)
+   - Requires `SIN_ALLOW_DEV_RESET=true`
+   - Use only when a clean slate is unavoidable
+
+   ```bash
+   SIN_ALLOW_DEV_RESET=true npx tsx scripts/hard-reset-dev.ts
    ```
 
 #### Running drizzle-kit via SST Dev Mode

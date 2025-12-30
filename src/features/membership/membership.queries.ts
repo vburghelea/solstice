@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
-import { getMembershipTypeSchema } from "./membership.schemas";
+import {
+  getMembershipTypeSchema,
+  membershipEligibilitySchema,
+} from "./membership.schemas";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -15,7 +19,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
   async (): Promise<
     MembershipOperationResult<import("./membership.types").MembershipType[]>
   > => {
-    await assertFeatureEnabled("qc_membership");
+    await assertFeatureEnabled("membership");
     try {
       // Import server-only modules inside the handler
       const { getDb } = await import("~/db/server-helpers");
@@ -62,7 +66,7 @@ export const getMembershipType = createServerFn({ method: "GET" })
     }): Promise<
       MembershipOperationResult<import("./membership.types").MembershipType>
     > => {
-      await assertFeatureEnabled("qc_membership");
+      await assertFeatureEnabled("membership");
       try {
         // Import server-only modules inside the handler
         const { getDb } = await import("~/db/server-helpers");
@@ -115,7 +119,7 @@ export const getMembershipType = createServerFn({ method: "GET" })
  */
 export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<MembershipOperationResult<MembershipStatus>> => {
-    await assertFeatureEnabled("qc_membership");
+    await assertFeatureEnabled("membership");
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -206,3 +210,52 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
     }
   },
 );
+
+/**
+ * Check if the current user is eligible for membership requirements on an event.
+ */
+export const checkMembershipEligibility = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(membershipEligibilitySchema.parse)
+  .handler(async ({ data, context }) => {
+    await assertFeatureEnabled("membership");
+    const user = requireUser(context);
+
+    const [{ resolveMembershipEligibility, evaluateMembershipEligibility }, { getDb }] =
+      await Promise.all([
+        import("./membership.eligibility"),
+        import("~/db/server-helpers"),
+      ]);
+    const { events } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+    const { notFound } = await import("~/lib/server/errors");
+
+    const db = await getDb();
+
+    let requiresMembership = true;
+
+    if (data?.eventId) {
+      const [event] = await db
+        .select({ requireMembership: events.requireMembership })
+        .from(events)
+        .where(eq(events.id, data.eventId))
+        .limit(1);
+
+      if (!event) {
+        throw notFound("Event not found");
+      }
+
+      requiresMembership = event.requireMembership;
+    }
+
+    const eligibility = await resolveMembershipEligibility({
+      db,
+      userId: user.id,
+      ...(data?.eventId ? { eventId: data.eventId } : {}),
+    });
+
+    return evaluateMembershipEligibility({
+      requiresMembership,
+      ...eligibility,
+    });
+  });

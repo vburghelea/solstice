@@ -61,11 +61,13 @@ import type {
   EventWithDetails,
   UpdateEventInput,
 } from "~/features/events/events.types";
+import { listRegistrationGroupsForEvent } from "~/features/events/registration-groups.queries";
+import type { RegistrationGroupRoster } from "~/features/events/registration-groups.types";
 import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
-type ManagementTab = "overview" | "registrations" | "settings";
+type ManagementTab = "overview" | "registrations" | "groups" | "settings";
 
 const currencyFormatter = new Intl.NumberFormat("en-CA", {
   style: "currency",
@@ -114,6 +116,15 @@ function EventManagementPage() {
   } = useQuery<EventRegistrationSummary[], Error>({
     queryKey: ["event-registrations", eventId],
     queryFn: () => getEventRegistrations({ data: { eventId } }),
+    enabled: !!eventId,
+  });
+
+  const { data: groupRosters, isLoading: groupsLoading } = useQuery<
+    RegistrationGroupRoster[],
+    Error
+  >({
+    queryKey: ["event-registration-groups", eventId],
+    queryFn: () => listRegistrationGroupsForEvent({ data: { eventId } }),
     enabled: !!eventId,
   });
 
@@ -247,6 +258,22 @@ function EventManagementPage() {
     0,
   );
 
+  const groupSummary =
+    groupRosters?.map((entry, index) => ({
+      id: entry.group.id,
+      label: `Group ${index + 1}`,
+      type: entry.group.groupType,
+      status: entry.group.status,
+      paymentStatus: entry.registration?.paymentStatus ?? "pending",
+      registrationStatus: entry.registration?.status ?? "pending",
+      members: entry.members.map((member) => ({
+        name: member.userName ?? member.email ?? "Unknown member",
+        email: member.email ?? "N/A",
+        role: member.role,
+        status: member.status,
+      })),
+    })) ?? [];
+
   const handleStatusChange = (newStatus: EventStatus) => {
     updateMutation.mutate({ status: newStatus });
   };
@@ -300,6 +327,71 @@ function EventManagementPage() {
     toast.success("Registrations exported successfully");
   };
 
+  const handleExportGroupRoster = () => {
+    if (!groupRosters || groupRosters.length === 0) {
+      toast.error("No registration groups to export");
+      return;
+    }
+
+    const headers = [
+      "Group ID",
+      "Group Type",
+      "Group Status",
+      "Registration Status",
+      "Payment Status",
+      "Member Name",
+      "Member Email",
+      "Member Role",
+      "Member Status",
+    ];
+
+    const rows = groupRosters.flatMap((group) =>
+      group.members.length > 0
+        ? group.members.map((member) => [
+            group.group.id,
+            group.group.groupType,
+            group.group.status,
+            group.registration?.status ?? "pending",
+            group.registration?.paymentStatus ?? "pending",
+            member.userName ?? "",
+            member.email ?? "",
+            member.role ?? "",
+            member.status ?? "",
+          ])
+        : [
+            [
+              group.group.id,
+              group.group.groupType,
+              group.group.status,
+              group.registration?.status ?? "pending",
+              group.registration?.paymentStatus ?? "pending",
+              "",
+              "",
+              "",
+              "",
+            ],
+          ],
+    );
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${event.slug}-registration-groups-${format(
+      new Date(),
+      "yyyy-MM-dd",
+    )}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    toast.success("Registration groups exported successfully");
+  };
+
   return (
     <div className="container mx-auto space-y-6 p-6">
       {/* Header */}
@@ -336,6 +428,14 @@ function EventManagementPage() {
             {registrations && registrations.length > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {registrations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="groups">
+            Groups
+            {groupSummary.length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {groupSummary.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -690,6 +790,95 @@ function EventManagementPage() {
                 <div className="py-8 text-center">
                   <UsersIcon className="text-muted-foreground mx-auto h-12 w-12" />
                   <p className="text-muted-foreground mt-2">No registrations yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Groups Tab */}
+        <TabsContent value="groups" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Registration Groups</CardTitle>
+                <CardDescription>
+                  Group members and invite status for this event
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={handleExportGroupRoster}>
+                <DownloadIcon className="mr-2 h-4 w-4" />
+                Export groups
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {groupsLoading ? (
+                <div className="space-y-2">
+                  {["group-0", "group-1", "group-2"].map((rowKey) => (
+                    <Skeleton key={rowKey} className="h-12 w-full" />
+                  ))}
+                </div>
+              ) : groupSummary.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Group</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Payment</TableHead>
+                      <TableHead>Members</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {groupSummary.map((group) => {
+                      const statusBadge = getRegistrationStatusBadge(group.status);
+                      return (
+                        <TableRow key={group.id}>
+                          <TableCell className="font-medium">{group.label}</TableCell>
+                          <TableCell className="capitalize">{group.type}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={statusBadge.variant}
+                              className={cn("capitalize", statusBadge.className)}
+                            >
+                              {group.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {group.paymentStatus}
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1 text-sm">
+                              {group.members.map((member) => (
+                                <div key={`${group.id}-${member.email}`}>
+                                  <div className="flex items-center gap-2">
+                                    <span>{member.name}</span>
+                                    <Badge variant="secondary" className="capitalize">
+                                      {member.status}
+                                    </Badge>
+                                  </div>
+                                  <div className="text-muted-foreground text-xs">
+                                    {member.email} · {member.role}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm" disabled>
+                              Manage
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="py-8 text-center">
+                  <UsersIcon className="text-muted-foreground mx-auto h-12 w-12" />
+                  <p className="text-muted-foreground mt-2">No group registrations yet</p>
                 </div>
               )}
             </CardContent>

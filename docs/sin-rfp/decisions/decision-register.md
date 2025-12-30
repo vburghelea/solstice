@@ -21,4 +21,5 @@ This register tracks D0 decisions for SIN RFP 5.2.
 | D0.15 | Templates/help/support rollout     | Accepted | 2025-12-26 | `docs/sin-rfp/decisions/ADR-2025-12-26-d0-15-templates-help-support-rollout.md`      |
 | D0.16 | Analytics charts and pivots scope  | Accepted | 2025-12-26 | `docs/sin-rfp/decisions/ADR-2025-12-26-d0-16-analytics-charts-pivots-scope.md`       |
 | D0.17 | Import batch runtime               | Accepted | 2025-12-26 | `docs/sin-rfp/decisions/ADR-2025-12-26-d0-17-import-batch-runtime.md`                |
-| D0.18 | Group registration + checkout      | Proposed | 2025-12-29 | `docs/sin-rfp/decisions/ADR-2025-12-29-d0-18-group-registration-bundled-checkout.md` |
+| D0.18 | Group registration + checkout      | Accepted | 2025-12-29 | `docs/sin-rfp/decisions/ADR-2025-12-29-d0-18-group-registration-bundled-checkout.md` |
+| D0.19 | BI analytics platform direction    | Proposed | 2025-12-30 | `docs/sin-rfp/decisions/ADR-2025-12-30-d0-19-bi-analytics-platform-direction.md`     |

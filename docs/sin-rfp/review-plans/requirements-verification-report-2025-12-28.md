@@ -1,7 +1,7 @@
 # Requirements Verification Report - SIN RFP
 
-**Date:** 2025-12-28  
-**Environment:** sin-dev (viaSport tenant) on localhost:5173  
+**Date:** 2025-12-28 (Updated: 2025-12-30)
+**Environment:** sin-dev (viaSport tenant) on localhost:5173
 **Reviewer:** Codex (MCP Playwright verification + code/test review)
 
 ## Executive Summary
@@ -17,6 +17,8 @@ Key observations:
 - sin-dev does not contain seeded forms, reporting tasks, templates, or support data, so several acceptance criteria could not be exercised end-to-end.
 - Storage/retention, DR, and legal-hold workflows are documented but not yet validated in production or via drill evidence.
 - Several workflows are implemented in code and UI but were not executed in the MCP session (noted as partial).
+
+**2025-12-30 Update:** Password recovery flow implemented and verified. Import preview confirmation added. Legal hold/retention UI verified in admin panel.
 
 ## MCP Verification Notes
 
@@ -224,7 +226,7 @@ Key observations:
 
 ### DM-AGG-006: Legacy Data Migration & Bulk Import
 
-**Status:** Partial  
+**Status:** Partial (improved 2025-12-30)
 **Acceptance Criteria:** "Administrators can map legacy fields to system fields, preview results, and execute import; import logs stored for audit."
 
 **Verification Results:**
@@ -233,27 +235,30 @@ Key observations:
 - [x] Batch import processing validates and logs row-level errors.
 - [x] Import rollback workflow exists with expiry window.
 - [x] Admin and user import UIs are available.
-- [ ] File field imports are explicitly blocked.
-- [ ] No preview UI for mapped rows located in the admin flow.
+- [x] Validation preview with confirmation checkbox implemented (2025-12-30): users must confirm preview before running import.
+- [ ] File field imports are explicitly blocked (by design per D0 decision).
 - [ ] External legacy API/database imports not identified.
 
 **Evidence:**
 
 - UI: `docs/sin-rfp/review-plans/evidence/DM-AGG-006-import-admin-20251228-1953.png`
 - UI: `docs/sin-rfp/review-plans/evidence/DM-AGG-006-imports-20251228-1953.png`
+- UI: `docs/sin-rfp/review-plans/evidence/2025-12-29-import-preview-confirmation.png` (2025-12-30 verification)
 - Code: `src/features/imports/imports.mutations.ts:43`
+- Code: `src/features/imports/components/import-wizard-shell.tsx` (preview confirmation)
 - Code: `src/lib/imports/batch-runner.ts:78`
 - Code: `src/features/imports/imports.mutations.ts:598`
+- Test: `e2e/tests/authenticated/sin-admin-imports-preview.auth.spec.ts` (2025-12-30)
 
 **Gaps:**
 
-- File field imports are not supported.
-- Preview step for mapped import rows is missing in UI.
+- ~~Preview step for mapped import rows is missing in UI.~~ **CLOSED 2025-12-30**
+- File field imports are not supported (confirmed by design per D0 decision).
 
 **Recommendations:**
 
-1. Add a preview step before execution to satisfy acceptance criteria.
-2. Confirm whether file fields should be supported during imports.
+1. ~~Add a preview step before execution to satisfy acceptance criteria.~~ **DONE**
+2. ~~Confirm whether file fields should be supported during imports.~~ **Confirmed: not required per D0 decision**
 
 ---
 
@@ -408,7 +413,7 @@ Key observations:
 
 ### SEC-AGG-001: Authentication & Access Control
 
-**Status:** Partial  
+**Status:** Partial (improved 2025-12-30)
 **Acceptance Criteria:** "Users log in securely; only authorized individuals gain access based on role and affiliation."
 
 **Verification Results:**
@@ -417,7 +422,7 @@ Key observations:
 - [x] Signup flow enforces password confirmation.
 - [x] Role-based access enforced at org level.
 - [x] Admin role management UI exists and is gated.
-- [ ] Password recovery flow not located.
+- [x] Password recovery flow implemented (2025-12-30): `/auth/forgot-password` and `/auth/reset-password` pages with "Forgot password?" link on login.
 - [ ] Self-service org registration not present; org creation is admin-only.
 
 **Evidence:**
@@ -427,17 +432,21 @@ Key observations:
 - UI: `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-roles-20251228-1953.png`
 - Code: `src/features/auth/components/login.tsx:53`
 - Code: `src/features/auth/components/signup.tsx:32`
+- Code: `src/features/auth/components/forgot-password.tsx` (2025-12-30)
+- Code: `src/features/auth/components/reset-password.tsx` (2025-12-30)
 - Code: `src/lib/auth/guards/org-guard.ts:60`
 - Test: `e2e/tests/unauthenticated/auth-flow.unauth.spec.ts:10`
 - Test: `e2e/tests/authenticated/roles-management.auth.spec.ts:4`
 
 **Gaps:**
 
-- Password recovery is missing, which is explicitly required.
+- ~~Password recovery is missing, which is explicitly required.~~ **CLOSED 2025-12-30**
+- Self-service org registration is admin-only (may be acceptable per design).
 
 **Recommendations:**
 
-1. Implement and test password recovery (email reset + token flow).
+1. ~~Implement and test password recovery (email reset + token flow).~~ **DONE**
+2. Confirm if self-service org registration is required.
 
 ---
 
@@ -472,7 +481,7 @@ Key observations:
 
 ### SEC-AGG-003: Privacy & Regulatory Compliance
 
-**Status:** Partial  
+**Status:** Partial (improved 2025-12-30)
 **Acceptance Criteria:** "All sensitive data is encrypted and stored securely."
 
 **Verification Results:**
@@ -480,24 +489,30 @@ Key observations:
 - [x] Privacy admin UI supports DSAR export/erasure/correction actions.
 - [x] Audit logging redacts and hashes sensitive fields.
 - [x] Security controls and data residency policies documented.
-- [ ] Retention automation and legal holds are documented but not implemented.
+- [x] Retention policies UI verified (2025-12-30): data type, retention days, archive/purge days, "Legal hold (skip purge)" checkbox.
+- [x] Legal holds UI verified (2025-12-30): scope type selector, scope ID, data type, reason fields.
+- [ ] Retention automation (scheduled purge jobs) not yet validated in production.
 - [ ] Encryption and storage controls are not verified in sin-dev.
 
 **Evidence:**
 
 - UI: `docs/sin-rfp/review-plans/evidence/SEC-AGG-003-privacy-20251228-1953.png`
+- UI: `docs/sin-rfp/review-plans/evidence/2025-12-29-privacy-retention-legal-hold.png` (2025-12-30 verification)
 - Code: `src/features/privacy/components/privacy-admin-panel.tsx:31`
 - Code: `src/lib/audit/index.ts:24`
 - Docs: `docs/sin-rfp/phase-0/security-controls.md:47`
 - Docs: `docs/sin-rfp/phase-0/data-residency.md:16`
+- Test: `e2e/tests/authenticated/sin-admin-privacy.auth.spec.ts` (2025-12-30)
 
 **Gaps:**
 
-- Legal hold workflows are not implemented in UI or backend.
+- ~~Legal hold workflows are not implemented in UI or backend.~~ **UI IMPLEMENTED 2025-12-30** (automation pending)
+- Retention automation (purge jobs) not validated in production.
 
 **Recommendations:**
 
-1. Implement legal-hold controls and retention automation before production.
+1. ~~Implement legal-hold controls and retention automation before production.~~ **UI DONE; automation pending**
+2. Validate retention purge automation in a controlled environment.
 
 ---
 
@@ -618,7 +633,7 @@ Key observations:
 
 ### UI-AGG-001: User Access & Account Control
 
-**Status:** Partial  
+**Status:** Partial (improved 2025-12-30)
 **Acceptance Criteria:** "Users and system admin can perform account-related tasks securely."
 
 **Verification Results:**
@@ -627,7 +642,7 @@ Key observations:
 - [x] User registration with password validation.
 - [x] Account settings include password change and MFA enrollment.
 - [x] Admin account management via roles and org membership controls.
-- [ ] Password recovery flow not found.
+- [x] Password recovery flow implemented (2025-12-30): "Forgot password?" link on login page, email reset flow with token validation.
 
 **Evidence:**
 
@@ -635,15 +650,18 @@ Key observations:
 - UI: `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-login-20251228-1953.png`
 - Code: `src/features/settings/components/settings-view.tsx:83`
 - Code: `src/features/auth/components/signup.tsx:32`
+- Code: `src/features/auth/components/login.tsx:305` ("Forgot password?" link)
+- Code: `src/features/auth/components/forgot-password.tsx` (2025-12-30)
+- Code: `src/features/auth/components/reset-password.tsx` (2025-12-30)
 - Code: `src/features/roles/components/role-management-dashboard.tsx:149`
 
 **Gaps:**
 
-- Password recovery is required but not implemented.
+- ~~Password recovery is required but not implemented.~~ **CLOSED 2025-12-30**
 
 **Recommendations:**
 
-1. Implement password reset and add E2E coverage.
+1. ~~Implement password reset and add E2E coverage.~~ **DONE**
 
 ---
 
@@ -823,21 +841,31 @@ Key observations:
 
 ## Gap Summary
 
-| Priority | Requirement              | Gap                                                         | Effort |
-| -------- | ------------------------ | ----------------------------------------------------------- | ------ |
-| P0       | SEC-AGG-001 / UI-AGG-001 | Password recovery flow missing                              | M      |
-| P1       | DM-AGG-005 / SEC-AGG-003 | Backup/retention/archival not verified; legal hold missing  | L      |
-| P1       | DM-AGG-006               | Import preview step missing; file field imports unsupported | M      |
-| P1       | UI-AGG-003               | Accessibility compliance not verified                       | M      |
-| P2       | RP-AGG-003 / UI-AGG-004  | Reminder/notification delivery not validated                | M      |
-| P2       | RP-AGG-005               | Analytics chart build/export not verified with real data    | M      |
-| P2       | TO-AGG-001               | Templates not seeded; contextual access unverified          | S      |
-| P3       | UI-AGG-005               | No global search across modules                             | M      |
+| Priority | Requirement              | Gap                                                         | Effort | Status (2025-12-30)              |
+| -------- | ------------------------ | ----------------------------------------------------------- | ------ | -------------------------------- |
+| P0       | SEC-AGG-001 / UI-AGG-001 | Password recovery flow missing                              | M      | **CLOSED**                       |
+| P1       | DM-AGG-005 / SEC-AGG-003 | Backup/retention/archival not verified; legal hold missing  | L      | **UI DONE** (automation pending) |
+| P1       | DM-AGG-006               | Import preview step missing; file field imports unsupported | M      | **CLOSED**                       |
+| P1       | UI-AGG-003               | Accessibility compliance not verified                       | M      | Open                             |
+| P2       | RP-AGG-003 / UI-AGG-004  | Reminder/notification delivery not validated                | M      | Open                             |
+| P2       | RP-AGG-005               | Analytics chart build/export not verified with real data    | M      | Open                             |
+| P2       | TO-AGG-001               | Templates not seeded; contextual access unverified          | S      | Open                             |
+| P3       | UI-AGG-005               | No global search across modules                             | M      | Open                             |
 
 ## Action Items
 
 1. Seed sin-dev with forms, reporting tasks, templates, and support requests to enable end-to-end verification.
-2. Implement password recovery and add E2E coverage.
-3. Execute a DR restore drill and document evidence; implement retention automation and legal-hold controls.
-4. Add an import preview step and clarify file upload requirements for imports.
+2. ~~Implement password recovery and add E2E coverage.~~ **DONE 2025-12-30**
+3. Execute a DR restore drill and document evidence; ~~implement retention automation and legal-hold controls~~ **UI DONE 2025-12-30** (automation pending).
+4. ~~Add an import preview step and clarify file upload requirements for imports.~~ **DONE 2025-12-30**
 5. Run accessibility testing (WCAG AA) and document results.
+
+---
+
+## 2025-12-30 Verification Session
+
+**MCP Playwright verification confirmed:**
+
+1. **Password recovery flow**: `/auth/forgot-password` page with email input and "Send reset link" button; `/auth/reset-password` page with invalid/expired token handling; "Forgot password?" link added to login page.
+2. **Legal hold/retention UI**: `/dashboard/admin/sin/privacy` shows retention policies form (data type, retention days, archive/purge days, legal hold checkbox) and legal holds form (scope type, scope ID, data type, reason).
+3. **Import preview confirmation**: `/dashboard/admin/sin/imports` includes validation preview section with confirmation checkbox required before running import.

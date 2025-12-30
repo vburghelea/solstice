@@ -107,3 +107,13 @@ function`). `@vite-plugin-pwa/pwa-entry-point-loaded` requests also returning
 - The Playwright runs failed before assertions because `getByLabel("Password")`
   matched devtools elements; updated login page inputs with stable `data-testid`
   attributes and switched auth helpers to use those IDs.
+
+### 2025-12-29: E2E stabilization (sin-admin)
+
+- Seeded sin-dev via `scripts/seed-sin-data.ts --force` (preserving fixed users).
+- Updated `/api/test/cleanup` to allow policy acceptance and MFA toggling for
+  E2E setup, then used E2E helpers to disable MFA and accept privacy policy.
+- Added validation-preview confirmation checkbox to import wizard and enforced
+  it before enabling `Run import`.
+- E2E run: `sin-admin-privacy` and `sin-admin-imports-preview` pass using:
+  `TENANT_KEY=viasport VITE_TENANT_KEY=viasport VITE_BASE_URL=http://localhost:5173 SIN_ARTIFACTS_BUCKET=solstice-sin-dev-sinartifactsbucket-kcdsxdnu pnpm exec playwright test e2e/tests/authenticated/sin-admin-imports-preview.auth.spec.ts e2e/tests/authenticated/sin-admin-privacy.auth.spec.ts --project=chromium-authenticated --reporter=line`.

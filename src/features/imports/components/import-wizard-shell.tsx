@@ -7,6 +7,7 @@ import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import {
   Select,
@@ -105,6 +106,7 @@ export function ImportWizardShell() {
   const [importJobId, setImportJobId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [hasReviewedPreview, setHasReviewedPreview] = useState(false);
 
   const { data: organizations = [] } = useQuery({
     queryKey: ["organizations", "list"],
@@ -321,6 +323,7 @@ export function ImportWizardShell() {
     const handleFile = async () => {
       try {
         setErrorMessage("");
+        setHasReviewedPreview(false);
         const { type, rows: parsedRows } = await parseImportFile(selectedFile);
         setImportFileType(type);
         setRows(parsedRows);
@@ -610,6 +613,16 @@ export function ImportWizardShell() {
                 Showing first {previewRows.length} rows. Total errors:{" "}
                 <strong>{validationErrorCount}</strong>
               </p>
+              <div className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  id="reviewed-preview"
+                  checked={hasReviewedPreview}
+                  onCheckedChange={(value) => setHasReviewedPreview(Boolean(value))}
+                />
+                <Label htmlFor="reviewed-preview">
+                  I have reviewed the validation preview
+                </Label>
+              </div>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -641,6 +654,7 @@ export function ImportWizardShell() {
                     !importJobId ||
                     !selectedFormId ||
                     runImportMutation.isPending ||
+                    !hasReviewedPreview ||
                     mappedFileFields.length > 0
                   }
                   onClick={() => runImportMutation.mutate()}
@@ -653,6 +667,7 @@ export function ImportWizardShell() {
                   disabled={
                     !importJobId ||
                     runBatchMutation.isPending ||
+                    !hasReviewedPreview ||
                     mappedFileFields.length > 0
                   }
                   onClick={() => runBatchMutation.mutate()}

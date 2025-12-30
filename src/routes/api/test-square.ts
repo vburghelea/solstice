@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/test-square")({
   server: {
     handlers: {
       GET: async () => {
-        await assertFeatureEnabled("qc_payments_square");
+        await assertFeatureEnabled("payments_square");
         // Block access in production - returns 404
         const guardResponse = debugGuard();
         if (guardResponse) return guardResponse;

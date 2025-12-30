@@ -121,9 +121,8 @@ async function seed() {
     console.log("Clearing accounts...");
     await db.delete(account).where(like(account.userId, "clxpfz4jn%"));
 
-    // 3. Now we can safely clear users
-    console.log("Clearing test users...");
-    await db.delete(user).where(like(user.email, "%@example.com"));
+    // 3. Preserve fixed test users so audit history stays intact
+    console.log("Skipping test user deletion (fixed users preserved)...");
 
     // 4. Clear standalone tables last
     console.log("Clearing membership types...");
@@ -401,33 +400,71 @@ async function seed() {
 
     console.log("Creating test users...");
     for (const userData of testUsers) {
-      // Create user
-      await db.insert(user).values({
-        ...userData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const now = new Date();
+      await db
+        .insert(user)
+        .values({
+          ...userData,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: user.id,
+          set: {
+            name: userData.name,
+            email: userData.email,
+            emailVerified: userData.emailVerified ?? true,
+            profileComplete: userData.profileComplete ?? false,
+            dateOfBirth: userData.dateOfBirth ?? null,
+            phone: userData.phone ?? null,
+            gender: userData.gender ?? null,
+            pronouns: userData.pronouns ?? null,
+            emergencyContact: userData.emergencyContact ?? null,
+            privacySettings: userData.privacySettings ?? null,
+            profileVersion: userData.profileVersion ?? 1,
+            mfaRequired: userData.mfaRequired ?? false,
+            updatedAt: now,
+          },
+        });
 
-      // Create account for password login
-      await db.insert(account).values({
-        id: `${userData.id}-account`,
-        userId: userData.id,
-        providerId: "credential",
-        accountId: userData.email,
-        password: hashedPassword,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await db
+        .insert(account)
+        .values({
+          id: `${userData.id}-account`,
+          userId: userData.id,
+          providerId: "credential",
+          accountId: userData.email,
+          password: hashedPassword,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: account.id,
+          set: {
+            accountId: userData.email,
+            password: hashedPassword,
+            updatedAt: now,
+          },
+        });
 
-      // Create session (optional, for pre-authenticated tests)
-      await db.insert(session).values({
-        id: `${userData.id}-session`,
-        userId: userData.id,
-        token: `test-token-${userData.id}`,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await db
+        .insert(session)
+        .values({
+          id: `${userData.id}-session`,
+          userId: userData.id,
+          token: `test-token-${userData.id}`,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: session.id,
+          set: {
+            token: `test-token-${userData.id}`,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            updatedAt: now,
+          },
+        });
 
       if (userData.id === adminUserId) {
         let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES);
@@ -442,12 +479,21 @@ async function seed() {
           }
         }
 
-        await db.insert(twoFactor).values({
-          id: `${userData.id}-2fa`,
-          userId: userData.id,
-          secret: FAKE_MFA_SECRET,
-          backupCodes: encryptedBackupCodes,
-        });
+        await db
+          .insert(twoFactor)
+          .values({
+            id: `${userData.id}-2fa`,
+            userId: userData.id,
+            secret: FAKE_MFA_SECRET,
+            backupCodes: encryptedBackupCodes,
+          })
+          .onConflictDoUpdate({
+            target: twoFactor.id,
+            set: {
+              secret: FAKE_MFA_SECRET,
+              backupCodes: encryptedBackupCodes,
+            },
+          });
 
         await db
           .update(user)

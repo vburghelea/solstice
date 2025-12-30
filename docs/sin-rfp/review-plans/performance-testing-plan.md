@@ -15,10 +15,22 @@ This plan outlines a comprehensive approach to performance testing the SIN appli
 
 - **Environment:** Prefer production build on local or a perf/staging stage;
   use sin-dev only for functional smoke checks
+- **Ports:**
+  - **Dev server (Vite):** `http://localhost:5173` - fast rebuilds, not for perf metrics
+  - **Production build:** `http://localhost:3000` via `pnpm build && pnpm start` - use for accurate metrics
 - **Load Level:** Moderate (10-25 concurrent users); avoid shared dev unless
   scheduled
 - **Scope:** Baseline audit + optional CI/observability setup
 - **Data:** Seeded, non-PII test data with reset between runs
+
+### Authenticated Testing Strategy
+
+- Use a dedicated perf user without MFA (automation-safe).
+- Export credentials for tooling: `PERF_EMAIL`, `PERF_PASSWORD`.
+- Lighthouse uses `puppeteerScript` to log in before collecting metrics.
+- Playwright uses a login helper or storage state; run with `--workers=1`.
+- k6 uses `SESSION_COOKIE` or a scripted login; prefer perf endpoints for
+  stable request paths.
 
 ### Page Load Phases Measured
 
@@ -120,6 +132,12 @@ This plan outlines a comprehensive approach to performance testing the SIN appli
 | `/dashboard/sin/imports`       | Batch operations | File processing status   |
 | Report exports                 | On-demand        | Query + file generation  |
 
+### Priority 4: Heavy Workflows (Must-Test)
+
+- Audit log queries: date range + org + action filters with pagination
+- Reporting analytics/export: export generation time + query cost
+- Imports: preview latency + batch worker throughput (rows/sec)
+
 ---
 
 ## 4. API Endpoints to Profile
@@ -144,7 +162,20 @@ This plan outlines a comprehensive approach to performance testing the SIN appli
 - `createReport` - Report generation
 - `runImport` - Import batch processing
 
-Confirm actual route paths and auth requirements before profiling.
+### Performance Test Endpoints (Recommended)
+
+Prefer explicit perf endpoints to keep k6 stable and avoid RPC routing
+changes. Suggested endpoints:
+
+- `GET /api/perf/organizations`
+- `GET /api/perf/reporting-tasks`
+- `GET /api/perf/forms`
+- `GET /api/perf/audit`
+- `POST /api/perf/report-export`
+
+Confirm actual route paths and auth requirements before profiling. If perf
+endpoints are not added, capture the real server-function request paths and
+payloads from the browser and codify them in k6 scripts.
 
 ---
 
@@ -164,7 +195,7 @@ pnpm add -D @lhci/cli playwright-lighthouse
 **Create:** `performance/lighthouse.config.js`
 
 ```javascript
-const baseUrl = process.env.PERF_BASE_URL || "http://localhost:3000";
+const baseUrl = process.env.PERF_BASE_URL || "http://localhost:5173";
 
 module.exports = {
   ci: {
@@ -176,6 +207,7 @@ module.exports = {
         // ... more routes
       ],
       numberOfRuns: 3,
+      puppeteerScript: "./performance/lhci-auth.js",
     },
     assert: {
       assertions: {
@@ -193,6 +225,24 @@ module.exports = {
 };
 ```
 
+**Create:** `performance/lhci-auth.js`
+
+```javascript
+module.exports = async (page, context) => {
+  const baseUrl = context.options.url;
+  await page.goto(`${baseUrl}/auth/login`, { waitUntil: "networkidle0" });
+  await page.type('input[name="email"]', process.env.PERF_EMAIL);
+  await page.type('input[name="password"]', process.env.PERF_PASSWORD);
+  await page.click('button[type="submit"]');
+  await page.waitForNavigation({ waitUntil: "networkidle0" });
+};
+```
+
+Notes:
+
+- Use a perf user without MFA.
+- Ensure `PERF_EMAIL` and `PERF_PASSWORD` are set for LHCI runs.
+
 ### Phase 2: Playwright Performance Tests (Day 1-2)
 
 Extend existing Playwright setup with performance measurement.
@@ -202,7 +252,7 @@ Extend existing Playwright setup with performance measurement.
 ```typescript
 import { test, expect } from "@playwright/test";
 
-const baseURL = process.env.BASE_URL ?? "http://localhost:3000";
+const baseURL = process.env.VITE_BASE_URL ?? "http://localhost:5173";
 
 const routes = [
   { name: "Login", path: "/auth/login", readySelector: "form" },
@@ -245,6 +295,12 @@ for (const route of routes) {
   });
 }
 ```
+
+Notes:
+
+- Use a login helper or storage state to avoid re-auth every test.
+- Run with `--workers=1` to avoid mixing concurrency with perf.
+- Run cold and warm passes; report median and p95 across 3 runs.
 
 ### Phase 3: Server Timing Headers (Day 2)
 
@@ -305,6 +361,13 @@ const db = drizzle(client, {
 - RDS Performance Insights or `pg_stat_statements` for query durations
 - Postgres `log_min_duration_statement` in dev/perf
 
+**DB instrumentation checklist (perf):**
+
+- [ ] Enable RDS Performance Insights
+- [ ] Enable `pg_stat_statements`
+- [ ] Capture top queries by total time and mean time after each run
+- [ ] Snapshot CPU, connections, and IOPS for the run window
+
 ### Phase 5: k6 Load Testing (Day 3)
 
 Create load test scripts for API endpoints.
@@ -330,6 +393,7 @@ const apiLatency = new Trend("api_latency");
 // Test configuration
 export const options = {
   stages: [
+    { duration: "30s", target: 5 }, // Warm-up
     { duration: "30s", target: 10 }, // Ramp up to 10 users
     { duration: "1m", target: 10 }, // Stay at 10
     { duration: "30s", target: 25 }, // Ramp to 25
@@ -342,7 +406,7 @@ export const options = {
   },
 };
 
-const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
+const BASE_URL = __ENV.BASE_URL || "http://localhost:5173";
 const SESSION_COOKIE = __ENV.SESSION_COOKIE;
 const params = SESSION_COOKIE ? { headers: { Cookie: SESSION_COOKIE } } : {};
 
@@ -355,22 +419,31 @@ export default function () {
 
   sleep(1);
 
-  // Test dashboard data
-  const dashRes = http.get(`${BASE_URL}/api/dashboard/data`, params);
-  check(dashRes, { "dashboard 200": (r) => r.status === 200 });
-  apiLatency.add(dashRes.timings.duration);
+  // Test perf endpoints (recommended) or replace with captured server-function paths
+  const orgRes = http.get(`${BASE_URL}/api/perf/organizations?limit=50`, params);
+  check(orgRes, { "orgs 200": (r) => r.status === 200 });
+  apiLatency.add(orgRes.timings.duration);
+
+  sleep(1);
+
+  const tasksRes = http.get(`${BASE_URL}/api/perf/reporting-tasks?limit=50`, params);
+  check(tasksRes, { "tasks 200": (r) => r.status === 200 });
+  apiLatency.add(tasksRes.timings.duration);
 
   sleep(1);
 }
 ```
 
 Note: set `SESSION_COOKIE` from an authenticated browser session; otherwise
-requests may return 401 and skew results.
+requests may return 401 and skew results. If perf endpoints are not available,
+capture actual server-function request paths and payloads from the browser and
+use them here.
 
 **Run:**
 
 ```bash
-k6 run performance/load-tests/api-load.js
+k6 run --summary-export performance/reports/k6/<date>-summary.json \
+  performance/load-tests/api-load.js
 ```
 
 ### Phase 6: Bundle Analysis (Day 3)
@@ -428,6 +501,14 @@ Note: INP replaces TTI for responsiveness; treat TTI as legacy if referenced.
 | Error rate       | <1%             |
 | p95 latency      | <500ms          |
 | Throughput       | >30 req/s       |
+
+### Repeatability Controls
+
+- Run a warm-up pass before recording results
+- Run each scenario at least 3 times; report median and p95
+- Keep Playwright at `--workers=1` for perf runs
+- Record commit SHA, stage, RDS class/storage, Lambda memory/timeout, and
+  CloudFront enabled/disabled
 
 ---
 
@@ -517,6 +598,7 @@ jobs:
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           PERF_BASE_URL: http://localhost:3000
+          # Note: Production build runs on port 3000 via `pnpm start`
 
       - name: Upload Lighthouse Report
         uses: actions/upload-artifact@v4
@@ -657,6 +739,12 @@ export const APIRoute = createAPIFileRoute("/api/analytics/vitals")({
 
 ## Summary
 
+- Commit SHA: `<sha>`
+- Stage: `sin-perf`
+- RDS class/storage: `<class> / <size>`
+- Lambda memory/timeout: `<mem> / <timeout>`
+- CloudFront: `<enabled|disabled>`
+- Dataset distribution: `<table>: <rows>`
 - Pages tested: X
 - API endpoints: Y
 - Load test peak: Z concurrent users
@@ -750,15 +838,19 @@ src/lib/server/
 # Install dependencies
 pnpm add -D @lhci/cli playwright-lighthouse
 
-# Run Lighthouse on specific page (production build running)
-PERF_BASE_URL=http://localhost:3000 pnpm exec lhci collect \
-  --url=http://localhost:3000/dashboard/sin/
+# Run Lighthouse on specific page (production build running on :3000)
+# For dev server, use PERF_BASE_URL=http://localhost:5173
+PERF_BASE_URL=http://localhost:3000 \
+PERF_EMAIL="<perf-user-email>" \
+PERF_PASSWORD="<perf-user-password>" \
+pnpm exec lhci autorun
 
-# Run Playwright performance tests
-BASE_URL=http://localhost:3000 pnpm test:e2e --grep="Performance"
+# Run Playwright performance tests (uses VITE_BASE_URL, default :5173)
+VITE_BASE_URL=http://localhost:5173 pnpm test:e2e --grep="Performance"
 
 # Run k6 load test
-k6 run performance/load-tests/api-load.js
+k6 run --summary-export performance/reports/k6/<date>-summary.json \
+  performance/load-tests/api-load.js
 
 # Analyze bundle
 pnpm analyze:bundle

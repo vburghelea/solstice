@@ -6,7 +6,7 @@ import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/reports")({
   beforeLoad: async ({ context }) => {
-    requireFeatureInRoute("qc_reports");
+    requireFeatureInRoute("reports");
     await requireGlobalAdmin(context.user);
   },
   component: ReportsPage,

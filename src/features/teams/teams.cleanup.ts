@@ -16,7 +16,7 @@ const clearUserTeamsSchema = z.object({
 export const clearUserTeamsForTesting = createServerFn({ method: "POST" })
   .inputValidator(zod$(clearUserTeamsSchema))
   .handler(async ({ data }) => {
-    await assertFeatureEnabled("qc_teams");
+    await assertFeatureEnabled("teams");
     // Only allow in test environments
     if (process.env["NODE_ENV"] === "production" && !process.env["E2E_TEST_EMAIL"]) {
       throw new Error("This function is only available in test environments");

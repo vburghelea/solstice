@@ -1,19 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
 import {
-  eventPaymentSessions,
+  checkoutItems,
+  checkoutSessions,
   eventRegistrations,
   events,
-  membershipPaymentSessions,
+  membershipPurchases,
   membershipTypes,
   memberships,
 } from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
+import { finalizeMembershipPurchase } from "~/features/membership/membership.finalize";
 import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
-import { getSquarePaymentService } from "~/lib/payments/square";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 
-async function finalizeMembershipFromWebhook({
+async function finalizeCheckoutFromWebhook({
   paymentId,
   orderId,
   eventType,
@@ -29,152 +30,16 @@ async function finalizeMembershipFromWebhook({
     return;
   }
 
-  const [{ getDb }, { finalizeMembershipForSession }] = await Promise.all([
-    import("~/db/server-helpers"),
-    import("~/features/membership/membership.finalize"),
-  ]);
-
-  const db = await getDb();
-
-  let session = null as typeof membershipPaymentSessions.$inferSelect | null;
-
-  if (paymentId) {
-    const [byPaymentId] = await db
-      .select()
-      .from(membershipPaymentSessions)
-      .where(eq(membershipPaymentSessions.squarePaymentId, paymentId))
-      .limit(1);
-    session = byPaymentId ?? session;
-  }
-
-  if (!session && orderId) {
-    const [byOrderId] = await db
-      .select()
-      .from(membershipPaymentSessions)
-      .where(eq(membershipPaymentSessions.squareOrderId, orderId))
-      .limit(1);
-    session = byOrderId ?? session;
-  }
-
-  if (!session) {
-    console.warn("[Square webhook] No payment session found for finalize", {
-      paymentId,
-      orderId,
-      eventType,
-    });
-    return;
-  }
-
-  const [membershipType] = await db
-    .select()
-    .from(membershipTypes)
-    .where(eq(membershipTypes.id, session.membershipTypeId))
-    .limit(1);
-
-  if (!membershipType) {
-    console.error("[Square webhook] Membership type missing during finalize", {
-      membershipTypeId: session.membershipTypeId,
-      sessionId: session.id,
-    });
-    return;
-  }
-
-  // Ensure we have a valid payment ID before finalizing
-  const resolvedPaymentId = paymentId ?? session.squarePaymentId;
-  if (!resolvedPaymentId) {
-    console.warn("[Square webhook] Skipping finalize - missing paymentId", {
-      orderId,
-      sessionId: session.id,
-      eventType,
-    });
-    return;
-  }
-
-  const now = new Date();
-  const finalizeResult = await finalizeMembershipForSession({
-    db,
-    paymentSession: session,
-    membershipType,
-    paymentId: resolvedPaymentId,
-    orderId: orderId ?? session.squareOrderId ?? null,
-    sessionId: session.squareCheckoutId,
-    now,
-  });
-
-  const [{ sendMembershipPurchaseReceipt }] = await Promise.all([
-    import("~/lib/email/sendgrid"),
-  ]);
-
-  if (finalizeResult.wasCreated) {
-    const [member] = await db
-      .select({
-        email: user.email,
-        name: user.name,
-      })
-      .from(user)
-      .where(eq(user.id, session.userId))
-      .limit(1);
-
-    if (member?.email) {
-      try {
-        await sendMembershipPurchaseReceipt({
-          to: {
-            email: member.email,
-            name: member.name ?? undefined,
-          },
-          membershipType: membershipType.name,
-          amount: membershipType.priceCents,
-          paymentId: finalizeResult.membership.paymentId ?? paymentId ?? "",
-          expiresAt: new Date(finalizeResult.membership.endDate),
-        });
-      } catch (emailError) {
-        console.error("[Square webhook] Failed to send membership receipt", {
-          paymentId,
-          email: member.email,
-          error: emailError,
-        });
-      }
-    }
-  }
-
-  await db
-    .update(membershipPaymentSessions)
-    .set({
-      metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
-        membershipId: finalizeResult.membership.id,
-        lastWebhookFinalizeAt: now.toISOString(),
-        lastWebhookEvent: eventType,
-      }),
-      updatedAt: now,
-    })
-    .where(eq(membershipPaymentSessions.id, session.id));
-}
-
-async function finalizeEventRegistrationFromWebhook({
-  paymentId,
-  orderId,
-  eventType,
-  amount,
-}: {
-  paymentId: string | undefined;
-  orderId: string | undefined;
-  eventType: string;
-  amount: number | undefined;
-}) {
-  if (!paymentId && !orderId) {
-    return;
-  }
-
   const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
   const db = await getDb();
 
-  let session = null as typeof eventPaymentSessions.$inferSelect | null;
+  let session = null as typeof checkoutSessions.$inferSelect | null;
 
   if (paymentId) {
     const [byPaymentId] = await db
       .select()
-      .from(eventPaymentSessions)
-      .where(eq(eventPaymentSessions.squarePaymentId, paymentId))
+      .from(checkoutSessions)
+      .where(eq(checkoutSessions.providerPaymentId, paymentId))
       .limit(1);
     session = byPaymentId ?? session;
   }
@@ -182,78 +47,171 @@ async function finalizeEventRegistrationFromWebhook({
   if (!session && orderId) {
     const [byOrderId] = await db
       .select()
-      .from(eventPaymentSessions)
-      .where(eq(eventPaymentSessions.squareOrderId, orderId))
+      .from(checkoutSessions)
+      .where(eq(checkoutSessions.providerOrderId, orderId))
       .limit(1);
     session = byOrderId ?? session;
   }
 
+  const now = new Date();
+
   if (!session) {
-    return;
+    const { ensureLegacyCheckoutSession } =
+      await import("~/lib/payments/legacy-checkout");
+    const legacyResult = await ensureLegacyCheckoutSession({
+      db,
+      checkoutId: null,
+      paymentId: paymentId ?? null,
+      orderId: orderId ?? null,
+      now,
+    });
+    session = legacyResult.session;
+
+    if (legacyResult.legacyType) {
+      console.warn("[Square webhook] Legacy checkout session migrated", {
+        paymentId,
+        orderId,
+        eventType,
+        legacyType: legacyResult.legacyType,
+      });
+    }
   }
 
-  const [registrationResult] = await db
-    .select({
-      registration: eventRegistrations,
-      event: events,
-    })
-    .from(eventRegistrations)
-    .innerJoin(events, eq(eventRegistrations.eventId, events.id))
-    .where(eq(eventRegistrations.id, session.registrationId))
-    .limit(1);
-
-  if (!registrationResult) {
-    console.warn("[Square webhook] Event registration not found for payment", {
-      registrationId: session.registrationId,
+  if (!session) {
+    console.warn("[Square webhook] No checkout session found for finalize", {
       paymentId,
       orderId,
+      eventType,
     });
     return;
   }
 
-  const { registration, event } = registrationResult;
+  const rows = await db
+    .select({
+      item: checkoutItems,
+      registration: eventRegistrations,
+      event: events,
+      purchase: membershipPurchases,
+      membershipType: membershipTypes,
+    })
+    .from(checkoutItems)
+    .leftJoin(
+      eventRegistrations,
+      eq(checkoutItems.eventRegistrationId, eventRegistrations.id),
+    )
+    .leftJoin(events, eq(eventRegistrations.eventId, events.id))
+    .leftJoin(
+      membershipPurchases,
+      eq(checkoutItems.membershipPurchaseId, membershipPurchases.id),
+    )
+    .leftJoin(
+      membershipTypes,
+      eq(membershipPurchases.membershipTypeId, membershipTypes.id),
+    )
+    .where(eq(checkoutItems.checkoutSessionId, session.id));
 
-  const now = new Date();
+  if (rows.length === 0) {
+    console.warn("[Square webhook] No checkout items found for finalize", {
+      sessionId: session.id,
+      eventType,
+    });
+    return;
+  }
+
   const nowIso = now.toISOString();
-  const paymentIdentifier = paymentId ?? session.squarePaymentId ?? "";
-  const resolvedAmount = typeof amount === "number" ? amount : session.amountCents;
+  const paymentIdentifier = paymentId ?? session.providerPaymentId ?? "";
 
   await db
-    .update(eventPaymentSessions)
+    .update(checkoutSessions)
     .set({
       status: "completed",
-      squarePaymentId: paymentIdentifier,
-      metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
+      providerPaymentId: paymentIdentifier || session.providerPaymentId,
+      providerOrderId: orderId ?? session.providerOrderId ?? null,
+      metadata: atomicJsonbMerge(checkoutSessions.metadata, {
         lastWebhookFinalizeAt: nowIso,
         lastWebhookEvent: eventType,
       }),
       updatedAt: now,
     })
-    .where(eq(eventPaymentSessions.id, session.id));
+    .where(eq(checkoutSessions.id, session.id));
 
-  await db
-    .update(eventRegistrations)
-    .set({
-      paymentStatus: "paid",
-      status: registration.status === "cancelled" ? registration.status : "confirmed",
-      paymentCompletedAt: now,
-      paymentId: paymentIdentifier,
-      amountPaidCents: resolvedAmount,
-      paymentMetadata: atomicJsonbMerge(eventRegistrations.paymentMetadata, {
-        squareTransactionId: paymentIdentifier,
-        lastWebhookFinalizeAt: nowIso,
-        lastWebhookEvent: eventType,
-      }),
-      updatedAt: now,
-    })
-    .where(eq(eventRegistrations.id, registration.id));
+  for (const row of rows) {
+    if (row.registration) {
+      const existingMetadata = (row.registration.paymentMetadata ?? {}) as Record<
+        string,
+        unknown
+      >;
+      const amountCents = row.item.amountCents * (row.item.quantity ?? 1);
 
-  console.log("[Square webhook] Event registration finalized", {
-    registrationId: registration.id,
-    eventId: event.id,
-    paymentId: paymentIdentifier,
-    amount: resolvedAmount,
-  });
+      await db
+        .update(eventRegistrations)
+        .set({
+          paymentStatus: "paid",
+          status:
+            row.registration.status === "cancelled"
+              ? row.registration.status
+              : "confirmed",
+          paymentCompletedAt: now,
+          paymentId: paymentIdentifier,
+          amountPaidCents: amountCents,
+          paymentMetadata: {
+            ...existingMetadata,
+            squareTransactionId: paymentIdentifier,
+            lastWebhookFinalizeAt: nowIso,
+            lastWebhookEvent: eventType,
+          },
+          updatedAt: now,
+        })
+        .where(eq(eventRegistrations.id, row.registration.id));
+    }
+
+    if (row.purchase && row.membershipType) {
+      const finalizeResult = await finalizeMembershipPurchase({
+        db,
+        purchase: row.purchase,
+        membershipType: row.membershipType,
+        paymentId: paymentIdentifier,
+        orderId: orderId ?? session.providerOrderId ?? null,
+        sessionId: session.providerCheckoutId,
+        now,
+      });
+
+      if (finalizeResult.wasCreated && finalizeResult.membership) {
+        const [member] = await db
+          .select({
+            email: user.email,
+            name: user.name,
+          })
+          .from(user)
+          .where(eq(user.id, row.purchase.userId ?? ""))
+          .limit(1);
+
+        if (member?.email) {
+          try {
+            const { sendMembershipPurchaseReceipt } =
+              await import("~/lib/email/sendgrid");
+
+            await sendMembershipPurchaseReceipt({
+              to: {
+                email: member.email,
+                name: member.name ?? undefined,
+              },
+              membershipType: row.membershipType.name,
+              amount: row.membershipType.priceCents,
+              paymentId: finalizeResult.membership.paymentId ?? paymentIdentifier,
+              expiresAt: new Date(finalizeResult.membership.endDate),
+            });
+          } catch (emailError) {
+            console.error("[Square webhook] Failed to send membership receipt", {
+              paymentId: paymentIdentifier,
+              email: member.email,
+              error: emailError,
+            });
+          }
+        }
+      }
+    }
+  }
 }
 
 async function handleRefundEvent({
@@ -275,38 +233,177 @@ async function handleRefundEvent({
   const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
   const db = await getDb();
 
-  const [membershipRecord] = await db
-    .select()
-    .from(memberships)
-    .where(eq(memberships.paymentId, paymentId))
-    .limit(1);
-
-  if (!membershipRecord) {
-    console.warn("[Square webhook] Refund received for unknown membership", {
-      paymentId,
-      refundId,
-    });
-    return;
-  }
-
   const now = new Date();
   const nowIso = now.toISOString();
 
-  await db
-    .update(memberships)
-    .set({
-      status: "cancelled",
-      metadata: atomicJsonbMerge(memberships.metadata, {
-        lastRefundStatus: status,
-        lastRefundId: refundId,
-        lastRefundedAt: nowIso,
-      }),
-      updatedAt: now,
-    })
-    .where(eq(memberships.id, membershipRecord.id));
+  const [session] = await db
+    .select()
+    .from(checkoutSessions)
+    .where(eq(checkoutSessions.providerPaymentId, paymentId))
+    .limit(1);
+
+  let membershipRecord: typeof memberships.$inferSelect | null = null;
+  let purchaseRecord: typeof membershipPurchases.$inferSelect | null = null;
+  let registrationRecords: Array<typeof eventRegistrations.$inferSelect> = [];
+
+  if (session) {
+    const rows = await db
+      .select({
+        item: checkoutItems,
+        registration: eventRegistrations,
+        purchase: membershipPurchases,
+        membership: memberships,
+      })
+      .from(checkoutItems)
+      .leftJoin(
+        eventRegistrations,
+        eq(checkoutItems.eventRegistrationId, eventRegistrations.id),
+      )
+      .leftJoin(
+        membershipPurchases,
+        eq(checkoutItems.membershipPurchaseId, membershipPurchases.id),
+      )
+      .leftJoin(memberships, eq(membershipPurchases.membershipId, memberships.id))
+      .where(eq(checkoutItems.checkoutSessionId, session.id));
+
+    registrationRecords = rows
+      .map((row) => row.registration)
+      .filter((row): row is typeof eventRegistrations.$inferSelect => Boolean(row));
+    membershipRecord = rows.find((row) => row.membership)?.membership ?? membershipRecord;
+    purchaseRecord = rows.find((row) => row.purchase)?.purchase ?? purchaseRecord;
+
+    await db
+      .update(checkoutSessions)
+      .set({
+        status: "refunded",
+        metadata: atomicJsonbMerge(checkoutSessions.metadata, {
+          lastRefundStatus: status,
+          lastRefundId: refundId,
+          lastRefundedAt: nowIso,
+          lastRefundEvent: eventType,
+        }),
+        updatedAt: now,
+      })
+      .where(eq(checkoutSessions.id, session.id));
+
+    for (const registration of registrationRecords) {
+      const existingMetadata = (registration.paymentMetadata ?? {}) as Record<
+        string,
+        unknown
+      >;
+
+      await db
+        .update(eventRegistrations)
+        .set({
+          paymentStatus: "refunded",
+          paymentMetadata: {
+            ...existingMetadata,
+            lastRefundStatus: status,
+            lastRefundId: refundId,
+            lastRefundedAt: nowIso,
+            lastRefundEvent: eventType,
+          },
+          updatedAt: now,
+        })
+        .where(eq(eventRegistrations.id, registration.id));
+    }
+
+    if (purchaseRecord) {
+      await db
+        .update(membershipPurchases)
+        .set({
+          status: "refunded",
+          metadata: atomicJsonbMerge(membershipPurchases.metadata, {
+            lastRefundStatus: status,
+            lastRefundId: refundId,
+            lastRefundedAt: nowIso,
+            lastRefundEvent: eventType,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(membershipPurchases.id, purchaseRecord.id));
+    }
+
+    if (membershipRecord) {
+      await db
+        .update(memberships)
+        .set({
+          status: "cancelled",
+          metadata: atomicJsonbMerge(memberships.metadata, {
+            lastRefundStatus: status,
+            lastRefundId: refundId,
+            lastRefundedAt: nowIso,
+            lastRefundEvent: eventType,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(memberships.id, membershipRecord.id));
+    }
+  }
+
+  if (!membershipRecord && !purchaseRecord && registrationRecords.length === 0) {
+    const [legacyMembership] = await db
+      .select()
+      .from(memberships)
+      .where(eq(memberships.paymentId, paymentId))
+      .limit(1);
+
+    const [legacyPurchase] = await db
+      .select()
+      .from(membershipPurchases)
+      .where(eq(membershipPurchases.paymentId, paymentId))
+      .limit(1);
+
+    membershipRecord = legacyMembership ?? membershipRecord;
+    purchaseRecord = legacyPurchase ?? purchaseRecord;
+
+    if (!membershipRecord && !purchaseRecord) {
+      console.warn("[Square webhook] Refund received for unknown payment", {
+        paymentId,
+        refundId,
+      });
+      return;
+    }
+
+    if (membershipRecord) {
+      await db
+        .update(memberships)
+        .set({
+          status: "cancelled",
+          metadata: atomicJsonbMerge(memberships.metadata, {
+            lastRefundStatus: status,
+            lastRefundId: refundId,
+            lastRefundedAt: nowIso,
+            lastRefundEvent: eventType,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(memberships.id, membershipRecord.id));
+    }
+
+    if (purchaseRecord) {
+      await db
+        .update(membershipPurchases)
+        .set({
+          status: "refunded",
+          metadata: atomicJsonbMerge(membershipPurchases.metadata, {
+            lastRefundStatus: status,
+            lastRefundId: refundId,
+            lastRefundedAt: nowIso,
+            lastRefundEvent: eventType,
+          }),
+          updatedAt: now,
+        })
+        .where(eq(membershipPurchases.id, purchaseRecord.id));
+    }
+  }
 
   const supportEmail = process.env["SUPPORT_EMAIL"];
   if (!supportEmail) {
+    return;
+  }
+
+  if (!membershipRecord && !purchaseRecord) {
     return;
   }
 
@@ -319,14 +416,16 @@ async function handleRefundEvent({
     await emailService.send({
       to: { email: supportEmail },
       from: { email: fromEmail, name: fromName },
-      subject: `Membership refund processed (${paymentId})`,
+      subject: `Refund processed (${paymentId})`,
       text: `A refund event was received from Square.
 
 Payment ID: ${paymentId}
 Refund ID: ${refundId ?? "unknown"}
 Status: ${status ?? "unknown"}
-Membership ID: ${membershipRecord.id}
-User ID: ${membershipRecord.userId}
+Membership ID: ${membershipRecord?.id ?? purchaseRecord?.membershipId ?? "unknown"}
+Membership Purchase ID: ${purchaseRecord?.id ?? "unknown"}
+User ID: ${membershipRecord?.userId ?? purchaseRecord?.userId ?? "unknown"}
+Event Registrations: ${registrationRecords.map((row) => row.id).join(", ") || "none"}
 Event Type: ${eventType}
 Processed At: ${nowIso}
 `,
@@ -341,8 +440,7 @@ Processed At: ${nowIso}
 }
 
 export const __squareWebhookTestUtils = {
-  finalizeMembershipFromWebhook,
-  finalizeEventRegistrationFromWebhook,
+  finalizeCheckoutFromWebhook,
   handleRefundEvent,
 };
 
@@ -350,7 +448,7 @@ export const Route = createFileRoute("/api/webhooks/square")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        await assertFeatureEnabled("qc_payments_square");
+        await assertFeatureEnabled("payments_square");
         try {
           // Get the raw body for signature verification
           const body = await request.text();
@@ -373,6 +471,7 @@ export const Route = createFileRoute("/api/webhooks/square")({
           }
 
           // Get the payment service and verify the webhook
+          const { getSquarePaymentService } = await import("~/lib/payments/square");
           const paymentService = await getSquarePaymentService();
           const { valid, event, error } = await paymentService.verifyAndParseWebhook(
             payload,
@@ -401,16 +500,10 @@ export const Route = createFileRoute("/api/webhooks/square")({
                 amount: event.amount,
               });
 
-              await finalizeMembershipFromWebhook({
+              await finalizeCheckoutFromWebhook({
                 paymentId: event.paymentId,
                 orderId: event.orderId,
                 eventType: event.rawType,
-              });
-              await finalizeEventRegistrationFromWebhook({
-                paymentId: event.paymentId,
-                orderId: event.orderId,
-                eventType: event.rawType,
-                amount: event.amount,
               });
               break;
             }

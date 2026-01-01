@@ -167,8 +167,7 @@ compaction.
 - DM-AGG-001: End-user submission tracking/edit flow still not verified; multi-file
   uploads remain unsupported (design decision).
 - DM-AGG-002: External platform integration/API PoC pending (target TBD).
-- DM-AGG-003: Secure admin DB access/data explorer still absent; data catalog sync
-  not re-verified with live entries.
+- DM-AGG-003: ~~Secure admin DB access/data explorer still absent~~ → CLOSED 2025-12-31 (SQL Workbench + data catalog)
 - DM-AGG-005: Archival controls enabled for SIN artifacts bucket (Object Lock +
   Glacier lifecycle); audit log archival workflow still pending; DR RPO gap vs
   target.
@@ -261,7 +260,7 @@ compaction.
 - DM-AGG-001: Verified submission tracking/edit flow; multi-file uploads still
   unsupported (decision).
 - DM-AGG-002: External platform/API integration PoC pending target selection.
-- DM-AGG-003: Data catalog verified; secure admin DB explorer still unimplemented.
+- DM-AGG-003: ✅ Data catalog + SQL Workbench verified (CLOSED 2025-12-31).
 - DM-AGG-005: Backups configured + encryption evidenced; artifacts bucket now has
   Object Lock + lifecycle rules; audit log archival workflow still pending; DR
   RPO gap remains.
@@ -289,9 +288,9 @@ compaction.
   templates implemented in `src/features/imports/components/import-wizard-shell.tsx`
   with schema in `src/db/schema/imports.schema.ts`; external API integration target
   still unknown so no PoC yet; transformation log viewer remains deferred.
-- DM-AGG-003 (Data governance & access control): RBAC enforced; data catalog sync
-  verified (`scripts/verify-sin-data-catalog.ts`); secure admin DB explorer/read-only
-  query UI still not implemented (decision pending on scope/tooling).
+- DM-AGG-003 (Data governance & access control): ✅ RBAC enforced; data catalog sync
+  verified; SQL Workbench implemented with AST parser, org scoping, role enforcement,
+  and 44/44 SQL injection tests passed. CLOSED 2025-12-31.
 - DM-AGG-005 (Storage & retention): RDS backups + retention + DR drill evidence exist
   (`DR-DRILL` + `RETENTION-JOB` evidence); SIN artifacts bucket now has Glacier
   lifecycle rules + Object Lock with SSE-S3; audit log archival workflow still
@@ -322,8 +321,8 @@ Recommendations / next steps:
 
 - Decide external integration target (DM-AGG-002) so an API PoC + mapping plan can
   be scoped and scheduled.
-- Confirm admin DB explorer approach (DM-AGG-003): either a read-only data explorer
-  with audit logging or leverage BI/export workflows in lieu of direct queries.
+- ~~Confirm admin DB explorer approach (DM-AGG-003)~~ → CLOSED: SQL Workbench
+  implemented with full security controls.
 - Define archival policy (DM-AGG-005) and confirm retention tiers + audit log
   archival workflow; Object Lock + lifecycle rules now enabled on SIN artifacts
   bucket.
@@ -652,3 +651,45 @@ Ran `npx sst shell --stage sin-dev -- npx drizzle-kit push --force` to apply sch
 - Some existing FK constraints were refreshed (event_registrations, checkout_items, membership_purchases)
 
 **Verification:** Schema changes applied successfully to sin-dev database.
+
+### 2025-12-31: Admin DB Explorer / SQL Workbench Complete (DM-AGG-003)
+
+**Verification performed:**
+
+1. Started SST dev server (`AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono`)
+2. Logged in as admin with MFA (TOTP authentication)
+3. Navigated to SQL Workbench (`/dashboard/analytics/sql`)
+4. Ran `SELECT * FROM organizations LIMIT 1` - returned viaSport BC row successfully
+5. Verified: schema browser shows `bi_v_organizations` view with 8 columns
+6. Verified: data catalog link present
+7. Verified: query history populated
+
+**Issue found and fixed:**
+
+- BI views (`bi_v_organizations`, etc.) were missing from sin-dev database
+- Ran `sql-workbench-dba-setup.sql` to create views + `bi_readonly` role
+- Query execution now works correctly with no 500 errors
+
+**SQL Injection Testing:**
+
+- Created `scripts/test-sql-injection.ts` with 44 test cases covering:
+  - Multi-statement injection (DROP, DELETE, INSERT, UPDATE)
+  - Session/role manipulation (SET ROLE, SET app.\*, RESET)
+  - Transaction manipulation (BEGIN, COMMIT, ROLLBACK, SAVEPOINT)
+  - Dangerous statements (COPY, DO, CALL, VACUUM, TRUNCATE, CREATE, ALTER, DROP, GRANT, REVOKE)
+  - Comment bypass attempts
+  - Encoding/escape sequences
+  - Table access restrictions (subqueries, CTEs, UNIONs to raw tables)
+  - Dangerous functions (pg_read_file, pg_ls_dir, COPY TO PROGRAM)
+- **Result: 44/44 tests passed** - all injection attempts blocked by parser/validator
+- Defense layers:
+  1. AST-based parser (pgsql-ast-parser) - only single SELECT allowed
+  2. Table rewriter - maps to `bi_v_*` views
+  3. Dataset validator - blocks access to non-whitelisted tables
+  4. DB role enforcement - `bi_readonly` has SELECT only on views
+  5. Session context injection - `SET LOCAL app.org_id` for org scoping
+
+**Status update:**
+
+- DM-AGG-003: ✅ Complete - SQL Workbench functional with schema browser, query
+  execution, results, history. BI views deployed. 44/44 SQL injection tests passed.

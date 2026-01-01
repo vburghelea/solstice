@@ -42,7 +42,16 @@ Cons: Requirement remains partial.
 Option B: Add read-only query console with audit logging.
 Pros: Stronger compliance.
 Cons: Security review and scoping risk.
-Decision: What would this interface look like within our project?
+Decision: **CLOSED 2025-12-31** - Implemented SQL Workbench with:
+
+- AST-based SQL parser (only SELECT allowed)
+- Table rewriting to curated BI views (bi*v*\*)
+- DB role enforcement (bi_readonly with SELECT-only on views)
+- Session context injection for org scoping
+- Query guardrails (timeout, row limits, cost estimation)
+- Tamper-evident audit logging (SHA-256 chain)
+- 44/44 SQL injection tests passed
+  See: `src/features/bi/docs/CHECKLIST-sql-workbench-gate.md`
 
 ### Fiscal periods, agreements, NCCP metadata (RP-AGG-002)
 

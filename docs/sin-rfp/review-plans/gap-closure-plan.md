@@ -18,7 +18,7 @@
 - P2: Submission file delete/replace flow (RP-AGG-004) (decision: delete; scope TBD)
 - P3: Global search + command palette (entity + actions) (UI-AGG-005) (decision confirmed; open)
 - P3: External integrations/API PoC (DM-AGG-002) (target TBD)
-- P3: Admin data explorer/DB query interface (DM-AGG-003) (decision pending)
+- P3: Admin data explorer/DB query interface (DM-AGG-003) (CLOSED 2025-12-31; SQL Workbench + data catalog)
 
 ---
 

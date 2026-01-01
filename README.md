@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/austeane/solstice/actions/workflows/ci.yml/badge.svg)](https://github.com/austeane/solstice/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/austeane/solstice/branch/main/graph/badge.svg)](https://codecov.io/gh/austeane/solstice)
-[![Deploy Preview](https://github.com/austeane/solstice/actions/workflows/deploy-preview.yml/badge.svg)](https://github.com/austeane/solstice/actions/workflows/deploy-preview.yml)
 
 ## Overview
 

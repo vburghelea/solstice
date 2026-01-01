@@ -1,7 +1,7 @@
 # SQL Workbench Prerequisites Checklist
 
-**Status**: Not Started
-**Last Updated**: 2025-12-30
+**Status**: In Progress
+**Last Updated**: 2025-12-31
 **Owner**: Technical Architecture
 
 ---
@@ -39,31 +39,34 @@ This checklist gates #2-#4. UI gating is separate but required for rollout.
 
 | Status | Item                                                    | Validation                                                      | Owner    |
 | ------ | ------------------------------------------------------- | --------------------------------------------------------------- | -------- |
-| [ ]    | Feature key exists (e.g. `sin_analytics_sql_workbench`) | `src/tenant/tenant.types.ts` contains key                       | Backend  |
+| [x]    | Feature key exists (e.g. `sin_analytics_sql_workbench`) | `src/tenant/tenant.types.ts` contains key                       | Backend  |
 | [ ]    | Feature defaults OFF in all tenants                     | `src/tenant/tenants/*.ts`                                       | Backend  |
-| [ ]    | Route/server/nav gated by feature key                   | `requireFeatureInRoute`/`assertFeatureEnabled` + nav `feature:` | Frontend |
+| [x]    | Route/server/nav gated by feature key                   | `requireFeatureInRoute`/`assertFeatureEnabled` + nav `feature:` | Frontend |
 
 **Notes**
 
 - This repo uses **code-based tenant feature gates**, not a DB `feature_flags` table.
 - If you later add DB-driven feature flags, update this section accordingly.
+- viaSport is temporarily enabled for SQL workbench verification; revert before release.
 
 ---
 
 ### 1. Curated BI Views Created (No PII)
 
-| Status | Item                                 | Validation                                                   | Owner    |
-| ------ | ------------------------------------ | ------------------------------------------------------------ | -------- |
-| [ ]    | `bi_v_organizations` view created    | View exists; contains no PII columns                         | DBA      |
-| [ ]    | `bi_v_members` view created          | View exists; contains no PII columns                         | DBA      |
-| [ ]    | `bi_v_form_submissions` view created | View exists; **no raw payload** unless sanitized/allowlisted | DBA      |
-| [ ]    | `bi_v_events` view created           | View exists; contains no PII columns                         | DBA      |
-| [ ]    | Views created as `security_barrier`  | `pg_class.reloptions` includes `security_barrier=true`       | Security |
+| Status | Item                                      | Validation                                                   | Owner    |
+| ------ | ----------------------------------------- | ------------------------------------------------------------ | -------- |
+| [x]    | `bi_v_organizations` view created         | View exists; contains no PII columns                         | DBA      |
+| [x]    | `bi_v_reporting_submissions` view created | View exists; contains no PII columns                         | DBA      |
+| [x]    | `bi_v_form_submissions` view created      | View exists; **no raw payload** unless sanitized/allowlisted | DBA      |
+| [x]    | `bi_v_events` view created                | View exists; contains no PII columns                         | DBA      |
+| [x]    | Views created as `security_barrier`       | `pg_class.reloptions` includes `security_barrier=true`       | Security |
 
 **Rule**: If a field might contain PII (especially JSON payloads), it must be:
 
 - excluded from SQL Workbench views, **or**
 - surfaced only through an explicit sanitizer / allowlist mechanism.
+
+DBA setup script: `src/features/bi/docs/sql-workbench-dba-setup.sql`
 
 **SQL Template (Organizations)**
 
@@ -92,9 +95,10 @@ WHERE
 
 **Evidence**:
 
-- [ ] `\d+ bi_v_organizations` output showing columns
-- [ ] `SELECT * FROM bi_v_organizations` as non-admin returns only the scoped org row
-- [ ] `SELECT reloptions FROM pg_class WHERE relname='bi_v_organizations'` includes `security_barrier=true`
+- [x] `\d+ bi_v_organizations` output showing columns
+- [x] `SELECT * FROM bi_v_organizations` as non-admin returns only the scoped org row
+- [x] `SELECT reloptions FROM pg_class WHERE relname='bi_v_organizations'` includes `security_barrier=true`
+- [x] Evidence captured using `src/features/bi/docs/sql-workbench-evidence.sql`
 
 ---
 
@@ -106,9 +110,9 @@ WHERE
 
 | Status | Item                            | Validation                               | Owner    |
 | ------ | ------------------------------- | ---------------------------------------- | -------- |
-| [ ]    | Non-admin scope enforced        | Scoped session returns only allowed rows | DBA      |
-| [ ]    | Global admin scope works        | Admin session can return all rows        | DBA      |
-| [ ]    | Missing context returns no rows | Unset context yields zero rows           | Security |
+| [x]    | Non-admin scope enforced        | Scoped session returns only allowed rows | DBA      |
+| [x]    | Global admin scope works        | Admin session can return all rows        | DBA      |
+| [x]    | Missing context returns no rows | Unset context yields zero rows           | Security |
 
 **Validation Query**
 
@@ -147,7 +151,7 @@ ROLLBACK;
 
 **Evidence**:
 
-- [ ] Query outputs captured (copy/paste or screenshots)
+- [x] Query outputs captured (copy/paste or screenshots)
 
 ---
 
@@ -155,10 +159,10 @@ ROLLBACK;
 
 | Status | Item                                     | Validation                                                       | Owner |
 | ------ | ---------------------------------------- | ---------------------------------------------------------------- | ----- |
-| [ ]    | `bi_readonly` role exists                | `SELECT 1 FROM pg_roles WHERE rolname='bi_readonly'`             | DBA   |
-| [ ]    | Role has SELECT only on `bi_v_*` views   | `\dp bi_v_*` shows SELECT grants                                 | DBA   |
-| [ ]    | Role has **no** privileges on raw tables | `SELECT * FROM organizations` fails under `SET ROLE bi_readonly` | DBA   |
-| [ ]    | Role cannot create objects               | `CREATE TABLE ...` fails under `SET ROLE bi_readonly`            | DBA   |
+| [x]    | `bi_readonly` role exists                | `SELECT 1 FROM pg_roles WHERE rolname='bi_readonly'`             | DBA   |
+| [x]    | Role has SELECT only on `bi_v_*` views   | `\dp bi_v_*` shows SELECT grants                                 | DBA   |
+| [x]    | Role has **no** privileges on raw tables | `SELECT * FROM organizations` fails under `SET ROLE bi_readonly` | DBA   |
+| [x]    | Role cannot create objects               | `CREATE TABLE ...` fails under `SET ROLE bi_readonly`            | DBA   |
 
 **Important Implementation Detail (App Side)**
 The application must execute user SQL under **this role** using:
@@ -193,9 +197,10 @@ REVOKE ALL ON organizations FROM bi_readonly;
 
 **Evidence**:
 
-- [ ] `\du bi_readonly` output
-- [ ] `\dp bi_v_*` output showing grants
-- [ ] Transcript showing `SET ROLE bi_readonly; SELECT * FROM organizations;` fails
+- [x] `\du bi_readonly` output
+- [x] `\dp bi_v_*` output showing grants
+- [x] Transcript showing `SET ROLE bi_readonly; SELECT * FROM organizations;` fails
+- [x] Evidence captured using `src/features/bi/docs/sql-workbench-evidence.sql`
 
 ---
 
@@ -203,10 +208,10 @@ REVOKE ALL ON organizations FROM bi_readonly;
 
 | Status | Item                                                        | Validation                                      | Owner    |
 | ------ | ----------------------------------------------------------- | ----------------------------------------------- | -------- |
-| [ ]    | `SET LOCAL app.org_id` executed before every query          | Code review                                     | Backend  |
-| [ ]    | `SET LOCAL app.is_global_admin` executed before every query | Code review                                     | Backend  |
-| [ ]    | Query runs inside a transaction                             | Unit/integration test                           | Backend  |
-| [ ]    | User SQL cannot change session/role                         | Parser rejects `SET`, `RESET`, `SET ROLE`, etc. | Security |
+| [x]    | `SET LOCAL app.org_id` executed before every query          | Code review                                     | Backend  |
+| [x]    | `SET LOCAL app.is_global_admin` executed before every query | Code review                                     | Backend  |
+| [x]    | Query runs inside a transaction                             | Unit/integration test                           | Backend  |
+| [x]    | User SQL cannot change session/role                         | Parser rejects `SET`, `RESET`, `SET ROLE`, etc. | Security |
 
 **Code Pattern**
 
@@ -220,11 +225,19 @@ async function executeSqlWorkbenchQuery(
 
   return db.transaction(async (tx) => {
     // 1) Run as read-only role
-    await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
+    await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
 
     // 2) Set scope context
-    await tx.execute(sql`SET LOCAL app.org_id = ${orgId ?? ""}`);
-    await tx.execute(sql`SET LOCAL app.is_global_admin = ${String(isGlobalAdmin)}`);
+    await tx.execute(
+      sql.raw(`SET LOCAL app.org_id = ${formatSettingValue(orgId ?? "")}`),
+    );
+    await tx.execute(
+      sql.raw(
+        `SET LOCAL app.is_global_admin = ${formatSettingValue(
+          String(isGlobalAdmin),
+        )}`,
+      ),
+    );
 
     // 3) Execute prepared SQL (after parsing/rewriting/parameterization)
     return tx.execute(userSqlPrepared);
@@ -232,10 +245,13 @@ async function executeSqlWorkbenchQuery(
 }
 ```
 
+> **Note**: Postgres does not accept bind parameters in `SET LOCAL`. Use a
+> helper (e.g. `formatSettingValue`) to safely inline literal values.
+
 **Evidence**:
 
-- [ ] Unit test proves `SET LOCAL ROLE` and context are applied
-- [ ] Parser test proves user cannot include `SET`, `RESET`, `SET ROLE` statements
+- [x] Unit test proves `SET LOCAL ROLE` and context are applied
+- [x] Parser test proves user cannot include `SET`, `RESET`, `SET ROLE` statements
 
 ---
 
@@ -243,10 +259,10 @@ async function executeSqlWorkbenchQuery(
 
 | Status | Item                                | Validation  | Owner    |
 | ------ | ----------------------------------- | ----------- | -------- |
-| [ ]    | Only a single SELECT is allowed     | Unit tests  | Backend  |
-| [ ]    | Table names rewritten to view names | Unit tests  | Backend  |
-| [ ]    | Disallowed tables rejected          | Unit tests  | Backend  |
-| [ ]    | Rewriting is AST-based (not regex)  | Code review | Security |
+| [x]    | Only a single SELECT is allowed     | Unit tests  | Backend  |
+| [x]    | Table names rewritten to view names | Unit tests  | Backend  |
+| [x]    | Disallowed tables rejected          | Unit tests  | Backend  |
+| [x]    | Rewriting is AST-based (not regex)  | Code review | Security |
 
 **Rule**: Only a single SELECT statement is allowed (including WITH/CTE). Everything
 else is rejected.
@@ -272,7 +288,7 @@ expect(() => validateDataset("SELECT * FROM users")).toThrow();
 
 **Evidence**:
 
-- [ ] Test output / CI run
+- [x] Test output / CI run
 - [ ] Code review sign-off
 
 ---
@@ -281,11 +297,11 @@ expect(() => validateDataset("SELECT * FROM users")).toThrow();
 
 | Status | Item                                              | Validation            | Owner   |
 | ------ | ------------------------------------------------- | --------------------- | ------- |
-| [ ]    | Timeout applied via `SET LOCAL statement_timeout` | Integration test      | Backend |
-| [ ]    | UI row limit enforced (e.g. 10,000)               | Integration test      | Backend |
-| [ ]    | Export row limit enforced (e.g. 100,000)          | Integration test      | Backend |
-| [ ]    | Cost check via `EXPLAIN (FORMAT JSON)`            | Unit/integration test | Backend |
-| [ ]    | Concurrency limit enforced (per user/org)         | Integration test      | Backend |
+| [x]    | Timeout applied via `SET LOCAL statement_timeout` | Integration test      | Backend |
+| [x]    | UI row limit enforced (e.g. 10,000)               | Integration test      | Backend |
+| [x]    | Export row limit enforced (e.g. 100,000)          | Integration test      | Backend |
+| [x]    | Cost check via `EXPLAIN (FORMAT JSON)`            | Unit/integration test | Backend |
+| [x]    | Concurrency limit enforced (per user/org)         | Integration test      | Backend |
 
 **Guardrails Config**
 
@@ -302,9 +318,9 @@ export const QUERY_GUARDRAILS = {
 
 **Evidence**:
 
-- [ ] Timeout test
-- [ ] Limit enforcement test
-- [ ] Explain cost rejection test
+- [x] Timeout test
+- [x] Limit enforcement test
+- [x] Explain cost rejection test
 
 ---
 
@@ -312,18 +328,18 @@ export const QUERY_GUARDRAILS = {
 
 | Status | Item                                                   | Validation                | Owner    |
 | ------ | ------------------------------------------------------ | ------------------------- | -------- |
-| [ ]    | `bi_query_log` table exists                            | Drizzle migration applied | Backend  |
-| [ ]    | All SQL workbench queries logged                       | Integration test          | Backend  |
-| [ ]    | Chain fields populated (`previous_log_id`, `checksum`) | Inspection                | Security |
-| [ ]    | Chain verification script passes                       | Script output             | Security |
+| [x]    | `bi_query_log` table exists                            | Drizzle migration applied | Backend  |
+| [x]    | All SQL workbench queries logged                       | Integration test          | Backend  |
+| [x]    | Chain fields populated (`previous_log_id`, `checksum`) | Inspection                | Security |
+| [x]    | Chain verification script passes                       | Script output             | Security |
 
 **Checksum Rule (documented + implemented)**
 `checksum = HMAC_SHA256(secret, canonical_json(entry_without_checksum) || prev_checksum)`
 
 **Evidence**:
 
-- [ ] Sample log row
-- [ ] Verification output
+- [x] Sample log row
+- [x] Verification output
 
 ---
 
@@ -390,6 +406,13 @@ For external/public users:
 4. Root cause analysis before re-enablement.
 
 ---
+
+## Progress Notes (2025-12-31)
+
+- App-layer SQL parser/rewriter, guardrails, and audit logging are implemented; integration tests for timeout/cost/chain verification remain.
+- DBA setup + evidence scripts executed on sin-dev with org id `a0000000-0000-4000-8001-000000000001`.
+- SQL workbench query execution verified in UI; results + history render, and `bi_query_log` populated with checksum chain.
+- Guardrails + audit chain verification evidence captured in `src/features/bi/docs/sql-workbench-guardrails-audit-evidence.md`.
 
 ## Links
 

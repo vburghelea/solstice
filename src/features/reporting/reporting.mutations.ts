@@ -5,8 +5,10 @@ import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createReportingCycleSchema,
   createReportingTaskSchema,
+  updateReportingMetadataSchema,
   updateReportingSubmissionSchema,
 } from "./reporting.schemas";
+import type { ReportingMetadata } from "./reporting.schemas";
 
 const MAX_REMINDER_DAYS = 365;
 const REVIEW_STATUSES = new Set([
@@ -26,6 +28,23 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   approved: [],
   rejected: [],
 };
+
+const normalizeReportingMetadata = (metadata: ReportingMetadata) => ({
+  fiscalYearStart: metadata.fiscalYearStart?.trim() || null,
+  fiscalYearEnd: metadata.fiscalYearEnd?.trim() || null,
+  reportingPeriodStart: metadata.reportingPeriodStart?.trim() || null,
+  reportingPeriodEnd: metadata.reportingPeriodEnd?.trim() || null,
+  agreementId: metadata.agreementId?.trim() || null,
+  agreementName: metadata.agreementName?.trim() || null,
+  agreementStart: metadata.agreementStart?.trim() || null,
+  agreementEnd: metadata.agreementEnd?.trim() || null,
+  nccpStatus: metadata.nccpStatus?.trim() || null,
+  nccpNumber: metadata.nccpNumber?.trim() || null,
+  primaryContactName: metadata.primaryContactName?.trim() || null,
+  primaryContactEmail: metadata.primaryContactEmail?.trim() || null,
+  primaryContactPhone: metadata.primaryContactPhone?.trim() || null,
+  reportingFrequency: metadata.reportingFrequency?.trim() || null,
+});
 
 const getSession = async () => {
   const { getAuth } = await import("~/lib/auth/server-helpers");
@@ -255,6 +274,78 @@ export const createReportingTask = createServerFn({ method: "POST" })
     }
 
     return created ?? null;
+  });
+
+export const updateReportingMetadata = createServerFn({ method: "POST" })
+  .inputValidator(zod$(updateReportingMetadataSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_reporting");
+    const session = await requireSession();
+    const actorUserId = session.user.id;
+
+    const { requireOrganizationAccess, ORG_ADMIN_ROLES } =
+      await import("~/lib/auth/guards/org-guard");
+    await requireOrganizationAccess(
+      { userId: actorUserId, organizationId: data.organizationId },
+      { roles: ORG_ADMIN_ROLES },
+    );
+
+    const { getDb } = await import("~/db/server-helpers");
+    const { organizations } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+    const { notFound } = await import("~/lib/server/errors");
+
+    const db = await getDb();
+    const [existing] = await db
+      .select({
+        id: organizations.id,
+        metadata: organizations.metadata,
+      })
+      .from(organizations)
+      .where(eq(organizations.id, data.organizationId))
+      .limit(1);
+
+    if (!existing) {
+      throw notFound("Organization not found");
+    }
+
+    const existingMetadata =
+      typeof existing.metadata === "object" && existing.metadata
+        ? (existing.metadata as JsonRecord)
+        : {};
+    const existingReporting =
+      typeof existingMetadata["reporting"] === "object" && existingMetadata["reporting"]
+        ? (existingMetadata["reporting"] as JsonRecord)
+        : {};
+
+    const normalized = normalizeReportingMetadata(data.metadata);
+    const nextMetadata = {
+      ...existingMetadata,
+      reporting: {
+        ...existingReporting,
+        ...normalized,
+      },
+    } satisfies JsonRecord;
+
+    const [updated] = await db
+      .update(organizations)
+      .set({ metadata: nextMetadata })
+      .where(eq(organizations.id, data.organizationId))
+      .returning();
+
+    if (updated) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "ORG_REPORTING_METADATA_UPDATE",
+        actorUserId,
+        targetType: "organization",
+        targetId: updated.id,
+        targetOrgId: updated.id,
+        metadata: { organizationId: updated.id },
+      });
+    }
+
+    return normalized;
   });
 
 export const updateReportingSubmission = createServerFn({ method: "POST" })

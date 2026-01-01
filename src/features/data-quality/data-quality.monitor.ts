@@ -51,6 +51,12 @@ const buildSummary = async (): Promise<DataQualitySummary> => {
 
   const orgNameById = new Map(orgRows.map((org) => [org.id, org.name]));
 
+  const toIsoString = (value: Date | string | null) => {
+    if (!value) return null;
+    const parsed = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  };
+
   const byOrganization = stats.map((row) => ({
     organizationId: row.organizationId,
     organizationName: orgNameById.get(row.organizationId) ?? null,
@@ -59,7 +65,7 @@ const buildSummary = async (): Promise<DataQualitySummary> => {
     validationErrors: Number(row.validationErrors ?? 0),
     lowCompleteness: Number(row.lowCompleteness ?? 0),
     draftSubmissions: Number(row.draftSubmissions ?? 0),
-    latestSubmittedAt: row.latestSubmittedAt ? row.latestSubmittedAt.toISOString() : null,
+    latestSubmittedAt: toIsoString(row.latestSubmittedAt),
   }));
 
   const totals = byOrganization.reduce(

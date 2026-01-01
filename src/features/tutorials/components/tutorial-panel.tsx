@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { GuidedTour } from "./guided-tour";
 import { tutorials, type TutorialId } from "../tutorials.config";
 import { completeTutorial, dismissTutorial, startTutorial } from "../tutorials.mutations";
 import { listTutorialProgress } from "../tutorials.queries";
@@ -24,6 +25,7 @@ export function TutorialPanel({
 }) {
   const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
+  const [activeTourId, setActiveTourId] = useState<TutorialId | null>(null);
 
   const filteredTutorials = useMemo(() => {
     if (!tutorialIds || tutorialIds.length === 0) return tutorials;
@@ -114,12 +116,21 @@ export function TutorialPanel({
                   {isOpen ? "Hide steps" : "View steps"}
                 </Button>
                 {status === "not_started" ? (
-                  <Button size="sm" onClick={() => startMutation.mutate(tutorial.id)}>
-                    Start walkthrough
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      startMutation.mutate(tutorial.id);
+                      setActiveTourId(tutorial.id);
+                    }}
+                  >
+                    Start tour
                   </Button>
                 ) : null}
                 {status === "started" ? (
                   <>
+                    <Button size="sm" onClick={() => setActiveTourId(tutorial.id)}>
+                      Resume tour
+                    </Button>
                     <Button
                       size="sm"
                       onClick={() => completeMutation.mutate(tutorial.id)}
@@ -129,7 +140,12 @@ export function TutorialPanel({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => dismissMutation.mutate(tutorial.id)}
+                      onClick={() => {
+                        dismissMutation.mutate(tutorial.id);
+                        if (activeTourId === tutorial.id) {
+                          setActiveTourId(null);
+                        }
+                      }}
                     >
                       Dismiss
                     </Button>
@@ -140,6 +156,14 @@ export function TutorialPanel({
           );
         })}
       </CardContent>
+      {activeTourId ? (
+        <GuidedTour
+          tutorialId={activeTourId}
+          onClose={() => setActiveTourId(null)}
+          onComplete={() => completeMutation.mutate(activeTourId)}
+          onDismiss={() => dismissMutation.mutate(activeTourId)}
+        />
+      ) : null}
     </Card>
   );
 }

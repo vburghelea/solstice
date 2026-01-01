@@ -6,8 +6,11 @@ import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createFormSchema,
   createFormUploadSchema,
+  deleteSubmissionFileSchema,
   publishFormSchema,
+  prepareSubmissionFileReplacementSchema,
   reviewFormSubmissionSchema,
+  replaceSubmissionFileSchema,
   submitFormSchema,
   updateFormSchema,
   updateFormSubmissionSchema,
@@ -54,6 +57,17 @@ const requireOrgAccess = async (
   return requireOrganizationAccess({ userId, organizationId }, options);
 };
 
+const requireSubmissionAccess = async (
+  userId: string,
+  submission: { organizationId: string; submitterId: string | null },
+) => {
+  if (submission.submitterId === userId) return;
+  const { ORG_ADMIN_ROLES } = await import("~/lib/auth/guards/org-guard");
+  await requireOrgAccess(userId, submission.organizationId, {
+    roles: ORG_ADMIN_ROLES,
+  });
+};
+
 const loadFormWithAccess = async (
   formId: string,
   userId: string,
@@ -72,6 +86,61 @@ const loadFormWithAccess = async (
 
   await requireOrgAccess(userId, form.organizationId, options);
   return form;
+};
+
+const normalizeHoldType = (value: string | null | undefined) =>
+  value ? value.trim().toLowerCase() : null;
+
+const assertNoSubmissionHold = async (params: {
+  submission: { id: string; organizationId: string; submitterId: string | null };
+  submissionFileId?: string;
+  dataType: string;
+}) => {
+  const { getDb } = await import("~/db/server-helpers");
+  const { legalHolds, retentionPolicies } = await import("~/db/schema");
+  const { inArray, isNull } = await import("drizzle-orm");
+  const db = await getDb();
+
+  const dataType = normalizeHoldType(params.dataType) ?? "";
+  const policyTypes = Array.from(
+    new Set([dataType, "submission_files", "form_submissions"].filter(Boolean)),
+  );
+  const policies = await db
+    .select()
+    .from(retentionPolicies)
+    .where(inArray(retentionPolicies.dataType, policyTypes));
+
+  if (policies.some((policy) => policy.legalHold)) {
+    throw forbidden("This submission is under legal hold.");
+  }
+
+  const holds = await db.select().from(legalHolds).where(isNull(legalHolds.releasedAt));
+  if (holds.length === 0) return;
+
+  const hasHold = holds.some((hold) => {
+    const holdType = normalizeHoldType(hold.dataType);
+    if (holdType && !policyTypes.includes(holdType)) return false;
+
+    if (hold.scopeType === "record") {
+      return (
+        hold.scopeId === params.submission.id ||
+        (params.submissionFileId && hold.scopeId === params.submissionFileId)
+      );
+    }
+    if (hold.scopeType === "user") {
+      return params.submission.submitterId
+        ? hold.scopeId === params.submission.submitterId
+        : false;
+    }
+    if (hold.scopeType === "organization") {
+      return hold.scopeId === params.submission.organizationId;
+    }
+    return false;
+  });
+
+  if (hasHold) {
+    throw forbidden("This submission is under legal hold.");
+  }
 };
 
 type FilePayload = {
@@ -735,4 +804,354 @@ export const reviewFormSubmission = createServerFn({ method: "POST" })
     }
 
     return updated ?? null;
+  });
+
+export const prepareSubmissionFileReplacement = createServerFn({ method: "POST" })
+  .inputValidator(zod$(prepareSubmissionFileReplacementSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { formSubmissions, formVersions, submissionFiles } =
+      await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+    const db = await getDb();
+
+    const [record] = await db
+      .select({
+        submissionId: formSubmissions.id,
+        formId: formSubmissions.formId,
+        formVersionId: formSubmissions.formVersionId,
+        organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+        fieldKey: submissionFiles.fieldKey,
+        fileName: submissionFiles.fileName,
+      })
+      .from(submissionFiles)
+      .innerJoin(formSubmissions, eq(submissionFiles.submissionId, formSubmissions.id))
+      .where(eq(submissionFiles.id, data.submissionFileId))
+      .limit(1);
+
+    if (!record) {
+      throw notFound("Submission file not found");
+    }
+
+    await requireSubmissionAccess(actorUserId, record);
+    await assertNoSubmissionHold({
+      submission: {
+        id: record.submissionId,
+        organizationId: record.organizationId,
+        submitterId: record.submitterId,
+      },
+      submissionFileId: data.submissionFileId,
+      dataType: "submission_files",
+    });
+
+    const [version] = await db
+      .select()
+      .from(formVersions)
+      .where(eq(formVersions.id, record.formVersionId))
+      .limit(1);
+
+    if (!version) {
+      throw notFound("Form version not found");
+    }
+
+    const definition = version.definition as FormDefinition;
+    const config = getFileConfigForField(definition, record.fieldKey);
+    const validation = validateFileUpload(
+      {
+        fileName: data.fileName,
+        mimeType: data.mimeType,
+        size: data.sizeBytes,
+      },
+      config,
+    );
+
+    if (!validation.valid) {
+      throw badRequest(validation.error ?? "File validation failed");
+    }
+
+    const { createId } = await import("@paralleldrive/cuid2");
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+    const { getArtifactsBucketName, getS3Client } =
+      await import("~/lib/storage/artifacts");
+
+    const safeFileName = data.fileName.replace(/[^a-zA-Z0-9_.-]/g, "_");
+    const storageKey = `forms/${record.formId}/${createId()}-${safeFileName}`;
+    const bucket = await getArtifactsBucketName();
+    const client = await getS3Client();
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: storageKey,
+      ContentType: data.mimeType,
+      ContentLength: data.sizeBytes,
+    });
+
+    const uploadUrl = await getSignedUrl(client, command, { expiresIn: 900 });
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "FORM_SUBMISSION_FILE_REPLACE_INIT",
+      actorUserId,
+      targetType: "submission_file",
+      targetId: data.submissionFileId,
+      targetOrgId: record.organizationId,
+      metadata: {
+        previousFileName: record.fileName,
+        fileName: data.fileName,
+        mimeType: data.mimeType,
+        sizeBytes: data.sizeBytes,
+        storageKey,
+      },
+    });
+
+    return { uploadUrl, storageKey };
+  });
+
+export const replaceSubmissionFile = createServerFn({ method: "POST" })
+  .inputValidator(zod$(replaceSubmissionFileSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { formSubmissionVersions, formSubmissions, formVersions, submissionFiles } =
+      await import("~/db/schema");
+    const { desc, eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [record] = await db
+      .select({
+        submissionId: formSubmissions.id,
+        formId: formSubmissions.formId,
+        formVersionId: formSubmissions.formVersionId,
+        organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+        payload: formSubmissions.payload,
+        fieldKey: submissionFiles.fieldKey,
+        fileName: submissionFiles.fileName,
+        storageKey: submissionFiles.storageKey,
+      })
+      .from(submissionFiles)
+      .innerJoin(formSubmissions, eq(submissionFiles.submissionId, formSubmissions.id))
+      .where(eq(submissionFiles.id, data.submissionFileId))
+      .limit(1);
+
+    if (!record) {
+      throw notFound("Submission file not found");
+    }
+
+    await requireSubmissionAccess(actorUserId, record);
+    await assertNoSubmissionHold({
+      submission: {
+        id: record.submissionId,
+        organizationId: record.organizationId,
+        submitterId: record.submitterId,
+      },
+      submissionFileId: data.submissionFileId,
+      dataType: "submission_files",
+    });
+
+    const [version] = await db
+      .select()
+      .from(formVersions)
+      .where(eq(formVersions.id, record.formVersionId))
+      .limit(1);
+
+    if (!version) {
+      throw notFound("Form version not found");
+    }
+
+    const definition = version.definition as FormDefinition;
+    const storageKeyPrefix = `forms/${record.formId}/`;
+    if (!isValidStorageKeyPrefix(data.storageKey, storageKeyPrefix)) {
+      throw badRequest("File storage key is not valid for this form.");
+    }
+
+    const updatedPayload = {
+      ...(record.payload as JsonRecord),
+      [record.fieldKey]: {
+        storageKey: data.storageKey,
+        fileName: data.fileName,
+        mimeType: data.mimeType,
+        sizeBytes: data.sizeBytes,
+        ...(data.checksum ? { checksum: data.checksum } : {}),
+      },
+    } as JsonRecord;
+
+    const validation = validateFormPayload(definition, updatedPayload, {
+      storageKeyPrefix,
+    });
+
+    const [updated] = await db
+      .update(formSubmissions)
+      .set({
+        payload: updatedPayload,
+        completenessScore: validation.completenessScore,
+        missingFields: validation.missingFields,
+        validationErrors: validation.validationErrors,
+        updatedAt: new Date(),
+      })
+      .where(eq(formSubmissions.id, record.submissionId))
+      .returning();
+
+    if (!updated) {
+      return null;
+    }
+
+    const [latestVersion] = await db
+      .select({ versionNumber: formSubmissionVersions.versionNumber })
+      .from(formSubmissionVersions)
+      .where(eq(formSubmissionVersions.submissionId, updated.id))
+      .orderBy(desc(formSubmissionVersions.versionNumber))
+      .limit(1);
+
+    await db.insert(formSubmissionVersions).values({
+      submissionId: updated.id,
+      versionNumber: (latestVersion?.versionNumber ?? 0) + 1,
+      payloadSnapshot: updatedPayload,
+      changedBy: actorUserId,
+      changeReason: `Replaced file ${record.fileName} with ${data.fileName}`,
+    });
+
+    await insertSubmissionFiles(definition, updatedPayload, updated.id, actorUserId);
+
+    const { deleteFormSubmissionFiles } = await import("~/lib/privacy/submission-files");
+    await deleteFormSubmissionFiles({ items: [record] });
+
+    await db.delete(submissionFiles).where(eq(submissionFiles.id, data.submissionFileId));
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "FORM_SUBMISSION_FILE_REPLACE",
+      actorUserId,
+      targetType: "submission_file",
+      targetId: data.submissionFileId,
+      targetOrgId: record.organizationId,
+      metadata: {
+        submissionId: record.submissionId,
+        previousFileName: record.fileName,
+        fileName: data.fileName,
+      },
+    });
+
+    return updated;
+  });
+
+export const deleteSubmissionFile = createServerFn({ method: "POST" })
+  .inputValidator(zod$(deleteSubmissionFileSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_forms");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { formSubmissionVersions, formSubmissions, formVersions, submissionFiles } =
+      await import("~/db/schema");
+    const { desc, eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [record] = await db
+      .select({
+        submissionId: formSubmissions.id,
+        formId: formSubmissions.formId,
+        formVersionId: formSubmissions.formVersionId,
+        organizationId: formSubmissions.organizationId,
+        submitterId: formSubmissions.submitterId,
+        payload: formSubmissions.payload,
+        fieldKey: submissionFiles.fieldKey,
+        fileName: submissionFiles.fileName,
+      })
+      .from(submissionFiles)
+      .innerJoin(formSubmissions, eq(submissionFiles.submissionId, formSubmissions.id))
+      .where(eq(submissionFiles.id, data.submissionFileId))
+      .limit(1);
+
+    if (!record) {
+      throw notFound("Submission file not found");
+    }
+
+    await requireSubmissionAccess(actorUserId, record);
+    await assertNoSubmissionHold({
+      submission: {
+        id: record.submissionId,
+        organizationId: record.organizationId,
+        submitterId: record.submitterId,
+      },
+      submissionFileId: data.submissionFileId,
+      dataType: "submission_files",
+    });
+
+    const [version] = await db
+      .select()
+      .from(formVersions)
+      .where(eq(formVersions.id, record.formVersionId))
+      .limit(1);
+
+    if (!version) {
+      throw notFound("Form version not found");
+    }
+
+    const definition = version.definition as FormDefinition;
+    const updatedPayload = {
+      ...(record.payload as JsonRecord),
+      [record.fieldKey]: null,
+    } as JsonRecord;
+
+    const validation = validateFormPayload(definition, updatedPayload, {
+      storageKeyPrefix: `forms/${record.formId}/`,
+    });
+
+    const [updated] = await db
+      .update(formSubmissions)
+      .set({
+        payload: updatedPayload,
+        completenessScore: validation.completenessScore,
+        missingFields: validation.missingFields,
+        validationErrors: validation.validationErrors,
+        updatedAt: new Date(),
+      })
+      .where(eq(formSubmissions.id, record.submissionId))
+      .returning();
+
+    if (!updated) {
+      return null;
+    }
+
+    const [latestVersion] = await db
+      .select({ versionNumber: formSubmissionVersions.versionNumber })
+      .from(formSubmissionVersions)
+      .where(eq(formSubmissionVersions.submissionId, updated.id))
+      .orderBy(desc(formSubmissionVersions.versionNumber))
+      .limit(1);
+
+    const reasonSuffix = data.reason ? ` (${data.reason})` : "";
+    await db.insert(formSubmissionVersions).values({
+      submissionId: updated.id,
+      versionNumber: (latestVersion?.versionNumber ?? 0) + 1,
+      payloadSnapshot: updatedPayload,
+      changedBy: actorUserId,
+      changeReason: `Removed file ${record.fileName}${reasonSuffix}`,
+    });
+
+    const { deleteFormSubmissionFiles } = await import("~/lib/privacy/submission-files");
+    await deleteFormSubmissionFiles({ items: [record] });
+
+    await db.delete(submissionFiles).where(eq(submissionFiles.id, data.submissionFileId));
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "FORM_SUBMISSION_FILE_DELETE",
+      actorUserId,
+      targetType: "submission_file",
+      targetId: data.submissionFileId,
+      targetOrgId: record.organizationId,
+      metadata: {
+        submissionId: record.submissionId,
+        fileName: record.fileName,
+        reason: data.reason ?? null,
+      },
+    });
+
+    return updated;
   });

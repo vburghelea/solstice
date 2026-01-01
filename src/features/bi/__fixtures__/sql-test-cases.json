@@ -1,0 +1,55 @@
+{
+  "blockedStatements": [
+    { "sql": "INSERT INTO users VALUES (1, 'test')", "reason": "INSERT" },
+    { "sql": "UPDATE users SET name = 'hacked'", "reason": "UPDATE" },
+    { "sql": "DELETE FROM users WHERE id = 1", "reason": "DELETE" },
+    { "sql": "DROP TABLE users", "reason": "DROP" },
+    { "sql": "TRUNCATE TABLE users", "reason": "TRUNCATE" },
+    { "sql": "ALTER TABLE users ADD COLUMN x TEXT", "reason": "ALTER" },
+    { "sql": "CREATE TABLE evil (id INT)", "reason": "CREATE" },
+    { "sql": "GRANT ALL ON users TO public", "reason": "GRANT" },
+    { "sql": "REVOKE ALL ON users FROM admin", "reason": "REVOKE" },
+    { "sql": "SET ROLE admin", "reason": "SET ROLE" },
+    { "sql": "RESET ROLE", "reason": "RESET" },
+    { "sql": "COPY users TO '/tmp/evil.csv'", "reason": "COPY" },
+    { "sql": "DO $$ BEGIN RAISE NOTICE 'x'; END $$;", "reason": "DO" },
+    { "sql": "CALL run_admin_task()", "reason": "CALL" },
+    { "sql": "BEGIN", "reason": "BEGIN" },
+    { "sql": "COMMIT", "reason": "COMMIT" },
+    { "sql": "ROLLBACK", "reason": "ROLLBACK" },
+    { "sql": "VACUUM", "reason": "VACUUM" },
+    { "sql": "ANALYZE", "reason": "ANALYZE" }
+  ],
+  "multiStatements": [
+    "SELECT 1; SELECT 2",
+    "SELECT * FROM organizations; DROP TABLE users"
+  ],
+  "validQueries": [
+    "SELECT * FROM organizations",
+    "SELECT name, type FROM organizations WHERE status = 'active'",
+    "SELECT COUNT(*) FROM organizations GROUP BY type",
+    "SELECT o.name, COUNT(m.id) FROM organizations o LEFT JOIN members m ON m.organization_id = o.id GROUP BY o.name",
+    "SELECT * FROM organizations ORDER BY created_at DESC LIMIT 100",
+    "SELECT DISTINCT type FROM organizations",
+    "SELECT name, COALESCE(description, 'N/A') FROM organizations",
+    "WITH active_orgs AS (SELECT * FROM organizations WHERE status = 'active') SELECT * FROM active_orgs"
+  ],
+  "tableExtraction": [
+    { "sql": "SELECT * FROM organizations", "tables": ["organizations"] },
+    {
+      "sql": "SELECT o.name, u.email FROM organizations o INNER JOIN users u ON u.org_id = o.id LEFT JOIN roles r ON r.user_id = u.id",
+      "tables": ["organizations", "users", "roles"]
+    },
+    {
+      "sql": "SELECT * FROM organizations WHERE id IN (SELECT org_id FROM memberships WHERE active = true)",
+      "tables": ["organizations", "memberships"]
+    }
+  ],
+  "parameterExtraction": [
+    {
+      "sql": "SELECT * FROM organizations WHERE id = {{organization_id}} AND type = {{type}}",
+      "parameters": ["organization_id", "type"]
+    },
+    { "sql": "SELECT * FROM organizations", "parameters": [] }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/sin-gap-bi.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "docs/sin-rfp/worklogs/WORKLOG-gap-closure.md",
+    "docs/sin-rfp/review-plans/gap-closure-plan.md",
+    "docs/sin-rfp/review-plans/requirements-verification-open-issues-plan.md",
+    "src/features/bi/bi.schemas.ts",
+    "src/features/bi/bi.types.ts",
+    "src/features/bi/bi.queries.ts",
+    "src/features/bi/bi.sql-executor.ts",
+    "src/features/bi/index.ts",
+    "src/features/bi/semantic/datasets.config.ts",
+    "src/features/bi/semantic/field-metadata.ts",
+    "src/features/bi/governance/field-acl.ts",
+    "src/features/bi/governance/org-scoping.ts",
+    "src/features/bi/governance/query-guardrails.ts",
+    "src/features/bi/governance/audit-logger.ts",
+    "src/features/bi/governance/index.ts",
+    "src/features/bi/components/sql-workbench/SqlWorkbench.tsx",
+    "src/features/bi/components/sql-workbench/SqlEditor.tsx",
+    "src/features/bi/components/sql-workbench/ResultsTable.tsx",
+    "src/features/bi/docs/CHECKLIST-sql-workbench-gate.md",
+    "src/db/schema/bi.schema.ts",
+    "src/routes/dashboard/admin/sin/analytics.tsx",
+    "src/tenant/tenants/viasport.ts"
+  ],
+  "ignore": {
+    "patterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.test.ts",
+      "**/__tests__/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

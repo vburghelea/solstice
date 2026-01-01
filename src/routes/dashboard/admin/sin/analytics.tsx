@@ -1,18 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ReportBuilderShell } from "~/features/reports/components/report-builder-shell";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/admin/sin/analytics")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_admin_analytics");
+    throw redirect({ to: "/dashboard/analytics/explore" });
   },
-  component: SinAnalyticsAdminPage,
 });
-
-function SinAnalyticsAdminPage() {
-  return (
-    <div className="container mx-auto space-y-6 p-6">
-      <ReportBuilderShell />
-    </div>
-  );
-}

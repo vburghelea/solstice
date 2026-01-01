@@ -5,12 +5,14 @@ import { AppSidebar } from "~/components/ui/app-sidebar";
 import { Breadcrumbs } from "~/components/ui/breadcrumbs";
 import { Button } from "~/components/ui/button";
 import { MobileAppHeader } from "~/components/ui/mobile-app-header";
+import { GlobalSearchCommandPalette } from "~/features/search/components/global-search-command-palette";
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      <GlobalSearchCommandPalette />
       <div className="hidden lg:block">
         <AppSidebar />
       </div>

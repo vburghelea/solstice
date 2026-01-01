@@ -27,6 +27,33 @@ export const reportingOrganizationTypeSchema = z.enum([
   "affiliate",
 ]);
 
+const optionalTextSchema = z.string().trim().min(1).nullable().optional();
+const optionalEmailSchema = z.string().trim().pipe(z.email()).nullable().optional();
+
+export const reportingMetadataSchema = z.object({
+  fiscalYearStart: optionalTextSchema,
+  fiscalYearEnd: optionalTextSchema,
+  reportingPeriodStart: optionalTextSchema,
+  reportingPeriodEnd: optionalTextSchema,
+  agreementId: optionalTextSchema,
+  agreementName: optionalTextSchema,
+  agreementStart: optionalTextSchema,
+  agreementEnd: optionalTextSchema,
+  nccpStatus: optionalTextSchema,
+  nccpNumber: optionalTextSchema,
+  primaryContactName: optionalTextSchema,
+  primaryContactEmail: optionalEmailSchema,
+  primaryContactPhone: optionalTextSchema,
+  reportingFrequency: optionalTextSchema,
+});
+export type ReportingMetadata = z.infer<typeof reportingMetadataSchema>;
+
+export const updateReportingMetadataSchema = z.object({
+  organizationId: z.uuid(),
+  metadata: reportingMetadataSchema,
+});
+export type UpdateReportingMetadataInput = z.infer<typeof updateReportingMetadataSchema>;
+
 export const createReportingCycleSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),

@@ -1,11 +1,5 @@
 /**
  * BI Module - Public API
- *
- * Self-service analytics and reporting for Solstice.
- * Implements viaSport requirements: RP-AGG-005, RP-AGG-003, SEC-AGG-004.
- *
- * @see docs/sin-rfp/decisions/bi/SPEC-bi-platform.md
- * @see docs/sin-rfp/decisions/bi/PLAN-bi-implementation.md
  */
 
 // =============================================================================
@@ -13,35 +7,47 @@
 // =============================================================================
 
 export {
-  // Aggregation schemas
   aggregationTypeSchema,
-  // Export schemas
+  chartTypeSchema,
+  datasetDefinitionSchema,
+  datasetFieldSchema,
+  datasetJoinSchema,
   exportFormatSchema,
   exportRequestSchema,
-  // Filter schemas
   filterOperatorSchema,
   filterSchema,
   filterValueSchema,
-  pivotCellSchema,
-  // Pivot schemas
-  pivotDimensionSchema,
+  formatOptionsSchema,
+  biQueryLogFilterSchema,
+  pivotMeasureMetaSchema,
   pivotMeasureSchema,
   pivotQuerySchema,
   pivotResultSchema,
+  sqlQuerySchema,
+  sqlSchemaRequestSchema,
+  widgetTypeSchema,
 } from "./bi.schemas";
 
 export type {
   AggregationType,
+  ChartType,
+  DatasetDefinition,
+  DatasetField,
+  DatasetJoin,
   ExportFormat,
   ExportRequest,
-  Filter,
+  FilterConfig,
   FilterOperator,
   FilterValue,
-  PivotCell,
-  PivotDimension,
+  FormatOptions,
   PivotMeasure,
+  PivotMeasureMeta,
   PivotQuery,
   PivotResult,
+  BiQueryLogFilter,
+  SqlQueryRequest,
+  SqlSchemaRequest,
+  WidgetType,
 } from "./bi.schemas";
 
 // =============================================================================
@@ -50,13 +56,17 @@ export type {
 
 export type {
   BiQueryLogEntry,
+  ChartConfig,
   Dashboard,
-  DashboardWidget,
+  DashboardLayout,
+  DashboardWidget as DashboardWidgetType,
+  DashboardWidgetPosition,
   DatasetConfig,
-  DatasetField,
+  DatasetField as DatasetFieldConfig,
   QueryContext,
   QueryExecutionResult,
-  WidgetPosition,
+  SqlConfig,
+  WidgetConfig,
 } from "./bi.types";
 
 // =============================================================================
@@ -69,6 +79,9 @@ export {
   getDashboard,
   getDashboards,
   getDatasetFields,
+  getSqlSchema,
+  executeSqlQuery,
+  listBiQueryLogs,
 } from "./bi.queries";
 
 // =============================================================================
@@ -89,15 +102,22 @@ export {
 // Engine (internal - exported for testing)
 // =============================================================================
 
-// TODO: Export after Slice 1 implementation
-// export { buildPivotResult } from './engine/pivot-aggregator';
-// export { aggregators } from './engine/aggregations';
-// export { applyFilters } from './engine/filters';
+export {
+  aggregators,
+  aggregatorsPhase2,
+  applyFilters,
+  buildPivotResult,
+  executeAggregation,
+} from "./engine";
 
 // =============================================================================
-// Governance (internal - exported for testing)
+// Hooks + UI Components
 // =============================================================================
 
-// TODO: Export after Slice 2 implementation
-// export { applyOrgScoping } from './governance/org-scoping';
-// export { applyFieldAcl } from './governance/field-acl';
+export { useCreateDashboard, useDashboard, useDashboards } from "./hooks/use-dashboard";
+
+export { PivotBuilder } from "./components/pivot-builder/PivotBuilder";
+export { SqlWorkbench } from "./components/sql-workbench/SqlWorkbench";
+export { DashboardCanvas } from "./components/dashboard/DashboardCanvas";
+export { DashboardWidget } from "./components/dashboard/DashboardWidget";
+export { AddWidgetModal } from "./components/dashboard/AddWidgetModal";

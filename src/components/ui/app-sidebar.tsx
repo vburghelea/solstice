@@ -1,13 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Logo } from "~/components/ui/logo";
+import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { authQueryKey } from "~/features/auth/auth.queries";
 import { getAppNavSections } from "~/features/layouts/app-nav";
 import { useOrgContext } from "~/features/organizations/org-context";
 import { clearActiveOrganizationState } from "~/features/organizations/org-context-utils";
+import { openGlobalSearch } from "~/features/search/search.events";
 import { setActiveOrganization } from "~/features/organizations/organizations.mutations";
 import { auth } from "~/lib/auth-client";
 import { getBrand } from "~/tenant";
@@ -78,6 +80,19 @@ export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
             </div>
           </div>
         </Link>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-4 w-full justify-between"
+          onClick={openGlobalSearch}
+        >
+          <span className="flex items-center gap-2">
+            <Search className="h-4 w-4" />
+            Search
+          </span>
+          <span className="text-muted-foreground text-xs">Cmd+K</span>
+        </Button>
       </div>
 
       <nav className="flex-1 space-y-6 px-4 pb-4">

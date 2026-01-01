@@ -1,5 +1,6 @@
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { NotificationBell } from "~/features/notifications/components/notification-bell";
+import { openGlobalSearch } from "~/features/search/search.events";
 import { getBrand } from "~/tenant";
 import { Button } from "./button";
 import { Logo } from "./logo";
@@ -28,7 +29,12 @@ export function MobileAppHeader({ onMenuClick }: MobileAppHeaderProps) {
             </div>
           </div>
         </div>
-        <NotificationBell />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={openGlobalSearch}>
+            <Search className="h-5 w-5" />
+          </Button>
+          <NotificationBell />
+        </div>
       </div>
     </header>
   );

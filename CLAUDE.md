@@ -79,11 +79,13 @@ All checks must pass before the commit is allowed. The pre-commit hook matches w
 
 ### Linting Tools
 
-The project uses a dual-linter setup for optimal speed and coverage:
+The project uses a dual-linter setup optimized with `eslint-plugin-oxlint` to avoid duplicate checks:
 
-- **oxlint** - Rust-based linter, extremely fast (~30ms for entire codebase). Catches common JS/TS issues.
-- **ESLint** - TypeScript-aware rules, React hooks, TanStack Query/Router plugins. Slower but more comprehensive.
+- **oxlint** - Rust-based linter, extremely fast (~30ms). Handles all common JS/TS/React rules.
+- **ESLint** - Only runs rules oxlint doesn't cover: TanStack Query/Router plugins, `@eslint-react` type-checked rules, `react-hooks/react-compiler`, and `@typescript-eslint/no-deprecated`. Uses `--cache` for speed.
 - **oxfmt** - Rust-based formatter, ~6x faster than Prettier. Reads `.prettierrc` for config.
+
+The `eslint-plugin-oxlint` config (must be last in `eslint.config.js`) automatically disables all ESLint rules that oxlint already covers.
 
 ## Architecture Overview
 
@@ -651,7 +653,9 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 - `admin@example.com` / `testpassword123` (Platform Admin)
 - `viasport-staff@example.com` / `testpassword123` (viaSport Staff)
 
-**TOTP Secret:** `JBSWY3DPEHPK3PXP`
+**TOTP Secret (for authenticator apps):** `JJBFGV2ZGNCFARKIKBFTGUCYKA`
+
+> Note: The raw secret stored is `JBSWY3DPEHPK3PXP`, but otplib requires the base32-encoded version above.
 
 **Login Flow:**
 
@@ -661,7 +665,7 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 4. Select "Authenticator code" tab (NOT backup code)
 5. Generate a fresh TOTP code:
    ```bash
-   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"
+   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));"
    ```
 6. Enter the 6-digit code and click "Verify code"
 

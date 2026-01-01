@@ -25,9 +25,14 @@ export const listNotifications = createServerFn({ method: "GET" })
     const { and, desc, eq, isNull } = await import("drizzle-orm");
 
     const db = await getDb();
+    // Exclude dismissed notifications from all listings
+    const baseCondition = and(
+      eq(notifications.userId, userId),
+      isNull(notifications.dismissedAt),
+    );
     const conditions = data.unreadOnly
-      ? and(eq(notifications.userId, userId), isNull(notifications.readAt))
-      : eq(notifications.userId, userId);
+      ? and(baseCondition, isNull(notifications.readAt))
+      : baseCondition;
 
     const rows = await db
       .select({
@@ -65,7 +70,13 @@ export const getUnreadNotificationCount = createServerFn({ method: "GET" }).hand
     const [result] = await db
       .select({ total: count() })
       .from(notifications)
-      .where(and(eq(notifications.userId, userId), isNull(notifications.readAt)));
+      .where(
+        and(
+          eq(notifications.userId, userId),
+          isNull(notifications.readAt),
+          isNull(notifications.dismissedAt),
+        ),
+      );
 
     return result?.total ?? 0;
   },

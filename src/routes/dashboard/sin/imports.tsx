@@ -52,7 +52,7 @@ function SinImportsPage() {
             Review recent import activity for your organization.
           </p>
         </div>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" data-tour="imports-templates">
           <Link to="/dashboard/sin/templates?context=imports">View templates</Link>
         </Button>
       </div>
@@ -62,13 +62,13 @@ function SinImportsPage() {
       {isLoading ? (
         <div className="text-muted-foreground">Loading import jobs…</div>
       ) : jobs.length === 0 ? (
-        <Card>
+        <Card data-tour="imports-list">
           <CardHeader>
             <CardTitle>No imports yet.</CardTitle>
           </CardHeader>
         </Card>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3" data-tour="imports-list">
           {jobs.map((job) => (
             <Card key={job.id}>
               <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">

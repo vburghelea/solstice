@@ -1153,6 +1153,20 @@ test.describe("BI Dashboard", () => {
 
     // Verify
     await expect(page.getByText("Sharing settings updated")).toBeVisible();
+
+    // Export widget data (or prompt for step-up)
+    const downloadPromise = page
+      .waitForEvent("download", { timeout: 5000 })
+      .catch(() => null);
+    await page.getByRole("button", { name: "Export" }).click();
+    await page.getByRole("button", { name: "Export data" }).click();
+
+    const download = await downloadPromise;
+    if (!download) {
+      await expect(
+        page.getByRole("dialog", { name: "Confirm your identity" }),
+      ).toBeVisible();
+    }
   });
 });
 ```

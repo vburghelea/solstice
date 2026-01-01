@@ -111,10 +111,10 @@ src/features/bi/
 
 **Acceptance Criteria**:
 
-- [ ] Pivot aggregator extracted with no behavior change (golden masters pass)
-- [ ] All existing pivot tests pass
-- [ ] New aggregations (`median`, `stddev`) implemented with tests
-- [ ] Pivot table shows subtotals and grand totals
+- [x] Pivot aggregator extracted with no behavior change (golden masters pass)
+- [x] All existing pivot tests pass
+- [x] New aggregations (`median`, `stddev`) implemented with tests
+- [x] Pivot table shows subtotals and grand totals
 
 **Estimated Effort**: 2-3 weeks
 
@@ -169,11 +169,11 @@ src/features/bi/
 
 **Acceptance Criteria**:
 
-- [ ] Filter UI uses typed components, not JSON textarea
-- [ ] Dataset configuration replaces `DATA_SOURCE_CONFIG`
-- [ ] Org scoping tests prove tenant isolation
-- [ ] PII masking tests prove field-level ACL works
-- [ ] Export step-up tests prove auth required
+- [x] Filter UI uses typed components, not JSON textarea
+- [x] Dataset configuration replaces `DATA_SOURCE_CONFIG`
+- [x] Org scoping tests prove tenant isolation
+- [x] PII masking tests prove field-level ACL works
+- [x] Export step-up tests prove auth required
 
 **Estimated Effort**: 3-4 weeks
 
@@ -226,10 +226,10 @@ e2e/tests/authenticated/
 
 **Acceptance Criteria**:
 
-- [ ] User can create dashboard with grid layout
-- [ ] User can add chart/pivot/KPI/text widgets
-- [ ] Dashboard persists and reloads correctly
-- [ ] Dashboard sharing (user-level, org-wide) works
+- [x] User can create dashboard with grid layout
+- [x] User can add chart/pivot/KPI/text widgets
+- [x] Dashboard persists and reloads correctly
+- [x] Dashboard sharing (user-level, org-wide) works
 - [ ] E2E tests pass for create + share + export flow
 
 **Estimated Effort**: 4-5 weeks
@@ -318,12 +318,12 @@ GRANT SELECT ON bi_v_form_submissions TO bi_readonly;
 **Acceptance Criteria**:
 
 - [ ] All CHECKLIST-sql-workbench-gate.md prerequisites complete
-- [ ] SQL parser rejects all non-select statements
-- [ ] SQL parser rejects tables not in dataset
-- [ ] Query rewriter substitutes raw tables with views
-- [ ] DB-level scoping via curated views is enforced
-- [ ] All queries logged to `bi_query_log` with checksums
-- [ ] Query guardrails (timeout, row limit) enforced
+- [x] SQL parser rejects all non-select statements
+- [x] SQL parser rejects tables not in dataset
+- [x] Query rewriter substitutes raw tables with views
+- [x] DB-level scoping via curated views is enforced
+- [x] All queries logged to `bi_query_log` with checksums
+- [x] Query guardrails (timeout, row limit) enforced
 - [ ] E2E tests pass
 
 **Estimated Effort**: 5-6 weeks (including DBA work)
@@ -505,13 +505,13 @@ See individual slice sections above.
 
 The BI platform MVP (Slices 1-3) is complete when:
 
-- [ ] Pivot builder works with typed filters (no JSON)
-- [ ] Pivot supports totals, subtotals, median/stddev aggregations
-- [ ] Dashboard canvas allows widget composition
-- [ ] Dashboard sharing works (user + org-wide)
-- [ ] Exports require step-up auth and are audited
-- [ ] PII masking enforced across UI and exports
-- [ ] All integration tests pass
+- [x] Pivot builder works with typed filters (no JSON)
+- [x] Pivot supports totals, subtotals, median/stddev aggregations
+- [x] Dashboard canvas allows widget composition
+- [x] Dashboard sharing works (user + org-wide)
+- [x] Exports require step-up auth and are audited
+- [x] PII masking enforced across UI and exports
+- [x] All integration tests pass
 - [ ] E2E tests pass for: pivot run, pivot export, dashboard create, dashboard share
 
 ### 6.3 SQL Workbench Criteria
@@ -519,10 +519,10 @@ The BI platform MVP (Slices 1-3) is complete when:
 SQL Workbench (Slice 4) is complete when:
 
 - [ ] All CHECKLIST-sql-workbench-gate.md prerequisites pass
-- [ ] AST parser enforces single SELECT rule
-- [ ] Query rewriter enforces dataset-only access
+- [x] AST parser enforces single SELECT rule
+- [x] Query rewriter enforces dataset-only access
 - [ ] DB scoping proven via integration tests (views + session context)
-- [ ] Audit chain integrity verified
+- [x] Audit chain integrity verified
 - [ ] Security review complete with sign-off
 - [ ] E2E tests pass
 

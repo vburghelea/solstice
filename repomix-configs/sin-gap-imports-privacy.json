@@ -1,0 +1,39 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/sin-gap-imports-privacy.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "docs/sin-rfp/worklogs/WORKLOG-gap-closure.md",
+    "docs/sin-rfp/review-plans/gap-closure-plan.md",
+    "docs/sin-rfp/review-plans/evidence/*.md",
+    "src/features/imports/imports.schemas.ts",
+    "src/features/imports/imports.queries.ts",
+    "src/features/imports/imports.mutations.ts",
+    "src/features/imports/imports.utils.ts",
+    "src/features/imports/components/import-wizard-shell.tsx",
+    "src/db/schema/imports.schema.ts",
+    "src/features/privacy/privacy.schemas.ts",
+    "src/features/privacy/privacy.queries.ts",
+    "src/features/privacy/privacy.mutations.ts",
+    "src/cron/enforce-retention.ts",
+    "src/cron/data-quality-monitor.ts",
+    "src/routes/dashboard/sin/imports.tsx",
+    "src/tenant/tenants/viasport.ts"
+  ],
+  "ignore": {
+    "patterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.test.ts",
+      "**/__tests__/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

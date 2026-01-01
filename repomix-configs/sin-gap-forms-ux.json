@@ -1,0 +1,48 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/sin-gap-forms-ux.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "docs/sin-rfp/worklogs/WORKLOG-gap-closure.md",
+    "docs/sin-rfp/review-plans/gap-closure-plan.md",
+    "docs/sin-rfp/review-plans/evidence/*.md",
+
+    "src/features/forms/forms.schemas.ts",
+    "src/features/forms/forms.queries.ts",
+    "src/features/forms/forms.mutations.ts",
+    "src/db/schema/forms.schema.ts",
+
+    "src/features/tutorials/tutorials.config.ts",
+    "src/features/tutorials/tutorials.schemas.ts",
+    "src/features/tutorials/components/guided-tour.tsx",
+
+    "src/features/search/search.schemas.ts",
+    "src/features/search/search.queries.ts",
+
+    "src/routes/dashboard/sin/index.tsx",
+    "src/routes/dashboard/sin/forms.tsx",
+    "src/routes/dashboard/sin/forms/$formId.tsx",
+    "src/routes/dashboard/sin/submissions/$submissionId.tsx",
+
+    "scripts/verify-sin-form-submission.ts",
+    "scripts/verify-sin-data-catalog.ts",
+
+    "src/tenant/tenants/viasport.ts"
+  ],
+  "ignore": {
+    "patterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.test.ts",
+      "**/__tests__/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

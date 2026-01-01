@@ -165,3 +165,29 @@ export const getSubmissionFileDownloadSchema = z.object({
 export type GetSubmissionFileDownloadInput = z.infer<
   typeof getSubmissionFileDownloadSchema
 >;
+
+export const deleteSubmissionFileSchema = z.object({
+  submissionFileId: z.uuid(),
+  reason: z.string().optional(),
+});
+export type DeleteSubmissionFileInput = z.infer<typeof deleteSubmissionFileSchema>;
+
+export const prepareSubmissionFileReplacementSchema = z.object({
+  submissionFileId: z.uuid(),
+  fileName: z.string().min(1),
+  mimeType: z.string().min(1),
+  sizeBytes: z.number().int().positive(),
+});
+export type PrepareSubmissionFileReplacementInput = z.infer<
+  typeof prepareSubmissionFileReplacementSchema
+>;
+
+export const replaceSubmissionFileSchema = z.object({
+  submissionFileId: z.uuid(),
+  storageKey: z.string().min(1),
+  fileName: z.string().min(1),
+  mimeType: z.string().min(1),
+  sizeBytes: z.number().int().positive(),
+  checksum: z.string().optional(),
+});
+export type ReplaceSubmissionFileInput = z.infer<typeof replaceSubmissionFileSchema>;

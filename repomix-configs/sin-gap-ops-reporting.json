@@ -1,0 +1,53 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/sin-gap-ops-reporting.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "docs/sin-rfp/worklogs/WORKLOG-gap-closure.md",
+    "docs/sin-rfp/review-plans/gap-closure-plan.md",
+    "docs/sin-rfp/review-plans/evidence/*.md",
+
+    "src/features/reporting/reporting.schemas.ts",
+    "src/features/reporting/reporting.queries.ts",
+    "src/features/reporting/reporting.mutations.ts",
+    "src/db/schema/reporting.schema.ts",
+
+    "src/features/notifications/notifications.schemas.ts",
+    "src/features/notifications/notifications.queries.ts",
+    "src/features/notifications/notifications.mutations.ts",
+    "src/features/notifications/notifications.types.ts",
+    "src/db/schema/notifications.schema.ts",
+
+    "src/features/data-quality/data-quality.schemas.ts",
+    "src/features/data-quality/data-quality.monitor.ts",
+
+    "src/cron/enforce-retention.ts",
+    "src/cron/process-notifications.ts",
+    "src/cron/notification-worker.ts",
+    "src/cron/data-quality-monitor.ts",
+
+    "src/routes/dashboard/sin/index.tsx",
+    "src/routes/dashboard/sin/reporting.tsx",
+
+    "scripts/verify-sin-security-lockout.ts",
+    "scripts/run-sin-a11y-scan.ts",
+
+    "src/tenant/tenants/viasport.ts"
+  ],
+  "ignore": {
+    "patterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.test.ts",
+      "**/__tests__/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

@@ -58,9 +58,10 @@ export const dismissNotification = createServerFn({ method: "POST" })
     const { and, eq } = await import("drizzle-orm");
 
     const db = await getDb();
+    const now = new Date();
     const [updated] = await db
       .update(notifications)
-      .set({ dismissedAt: new Date() })
+      .set({ dismissedAt: now, readAt: now })
       .where(
         and(eq(notifications.id, data.notificationId), eq(notifications.userId, userId)),
       )
@@ -78,35 +79,10 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
 
     const { getDb } = await import("~/db/server-helpers");
     const { notificationPreferences } = await import("~/db/schema");
-    const { and, eq } = await import("drizzle-orm");
 
     const db = await getDb();
-    const [existing] = await db
-      .select()
-      .from(notificationPreferences)
-      .where(
-        and(
-          eq(notificationPreferences.userId, userId),
-          eq(notificationPreferences.category, data.category),
-        ),
-      )
-      .limit(1);
-
-    if (existing) {
-      const [updated] = await db
-        .update(notificationPreferences)
-        .set({
-          channelEmail: data.channelEmail ?? existing.channelEmail,
-          channelInApp: data.channelInApp ?? existing.channelInApp,
-          emailFrequency: data.emailFrequency ?? existing.emailFrequency,
-        })
-        .where(eq(notificationPreferences.id, existing.id))
-        .returning();
-
-      return updated ?? null;
-    }
-
-    const [created] = await db
+    // Use upsert to avoid race condition with select-then-update pattern
+    const [result] = await db
       .insert(notificationPreferences)
       .values({
         userId,
@@ -115,9 +91,17 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
         channelInApp: data.channelInApp ?? true,
         emailFrequency: data.emailFrequency ?? "immediate",
       })
+      .onConflictDoUpdate({
+        target: [notificationPreferences.userId, notificationPreferences.category],
+        set: {
+          channelEmail: data.channelEmail ?? notificationPreferences.channelEmail,
+          channelInApp: data.channelInApp ?? notificationPreferences.channelInApp,
+          emailFrequency: data.emailFrequency ?? notificationPreferences.emailFrequency,
+        },
+      })
       .returning();
 
-    return created ?? null;
+    return result ?? null;
   });
 
 export const sendAdminNotification = createServerFn({ method: "POST" })
@@ -216,6 +200,16 @@ export const updateNotificationTemplate = createServerFn({ method: "POST" })
       .where(eq(notificationTemplates.id, data.templateId))
       .returning();
 
+    if (updated) {
+      const { logAdminAction } = await import("~/lib/audit");
+      await logAdminAction({
+        action: "NOTIFICATION_TEMPLATE_UPDATE",
+        actorUserId: sessionUser.id,
+        targetType: "notification_template",
+        targetId: updated.id,
+      });
+    }
+
     return updated ?? null;
   });
 
@@ -239,6 +233,16 @@ export const deleteNotificationTemplate = createServerFn({ method: "POST" })
       .where(eq(notificationTemplates.id, data.templateId))
       .returning();
 
+    if (deleted) {
+      const { logAdminAction } = await import("~/lib/audit");
+      await logAdminAction({
+        action: "NOTIFICATION_TEMPLATE_DELETE",
+        actorUserId: sessionUser.id,
+        targetType: "notification_template",
+        targetId: deleted.id,
+      });
+    }
+
     return deleted ?? null;
   });
 
@@ -256,6 +260,7 @@ export const scheduleNotification = createServerFn({ method: "POST" })
     const { scheduledNotifications } = await import("~/db/schema");
     const db = await getDb();
 
+    // Use onConflictDoNothing for idempotency (same template/user/org/time = no-op)
     const [created] = await db
       .insert(scheduledNotifications)
       .values({
@@ -266,6 +271,7 @@ export const scheduleNotification = createServerFn({ method: "POST" })
         scheduledFor: new Date(data.scheduledFor),
         variables: data.variables ?? {},
       })
+      .onConflictDoNothing()
       .returning();
 
     if (created) {
@@ -278,5 +284,6 @@ export const scheduleNotification = createServerFn({ method: "POST" })
       });
     }
 
+    // Return created notification or null if duplicate was skipped
     return created ?? null;
   });

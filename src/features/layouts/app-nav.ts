@@ -3,6 +3,7 @@ import {
   BookOpen,
   Calendar,
   ClipboardList,
+  Code,
   CreditCard,
   FileText,
   Files,
@@ -90,8 +91,15 @@ const portalItems: NavItem[] = [
   {
     icon: LineChart,
     label: "Analytics",
-    to: "/dashboard/sin/analytics",
+    to: "/dashboard/analytics/explore",
     feature: "sin_analytics",
+    requiresOrgRole: analyticsRoles,
+  },
+  {
+    icon: Code,
+    label: "SQL Workbench",
+    to: "/dashboard/analytics/sql",
+    feature: "sin_analytics_sql_workbench",
     requiresOrgRole: analyticsRoles,
   },
   {

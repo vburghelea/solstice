@@ -93,14 +93,16 @@ export const requireRecentAuth = async (
 
   // For MFA-enabled users, also require recent MFA verification
   if (record.twoFactorEnabled) {
-    if (!lastMfaVerifiedAt) {
+    // Better Auth sessions do not expose MFA timestamps, so fall back to auth time.
+    const effectiveMfaVerifiedAt = lastMfaVerifiedAt ?? authenticatedAt;
+    if (!effectiveMfaVerifiedAt) {
       throw stepUpForbidden(
         "MFA re-verification required for this action",
         STEP_UP_REASONS.MFA_REVERIFY_REQUIRED,
       );
     }
 
-    const mfaAge = now - lastMfaVerifiedAt.getTime();
+    const mfaAge = now - effectiveMfaVerifiedAt.getTime();
     if (mfaAge > reAuthWindowMs) {
       throw stepUpForbidden(
         "MFA re-verification required for this action",

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "outputs/bi-feature.xml",
+    "style": "xml",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": true,
+    "topFilesLength": 20
+  },
+  "include": [
+    "src/features/bi/**/*.ts",
+    "src/features/bi/**/*.tsx",
+    "src/db/schema/bi.schema.ts",
+    "src/routes/dashboard/sin/analytics.tsx",
+    "src/routes/dashboard/admin/sin/analytics.tsx"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "**/__fixtures__/**",
+      "**/docs/**",
+      "**/__tests__/**",
+      "**/*.test.ts"
+    ]
+  }
+}

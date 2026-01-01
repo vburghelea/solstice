@@ -21,6 +21,32 @@ export const tutorials = [
         body: "Explore saved reports or build a pivot for quick insights.",
       },
     ],
+    tourSteps: [
+      {
+        title: "Review reporting tasks",
+        body: "Open Reporting to see deadlines and required submissions.",
+        target: "[data-tour='sin-reporting-card']",
+        route: "/dashboard/sin",
+      },
+      {
+        title: "Complete forms",
+        body: "Access your assigned forms and submit updates.",
+        target: "[data-tour='sin-forms-card']",
+        route: "/dashboard/sin",
+      },
+      {
+        title: "Check analytics",
+        body: "Build charts and export insights for your organization.",
+        target: "[data-tour='sin-analytics-card']",
+        route: "/dashboard/sin",
+      },
+      {
+        title: "Grab templates",
+        body: "Find the latest reporting and import templates.",
+        target: "[data-tour='sin-templates-card']",
+        route: "/dashboard/sin",
+      },
+    ],
     suggestedRoutes: ["/dashboard/sin"],
   },
   {
@@ -43,6 +69,20 @@ export const tutorials = [
       {
         title: "Review status",
         body: "Track import status and resolve any validation issues.",
+      },
+    ],
+    tourSteps: [
+      {
+        title: "Download the right template",
+        body: "Open the template library for the latest import files.",
+        target: "[data-tour='imports-templates']",
+        route: "/dashboard/sin/imports",
+      },
+      {
+        title: "Review import activity",
+        body: "Track recent imports and their processing status.",
+        target: "[data-tour='imports-list']",
+        route: "/dashboard/sin/imports",
       },
     ],
     suggestedRoutes: ["/dashboard/sin/imports"],

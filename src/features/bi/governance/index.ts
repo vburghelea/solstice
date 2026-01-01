@@ -29,3 +29,13 @@ export {
   type LogQueryParams,
   type QueryType,
 } from "./audit-logger";
+
+export {
+  QUERY_GUARDRAILS,
+  acquireConcurrencySlot,
+  buildLimitedQuery,
+  inlineParameters,
+  stripTrailingSemicolons,
+} from "./query-guardrails";
+
+export { assertExportAllowed } from "./export-controls";

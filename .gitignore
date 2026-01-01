@@ -30,6 +30,9 @@ dev-dist
 
 .tanstack
 
+# Linting
+.eslintcache
+
 # Testing
 coverage
 .nyc_output
@@ -54,7 +57,7 @@ stitch/
 
 # Repomix generated outputs
 repomix-configs/outputs/
-repomix-output.xml
+repomix-*.xml
 
 # Confidential RFP documents
 docs/sin-rfp/example-rfp-real.*

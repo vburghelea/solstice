@@ -8,6 +8,17 @@ import { ValidatedFileUpload } from "~/components/form-fields/ValidatedFileUploa
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -29,7 +40,10 @@ import type { JsonRecord, JsonValue } from "~/shared/lib/json";
 import {
   createForm,
   createFormUpload,
+  deleteSubmissionFile,
   publishForm,
+  prepareSubmissionFileReplacement,
+  replaceSubmissionFile,
   reviewFormSubmission,
   submitForm,
   updateForm,
@@ -660,6 +674,8 @@ export function FormBuilderShell() {
   const [settings, setSettings] = useState<FormDefinition["settings"]>(defaultSettings);
   const [fields, setFields] = useState<FormDefinition["fields"]>([]);
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
+  const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  const [fileActionError, setFileActionError] = useState<string | null>(null);
 
   const { data: organizations = [] } = useQuery({
     queryKey: ["organizations", "list"],
@@ -721,6 +737,90 @@ export function FormBuilderShell() {
       if (result?.url) {
         window.open(result.url, "_blank", "noopener,noreferrer");
       }
+    },
+  });
+
+  const replaceMutation = useMutation({
+    mutationFn: async (payload: { submissionFileId: string; file: File }) => {
+      const checksum = await hashFile(payload.file);
+      const upload = await prepareSubmissionFileReplacement({
+        data: {
+          submissionFileId: payload.submissionFileId,
+          fileName: payload.file.name,
+          mimeType: payload.file.type || "application/octet-stream",
+          sizeBytes: payload.file.size,
+        },
+      });
+
+      if (!upload?.uploadUrl || !upload.storageKey) {
+        throw new Error("Upload URL not available.");
+      }
+
+      const response = await fetch(upload.uploadUrl, {
+        method: "PUT",
+        body: payload.file,
+        headers: {
+          "Content-Type": payload.file.type || "application/octet-stream",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload file.");
+      }
+
+      return replaceSubmissionFile({
+        data: {
+          submissionFileId: payload.submissionFileId,
+          storageKey: upload.storageKey,
+          fileName: payload.file.name,
+          mimeType: payload.file.type || "application/octet-stream",
+          sizeBytes: payload.file.size,
+          checksum,
+        },
+      });
+    },
+    onMutate: (payload) => {
+      setActiveFileId(payload.submissionFileId);
+      setFileActionError(null);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["forms", "submissions"] });
+      void queryClient.invalidateQueries({ queryKey: ["forms", "submission-files"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["forms", "submission-versions"],
+      });
+    },
+    onError: (error) => {
+      setFileActionError(
+        error instanceof Error ? error.message : "Failed to replace file.",
+      );
+    },
+    onSettled: () => {
+      setActiveFileId(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (submissionFileId: string) =>
+      deleteSubmissionFile({ data: { submissionFileId } }),
+    onMutate: (submissionFileId) => {
+      setActiveFileId(submissionFileId);
+      setFileActionError(null);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["forms", "submissions"] });
+      void queryClient.invalidateQueries({ queryKey: ["forms", "submission-files"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["forms", "submission-versions"],
+      });
+    },
+    onError: (error) => {
+      setFileActionError(
+        error instanceof Error ? error.message : "Failed to delete file.",
+      );
+    },
+    onSettled: () => {
+      setActiveFileId(null);
     },
   });
 
@@ -1582,6 +1682,11 @@ export function FormBuilderShell() {
 
                 <div className="space-y-2">
                   <p className="text-sm font-semibold">Attachments</p>
+                  {fileActionError ? (
+                    <p className="text-destructive text-sm font-medium">
+                      {fileActionError}
+                    </p>
+                  ) : null}
                   {submissionFiles.length === 0 ? (
                     <p className="text-muted-foreground text-sm">No files attached.</p>
                   ) : (
@@ -1597,15 +1702,82 @@ export function FormBuilderShell() {
                               {file.mimeType} · {(file.sizeBytes / 1024).toFixed(1)} KB
                             </p>
                           </div>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => downloadMutation.mutate(file.id)}
-                            disabled={downloadMutation.isPending}
-                          >
-                            {downloadMutation.isPending ? "Fetching..." : "Download"}
-                          </Button>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => downloadMutation.mutate(file.id)}
+                              disabled={downloadMutation.isPending}
+                            >
+                              {downloadMutation.isPending ? "Fetching..." : "Download"}
+                            </Button>
+                            <Input
+                              id={`replace-submission-file-${file.id}`}
+                              type="file"
+                              className="sr-only"
+                              onChange={(event) => {
+                                const nextFile = event.target.files?.[0];
+                                if (!nextFile) return;
+                                replaceMutation.mutate({
+                                  submissionFileId: file.id,
+                                  file: nextFile,
+                                });
+                                event.target.value = "";
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const input = document.getElementById(
+                                  `replace-submission-file-${file.id}`,
+                                ) as HTMLInputElement | null;
+                                input?.click();
+                              }}
+                              disabled={
+                                replaceMutation.isPending && activeFileId === file.id
+                              }
+                            >
+                              {replaceMutation.isPending && activeFileId === file.id
+                                ? "Replacing..."
+                                : "Replace"}
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="destructive"
+                                  disabled={
+                                    deleteMutation.isPending && activeFileId === file.id
+                                  }
+                                >
+                                  {deleteMutation.isPending && activeFileId === file.id
+                                    ? "Deleting..."
+                                    : "Delete"}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete this file?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action removes the attachment from the submission
+                                    and deletes the stored file.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteMutation.mutate(file.id)}
+                                  >
+                                    Delete file
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
                       ))}
                     </div>

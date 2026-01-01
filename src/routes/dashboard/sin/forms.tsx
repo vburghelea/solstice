@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute, useMatchRoute } from "@tanstack/react-router";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -11,8 +11,21 @@ export const Route = createFileRoute("/dashboard/sin/forms")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_forms");
   },
-  component: SinFormsPage,
+  component: SinFormsLayout,
 });
+
+function SinFormsLayout() {
+  const matchRoute = useMatchRoute();
+  const isDetail = Boolean(
+    matchRoute({ to: "/dashboard/sin/forms/$formId", fuzzy: false }),
+  );
+
+  if (isDetail) {
+    return <Outlet />;
+  }
+
+  return <SinFormsPage />;
+}
 
 function SinFormsPage() {
   const { activeOrganizationId } = useOrgContext();

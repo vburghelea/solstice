@@ -181,7 +181,7 @@ export const listReportingOverview = createServerFn({ method: "GET" })
     const { getDb } = await import("~/db/server-helpers");
     const { organizations, reportingCycles, reportingSubmissions, reportingTasks } =
       await import("~/db/schema");
-    const { and, eq, inArray } = await import("drizzle-orm");
+    const { and, asc, eq, inArray } = await import("drizzle-orm");
     const db = await getDb();
 
     let orgIds: string[] = [];
@@ -228,7 +228,8 @@ export const listReportingOverview = createServerFn({ method: "GET" })
       .innerJoin(reportingTasks, eq(reportingSubmissions.taskId, reportingTasks.id))
       .innerJoin(reportingCycles, eq(reportingTasks.cycleId, reportingCycles.id))
       .innerJoin(organizations, eq(reportingSubmissions.organizationId, organizations.id))
-      .where(conditions.length ? and(...conditions) : undefined);
+      .where(conditions.length ? and(...conditions) : undefined)
+      .orderBy(asc(reportingTasks.dueDate), asc(organizations.name));
   });
 
 export const listReportingSubmissionHistory = createServerFn({ method: "GET" })

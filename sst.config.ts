@@ -207,6 +207,8 @@ export default $config({
     // DSAR exports bucket with Object Lock for compliance retention
     // Object Lock provides WORM (Write Once Read Many) protection for DSAR exports
     // and audit archives per ADR D0.13 (14-day DSAR retention)
+    //
+    // NOTE: Object Lock must be enabled at bucket creation time.
     const sinArtifacts = new sst.aws.Bucket("SinArtifacts", {
       cors: [
         {
@@ -223,11 +225,35 @@ export default $config({
       ],
       versioning: true, // Required for Object Lock
       transform: {
-        bucket: (args) => ({
-          ...args,
+        bucket: {
           objectLockEnabled: true,
-        }),
+        },
       },
+    });
+
+    // Lifecycle rules for SIN artifacts: archive to Glacier after 90 days,
+    // delete non-current versions after 180 days
+    new aws.s3.BucketLifecycleConfigurationV2("SinArtifactsLifecycle", {
+      bucket: sinArtifacts.name,
+      rules: [
+        {
+          id: "ArchiveToGlacier",
+          status: "Enabled",
+          transitions: [
+            {
+              days: 90,
+              storageClass: "GLACIER",
+            },
+          ],
+        },
+        {
+          id: "DeleteOldVersions",
+          status: "Enabled",
+          noncurrentVersionExpiration: {
+            noncurrentDays: 180,
+          },
+        },
+      ],
     });
 
     const notificationsDlq = new sst.aws.Queue("SinNotificationsDlq");

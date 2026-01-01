@@ -1,0 +1,202 @@
+{
+  "testCases": [
+    {
+      "name": "simple_count_by_type",
+      "input": {
+        "rows": [
+          { "type": "club", "status": "active" },
+          { "type": "club", "status": "pending" },
+          { "type": "league", "status": "active" }
+        ],
+        "config": {
+          "rowFields": ["type"],
+          "columnFields": ["status"],
+          "measures": [
+            {
+              "field": null,
+              "aggregation": "count",
+              "key": "count:count",
+              "label": "Count"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "rowFields": ["type"],
+        "columnFields": ["status"],
+        "measures": [
+          {
+            "field": null,
+            "aggregation": "count",
+            "key": "count:count",
+            "label": "Count"
+          }
+        ],
+        "columnKeys": [
+          {
+            "key": "active",
+            "label": "status: active",
+            "values": { "status": "active" }
+          },
+          {
+            "key": "pending",
+            "label": "status: pending",
+            "values": { "status": "pending" }
+          }
+        ],
+        "rows": [
+          {
+            "key": "club",
+            "values": { "type": "club" },
+            "cells": {
+              "active": { "count:count": 1 },
+              "pending": { "count:count": 1 }
+            }
+          },
+          {
+            "key": "league",
+            "values": { "type": "league" },
+            "cells": {
+              "active": { "count:count": 1 },
+              "pending": { "count:count": null }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "sum_and_avg_totals",
+      "input": {
+        "rows": [
+          { "type": "club", "score": 10 },
+          { "type": "club", "score": 20 },
+          { "type": "club", "score": null },
+          { "type": "league", "score": "5" },
+          { "type": "league", "score": "bad" }
+        ],
+        "config": {
+          "rowFields": ["type"],
+          "columnFields": [],
+          "measures": [
+            {
+              "field": "score",
+              "aggregation": "sum",
+              "key": "sum:score",
+              "label": "SUM(score)"
+            },
+            {
+              "field": "score",
+              "aggregation": "avg",
+              "key": "avg:score",
+              "label": "AVG(score)"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "rowFields": ["type"],
+        "columnFields": [],
+        "measures": [
+          {
+            "field": "score",
+            "aggregation": "sum",
+            "key": "sum:score",
+            "label": "SUM(score)"
+          },
+          {
+            "field": "score",
+            "aggregation": "avg",
+            "key": "avg:score",
+            "label": "AVG(score)"
+          }
+        ],
+        "columnKeys": [{ "key": "__total__", "label": "Total", "values": {} }],
+        "rows": [
+          {
+            "key": "club",
+            "values": { "type": "club" },
+            "cells": {
+              "__total__": { "sum:score": 30, "avg:score": 15 }
+            }
+          },
+          {
+            "key": "league",
+            "values": { "type": "league" },
+            "cells": {
+              "__total__": { "sum:score": 5, "avg:score": 5 }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "min_max_with_columns",
+      "input": {
+        "rows": [
+          { "category": "A", "bucket": "x", "value": 3 },
+          { "category": "A", "bucket": "x", "value": 7 },
+          { "category": "A", "bucket": "y", "value": 2 },
+          { "category": "B", "bucket": "x", "value": 5 }
+        ],
+        "config": {
+          "rowFields": ["category"],
+          "columnFields": ["bucket"],
+          "measures": [
+            {
+              "field": "value",
+              "aggregation": "min",
+              "key": "min:value",
+              "label": "MIN(value)"
+            },
+            {
+              "field": "value",
+              "aggregation": "max",
+              "key": "max:value",
+              "label": "MAX(value)"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "rowFields": ["category"],
+        "columnFields": ["bucket"],
+        "measures": [
+          {
+            "field": "value",
+            "aggregation": "min",
+            "key": "min:value",
+            "label": "MIN(value)"
+          },
+          {
+            "field": "value",
+            "aggregation": "max",
+            "key": "max:value",
+            "label": "MAX(value)"
+          }
+        ],
+        "columnKeys": [
+          { "key": "x", "label": "bucket: x", "values": { "bucket": "x" } },
+          { "key": "y", "label": "bucket: y", "values": { "bucket": "y" } }
+        ],
+        "rows": [
+          {
+            "key": "A",
+            "values": { "category": "A" },
+            "cells": {
+              "x": { "min:value": 3, "max:value": 7 },
+              "y": { "min:value": 2, "max:value": 2 }
+            }
+          },
+          {
+            "key": "B",
+            "values": { "category": "B" },
+            "cells": {
+              "x": { "min:value": 5, "max:value": 5 },
+              "y": { "min:value": null, "max:value": null }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

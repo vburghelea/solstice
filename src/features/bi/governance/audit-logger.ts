@@ -1,54 +1,39 @@
 /**
  * BI Audit Logger
  *
- * Logs all BI queries and exports to the bi_query_log table.
- * Maintains its own tamper-evident chain with periodic anchoring to main audit log.
+ * Logs BI queries and exports to the bi_query_log table.
+ * Maintains its own tamper-evident chain.
  *
- * @see docs/sin-rfp/decisions/bi/SPEC-bi-platform.md (Audit Model)
+ * @see src/features/bi/docs/SPEC-bi-platform.md
  */
 
 import type { PivotQuery } from "../bi.schemas";
 import type { BiQueryLogEntry, QueryContext } from "../bi.types";
+import type { JsonRecord } from "~/shared/lib/json";
 
-/**
- * Query type for audit logging
- */
 export type QueryType = "pivot" | "sql" | "export";
 
-/**
- * Parameters for logging a BI query
- */
 export interface LogQueryParams {
   context: QueryContext;
   queryType: QueryType;
   datasetId?: string;
   pivotQuery?: PivotQuery;
   sqlQuery?: string;
+  parameters?: JsonRecord | null;
   rowsReturned: number;
   executionTimeMs: number;
 }
 
-/**
- * Compute SHA-256 hash of query for deduplication and integrity
- */
 export async function computeQueryHash(query: PivotQuery | string): Promise<string> {
   const queryString = typeof query === "string" ? query : JSON.stringify(query);
   const encoder = new TextEncoder();
   const data = encoder.encode(queryString);
 
-  // Use Web Crypto API (available in Node 18+ and browsers)
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/**
- * Compute HMAC-SHA256 checksum for tamper-evident chain
- *
- * @param logEntry - Log entry to compute checksum for
- * @param previousChecksum - Checksum of previous entry (null for first entry)
- * @param secret - HMAC secret key
- */
 export async function computeChecksum(
   logEntry: Omit<BiQueryLogEntry, "checksum">,
   previousChecksum: string | null,
@@ -84,14 +69,6 @@ export async function computeChecksum(
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/**
- * Log a BI query to the audit log
- *
- * TODO: Implement database interaction in Slice 2
- *
- * @param params - Query logging parameters
- * @returns Log entry ID
- */
 export async function logQuery(params: LogQueryParams): Promise<string> {
   const {
     context,
@@ -99,45 +76,81 @@ export async function logQuery(params: LogQueryParams): Promise<string> {
     datasetId,
     pivotQuery,
     sqlQuery,
+    parameters,
     rowsReturned,
     executionTimeMs,
   } = params;
+  const normalizedDatasetId =
+    datasetId &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      datasetId,
+    )
+      ? datasetId
+      : null;
 
-  // Compute query hash
+  const { getDb } = await import("~/db/server-helpers");
+  const { biQueryLog } = await import("~/db/schema");
+  const { desc, eq, isNull } = await import("drizzle-orm");
+  const { getAuthSecret } = await import("~/lib/env.server");
+
+  const db = await getDb();
+
+  const [previous] = await db
+    .select({ id: biQueryLog.id, checksum: biQueryLog.checksum })
+    .from(biQueryLog)
+    .where(
+      context.organizationId
+        ? eq(biQueryLog.organizationId, context.organizationId)
+        : isNull(biQueryLog.organizationId),
+    )
+    .orderBy(desc(biQueryLog.createdAt), desc(biQueryLog.id))
+    .limit(1);
+
+  const id = crypto.randomUUID();
   const queryHash = await computeQueryHash(
     sqlQuery ?? pivotQuery ?? `${queryType}:${datasetId ?? "unknown"}`,
   );
 
-  // TODO: Implement in Slice 2
-  // 1. Get previous log entry for this org (for chain linking)
-  // 2. Create log entry with tamper-evident checksum
-  // 3. Insert into bi_query_log table
-
-  const logId = crypto.randomUUID();
-
-  console.log("[BI Audit]", {
-    logId,
+  const entry: Omit<BiQueryLogEntry, "checksum"> = {
+    id,
     userId: context.userId,
-    organizationId: context.organizationId,
+    organizationId: context.organizationId ?? null,
     queryType,
-    queryHash: queryHash.substring(0, 16) + "...",
-    datasetId,
+    queryHash,
+    datasetId: normalizedDatasetId,
+    sqlQuery: sqlQuery ?? null,
+    parameters: parameters ?? null,
+    pivotConfig: pivotQuery
+      ? {
+          rows: pivotQuery.rows,
+          columns: pivotQuery.columns,
+          measures: pivotQuery.measures.map((measure) => ({
+            field: measure.field ?? null,
+            aggregation: measure.aggregation,
+            ...(measure.label ? { label: measure.label } : {}),
+          })),
+        }
+      : null,
     rowsReturned,
     executionTimeMs,
-    timestamp: context.timestamp.toISOString(),
+    previousLogId: previous?.id ?? null,
+    createdAt: new Date(),
+  };
+
+  const checksum = await computeChecksum(
+    entry,
+    previous?.checksum ?? null,
+    getAuthSecret(),
+  );
+
+  await db.insert(biQueryLog).values({
+    ...entry,
+    checksum,
   });
 
-  return logId;
+  return id;
 }
 
-/**
- * Log an export operation
- *
- * Exports require additional logging for compliance.
- *
- * @param params - Export logging parameters
- * @returns Log entry ID
- */
 export async function logExport(
   params: LogQueryParams & {
     format: "csv" | "xlsx" | "json";
@@ -145,32 +158,12 @@ export async function logExport(
     stepUpAuthUsed: boolean;
   },
 ): Promise<string> {
-  const logId = await logQuery({
+  return logQuery({
     ...params,
     queryType: "export",
   });
-
-  // TODO: Add export-specific metadata
-  console.log("[BI Audit - Export]", {
-    logId,
-    format: params.format,
-    includesPii: params.includesPii,
-    stepUpAuthUsed: params.stepUpAuthUsed,
-  });
-
-  return logId;
 }
 
-/**
- * Verify integrity of audit chain
- *
- * TODO: Implement in Slice 2
- *
- * @param organizationId - Organization to verify
- * @param startDate - Start of verification range
- * @param endDate - End of verification range
- * @returns Verification result
- */
 export async function verifyAuditChain(
   organizationId: string,
   startDate: Date,
@@ -180,13 +173,53 @@ export async function verifyAuditChain(
   entriesChecked: number;
   firstBrokenEntry: string | null;
 }> {
-  // TODO: Implement chain verification in Slice 2
-  void organizationId;
-  void startDate;
-  void endDate;
-  return {
-    valid: true,
-    entriesChecked: 0,
-    firstBrokenEntry: null,
-  };
+  const { getDb } = await import("~/db/server-helpers");
+  const { biQueryLog } = await import("~/db/schema");
+  const { and, asc, between, eq } = await import("drizzle-orm");
+  const { getAuthSecret } = await import("~/lib/env.server");
+
+  const db = await getDb();
+  const rows = await db
+    .select()
+    .from(biQueryLog)
+    .where(
+      and(
+        eq(biQueryLog.organizationId, organizationId),
+        between(biQueryLog.createdAt, startDate, endDate),
+      ),
+    )
+    .orderBy(asc(biQueryLog.createdAt), asc(biQueryLog.id));
+
+  let previousChecksum: string | null = null;
+  let entriesChecked = 0;
+
+  for (const row of rows) {
+    const expected = await computeChecksum(
+      {
+        id: row.id,
+        userId: row.userId,
+        organizationId: row.organizationId ?? null,
+        queryType: row.queryType as QueryType,
+        queryHash: row.queryHash,
+        datasetId: row.datasetId ?? null,
+        sqlQuery: row.sqlQuery ?? null,
+        parameters: row.parameters ?? null,
+        pivotConfig: row.pivotConfig ?? null,
+        rowsReturned: row.rowsReturned ?? 0,
+        executionTimeMs: row.executionTimeMs ?? 0,
+        previousLogId: row.previousLogId ?? null,
+        createdAt: row.createdAt,
+      },
+      previousChecksum,
+      getAuthSecret(),
+    );
+
+    entriesChecked += 1;
+    if (row.checksum !== expected) {
+      return { valid: false, entriesChecked, firstBrokenEntry: row.id };
+    }
+    previousChecksum = row.checksum ?? null;
+  }
+
+  return { valid: true, entriesChecked, firstBrokenEntry: null };
 }

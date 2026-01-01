@@ -42,7 +42,9 @@ export const notifications = pgTable(
 export const notificationEmailDeliveries = pgTable(
   "notification_email_deliveries",
   {
-    notificationId: uuid("notification_id").primaryKey(),
+    notificationId: uuid("notification_id")
+      .primaryKey()
+      .references(() => notifications.id, { onDelete: "cascade" }),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -115,6 +117,13 @@ export const scheduledNotifications = pgTable(
       foreignColumns: [notificationTemplates.key],
       name: "scheduled_notifications_template_fk",
     }),
+    // Prevent duplicate scheduling of the same notification
+    uniqueIndex("scheduled_notifications_idempotency_idx").on(
+      table.templateKey,
+      table.userId,
+      table.organizationId,
+      table.scheduledFor,
+    ),
   ],
 );
 

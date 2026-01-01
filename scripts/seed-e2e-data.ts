@@ -468,14 +468,20 @@ async function seed() {
 
       if (userData.id === adminUserId) {
         let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES);
+        let encryptedTotpSecret = FAKE_MFA_SECRET; // Fallback: store raw (will fail verification)
         if (authSecret) {
           try {
             encryptedBackupCodes = await encryptBackupCodes(
               FAKE_BACKUP_CODES,
               authSecret,
             );
+            // Encrypt TOTP secret the same way Better Auth does
+            encryptedTotpSecret = await symmetricEncrypt({
+              data: FAKE_MFA_SECRET,
+              key: authSecret,
+            });
           } catch (error) {
-            console.warn(`⚠️  Could not encrypt backup codes: ${error}`);
+            console.warn(`⚠️  Could not encrypt MFA secrets: ${error}`);
           }
         }
 
@@ -484,13 +490,13 @@ async function seed() {
           .values({
             id: `${userData.id}-2fa`,
             userId: userData.id,
-            secret: FAKE_MFA_SECRET,
+            secret: encryptedTotpSecret,
             backupCodes: encryptedBackupCodes,
           })
           .onConflictDoUpdate({
             target: twoFactor.id,
             set: {
-              secret: FAKE_MFA_SECRET,
+              secret: encryptedTotpSecret,
               backupCodes: encryptedBackupCodes,
             },
           });

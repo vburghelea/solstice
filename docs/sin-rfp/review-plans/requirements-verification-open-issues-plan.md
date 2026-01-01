@@ -188,19 +188,19 @@ Decision: no, we will need to define minimal fixtures and also a way to generate
 
 ## Decision Log (Fill In)
 
-| Topic                         | Decision | Date | Notes |
-| ----------------------------- | -------- | ---- | ----- |
-| External integrations         |          |      |       |
-| Multi-file uploads            |          |      |       |
-| Admin DB query interface      |          |      |       |
-| Fiscal/NCCP metadata          |          |      |       |
-| Self-service org registration |          |      |       |
-| Guided walkthroughs           |          |      |       |
-| Global search                 |          |      |       |
-| File delete/replace           |          |      |       |
-| Transformation log viewer     |          |      |       |
-| Retention automation          |          |      |       |
-| Backup/DR drill evidence      |          |      |       |
-| Accessibility audit scope     |          |      |       |
-| Notification verification     |          |      |       |
-| Seeding sources               |          |      |       |
+| Topic                         | Decision                              | Date       | Notes                                                                      |
+| ----------------------------- | ------------------------------------- | ---------- | -------------------------------------------------------------------------- |
+| External integrations         | Defer PoC until target named          | 2025-12-30 | CSV/Excel import/export is baseline; API PoC pending vendor/system choice. |
+| Multi-file uploads            | Single file only                      | 2025-12-30 | Log multi-file as future work.                                             |
+| Admin DB query interface      | Out of scope for v1                   | 2025-12-30 | Use data catalog + exports; revisit if required.                           |
+| Fiscal/NCCP metadata          | Pending                               |            | Need final field list + UX direction.                                      |
+| Self-service org registration | Admin-only                            | 2025-12-30 | Controlled onboarding accepted.                                            |
+| Guided walkthroughs           | In-context tours                      | 2025-12-30 | Implement guided overlays with step targets.                               |
+| Global search                 | Cmd/Ctrl+K palette + unified endpoint | 2025-12-30 | Permission-gated actions + objects.                                        |
+| File delete/replace           | Delete + replace with audit           | 2025-12-30 | Block when legal holds apply.                                              |
+| Transformation log viewer     | Defer                                 | 2025-12-30 | Audit logs sufficient for now.                                             |
+| Retention automation          | Implement scheduled enforcement       | 2025-12-30 | Evidence pending after run.                                                |
+| Backup/DR drill evidence      | Sin-dev drill                         | 2025-12-30 | Capture RPO/RTO evidence in sin-dev.                                       |
+| Accessibility audit scope     | Automated-only                        | 2025-12-30 | Manual follow-up optional.                                                 |
+| Notification verification     | Real email delivery                   | 2025-12-30 | Capture SES delivery evidence.                                             |
+| Seeding sources               | Define fixtures + synthetic generator | 2025-12-30 | Seed scripts updated, generator added.                                     |

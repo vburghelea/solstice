@@ -513,19 +513,24 @@ export const Route = createFileRoute("/api/test/cleanup")({
                   data: JSON.stringify(codes),
                   key: authSecret,
                 });
+                // Encrypt TOTP secret the same way Better Auth does
+                const encryptedSecret = await symmetricEncrypt({
+                  data: secret,
+                  key: authSecret,
+                });
 
                 await db
                   .insert(twoFactor)
                   .values({
                     id: `${targetUserId}-2fa`,
                     userId: targetUserId,
-                    secret,
+                    secret: encryptedSecret,
                     backupCodes: encryptedBackupCodes,
                   })
                   .onConflictDoUpdate({
                     target: twoFactor.id,
                     set: {
-                      secret,
+                      secret: encryptedSecret,
                       backupCodes: encryptedBackupCodes,
                     },
                   });

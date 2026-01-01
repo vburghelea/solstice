@@ -1,0 +1,43 @@
+{
+  "normalizeFilterCases": [
+    {
+      "name": "eq_string",
+      "input": { "field": "status", "operator": "eq", "value": "active" },
+      "expected": { "field": "status", "operator": "eq", "value": "active" }
+    },
+    {
+      "name": "in_single_to_eq",
+      "input": { "field": "status", "operator": "in", "value": ["active"] },
+      "expected": { "field": "status", "operator": "in", "value": ["active"] }
+    },
+    {
+      "name": "between_dates",
+      "input": {
+        "field": "createdAt",
+        "operator": "between",
+        "value": ["2024-01-01", "2024-12-31"]
+      },
+      "expected": {
+        "field": "createdAt",
+        "operator": "between",
+        "value": ["2024-01-01T00:00:00.000Z", "2024-12-31T00:00:00.000Z"]
+      }
+    }
+  ],
+  "validateFilterCases": [
+    {
+      "name": "valid_eq_on_allowed_field",
+      "input": { "field": "status", "operator": "eq", "value": "active" },
+      "allowedFilters": { "status": { "operators": ["eq", "in"], "type": "enum" } },
+      "expectedValid": true,
+      "expectedErrors": []
+    },
+    {
+      "name": "invalid_operator",
+      "input": { "field": "status", "operator": "gt", "value": "active" },
+      "allowedFilters": { "status": { "operators": ["eq", "in"], "type": "enum" } },
+      "expectedValid": false,
+      "expectedErrors": ["Operator 'gt' not allowed for field 'status'"]
+    }
+  ]
+}

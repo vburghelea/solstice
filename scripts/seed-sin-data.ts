@@ -17,26 +17,35 @@
  * - member@example.com - Regular member
  */
 
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import dotenv from "dotenv";
 import { like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import type { JsonRecord } from "../src/shared/lib/json";
 import {
   account,
   delegatedAccess,
   forms,
   formSubmissions,
   formVersions,
+  importMappingTemplates,
   notificationTemplates,
+  notifications,
   organizationMembers,
+  organizations,
   policyDocuments,
   reportingCycles,
   reportingSubmissions,
   reportingTasks,
   retentionPolicies,
   roles,
+  savedReports,
   session,
+  submissionFiles,
+  supportRequests,
+  templates,
   twoFactor,
   user,
   userPolicyAcceptances,
@@ -82,6 +91,34 @@ if (!process.env["DATABASE_URL"]) {
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".env.e2e" });
 }
+
+const artifactsBucket = process.env["SIN_ARTIFACTS_BUCKET"] ?? "";
+const artifactsRegion = process.env["AWS_REGION"] ?? "ca-central-1";
+const s3Client = artifactsBucket ? new S3Client({ region: artifactsRegion }) : null;
+
+const uploadSeedArtifact = async (params: {
+  key: string;
+  body: string;
+  contentType: string;
+}) => {
+  if (!s3Client || !artifactsBucket) {
+    return null;
+  }
+
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: artifactsBucket,
+      Key: params.key,
+      Body: params.body,
+      ContentType: params.contentType,
+    }),
+  );
+
+  return {
+    storageKey: params.key,
+    sizeBytes: Buffer.byteLength(params.body),
+  };
+};
 
 // Static IDs for predictable test data
 // UUIDs must be RFC 4122 compliant (version nibble at pos 13, variant nibble at pos 17)
@@ -132,6 +169,33 @@ const IDS = {
   // Policy Documents (RFC 4122 compliant UUIDs)
   privacyPolicyId: "a0000000-0000-4000-8006-000000000001",
   tosId: "a0000000-0000-4000-8006-000000000002",
+
+  // Form Submissions (RFC 4122 compliant UUIDs)
+  annualStatsSubmissionId: "a0000000-0000-4000-8007-000000000001",
+  quarterlyFinSubmissionId: "a0000000-0000-4000-8007-000000000002",
+
+  // Submission Files (RFC 4122 compliant UUIDs)
+  quarterlyFinFileId: "a0000000-0000-4000-8008-000000000001",
+
+  // Templates (RFC 4122 compliant UUIDs)
+  reportingTemplateId: "a0000000-0000-4000-8009-000000000001",
+  importsTemplateId: "a0000000-0000-4000-8009-000000000002",
+  formsTemplateId: "a0000000-0000-4000-8009-000000000003",
+  analyticsTemplateId: "a0000000-0000-4000-8009-000000000004",
+
+  // Support Requests (RFC 4122 compliant UUIDs)
+  supportRequestId1: "a0000000-0000-4000-8010-000000000001",
+  supportRequestId2: "a0000000-0000-4000-8010-000000000002",
+
+  // Saved Reports (RFC 4122 compliant UUIDs)
+  savedReportId1: "a0000000-0000-4000-8011-000000000001",
+
+  // Import Mapping Templates (RFC 4122 compliant UUIDs)
+  importTemplateId1: "a0000000-0000-4000-8012-000000000001",
+
+  // Notifications (RFC 4122 compliant UUIDs)
+  notificationId1: "a0000000-0000-4000-8013-000000000001",
+  notificationId2: "a0000000-0000-4000-8013-000000000002",
 } as const;
 
 /**
@@ -193,9 +257,15 @@ async function seed() {
     await db.delete(reportingSubmissions);
     await db.delete(reportingTasks);
     await db.delete(reportingCycles);
+    await db.delete(submissionFiles);
     await db.delete(formSubmissions);
+    await db.delete(importMappingTemplates);
     await db.delete(formVersions);
     await db.delete(forms);
+    await db.delete(savedReports);
+    await db.delete(supportRequests);
+    await db.delete(templates);
+    await db.delete(notifications);
     await db.delete(delegatedAccess);
     await db.delete(organizationMembers);
     await db.delete(retentionPolicies);
@@ -228,6 +298,8 @@ async function seed() {
         permissions: {
           "system:*": true,
           "roles:manage": true,
+          "analytics.admin": true,
+          "analytics.export": true,
         },
       },
       {
@@ -239,6 +311,8 @@ async function seed() {
           "orgs:manage": true,
           "reports:view": true,
           "forms:manage": true,
+          "analytics.admin": true,
+          "analytics.export": true,
         },
       },
       {
@@ -366,16 +440,22 @@ async function seed() {
 
       // Enroll MFA for global admins (fake MFA for testing)
       if (isGlobalAdmin) {
-        // Encrypt backup codes if auth secret is available
+        // Encrypt backup codes and TOTP secret if auth secret is available
         let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES); // Fallback: store as JSON
+        let encryptedTotpSecret = FAKE_MFA_SECRET; // Fallback: store raw (will fail verification)
         if (authSecret) {
           try {
             encryptedBackupCodes = await encryptBackupCodes(
               FAKE_BACKUP_CODES,
               authSecret,
             );
+            // Encrypt the TOTP secret the same way Better Auth does
+            encryptedTotpSecret = await symmetricEncrypt({
+              data: FAKE_MFA_SECRET,
+              key: authSecret,
+            });
           } catch (err) {
-            console.warn(`   ⚠️  Could not encrypt backup codes: ${err}`);
+            console.warn(`   ⚠️  Could not encrypt MFA secrets: ${err}`);
           }
         }
 
@@ -384,13 +464,13 @@ async function seed() {
           .values({
             id: `${userData.id}-2fa`,
             userId: userData.id,
-            secret: FAKE_MFA_SECRET,
+            secret: encryptedTotpSecret,
             backupCodes: encryptedBackupCodes,
           })
           .onConflictDoUpdate({
             target: twoFactor.id,
             set: {
-              secret: FAKE_MFA_SECRET,
+              secret: encryptedTotpSecret,
               backupCodes: encryptedBackupCodes,
             },
           });
@@ -419,44 +499,42 @@ async function seed() {
       type: "governing_body" | "pso" | "league" | "club" | "affiliate";
       parentOrgId?: string;
       status?: "pending" | "active" | "suspended" | "archived";
-      settings?: Record<string, unknown>;
-      metadata?: Record<string, unknown>;
+      settings?: JsonRecord;
+      metadata?: JsonRecord;
     }) => {
       const now = new Date();
-      await db.execute(sql`
-        INSERT INTO organizations (
-          id,
-          name,
-          slug,
-          type,
-          parent_org_id,
+      const settings: JsonRecord = data.settings ?? {};
+      const metadata: JsonRecord = data.metadata ?? {};
+      const status = data.status ?? "active";
+      const parentOrgId = data.parentOrgId ?? null;
+
+      await db
+        .insert(organizations)
+        .values({
+          id: data.id,
+          name: data.name,
+          slug: data.slug,
+          type: data.type,
+          parentOrgId,
           status,
           settings,
           metadata,
-          created_at,
-          updated_at
-        ) VALUES (
-          ${data.id},
-          ${data.name},
-          ${data.slug},
-          ${data.type},
-          ${data.parentOrgId ?? null},
-          ${data.status ?? "active"},
-          ${data.settings ?? {}},
-          ${data.metadata ?? {}},
-          ${now},
-          ${now}
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          slug = EXCLUDED.slug,
-          type = EXCLUDED.type,
-          parent_org_id = EXCLUDED.parent_org_id,
-          status = EXCLUDED.status,
-          settings = EXCLUDED.settings,
-          metadata = EXCLUDED.metadata,
-          updated_at = ${now}
-      `);
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: organizations.id,
+          set: {
+            name: data.name,
+            slug: data.slug,
+            type: data.type,
+            parentOrgId,
+            status,
+            settings,
+            metadata,
+            updatedAt: now,
+          },
+        });
     };
 
     // Root: viaSport BC (governing body)
@@ -665,7 +743,7 @@ async function seed() {
               required: false,
             },
           ],
-          settings: { allowDraft: true, requireApproval: true },
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
         },
       },
       {
@@ -679,43 +757,43 @@ async function seed() {
           fields: [
             {
               key: "revenue_grants",
-              type: "currency",
+              type: "number",
               label: "Revenue - Grants",
               required: true,
             },
             {
               key: "revenue_fees",
-              type: "currency",
+              type: "number",
               label: "Revenue - Membership Fees",
               required: true,
             },
             {
               key: "revenue_events",
-              type: "currency",
+              type: "number",
               label: "Revenue - Events",
               required: true,
             },
             {
               key: "revenue_other",
-              type: "currency",
+              type: "number",
               label: "Revenue - Other",
               required: false,
             },
             {
               key: "expenses_programs",
-              type: "currency",
+              type: "number",
               label: "Expenses - Programs",
               required: true,
             },
             {
               key: "expenses_admin",
-              type: "currency",
+              type: "number",
               label: "Expenses - Administration",
               required: true,
             },
             {
               key: "expenses_facilities",
-              type: "currency",
+              type: "number",
               label: "Expenses - Facilities",
               required: true,
             },
@@ -726,7 +804,7 @@ async function seed() {
               required: false,
             },
           ],
-          settings: { allowDraft: true, requireApproval: true },
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
         },
       },
       {
@@ -763,7 +841,7 @@ async function seed() {
               required: false,
             },
           ],
-          settings: { allowDraft: true, requireApproval: false },
+          settings: { allowDraft: true, requireApproval: false, notifyOnSubmit: [] },
         },
       },
       {
@@ -806,7 +884,7 @@ async function seed() {
               required: true,
             },
           ],
-          settings: { allowDraft: true, requireApproval: true },
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
         },
       },
     ];
@@ -931,7 +1009,7 @@ async function seed() {
     console.log("Phase 9: Creating sample form submissions...");
 
     // Create a submission for BC Hockey
-    const bcHockeySubmissionId = "a0000000-0000-4000-8007-000000000001";
+    const bcHockeySubmissionId = IDS.annualStatsSubmissionId;
     await db.insert(formSubmissions).values({
       id: bcHockeySubmissionId,
       formId: IDS.annualStatsFormId,
@@ -962,12 +1040,264 @@ async function seed() {
       submittedAt: new Date(),
       submittedBy: IDS.psoAdminId,
     });
-    console.log("   ✓ BC Hockey annual stats (submitted)\n");
+    console.log("   ✓ BC Hockey annual stats (submitted)");
+
+    const supportingDocs = await uploadSeedArtifact({
+      key: `submissions/${IDS.quarterlyFinSubmissionId}/supporting-docs.csv`,
+      body: "category,amount,currency\nFacility rentals,12450,CAD\nEquipment,7320,CAD\n",
+      contentType: "text/csv",
+    });
+
+    const quarterlyPayload: JsonRecord = {
+      revenue_grants: 98000,
+      revenue_fees: 41250,
+      revenue_events: 9200,
+      revenue_other: 1300,
+      expenses_programs: 58750,
+      expenses_admin: 16200,
+      expenses_facilities: 14100,
+      supporting_docs: null,
+    };
+
+    if (supportingDocs) {
+      quarterlyPayload["supporting_docs"] = {
+        storageKey: supportingDocs.storageKey,
+        fileName: "bc-hockey-q1-financials.csv",
+        mimeType: "text/csv",
+        sizeBytes: supportingDocs.sizeBytes,
+        checksum: "seed",
+      };
+    } else {
+      console.warn(
+        "   ⚠️  SIN_ARTIFACTS_BUCKET not set; skipping submission file upload.",
+      );
+    }
+
+    await db.insert(formSubmissions).values({
+      id: IDS.quarterlyFinSubmissionId,
+      formId: IDS.quarterlyFinFormId,
+      formVersionId: IDS.quarterlyFinFormV1Id,
+      organizationId: IDS.bcHockeyId,
+      submitterId: IDS.psoAdminId,
+      status: "submitted",
+      payload: quarterlyPayload,
+      completenessScore: 100,
+      submittedAt: new Date(),
+    });
+
+    if (supportingDocs) {
+      await db.insert(submissionFiles).values({
+        id: IDS.quarterlyFinFileId,
+        submissionId: IDS.quarterlyFinSubmissionId,
+        fieldKey: "supporting_docs",
+        fileName: "bc-hockey-q1-financials.csv",
+        mimeType: "text/csv",
+        sizeBytes: supportingDocs.sizeBytes,
+        checksum: "seed",
+        storageKey: supportingDocs.storageKey,
+        uploadedBy: IDS.psoAdminId,
+      });
+    }
+
+    await db.insert(reportingSubmissions).values({
+      taskId: IDS.quarterlyTask1Id,
+      organizationId: IDS.bcHockeyId,
+      formSubmissionId: IDS.quarterlyFinSubmissionId,
+      status: "submitted",
+      submittedAt: new Date(),
+      submittedBy: IDS.psoAdminId,
+    });
+    console.log("   ✓ BC Hockey quarterly financials (submitted)\n");
 
     // ========================================
-    // PHASE 10: Create notification templates
+    // PHASE 10: Create import mapping templates
     // ========================================
-    console.log("Phase 10: Creating notification templates...");
+    console.log("Phase 10: Creating import mapping templates...");
+
+    await db.insert(importMappingTemplates).values([
+      {
+        id: IDS.importTemplateId1,
+        organizationId: IDS.bcHockeyId,
+        name: "BC Hockey Annual Stats Mapping",
+        description: "Mapping template for annual stats submissions",
+        targetFormId: IDS.annualStatsFormId,
+        mappings: {
+          total_participants: "Total Participants",
+          male_participants: "Male Participants",
+          female_participants: "Female Participants",
+          youth_under_18: "Youth Under 18",
+          adults_18_plus: "Adults 18+",
+        },
+        createdBy: IDS.viasportStaffId,
+      },
+    ]);
+    console.log("   ✓ Created import mapping templates\n");
+
+    // ========================================
+    // PHASE 11: Create saved reports
+    // ========================================
+    console.log("Phase 11: Creating saved reports...");
+
+    await db.insert(savedReports).values({
+      id: IDS.savedReportId1,
+      organizationId: IDS.bcHockeyId,
+      name: "BC Hockey Submission Health",
+      description: "Track completeness and submissions over time",
+      dataSource: "form_submissions",
+      filters: { organizationId: IDS.bcHockeyId },
+      columns: ["status", "completenessScore", "submittedAt"],
+      sort: { submittedAt: "desc" },
+      ownerId: IDS.viasportStaffId,
+      isOrgWide: true,
+    });
+    console.log("   ✓ Created saved reports\n");
+
+    // ========================================
+    // PHASE 12: Create templates
+    // ========================================
+    console.log("Phase 12: Creating templates...");
+
+    if (!artifactsBucket) {
+      console.warn("   ⚠️  SIN_ARTIFACTS_BUCKET not set; skipping template uploads.");
+    } else {
+      const reportingTemplate = await uploadSeedArtifact({
+        key: `templates/reporting/${IDS.reportingTemplateId}-reporting-template.csv`,
+        body: "metric,value\nparticipants,1200\ncoaches,45\n",
+        contentType: "text/csv",
+      });
+
+      const importTemplate = await uploadSeedArtifact({
+        key: `templates/imports/${IDS.importsTemplateId}-imports-template.csv`,
+        body: "Total Participants,Male Participants,Female Participants\n1200,620,580\n",
+        contentType: "text/csv",
+      });
+
+      const formsTemplate = await uploadSeedArtifact({
+        key: `templates/forms/${IDS.formsTemplateId}-forms-template.csv`,
+        body: "Field,Example\nTotal Participants,1200\nEvents Held,25\n",
+        contentType: "text/csv",
+      });
+
+      const analyticsTemplate = await uploadSeedArtifact({
+        key: `templates/analytics/${IDS.analyticsTemplateId}-analytics-template.csv`,
+        body: "Month,Registrations\nJan,120\nFeb,140\nMar,160\n",
+        contentType: "text/csv",
+      });
+
+      if (reportingTemplate && importTemplate && formsTemplate && analyticsTemplate) {
+        await db.insert(templates).values([
+          {
+            id: IDS.reportingTemplateId,
+            name: "Reporting Submission Template",
+            description: "Baseline reporting CSV template",
+            context: "reporting",
+            tags: ["reporting", "csv"],
+            storageKey: reportingTemplate.storageKey,
+            fileName: "reporting-template.csv",
+            mimeType: "text/csv",
+            sizeBytes: reportingTemplate.sizeBytes,
+            createdBy: IDS.viasportStaffId,
+          },
+          {
+            id: IDS.importsTemplateId,
+            name: "Import Mapping Template",
+            description: "Template for bulk import mappings",
+            context: "imports",
+            tags: ["imports", "csv"],
+            storageKey: importTemplate.storageKey,
+            fileName: "imports-template.csv",
+            mimeType: "text/csv",
+            sizeBytes: importTemplate.sizeBytes,
+            createdBy: IDS.viasportStaffId,
+          },
+          {
+            id: IDS.formsTemplateId,
+            name: "Form Submission Checklist",
+            description: "Checklist for required form fields",
+            context: "forms",
+            tags: ["forms", "csv"],
+            storageKey: formsTemplate.storageKey,
+            fileName: "forms-template.csv",
+            mimeType: "text/csv",
+            sizeBytes: formsTemplate.sizeBytes,
+            createdBy: IDS.viasportStaffId,
+          },
+          {
+            id: IDS.analyticsTemplateId,
+            name: "Analytics Snapshot Export",
+            description: "Sample analytics export for quick reporting",
+            context: "analytics",
+            tags: ["analytics", "csv"],
+            storageKey: analyticsTemplate.storageKey,
+            fileName: "analytics-template.csv",
+            mimeType: "text/csv",
+            sizeBytes: analyticsTemplate.sizeBytes,
+            createdBy: IDS.viasportStaffId,
+          },
+        ]);
+        console.log("   ✓ Uploaded and created 4 templates\n");
+      } else {
+        console.warn("   ⚠️  Template uploads incomplete; skipping template records.\n");
+      }
+    }
+
+    // ========================================
+    // PHASE 13: Create support requests + notifications
+    // ========================================
+    console.log("Phase 13: Creating support requests and notifications...");
+
+    await db.insert(supportRequests).values([
+      {
+        id: IDS.supportRequestId1,
+        organizationId: IDS.bcHockeyId,
+        userId: IDS.clubReporterId,
+        subject: "Clarify reporting deadline",
+        message: "Can you confirm the FY reporting deadline for our club?",
+        category: "question",
+        status: "open",
+      },
+      {
+        id: IDS.supportRequestId2,
+        organizationId: IDS.bcSoccerId,
+        userId: IDS.psoAdminId,
+        subject: "Template download issue",
+        message: "The import template download returned an error.",
+        category: "issue",
+        status: "in_progress",
+      },
+    ]);
+
+    await db.insert(notifications).values([
+      {
+        id: IDS.notificationId1,
+        userId: IDS.clubReporterId,
+        organizationId: IDS.bcHockeyId,
+        type: "reporting_reminder",
+        category: "reporting",
+        title: "Reporting reminder",
+        body: "Annual Statistics Report is due in 14 days.",
+        link: "/dashboard/sin/reporting",
+        metadata: { taskId: IDS.annualTask1Id },
+      },
+      {
+        id: IDS.notificationId2,
+        userId: IDS.psoAdminId,
+        organizationId: IDS.bcHockeyId,
+        type: "form_submission",
+        category: "system",
+        title: "Submission received",
+        body: "Quarterly financial submission received for BC Hockey.",
+        link: `/dashboard/sin/submissions/${IDS.quarterlyFinSubmissionId}`,
+        metadata: { submissionId: IDS.quarterlyFinSubmissionId },
+      },
+    ]);
+
+    console.log("   ✓ Created support requests and notifications\n");
+
+    // ========================================
+    // PHASE 14: Create notification templates
+    // ========================================
+    console.log("Phase 14: Creating notification templates...");
 
     await db.insert(notificationTemplates).values([
       {
@@ -1006,9 +1336,9 @@ async function seed() {
     console.log("   ✓ Created 4 notification templates\n");
 
     // ========================================
-    // PHASE 11: Create policy documents
+    // PHASE 15: Create policy documents
     // ========================================
-    console.log("Phase 11: Creating policy documents...");
+    console.log("Phase 15: Creating policy documents...");
 
     await db.insert(policyDocuments).values([
       {
@@ -1033,9 +1363,9 @@ async function seed() {
     console.log("   ✓ Created privacy policy and terms of service\n");
 
     // ========================================
-    // PHASE 12: Create retention policies
+    // PHASE 16: Create retention policies
     // ========================================
-    console.log("Phase 12: Creating retention policies...");
+    console.log("Phase 16: Creating retention policies...");
 
     await db.insert(retentionPolicies).values([
       { dataType: "audit_logs", retentionDays: 2555, archiveAfterDays: 365 }, // 7 years
@@ -1063,9 +1393,11 @@ async function seed() {
     console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)\n");
     console.log("-".repeat(60));
     console.log("🔐 FAKE MFA FOR TESTING (admin users only):");
-    console.log("   TOTP Secret: JBSWY3DPEHPK3PXP");
-    console.log("   → Add this to any authenticator app to generate valid codes");
-    console.log("   → Or use otpauth CLI: otpauth -b JBSWY3DPEHPK3PXP");
+    console.log("   TOTP Secret (for otplib): JJBFGV2ZGNCFARKIKBFTGUCYKA");
+    console.log(
+      "   → Generate codes: npx tsx -e \"import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));\"",
+    );
+    console.log("   → Raw secret stored: JBSWY3DPEHPK3PXP (base32-encoded for otplib)");
     console.log("\n   Backup Codes (use with 'Use backup code' option):");
     console.log("   → backup-testcode1 through backup-testcode10");
     console.log("-".repeat(60));

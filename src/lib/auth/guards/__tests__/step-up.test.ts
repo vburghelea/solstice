@@ -77,15 +77,14 @@ describe("requireRecentAuth", () => {
     );
   });
 
-  it("requires MFA re-verification when MFA timestamp is missing", async () => {
+  it("allows MFA-enabled sessions without MFA timestamp when auth is recent", async () => {
     setUserRecord({ mfaRequired: false, twoFactorEnabled: true });
 
     const createdAt = new Date(Date.now() - 2 * 60 * 1000);
 
-    await expectReason(
+    await expect(
       requireRecentAuth("user-1", { session: { createdAt } }),
-      "MFA_REVERIFY_REQUIRED",
-    );
+    ).resolves.toBeUndefined();
   });
 
   it("rejects when MFA is required but not enabled", async () => {

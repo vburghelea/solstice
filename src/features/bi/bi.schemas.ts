@@ -1,55 +1,78 @@
 /**
  * BI Module Schemas
  *
- * Zod schemas for BI operations including pivot queries, filters, and exports.
- * These schemas serve as the contract-first source of truth for the BI API.
+ * Contract-first Zod schemas for BI operations, datasets, and query configs.
  *
- * @see docs/sin-rfp/decisions/bi/SPEC-bi-platform.md
+ * @see src/features/bi/docs/SPEC-bi-platform.md
  */
 
 import { z } from "zod";
+import { jsonRecordSchema } from "~/shared/lib/json";
 
 // =============================================================================
-// Filter Operators (Phase 1 - Current Implementation)
+// Operators + Aggregations
 // =============================================================================
 
-/**
- * Phase 1 filter operators - matches current reports.config.ts
- */
 export const filterOperatorSchema = z.enum([
-  "eq", // equals
-  "neq", // not equals
-  "gt", // greater than
-  "gte", // greater than or equal
-  "lt", // less than
-  "lte", // less than or equal
-  "in", // in array
-  "between", // between two values
+  "eq",
+  "neq",
+  "gt",
+  "gte",
+  "lt",
+  "lte",
+  "in",
+  "between",
+  "not_in",
+  "contains",
+  "starts_with",
+  "ends_with",
+  "is_null",
+  "is_not_null",
 ]);
 
 export type FilterOperator = z.infer<typeof filterOperatorSchema>;
 
-// =============================================================================
-// Aggregation Types (Phase 1 - Current Implementation)
-// =============================================================================
-
-/**
- * Phase 1 aggregations - matches current reports.mutations.ts
- */
-export const aggregationTypeSchema = z.enum(["count", "sum", "avg", "min", "max"]);
+export const aggregationTypeSchema = z.enum([
+  "count",
+  "sum",
+  "avg",
+  "min",
+  "max",
+  "count_distinct",
+  "median",
+  "stddev",
+  "variance",
+]);
 
 export type AggregationType = z.infer<typeof aggregationTypeSchema>;
 
+export const chartTypeSchema = z.enum([
+  "table",
+  "bar",
+  "line",
+  "area",
+  "pie",
+  "donut",
+  "heatmap",
+  "scatter",
+  "kpi",
+]);
+
+export type ChartType = z.infer<typeof chartTypeSchema>;
+
+export const widgetTypeSchema = z.enum(["chart", "pivot", "kpi", "text", "filter"]);
+
+export type WidgetType = z.infer<typeof widgetTypeSchema>;
+
 // =============================================================================
-// Filter Schemas
+// Filters
 // =============================================================================
 
+const filterPrimitiveSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+
 export const filterValueSchema = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-  z.null(),
-  z.array(z.union([z.string(), z.number()])),
+  filterPrimitiveSchema,
+  z.array(filterPrimitiveSchema),
 ]);
 
 export type FilterValue = z.infer<typeof filterValueSchema>;
@@ -57,24 +80,96 @@ export type FilterValue = z.infer<typeof filterValueSchema>;
 export const filterSchema = z.object({
   field: z.string().min(1),
   operator: filterOperatorSchema,
-  value: filterValueSchema,
-});
-
-export type Filter = z.infer<typeof filterSchema>;
-
-// =============================================================================
-// Pivot Query Schemas
-// =============================================================================
-
-export const pivotDimensionSchema = z.object({
-  field: z.string().min(1),
+  value: filterValueSchema.optional(),
   label: z.string().optional(),
 });
 
-export type PivotDimension = z.infer<typeof pivotDimensionSchema>;
+export type FilterConfig = z.infer<typeof filterSchema>;
+
+// =============================================================================
+// Dataset Definitions
+// =============================================================================
+
+export const datasetJoinSchema = z.object({
+  table: z.string().min(1),
+  type: z.enum(["inner", "left", "right"]),
+  on: z.object({
+    left: z.string().min(1),
+    right: z.string().min(1),
+  }),
+});
+
+export type DatasetJoin = z.infer<typeof datasetJoinSchema>;
+
+export const formatOptionsSchema = z.object({
+  decimals: z.number().int().min(0).optional(),
+  prefix: z.string().optional(),
+  suffix: z.string().optional(),
+  thousandsSeparator: z.string().optional(),
+  dateFormat: z.string().optional(),
+  currency: z.string().optional(),
+});
+
+export type FormatOptions = z.infer<typeof formatOptionsSchema>;
+
+export const datasetFieldSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  sourceColumn: z.string().min(1),
+  sourceTable: z.string().optional(),
+  dataType: z.enum([
+    "string",
+    "number",
+    "date",
+    "datetime",
+    "boolean",
+    "enum",
+    "json",
+    "uuid",
+  ]),
+  piiClassification: z.enum(["none", "personal", "sensitive", "restricted"]).optional(),
+  requiredPermission: z.string().optional(),
+  formatType: z
+    .enum(["text", "number", "currency", "percent", "date", "datetime"])
+    .optional(),
+  formatOptions: formatOptionsSchema.optional(),
+  allowFilter: z.boolean().optional(),
+  allowSort: z.boolean().optional(),
+  allowGroupBy: z.boolean().optional(),
+  allowAggregate: z.boolean().optional(),
+  defaultAggregation: aggregationTypeSchema.optional(),
+  enumValues: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string(),
+      }),
+    )
+    .optional(),
+});
+
+export type DatasetField = z.infer<typeof datasetFieldSchema>;
+
+export const datasetDefinitionSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  baseTable: z.string().min(1),
+  joins: z.array(datasetJoinSchema).optional(),
+  fields: z.array(datasetFieldSchema),
+  isPublic: z.boolean().optional(),
+  allowedRoles: z.array(z.string()).optional(),
+});
+
+export type DatasetDefinition = z.infer<typeof datasetDefinitionSchema>;
+
+// =============================================================================
+// Pivot Config + Queries
+// =============================================================================
 
 export const pivotMeasureSchema = z.object({
-  field: z.string().min(1),
+  field: z.string().min(1).nullable().optional(),
   aggregation: aggregationTypeSchema,
   label: z.string().optional(),
 });
@@ -83,7 +178,9 @@ export type PivotMeasure = z.infer<typeof pivotMeasureSchema>;
 
 export const pivotQuerySchema = z.object({
   datasetId: z.string().min(1),
-  dimensions: z.array(pivotDimensionSchema).default([]),
+  organizationId: z.uuid().optional(),
+  rows: z.array(z.string()).default([]),
+  columns: z.array(z.string()).default([]),
   measures: z.array(pivotMeasureSchema).min(1),
   filters: z.array(filterSchema).default([]),
   limit: z.number().int().min(1).max(10000).default(1000),
@@ -92,7 +189,42 @@ export const pivotQuerySchema = z.object({
 export type PivotQuery = z.infer<typeof pivotQuerySchema>;
 
 // =============================================================================
-// Export Schemas
+// Pivot Results
+// =============================================================================
+
+export const pivotMeasureMetaSchema = z.object({
+  field: z.string().nullable(),
+  aggregation: aggregationTypeSchema,
+  key: z.string().min(1),
+  label: z.string().min(1),
+});
+
+export type PivotMeasureMeta = z.infer<typeof pivotMeasureMetaSchema>;
+
+export const pivotColumnKeySchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  values: z.record(z.string(), z.string()),
+});
+
+export const pivotRowSchema = z.object({
+  key: z.string().min(1),
+  values: z.record(z.string(), z.string()),
+  cells: z.record(z.string(), z.record(z.string(), z.number().nullable())),
+});
+
+export const pivotResultSchema = z.object({
+  rowFields: z.array(z.string()),
+  columnFields: z.array(z.string()),
+  measures: z.array(pivotMeasureMetaSchema),
+  columnKeys: z.array(pivotColumnKeySchema),
+  rows: z.array(pivotRowSchema),
+});
+
+export type PivotResult = z.infer<typeof pivotResultSchema>;
+
+// =============================================================================
+// Exports
 // =============================================================================
 
 export const exportFormatSchema = z.enum(["csv", "xlsx", "json"]);
@@ -109,23 +241,31 @@ export const exportRequestSchema = z.object({
 export type ExportRequest = z.infer<typeof exportRequestSchema>;
 
 // =============================================================================
-// Pivot Result Schemas
+// SQL Workbench
 // =============================================================================
 
-export const pivotCellSchema = z.object({
-  dimensionValues: z.record(z.string(), z.unknown()),
-  measureValues: z.record(z.string(), z.union([z.number(), z.null()])),
+export const sqlQuerySchema = z.object({
+  sql: z.string().min(1),
+  parameters: jsonRecordSchema.optional(),
+  datasetId: z.string().min(1).optional(),
 });
 
-export type PivotCell = z.infer<typeof pivotCellSchema>;
+export type SqlQueryRequest = z.infer<typeof sqlQuerySchema>;
 
-export const pivotResultSchema = z.object({
-  cells: z.array(pivotCellSchema),
-  dimensions: z.array(z.string()),
-  measures: z.array(z.string()),
-  totalRows: z.number().int().nonnegative(),
-  truncated: z.boolean(),
-  executionTimeMs: z.number().nonnegative(),
+export const sqlSchemaRequestSchema = z.object({
+  datasetId: z.string().min(1).optional(),
 });
 
-export type PivotResult = z.infer<typeof pivotResultSchema>;
+export type SqlSchemaRequest = z.infer<typeof sqlSchemaRequestSchema>;
+
+export const biQueryLogFilterSchema = z.object({
+  organizationId: z.uuid().optional(),
+  userId: z.string().min(1).optional(),
+  queryType: z.enum(["sql", "pivot", "export"]).optional(),
+  datasetId: z.uuid().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+  limit: z.number().int().min(1).max(200).optional(),
+});
+
+export type BiQueryLogFilter = z.infer<typeof biQueryLogFilterSchema>;

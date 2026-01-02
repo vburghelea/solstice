@@ -1,7 +1,71 @@
 import type { FormDefinition } from "~/features/forms/forms.schemas";
+import type { DatasetField } from "./bi.types";
+import { getDataset } from "./semantic";
 import { maskPiiFields } from "./governance";
 
 export type QueryFilter = { field: string; operator: string; value: unknown };
+
+const toUtcDate = (value: unknown): Date | null => {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+  if (typeof value === "string" || typeof value === "number") {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+};
+
+const formatUtcDate = (date: Date) => date.toISOString().slice(0, 10);
+
+const truncateToGrain = (date: Date, grain: DatasetField["timeGrain"]) => {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+
+  switch (grain) {
+    case "day":
+      return new Date(Date.UTC(year, month, day));
+    case "week": {
+      const dayOfWeek = date.getUTCDay();
+      const diff = (dayOfWeek + 6) % 7;
+      return new Date(Date.UTC(year, month, day - diff));
+    }
+    case "month":
+      return new Date(Date.UTC(year, month, 1));
+    case "quarter": {
+      const quarterStart = Math.floor(month / 3) * 3;
+      return new Date(Date.UTC(year, quarterStart, 1));
+    }
+    default:
+      return new Date(Date.UTC(year, month, day));
+  }
+};
+
+const applyDerivedFields = (
+  rows: Array<Record<string, unknown>>,
+  fields: DatasetField[],
+  columns: string[],
+) => {
+  const requested = new Set(columns);
+  const derivedFields = fields.filter(
+    (field) => field.timeGrain && field.derivedFrom && requested.has(field.id),
+  );
+
+  if (derivedFields.length === 0) return rows;
+
+  return rows.map((row) => {
+    const next = { ...row };
+    for (const field of derivedFields) {
+      const sourceValue = row[field.derivedFrom ?? ""] ?? row[field.id];
+      const dateValue = toUtcDate(sourceValue);
+      next[field.id] = dateValue
+        ? formatUtcDate(truncateToGrain(dateValue, field.timeGrain))
+        : null;
+    }
+    return next;
+  });
+};
 
 export const shapeRows = (rows: Array<Record<string, unknown>>, columns: string[]) =>
   rows.map((row) => {
@@ -84,8 +148,10 @@ export const loadDatasetData = async (params: {
   columns: string[];
   filters: QueryFilter[];
   fieldsToMask: string[];
+  limit?: number;
 }) => {
   const { datasetId } = params;
+  const dataset = getDataset(datasetId);
   const { getDb } = await import("~/db/server-helpers");
   const { and, asc, between, eq, gt, gte, ilike, inArray, isNull, lt, lte, ne, not } =
     await import("drizzle-orm");
@@ -160,6 +226,17 @@ export const loadDatasetData = async (params: {
     return asc(columns[sortField] as never);
   };
 
+  const attachDerivedColumns = <T extends Record<string, unknown>>(columnMap: T) => {
+    const resolved = { ...columnMap } as Record<string, T[keyof T]>;
+    for (const field of dataset?.fields ?? []) {
+      if (!field.derivedFrom) continue;
+      if (field.derivedFrom in columnMap) {
+        resolved[field.id] = columnMap[field.derivedFrom] as T[keyof T];
+      }
+    }
+    return resolved;
+  };
+
   if (datasetId === "organizations") {
     const columnMap = {
       id: organizations.id,
@@ -172,22 +249,32 @@ export const loadDatasetData = async (params: {
       updatedAt: organizations.updatedAt,
     } as const;
 
+    type ColumnValue = (typeof columnMap)[keyof typeof columnMap];
+    const resolvedColumns = attachDerivedColumns(columnMap) as Record<
+      string,
+      ColumnValue
+    >;
     const selection = Object.fromEntries(
-      params.columns.map((column) => [
-        column,
-        columnMap[column as keyof typeof columnMap],
-      ]),
-    );
+      params.columns.map((column) => [column, resolvedColumns[column]]),
+    ) as Record<string, ColumnValue>;
 
     const baseQuery = db
       .select(selection)
       .from(organizations)
-      .where(buildConditions(columnMap, params.filters));
+      .where(buildConditions(resolvedColumns, params.filters));
 
-    const orderBy = buildOrderBy(columnMap);
-    const rows = orderBy ? await baseQuery.orderBy(orderBy) : await baseQuery;
+    const orderBy = buildOrderBy(resolvedColumns);
+    const query = orderBy ? baseQuery.orderBy(orderBy) : baseQuery;
+    const rows = await (typeof params.limit === "number"
+      ? query.limit(params.limit)
+      : query);
 
-    const masked = rows.map((row) => maskPiiFields(row, params.fieldsToMask));
+    const derived = applyDerivedFields(
+      rows as Array<Record<string, unknown>>,
+      dataset?.fields ?? [],
+      params.columns,
+    );
+    const masked = derived.map((row) => maskPiiFields(row, params.fieldsToMask));
 
     return shapeRows(masked as Array<Record<string, unknown>>, params.columns);
   }
@@ -208,22 +295,32 @@ export const loadDatasetData = async (params: {
       updatedAt: reportingSubmissions.updatedAt,
     } as const;
 
+    type ColumnValue = (typeof columnMap)[keyof typeof columnMap];
+    const resolvedColumns = attachDerivedColumns(columnMap) as Record<
+      string,
+      ColumnValue
+    >;
     const selection = Object.fromEntries(
-      params.columns.map((column) => [
-        column,
-        columnMap[column as keyof typeof columnMap],
-      ]),
-    );
+      params.columns.map((column) => [column, resolvedColumns[column]]),
+    ) as Record<string, ColumnValue>;
 
     const baseQuery = db
       .select(selection)
       .from(reportingSubmissions)
-      .where(buildConditions(columnMap, params.filters));
+      .where(buildConditions(resolvedColumns, params.filters));
 
-    const orderBy = buildOrderBy(columnMap);
-    const rows = orderBy ? await baseQuery.orderBy(orderBy) : await baseQuery;
+    const orderBy = buildOrderBy(resolvedColumns);
+    const query = orderBy ? baseQuery.orderBy(orderBy) : baseQuery;
+    const rows = await (typeof params.limit === "number"
+      ? query.limit(params.limit)
+      : query);
 
-    const masked = rows.map((row) => maskPiiFields(row, params.fieldsToMask));
+    const derived = applyDerivedFields(
+      rows as Array<Record<string, unknown>>,
+      dataset?.fields ?? [],
+      params.columns,
+    );
+    const masked = derived.map((row) => maskPiiFields(row, params.fieldsToMask));
 
     return shapeRows(masked as Array<Record<string, unknown>>, params.columns);
   }
@@ -249,6 +346,11 @@ export const loadDatasetData = async (params: {
       updatedAt: formSubmissions.updatedAt,
     } as const;
 
+    type ColumnValue = (typeof columnMap)[keyof typeof columnMap];
+    const resolvedColumns = attachDerivedColumns(columnMap) as Record<
+      string,
+      ColumnValue
+    >;
     const shouldIncludePayload = params.columns.includes("payload");
     const queryColumns = [...params.columns];
     if (shouldIncludePayload && !queryColumns.includes("formVersionId")) {
@@ -256,19 +358,27 @@ export const loadDatasetData = async (params: {
     }
 
     const selection = Object.fromEntries(
-      queryColumns.map((column) => [column, columnMap[column as keyof typeof columnMap]]),
-    );
+      queryColumns.map((column) => [column, resolvedColumns[column]]),
+    ) as Record<string, ColumnValue>;
 
     const baseQuery = db
       .select(selection)
       .from(formSubmissions)
-      .where(buildConditions(columnMap, params.filters));
+      .where(buildConditions(resolvedColumns, params.filters));
 
-    const orderBy = buildOrderBy(columnMap);
-    const rows = orderBy ? await baseQuery.orderBy(orderBy) : await baseQuery;
+    const orderBy = buildOrderBy(resolvedColumns);
+    const query = orderBy ? baseQuery.orderBy(orderBy) : baseQuery;
+    const rows = await (typeof params.limit === "number"
+      ? query.limit(params.limit)
+      : query);
 
     const maskFields = params.fieldsToMask.filter((field) => field !== "payload");
-    let masked = rows.map((row) => maskPiiFields(row, maskFields));
+    const derived = applyDerivedFields(
+      rows as Array<Record<string, unknown>>,
+      dataset?.fields ?? [],
+      params.columns,
+    );
+    let masked = derived.map((row) => maskPiiFields(row, maskFields));
 
     if (shouldIncludePayload) {
       masked = await redactFormSubmissionPayloads({
@@ -291,22 +401,32 @@ export const loadDatasetData = async (params: {
       createdAt: events.createdAt,
     } as const;
 
+    type ColumnValue = (typeof columnMap)[keyof typeof columnMap];
+    const resolvedColumns = attachDerivedColumns(columnMap) as Record<
+      string,
+      ColumnValue
+    >;
     const selection = Object.fromEntries(
-      params.columns.map((column) => [
-        column,
-        columnMap[column as keyof typeof columnMap],
-      ]),
-    );
+      params.columns.map((column) => [column, resolvedColumns[column]]),
+    ) as Record<string, ColumnValue>;
 
     const baseQuery = db
       .select(selection)
       .from(events)
-      .where(buildConditions(columnMap, params.filters));
+      .where(buildConditions(resolvedColumns, params.filters));
 
-    const orderBy = buildOrderBy(columnMap);
-    const rows = orderBy ? await baseQuery.orderBy(orderBy) : await baseQuery;
+    const orderBy = buildOrderBy(resolvedColumns);
+    const query = orderBy ? baseQuery.orderBy(orderBy) : baseQuery;
+    const rows = await (typeof params.limit === "number"
+      ? query.limit(params.limit)
+      : query);
 
-    const masked = rows.map((row) => maskPiiFields(row, params.fieldsToMask));
+    const derived = applyDerivedFields(
+      rows as Array<Record<string, unknown>>,
+      dataset?.fields ?? [],
+      params.columns,
+    );
+    const masked = derived.map((row) => maskPiiFields(row, params.fieldsToMask));
 
     return shapeRows(masked as Array<Record<string, unknown>>, params.columns);
   }

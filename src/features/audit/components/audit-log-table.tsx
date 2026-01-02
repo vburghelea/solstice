@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import {
@@ -78,15 +79,17 @@ export function AuditLogTable() {
           <Input
             placeholder="Actor user ID"
             value={actorUserId}
+            aria-label="Filter by actor user ID"
             onChange={(event) => setActorUserId(event.target.value)}
           />
           <Input
             placeholder="Target organization ID"
             value={targetOrgId}
+            aria-label="Filter by target organization ID"
             onChange={(event) => setTargetOrgId(event.target.value)}
           />
           <Select value={actionCategory} onValueChange={setActionCategory}>
-            <SelectTrigger className="h-9">
+            <SelectTrigger className="h-9" aria-label="Filter by action category">
               <SelectValue placeholder="Action category" />
             </SelectTrigger>
             <SelectContent>
@@ -103,11 +106,13 @@ export function AuditLogTable() {
           <Input
             type="date"
             value={fromDate}
+            aria-label="Filter from date"
             onChange={(event) => setFromDate(event.target.value)}
           />
           <Input
             type="date"
             value={toDate}
+            aria-label="Filter to date"
             onChange={(event) => setToDate(event.target.value)}
           />
           <Button
@@ -146,25 +151,44 @@ export function AuditLogTable() {
               <TableHead>Action</TableHead>
               <TableHead>Actor</TableHead>
               <TableHead>Target</TableHead>
+              <TableHead>Details</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground text-center">
+                <TableCell colSpan={6} className="text-muted-foreground text-center">
                   No audit entries yet.
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{new Date(row.occurredAt).toLocaleString()}</TableCell>
-                  <TableCell>{row.actionCategory}</TableCell>
-                  <TableCell>{row.action}</TableCell>
-                  <TableCell>{row.actorUserId ?? "-"}</TableCell>
-                  <TableCell>{row.targetType ?? "-"}</TableCell>
-                </TableRow>
-              ))
+              data.map((row) => {
+                const includesPii = row.metadata?.["includesPii"] === true;
+                const stepUpUsed = row.metadata?.["stepUpAuthUsed"] === true;
+                const format = row.metadata?.["format"] as string | undefined;
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell>{new Date(row.occurredAt).toLocaleString()}</TableCell>
+                    <TableCell>{row.actionCategory}</TableCell>
+                    <TableCell>{row.action}</TableCell>
+                    <TableCell>{row.actorUserId ?? "-"}</TableCell>
+                    <TableCell>{row.targetType ?? "-"}</TableCell>
+                    <TableCell>
+                      {row.action === "BI.EXPORT" ? (
+                        <div className="flex flex-wrap gap-1">
+                          {format ? <Badge variant="outline">{format}</Badge> : null}
+                          <Badge variant={includesPii ? "destructive" : "secondary"}>
+                            {includesPii ? "PII" : "No PII"}
+                          </Badge>
+                          {stepUpUsed ? <Badge variant="secondary">Step-up</Badge> : null}
+                        </div>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

@@ -44,6 +44,12 @@ export interface DatasetJoin {
   on: { left: string; right: string };
 }
 
+export interface DatasetFreshness {
+  sourceSystem: string;
+  updateCadence: string;
+  lastUpdatedField?: string;
+}
+
 export interface FormatOptions {
   decimals?: number;
   prefix?: string;
@@ -59,6 +65,8 @@ export interface DatasetField {
   description?: string;
   sourceColumn: string;
   sourceTable?: string;
+  derivedFrom?: string;
+  timeGrain?: "day" | "week" | "month" | "quarter";
   dataType:
     | "string"
     | "number"
@@ -89,6 +97,7 @@ export interface DatasetConfig {
   fields: DatasetField[];
   isPublic?: boolean;
   allowedRoles?: string[];
+  freshness?: DatasetFreshness;
   requiresOrgScope?: boolean;
   orgScopeColumn?: string;
 }
@@ -101,8 +110,10 @@ export interface PivotConfig {
   rows: string[];
   columns: string[];
   measures: Array<{
+    id?: string;
     field: string | null;
     aggregation: AggregationType;
+    metricId?: string;
     label?: string;
     format?: FormatOptions;
   }>;
@@ -129,6 +140,16 @@ export interface ChartConfig {
   options?: Record<string, unknown>;
 }
 
+export interface ChartOptions {
+  colorSchemeId?: string;
+  showLegend?: boolean;
+  legendPosition?: "top" | "bottom" | "left" | "right";
+  showLabels?: boolean;
+  stacked?: boolean;
+  smoothLines?: boolean;
+  donutRadius?: number;
+}
+
 // =============================================================================
 // Dashboard Types
 // =============================================================================
@@ -143,14 +164,17 @@ export interface WidgetConfig {
   title?: string;
   subtitle?: string;
   chartType?: ChartType;
+  chartOptions?: ChartOptions;
   query?: PivotQuery;
   kpiField?: string;
   kpiAggregation?: AggregationType;
   kpiFormat?: FormatOptions;
   textContent?: string;
   textFormat?: "plain" | "markdown";
+  filterDatasetId?: string;
   filterField?: string;
   filterType?: "select" | "date_range" | "search";
+  filterOperator?: FilterOperator;
 }
 
 export interface DashboardWidgetPosition {

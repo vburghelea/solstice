@@ -22,6 +22,7 @@ import { getStepUpErrorMessage, useStepUpPrompt } from "~/features/auth/step-up"
 import { exportPivotResults } from "~/features/bi/bi.mutations";
 import type { FilterConfig, PivotQuery } from "~/features/bi/bi.schemas";
 import { mergeDashboardFilters } from "~/features/bi/components/dashboard/dashboard-utils";
+import { logBiTelemetryEvent } from "~/features/bi/bi.telemetry";
 
 type ExportFormat = "csv" | "xlsx" | "json";
 
@@ -61,7 +62,7 @@ export function DashboardExportDialog({
     [exportableWidgets, selectedWidgetId],
   );
 
-  const mergedQuery = useMemo(
+  const { query: mergedQuery } = useMemo(
     () => mergeDashboardFilters(selectedWidget?.query ?? null, globalFilters),
     [selectedWidget, globalFilters],
   );
@@ -71,6 +72,13 @@ export function DashboardExportDialog({
       if (!mergedQuery) {
         throw new Error("Select a widget to export.");
       }
+      await logBiTelemetryEvent({
+        data: {
+          event: "pivot.export.attempt",
+          datasetId: mergedQuery.datasetId,
+          widgetId: selectedWidget?.id,
+        },
+      });
       return exportPivotResults({
         data: {
           pivotQuery: mergedQuery,
@@ -102,6 +110,14 @@ export function DashboardExportDialog({
     },
     onError: (error) => {
       const message = getStepUpErrorMessage(error);
+      void logBiTelemetryEvent({
+        data: {
+          event: "pivot.export.fail",
+          datasetId: mergedQuery?.datasetId,
+          widgetId: selectedWidget?.id,
+          errorType: error instanceof Error ? error.name : "UnknownError",
+        },
+      });
       if (message) {
         requestStepUp(message);
         return;

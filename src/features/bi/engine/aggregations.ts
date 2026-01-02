@@ -12,7 +12,8 @@ import type { AggregationType } from "../bi.schemas";
 export type AggregatorFn = (values: number[]) => number | null;
 
 export const count: AggregatorFn = (values) => values.length;
-export const sum: AggregatorFn = (values) => values.reduce((acc, val) => acc + val, 0);
+export const sum: AggregatorFn = (values) =>
+  values.length > 0 ? values.reduce((acc, val) => acc + val, 0) : null;
 export const avg: AggregatorFn = (values) =>
   values.length > 0 ? values.reduce((acc, val) => acc + val, 0) / values.length : null;
 export const min: AggregatorFn = (values) =>

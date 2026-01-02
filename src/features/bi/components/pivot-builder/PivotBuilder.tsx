@@ -1,15 +1,17 @@
 import {
   DndContext,
+  KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { arrayMove, useSortable } from "@dnd-kit/sortable";
+import { arrayMove, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -23,24 +25,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { useAuth } from "~/features/auth";
 import { getStepUpErrorMessage, useStepUpPrompt } from "~/features/auth/step-up";
 import { useOrgContext } from "~/features/organizations/org-context";
-import type { AggregationType, ChartType, FilterConfig, PivotResult } from "../..";
-import type { DatasetField } from "../../bi.types";
+import type {
+  AggregationType,
+  ChartType,
+  FilterConfig,
+  PivotQuery,
+  PivotResult,
+} from "../..";
+import type { ChartOptions, DatasetField } from "../../bi.types";
 import { exportPivotResults } from "../../bi.mutations";
 import {
   executePivotQuery,
   getAvailableDatasets,
   getDatasetFields,
 } from "../../bi.queries";
+import { logBiTelemetryEvent } from "../../bi.telemetry";
+import { getMetricsForDataset } from "../../semantic/metrics.config";
+import { estimateQueryCost } from "../../utils/query-cost";
+import { suggestChartType } from "../../utils/chart-suggestion";
+import { createMeasureId } from "../../utils/measure-utils";
+import type { AuthUser } from "~/lib/auth/types";
 import { DropZone } from "./DropZone";
 import { FieldPalette } from "./FieldPalette";
 import { FilterPanel } from "./FilterPanel";
 import { MeasureConfig } from "./MeasureConfig";
 import { PivotPreview } from "./PivotPreview";
 import { SaveToDashboardDialog } from "./SaveToDashboardDialog";
+import { ControlPanel } from "../chart-config/ControlPanel";
+import { getChartControlPanel, getDefaultChartOptions } from "../chart-config/panels";
 
-const chartOptions: Array<{ value: ChartType; label: string }> = [
+const chartTypeOptions: Array<{ value: ChartType; label: string }> = [
   { value: "table", label: "Table" },
   { value: "bar", label: "Bar" },
   { value: "line", label: "Line" },
@@ -51,6 +68,10 @@ const chartOptions: Array<{ value: ChartType; label: string }> = [
   { value: "scatter", label: "Scatter" },
   // KPI removed from chart types - use KPI widget type in dashboard instead
 ];
+
+const chartLabelByValue = new Map(
+  chartTypeOptions.map((option) => [option.value, option.label]),
+);
 
 const baseAggregations: AggregationType[] = [
   "count",
@@ -66,12 +87,38 @@ const baseAggregations: AggregationType[] = [
 
 const nonNumericAggregations: AggregationType[] = ["count", "count_distinct"];
 
+const MEASURE_ID_PREFIX = "measure:";
+
+const toMeasureDragId = (id: string) => `${MEASURE_ID_PREFIX}${id}`;
+
+const fromMeasureDragId = (id: string) =>
+  id.startsWith(MEASURE_ID_PREFIX) ? id.slice(MEASURE_ID_PREFIX.length) : null;
+
+type MeasureState = {
+  id: string;
+  field: string;
+  aggregation: AggregationType;
+  metricId?: string;
+  label?: string;
+};
+
 const aggregationOptionsForField = (
   field: DatasetField | undefined,
 ): AggregationType[] => {
   if (!field) return baseAggregations;
   if (field.dataType === "number") return baseAggregations;
   return nonNumericAggregations;
+};
+
+const getPermissionSet = (user: AuthUser | null) => {
+  const permissions = new Set<string>();
+  for (const assignment of user?.roles ?? []) {
+    const perms = assignment.role?.permissions ?? {};
+    for (const [key, enabled] of Object.entries(perms)) {
+      if (enabled) permissions.add(key);
+    }
+  }
+  return permissions;
 };
 
 function SortableField({
@@ -99,7 +146,12 @@ function SortableField({
       className="flex items-center justify-between gap-2 rounded-md border bg-background px-3 py-2 text-sm"
       data-testid={`field-${id}`}
     >
-      <span {...attributes} {...listeners} className="cursor-grab text-xs font-medium">
+      <span
+        {...attributes}
+        {...listeners}
+        aria-label={`Drag ${label}`}
+        className="cursor-grab rounded-sm text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1"
+      >
         {label}
       </span>
       {children}
@@ -109,23 +161,32 @@ function SortableField({
 
 export function PivotBuilder() {
   const { activeOrganizationId } = useOrgContext();
+  const { user } = useAuth();
   const { requestStepUp } = useStepUpPrompt();
   const [datasetId, setDatasetId] = useState<string>("");
   const [rows, setRows] = useState<string[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
-  const [measures, setMeasures] = useState<
-    Array<{ field: string; aggregation: AggregationType }>
-  >([]);
+  const [measures, setMeasures] = useState<MeasureState[]>([]);
   const [filters, setFilters] = useState<FilterConfig[]>([]);
   const [chartType, setChartType] = useState<ChartType>("table");
+  const [chartOptions, setChartOptions] = useState<ChartOptions>(() =>
+    getDefaultChartOptions("table"),
+  );
   const [pivotResult, setPivotResult] = useState<PivotResult | null>(null);
   const [selectedMeasureKey, setSelectedMeasureKey] = useState<string>("");
   const [showRowTotals, setShowRowTotals] = useState(true);
   const [showColumnTotals, setShowColumnTotals] = useState(true);
   const [showGrandTotal, setShowGrandTotal] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [autoRunEnabled, setAutoRunEnabled] = useState(true);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const runSourceRef = useRef<"manual" | "auto" | "sample">("manual");
+  const autoRunKeyRef = useRef<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const datasetsQuery = useQuery({
     queryKey: ["bi-datasets"],
@@ -141,6 +202,21 @@ export function PivotBuilder() {
 
   const datasets = datasetsQuery.data?.datasets ?? [];
   const fields = (fieldsQuery.data?.fields ?? []) as DatasetField[];
+  const permissions = useMemo(() => getPermissionSet(user as AuthUser | null), [user]);
+  const metrics = useMemo(() => {
+    return getMetricsForDataset(datasetId).filter((metric) => {
+      if (!metric.requiredPermission) return true;
+      return (
+        permissions.has(metric.requiredPermission) ||
+        permissions.has("analytics.admin") ||
+        permissions.has("*")
+      );
+    });
+  }, [datasetId, permissions]);
+  const metricsById = useMemo(
+    () => new Map(metrics.map((metric) => [metric.id, metric])),
+    [metrics],
+  );
   const fieldsById = useMemo(
     () => new Map(fields.map((field) => [field.id, field])),
     [fields],
@@ -150,12 +226,41 @@ export function PivotBuilder() {
     () => new Map(fields.map((field) => [field.id, field.name])),
     [fields],
   );
+  const pivotQuery = useMemo<PivotQuery | null>(() => {
+    if (!datasetId) return null;
+    return {
+      datasetId,
+      organizationId: activeOrganizationId ?? undefined,
+      rows,
+      columns,
+      measures,
+      filters,
+      limit: 1000,
+    };
+  }, [activeOrganizationId, columns, datasetId, filters, measures, rows]);
+  const pivotQueryKey = useMemo(
+    () => (pivotQuery ? JSON.stringify(pivotQuery) : ""),
+    [pivotQuery],
+  );
+  const queryCost = useMemo(
+    () => (pivotQuery ? estimateQueryCost(pivotQuery) : null),
+    [pivotQuery],
+  );
+  const chartSuggestion = useMemo(
+    () =>
+      pivotQuery
+        ? suggestChartType({
+            rows,
+            columns,
+            measures: pivotQuery.measures,
+            fieldsById,
+          })
+        : null,
+    [columns, fieldsById, pivotQuery, rows],
+  );
+  const chartControlPanel = useMemo(() => getChartControlPanel(chartType), [chartType]);
 
-  const usedFields = new Set([
-    ...rows,
-    ...columns,
-    ...measures.map((item) => item.field),
-  ]);
+  const usedFields = new Set([...rows, ...columns]);
 
   const availableFields = fields
     .filter((field) => !usedFields.has(field.id))
@@ -168,37 +273,45 @@ export function PivotBuilder() {
   }, [datasetId, datasets]);
 
   useEffect(() => {
+    const defaults = getDefaultChartOptions(chartType);
+    setChartOptions((prev) => ({ ...defaults, ...prev }));
+  }, [chartType]);
+
+  useEffect(() => {
     setRows([]);
     setColumns([]);
     setMeasures([]);
     setFilters([]);
     setPivotResult(null);
     setSelectedMeasureKey("");
+    autoRunKeyRef.current = null;
   }, [datasetId]);
 
   const runMutation = useMutation({
-    mutationFn: async () => {
-      if (!datasetId) {
+    mutationFn: async (override?: PivotQuery | null) => {
+      const query = override ?? pivotQuery;
+      if (!query) {
         throw new Error("Select a dataset to run a query.");
       }
-      if (measures.length === 0) {
+      if (query.measures.length === 0) {
         throw new Error("Add at least one measure.");
       }
 
       return executePivotQuery({
-        data: {
-          datasetId,
-          organizationId: activeOrganizationId ?? undefined,
-          rows,
-          columns,
-          measures,
-          filters,
-        },
+        data: query,
       });
     },
     onSuccess: (result) => {
       const pivot = result?.pivot ?? null;
       setPivotResult(pivot);
+      void logBiTelemetryEvent({
+        data: {
+          event: "pivot.query.run",
+          datasetId,
+          rowCount: result?.rowCount ?? 0,
+          chartType,
+        },
+      });
       if (pivot?.measures?.length) {
         setSelectedMeasureKey((prev) =>
           pivot.measures.some((measure) => measure.key === prev)
@@ -208,12 +321,45 @@ export function PivotBuilder() {
       } else {
         setSelectedMeasureKey("");
       }
-      toast.success("Pivot updated.");
+      if (runSourceRef.current !== "auto") {
+        toast.success("Pivot updated.");
+      }
     },
     onError: (error) => {
+      void logBiTelemetryEvent({
+        data: {
+          event: "pivot.query.fail",
+          datasetId,
+          errorType: error instanceof Error ? error.name : "UnknownError",
+        },
+      });
       toast.error(error instanceof Error ? error.message : "Failed to run pivot.");
     },
   });
+
+  const runPivot = (source: "manual" | "auto" | "sample", override?: PivotQuery) => {
+    runSourceRef.current = source;
+    const key = override ? JSON.stringify(override) : pivotQueryKey;
+    if (key) autoRunKeyRef.current = key;
+    runMutation.mutate(override ?? pivotQuery);
+  };
+
+  useEffect(() => {
+    if (!autoRunEnabled || !pivotQuery || !queryCost?.isSafe) return;
+    if (runMutation.isPending) return;
+    if (autoRunKeyRef.current === pivotQueryKey) return;
+    const handle = setTimeout(() => {
+      if (runMutation.isPending) return;
+      runPivot("auto", pivotQuery);
+    }, 500);
+    return () => clearTimeout(handle);
+  }, [
+    autoRunEnabled,
+    pivotQuery,
+    pivotQueryKey,
+    queryCost?.isSafe,
+    runMutation.isPending,
+  ]);
 
   const exportMutation = useMutation({
     mutationFn: async (format: "csv" | "xlsx" | "json") => {
@@ -224,6 +370,13 @@ export function PivotBuilder() {
         throw new Error("Add at least one measure before exporting.");
       }
 
+      await logBiTelemetryEvent({
+        data: {
+          event: "pivot.export.attempt",
+          datasetId,
+          chartType,
+        },
+      });
       return exportPivotResults({
         data: {
           pivotQuery: {
@@ -257,6 +410,13 @@ export function PivotBuilder() {
     },
     onError: (error) => {
       const message = getStepUpErrorMessage(error);
+      void logBiTelemetryEvent({
+        data: {
+          event: "pivot.export.fail",
+          datasetId,
+          errorType: error instanceof Error ? error.name : "UnknownError",
+        },
+      });
       if (message) {
         requestStepUp(message);
         return;
@@ -268,7 +428,8 @@ export function PivotBuilder() {
   const findContainer = (id: string) => {
     if (rows.includes(id)) return "rows";
     if (columns.includes(id)) return "columns";
-    if (measures.some((item) => item.field === id)) return "measures";
+    const measureId = fromMeasureDragId(id);
+    if (measureId && measures.some((item) => item.id === measureId)) return "measures";
     if (availableFields.includes(id)) return "available";
     return null;
   };
@@ -279,6 +440,8 @@ export function PivotBuilder() {
 
     const activeId = String(active.id);
     const overId = String(over.id);
+    const activeMeasureId = fromMeasureDragId(activeId);
+    const overMeasureId = fromMeasureDragId(overId);
     const activeContainer = findContainer(activeId);
     const overContainer =
       overId === "rows" ||
@@ -306,14 +469,12 @@ export function PivotBuilder() {
         }
       }
       if (activeContainer === "measures") {
-        const items = measures.map((item) => item.field);
-        const oldIndex = items.indexOf(activeId);
-        const newIndex = items.indexOf(overId);
+        const items = measures.map((item) => item.id);
+        const oldIndex = items.indexOf(activeMeasureId ?? "");
+        const newIndex = items.indexOf(overMeasureId ?? "");
         if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           const ordered = arrayMove(items, oldIndex, newIndex);
-          setMeasures(
-            ordered.map((field) => measures.find((item) => item.field === field)!),
-          );
+          setMeasures(ordered.map((id) => measures.find((item) => item.id === id)!));
         }
       }
       return;
@@ -324,7 +485,8 @@ export function PivotBuilder() {
       if (container === "columns")
         setColumns(columns.filter((item) => item !== activeId));
       if (container === "measures") {
-        setMeasures(measures.filter((item) => item.field !== activeId));
+        if (!activeMeasureId) return;
+        setMeasures(measures.filter((item) => item.id !== activeMeasureId));
       }
     };
 
@@ -354,15 +516,14 @@ export function PivotBuilder() {
           toast.error("This field cannot be used as a measure.");
           return;
         }
-        if (!measures.some((item) => item.field === activeId)) {
-          setMeasures([
-            ...measures,
-            {
-              field: activeId,
-              aggregation: field.defaultAggregation ?? "count",
-            },
-          ]);
-        }
+        setMeasures([
+          ...measures,
+          {
+            id: createMeasureId(),
+            field: activeId,
+            aggregation: field.defaultAggregation ?? "count",
+          },
+        ]);
       }
     };
 
@@ -375,14 +536,95 @@ export function PivotBuilder() {
     addTo(overContainer);
   };
 
-  const updateMeasure = (field: string, aggregation: AggregationType) => {
+  const updateMeasure = (measureId: string, aggregation: AggregationType) => {
     setMeasures((prev) =>
-      prev.map((item) => (item.field === field ? { ...item, aggregation } : item)),
+      prev.map((item) => (item.id === measureId ? { ...item, aggregation } : item)),
     );
   };
 
-  const removeMeasure = (field: string) => {
-    setMeasures((prev) => prev.filter((item) => item.field !== field));
+  const removeMeasure = (measureId: string) => {
+    setMeasures((prev) => prev.filter((item) => item.id !== measureId));
+  };
+
+  const addMetric = (metricId: string) => {
+    const metric = metricsById.get(metricId);
+    if (!metric) return;
+    if (measures.some((item) => item.metricId === metricId)) {
+      toast.message("Metric already added.");
+      return;
+    }
+    const metricFieldId = metric.fieldId ?? null;
+    if (!metricFieldId) {
+      toast.error("Metric is missing a mapped field.");
+      return;
+    }
+    setMeasures((prev) => [
+      ...prev,
+      {
+        id: createMeasureId(metricId),
+        field: metricFieldId,
+        aggregation: metric.aggregation ?? "count",
+        metricId,
+        label: metric.name,
+      },
+    ]);
+  };
+
+  const handleApplySample = () => {
+    if (!datasetId) return;
+    if (fields.length === 0) return;
+    const dateField =
+      fields.find((field) => field.allowGroupBy && field.timeGrain) ??
+      fields.find(
+        (field) =>
+          field.allowGroupBy &&
+          (field.dataType === "date" || field.dataType === "datetime"),
+      );
+    const dimensionField = dateField ?? fields.find((field) => field.allowGroupBy);
+    const nextRows = dimensionField ? [dimensionField.id] : [];
+    const metric = metrics[0];
+    const fallbackFieldId = dimensionField?.id ?? fields[0]?.id ?? "";
+    const nextMeasures: MeasureState[] = [
+      metric
+        ? {
+            id: createMeasureId(metric.id),
+            field: metric.fieldId ?? fallbackFieldId,
+            aggregation: metric.aggregation ?? "count",
+            metricId: metric.id,
+            label: metric.name,
+          }
+        : {
+            id: createMeasureId(),
+            field: fallbackFieldId,
+            aggregation: "count",
+          },
+    ];
+    setRows(nextRows);
+    setColumns([]);
+    setMeasures(nextMeasures);
+    setFilters([]);
+    setPivotResult(null);
+    const suggestion = suggestChartType({
+      rows: nextRows,
+      columns: [],
+      measures: nextMeasures,
+      fieldsById,
+    });
+    if (suggestion) {
+      setChartType(suggestion.chartType);
+    }
+
+    if (!autoRunEnabled) {
+      runPivot("sample", {
+        datasetId,
+        organizationId: activeOrganizationId ?? undefined,
+        rows: nextRows,
+        columns: [],
+        measures: nextMeasures,
+        filters: [],
+        limit: 1000,
+      });
+    }
   };
 
   return (
@@ -422,17 +664,47 @@ export function PivotBuilder() {
                   <SelectValue placeholder="Select chart" />
                 </SelectTrigger>
                 <SelectContent>
-                  {chartOptions.map((option) => (
+                  {chartTypeOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {chartSuggestion && chartSuggestion.chartType !== chartType ? (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>
+                    Suggested:{" "}
+                    {chartLabelByValue.get(chartSuggestion.chartType) ??
+                      chartSuggestion.chartType}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setChartType(chartSuggestion.chartType)}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </div>
 
           <FilterPanel fields={fields} filters={filters} onChange={setFilters} />
+
+          {chartControlPanel ? (
+            <div className="space-y-3 rounded-md border bg-muted/30 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Chart options
+              </p>
+              <ControlPanel
+                panel={chartControlPanel}
+                value={chartOptions as Record<string, unknown>}
+                onChange={(next) => setChartOptions(next as ChartOptions)}
+              />
+            </div>
+          ) : null}
 
           <DndContext
             sensors={sensors}
@@ -464,17 +736,29 @@ export function PivotBuilder() {
               <DropZone
                 id="measures"
                 label="Measures"
-                items={measures.map((item) => item.field)}
+                items={measures.map((item) => toMeasureDragId(item.id))}
                 renderItem={(item) => {
-                  const measure = measures.find((entry) => entry.field === item);
-                  const field = fieldsById.get(item);
+                  const measureId = fromMeasureDragId(item) ?? "";
+                  const measure = measures.find((entry) => entry.id === measureId);
+                  const fieldId = measure?.field ?? "";
+                  const field = fieldsById.get(fieldId);
                   return (
-                    <SortableField id={item} label={field?.name ?? item}>
+                    <SortableField
+                      id={item}
+                      label={measure?.label ?? field?.name ?? fieldId}
+                    >
                       <MeasureConfig
                         aggregation={measure?.aggregation ?? "count"}
-                        options={aggregationOptionsForField(field)}
-                        onChange={(next) => updateMeasure(item, next)}
-                        onRemove={() => removeMeasure(item)}
+                        options={
+                          measure?.metricId
+                            ? [measure.aggregation]
+                            : aggregationOptionsForField(field)
+                        }
+                        disabled={Boolean(measure?.metricId)}
+                        onChange={(next) =>
+                          measure ? updateMeasure(measure.id, next) : undefined
+                        }
+                        onRemove={() => (measure ? removeMeasure(measure.id) : undefined)}
                       />
                     </SortableField>
                   );
@@ -483,8 +767,29 @@ export function PivotBuilder() {
             </div>
           </DndContext>
 
+          {metrics.length > 0 ? (
+            <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Metrics
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {metrics.map((metric) => (
+                  <Button
+                    key={metric.id}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addMetric(metric.id)}
+                  >
+                    {metric.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap items-center gap-3">
-            <Button size="sm" onClick={() => runMutation.mutate()}>
+            <Button size="sm" onClick={() => runPivot("manual")}>
               Run query
             </Button>
             <Button
@@ -516,8 +821,27 @@ export function PivotBuilder() {
             >
               Save to Dashboard
             </Button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Checkbox
+                id="autoRun"
+                checked={autoRunEnabled}
+                onCheckedChange={(value) => setAutoRunEnabled(Boolean(value))}
+              />
+              <Label htmlFor="autoRun" className="text-xs">
+                Auto-run
+              </Label>
+            </div>
             <Badge variant="secondary">{activeOrganizationId ?? "No org"}</Badge>
           </div>
+          {queryCost && !queryCost.isSafe ? (
+            <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5" />
+              <div>
+                <p className="font-medium">Auto-run paused</p>
+                <p>{queryCost.reason}</p>
+              </div>
+            </div>
+          ) : null}
 
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
@@ -568,6 +892,13 @@ export function PivotBuilder() {
             showColumnTotals={showColumnTotals}
             showGrandTotal={showGrandTotal}
             fieldLabels={fieldLabels}
+            fieldsById={fieldsById}
+            chartOptions={chartOptions}
+            rows={rows}
+            columns={columns}
+            measures={measures}
+            isLoading={runMutation.isPending}
+            onApplySample={handleApplySample}
           />
         </CardContent>
       </Card>
@@ -581,6 +912,7 @@ export function PivotBuilder() {
         measures={measures}
         filters={filters}
         chartType={chartType}
+        chartOptions={chartOptions}
       />
     </div>
   );

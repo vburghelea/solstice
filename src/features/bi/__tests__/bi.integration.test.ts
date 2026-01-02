@@ -10,12 +10,14 @@ const getUserRolesMock = vi.fn();
 const requireOrganizationAccessMock = vi.fn();
 const requireRecentAuthMock = vi.fn();
 const loadDatasetDataMock = vi.spyOn(biData, "loadDatasetData");
+const logAuditEntryMock = vi.fn();
 
 const USER_ID = "22222222-2222-4222-8222-222222222222";
 const ORG_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_ORG_ID = "33333333-3333-4333-8333-333333333333";
 
 const schema = vi.hoisted(() => ({
+  auditLogs: "auditLogs",
   exportHistory: "exportHistory",
 }));
 
@@ -43,6 +45,10 @@ vi.mock("~/lib/auth/guards/org-guard", () => ({
 vi.mock("~/lib/auth/guards/step-up", () => ({
   getCurrentSession: vi.fn().mockResolvedValue({ session: { createdAt: new Date() } }),
   requireRecentAuth: (...args: unknown[]) => requireRecentAuthMock(...args),
+}));
+
+vi.mock("~/lib/audit", () => ({
+  logAuditEntry: (...args: unknown[]) => logAuditEntryMock(...args),
 }));
 
 vi.mock("~/db/server-helpers", () => ({
@@ -75,6 +81,12 @@ describe("bi integration", () => {
           return undefined;
         }),
       })),
+      transaction: vi.fn(() => {
+        // Simulate missing BI view so code falls back to loadDatasetData
+        throw Object.assign(new Error("relation bi_v_organizations does not exist"), {
+          code: "42P01",
+        });
+      }),
     });
   });
 

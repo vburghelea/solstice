@@ -187,6 +187,8 @@ export const createOrganization = createServerFn({ method: "POST" })
           changes: { name: { new: organization.name } },
           metadata: { slug: organization.slug },
         });
+        const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+        invalidatePivotCache("organizations");
 
         return {
           success: true,
@@ -334,6 +336,8 @@ export const updateOrganization = createServerFn({ method: "POST" })
           targetOrgId: updated.id,
           changes,
         });
+        const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+        invalidatePivotCache("organizations");
 
         return {
           success: true,

@@ -11,11 +11,15 @@ export function NumericFilter({
   operator,
   value,
   onChange,
+  label,
 }: {
   operator: FilterOperator;
   value: FilterValue | undefined;
   onChange: (next: FilterValue | undefined) => void;
+  label?: string;
 }) {
+  const labelPrefix = label ? `${label} ` : "";
+
   if (operator === "between") {
     const range = Array.isArray(value) ? value : ["", ""];
     return (
@@ -23,12 +27,14 @@ export function NumericFilter({
         <Input
           type="number"
           value={toNumberValue(range[0] as FilterValue)}
+          aria-label={`${labelPrefix}start value`}
           onChange={(event) => onChange([event.target.value, range[1] ?? ""])}
         />
         <span className="text-muted-foreground text-xs">to</span>
         <Input
           type="number"
           value={toNumberValue(range[1] as FilterValue)}
+          aria-label={`${labelPrefix}end value`}
           onChange={(event) => onChange([range[0] ?? "", event.target.value])}
         />
       </div>
@@ -40,6 +46,7 @@ export function NumericFilter({
       <Input
         placeholder="Comma-separated values"
         value={Array.isArray(value) ? value.join(", ") : ""}
+        aria-label={`${labelPrefix}values`}
         onChange={(event) =>
           onChange(
             event.target.value
@@ -56,6 +63,7 @@ export function NumericFilter({
     <Input
       type="number"
       value={toNumberValue(value)}
+      aria-label={`${labelPrefix}value`}
       onChange={(event) => onChange(event.target.value)}
     />
   );

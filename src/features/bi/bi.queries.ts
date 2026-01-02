@@ -9,17 +9,33 @@ import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   biQueryLogFilterSchema,
+  fieldValueSuggestionsSchema,
+  filterSchema,
   pivotQuerySchema,
   sqlQuerySchema,
   sqlSchemaRequestSchema,
 } from "./bi.schemas";
-import type { FilterConfig } from "./bi.schemas";
+import type { FilterConfig, PivotQuery } from "./bi.schemas";
 import type { BiQueryLogEntry, QueryContext } from "./bi.types";
-import { normalizePivotConfig } from "./bi.utils";
+import { buildAllowedFilters, normalizePivotConfig } from "./bi.utils";
+import { buildPivotCacheKey, getPivotCache, setPivotCache } from "./cache/pivot-cache";
 import { loadDatasetData } from "./bi.data";
 import { buildPivotResult } from "./engine/pivot-aggregator";
-import { filterAccessibleFields, getFieldsToMask } from "./governance";
+import {
+  buildFieldExpression,
+  buildFilterExpression,
+  buildPivotResultFromSqlRows,
+  buildPivotSqlPlan,
+} from "./engine/pivot-sql-compiler";
+import { normalizeFilter, type NormalizedFilter } from "./engine/filters";
+import {
+  acquireConcurrencySlot,
+  filterAccessibleFields,
+  getFieldsToMask,
+} from "./governance";
+import { assertPivotCardinality, QUERY_GUARDRAILS } from "./governance/query-guardrails";
 import { DATASETS, getDataset } from "./semantic";
+import { getMetric } from "./semantic/metrics.config";
 
 const ANALYTICS_ROLES: OrganizationRole[] = ["owner", "admin", "reporter"];
 
@@ -137,6 +153,7 @@ export const getAvailableDatasets = createServerFn({ method: "GET" })
         description: dataset.description ?? "",
         fieldCount: dataset.fields.length,
         canExport: permissions.has("analytics.export") || permissions.has("*"),
+        freshness: dataset.freshness ?? null,
       })),
     };
   });
@@ -195,6 +212,205 @@ export const getDatasetFields = createServerFn({ method: "GET" })
         defaultAggregation: field.defaultAggregation ?? null,
       })),
     };
+  });
+
+export const getFieldValueSuggestions = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(fieldValueSuggestionsSchema.parse)
+  .handler(async ({ data, context }) => {
+    await assertFeatureEnabled("sin_analytics");
+    const user = requireUser(context);
+    const dataset = getDataset(data.datasetId);
+    const { badRequest, forbidden } = await import("~/lib/server/errors");
+
+    if (!dataset) {
+      throw badRequest(`Unknown dataset: ${data.datasetId}`);
+    }
+
+    const { PermissionService } = await import("~/features/roles/permission.service");
+    const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+    const roleAssignments = await PermissionService.getUserRoles(user.id);
+    const permissions = extractPermissionSet(roleAssignments);
+
+    const contextOrganizationId =
+      (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+
+    let orgRole: OrganizationRole | null = null;
+    if (contextOrganizationId && !isGlobalAdmin) {
+      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+      const access = await requireOrganizationAccess(
+        { userId: user.id, organizationId: contextOrganizationId },
+        { roles: ANALYTICS_ROLES },
+      );
+      orgRole = access.role as OrganizationRole;
+    }
+
+    if (!isGlobalAdmin && dataset.allowedRoles && dataset.allowedRoles.length > 0) {
+      if (!orgRole || !dataset.allowedRoles.includes(orgRole)) {
+        throw forbidden("Dataset access denied");
+      }
+    }
+
+    const scopedFilters = (data.filters ?? []).filter(
+      (filter) => !filter.datasetId || filter.datasetId === dataset.id,
+    );
+    let scopedOrganizationId: string | null = null;
+    try {
+      scopedOrganizationId =
+        ensureOrgScope({
+          datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
+          datasetRequiresOrg: dataset.requiresOrgScope,
+          isGlobalAdmin,
+          contextOrganizationId,
+          requestOrganizationId: data.organizationId ?? null,
+          filters: scopedFilters,
+        }).scopedOrganizationId ?? null;
+    } catch (error) {
+      throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
+    }
+
+    const queryContext: QueryContext = {
+      userId: user.id,
+      organizationId: scopedOrganizationId,
+      orgRole,
+      isGlobalAdmin,
+      permissions,
+      hasRecentAuth: false,
+      timestamp: new Date(),
+    };
+
+    const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
+    const targetField = accessibleFields.find((field) => field.id === data.fieldId);
+    if (!targetField) {
+      throw forbidden(`Field access denied: ${data.fieldId}`);
+    }
+
+    if (!targetField.allowFilter || targetField.dataType === "json") {
+      return { values: [] };
+    }
+
+    const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
+    if (fieldsToMask.includes(targetField.id)) {
+      return { values: [] };
+    }
+
+    const allowedFilters = buildAllowedFilters(dataset);
+    const normalizedFilters: NormalizedFilter[] = [];
+    const filtersToApply = scopedFilters.filter((filter) => {
+      if (filter.field === targetField.id) return false;
+      return true;
+    });
+
+    for (const filter of filtersToApply) {
+      try {
+        normalizedFilters.push(normalizeFilter(filter, allowedFilters));
+      } catch {
+        continue;
+      }
+    }
+
+    if (dataset.requiresOrgScope && scopedOrganizationId) {
+      normalizedFilters.push({
+        field: dataset.orgScopeColumn ?? "organizationId",
+        operator: "eq",
+        value: scopedOrganizationId,
+      });
+    }
+
+    const { sql } = await import("drizzle-orm");
+    const fieldExpr = buildFieldExpression(dataset, targetField.id);
+    const whereConditions = normalizedFilters.map((filter) =>
+      buildFilterExpression(filter, dataset),
+    );
+    whereConditions.push(sql`${fieldExpr} IS NOT NULL`);
+
+    const search = data.search?.trim();
+    if (search) {
+      whereConditions.push(
+        sql`CAST(${fieldExpr} AS TEXT) ILIKE ${sql.param(`%${search}%`)}`,
+      );
+    }
+
+    const whereClause =
+      whereConditions.length > 0
+        ? sql`WHERE ${sql.join(whereConditions, sql` AND `)}`
+        : sql``;
+
+    const MAX_SUGGESTIONS = 50;
+    const limit = Math.min(data.limit ?? 25, MAX_SUGGESTIONS);
+    const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const viewName = quoteIdentifier(`bi_v_${dataset.id}`);
+    const baseAlias = quoteIdentifier("base");
+
+    const formatSettingValue = (value: string | number | boolean) => {
+      if (typeof value === "number") {
+        return Number.isFinite(value) ? String(value) : "0";
+      }
+      if (typeof value === "boolean") {
+        return value ? "true" : "false";
+      }
+      return `'${String(value).replace(/'/g, "''")}'`;
+    };
+
+    const release = acquireConcurrencySlot(user.id, scopedOrganizationId);
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
+
+      const result = await db.transaction(async (tx) => {
+        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.org_id = ${formatSettingValue(scopedOrganizationId ?? "")}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.is_global_admin = ${formatSettingValue(
+              String(isGlobalAdmin),
+            )}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL statement_timeout = ${formatSettingValue(
+              QUERY_GUARDRAILS.statementTimeoutMs,
+            )}`,
+          ),
+        );
+
+        return tx.execute<Record<string, unknown>>(sql`
+          SELECT ${fieldExpr} AS value, COUNT(*) AS count
+          FROM ${sql.raw(`${viewName} AS ${baseAlias}`)}
+          ${whereClause}
+          GROUP BY ${fieldExpr}
+          ORDER BY count DESC
+          LIMIT ${sql.param(limit)}
+        `);
+      });
+
+      const rows = Array.isArray(result)
+        ? result
+        : ((result as { rows?: Array<Record<string, unknown>> }).rows ?? []);
+
+      const values = rows
+        .map((row) => {
+          const value = row["value"];
+          if (value === null || value === undefined) return null;
+          const count = row["count"];
+          return {
+            value,
+            count: typeof count === "number" ? count : Number(count ?? 0),
+          };
+        })
+        .filter((entry): entry is { value: string | number | boolean; count: number } =>
+          Boolean(entry),
+        );
+
+      return { values };
+    } finally {
+      release();
+    }
   });
 
 export const getSqlSchema = createServerFn({ method: "GET" })
@@ -318,132 +534,338 @@ export const getSqlSchema = createServerFn({ method: "GET" })
     return { tables, isGlobalAdmin };
   });
 
-export const executePivotQuery = createServerFn({ method: "POST" })
-  .middleware(getAuthMiddleware())
-  .inputValidator(pivotQuerySchema.parse)
-  .handler(async ({ data, context }) => {
-    await assertFeatureEnabled("sin_analytics");
-    const user = requireUser(context);
-    const dataset = getDataset(data.datasetId);
-    const { badRequest, forbidden } = await import("~/lib/server/errors");
+const runPivotQuery = async (params: {
+  data: PivotQuery;
+  context: unknown;
+  user: { id: string };
+}) => {
+  await assertFeatureEnabled("sin_analytics");
+  const { data, context, user } = params;
+  const dataset = getDataset(data.datasetId);
+  const { badRequest, forbidden } = await import("~/lib/server/errors");
 
-    if (!dataset) {
-      throw badRequest(`Unknown dataset: ${data.datasetId}`);
-    }
+  if (!dataset) {
+    throw badRequest(`Unknown dataset: ${data.datasetId}`);
+  }
 
-    const { PermissionService } = await import("~/features/roles/permission.service");
-    const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
-    const roleAssignments = await PermissionService.getUserRoles(user.id);
-    const permissions = extractPermissionSet(roleAssignments);
+  const { PermissionService } = await import("~/features/roles/permission.service");
+  const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+  const roleAssignments = await PermissionService.getUserRoles(user.id);
+  const permissions = extractPermissionSet(roleAssignments);
 
-    const contextOrganizationId =
-      (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+  const contextOrganizationId =
+    (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
 
-    let orgRole: OrganizationRole | null = null;
-    if (contextOrganizationId && !isGlobalAdmin && dataset.requiresOrgScope) {
-      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
-      const access = await requireOrganizationAccess(
-        { userId: user.id, organizationId: contextOrganizationId },
-        { roles: ANALYTICS_ROLES },
-      );
-      orgRole = access.role as OrganizationRole;
-    }
-
-    let scopedOrganizationId: string | null = null;
-    try {
-      scopedOrganizationId =
-        ensureOrgScope({
-          datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
-          datasetRequiresOrg: dataset.requiresOrgScope,
-          isGlobalAdmin,
-          contextOrganizationId,
-          requestOrganizationId: data.organizationId ?? null,
-          filters: data.filters,
-        }).scopedOrganizationId ?? null;
-    } catch (error) {
-      throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
-    }
-
-    const queryContext: QueryContext = {
-      userId: user.id,
-      organizationId: scopedOrganizationId,
-      orgRole,
-      isGlobalAdmin,
-      permissions,
-      hasRecentAuth: false,
-      timestamp: new Date(),
-    };
-
-    const normalized = normalizePivotConfig({
-      dataset,
-      rows: data.rows,
-      columns: data.columns,
-      measures: data.measures,
-      filters: data.filters,
-    });
-
-    if (!normalized.ok) {
-      throw badRequest(normalized.errors.join(" "));
-    }
-
-    const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
-    const accessibleIds = new Set(accessibleFields.map((field) => field.id));
-    const requestedFields = new Set([
-      ...normalized.value.rowFields,
-      ...normalized.value.columnFields,
-      ...normalized.value.measures
-        .map((measure) => measure.field)
-        .filter((field): field is string => Boolean(field)),
-    ]);
-
-    const forbiddenFields = Array.from(requestedFields).filter(
-      (field) => !accessibleIds.has(field),
+  let orgRole: OrganizationRole | null = null;
+  if (contextOrganizationId && !isGlobalAdmin && dataset.requiresOrgScope) {
+    const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+    const access = await requireOrganizationAccess(
+      { userId: user.id, organizationId: contextOrganizationId },
+      { roles: ANALYTICS_ROLES },
     );
+    orgRole = access.role as OrganizationRole;
+  }
 
-    if (forbiddenFields.length > 0) {
-      throw forbidden(`Field access denied: ${forbiddenFields.join(", ")}`);
-    }
+  let scopedOrganizationId: string | null = null;
+  try {
+    scopedOrganizationId =
+      ensureOrgScope({
+        datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
+        datasetRequiresOrg: dataset.requiresOrgScope,
+        isGlobalAdmin,
+        contextOrganizationId,
+        requestOrganizationId: data.organizationId ?? null,
+        filters: data.filters,
+      }).scopedOrganizationId ?? null;
+  } catch (error) {
+    throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
+  }
 
-    const orgScopeFilters = normalized.value.filters;
+  const queryContext: QueryContext = {
+    userId: user.id,
+    organizationId: scopedOrganizationId,
+    orgRole,
+    isGlobalAdmin,
+    permissions,
+    hasRecentAuth: false,
+    timestamp: new Date(),
+  };
 
-    if (dataset.requiresOrgScope && scopedOrganizationId) {
-      const scopeField = dataset.orgScopeColumn ?? "organizationId";
-      orgScopeFilters.push({
-        field: scopeField,
-        operator: "eq",
-        value: scopedOrganizationId,
-      });
-    }
+  const requestedMetricIds = data.measures
+    .map((measure) => measure.metricId)
+    .filter((value): value is string => Boolean(value));
+  const forbiddenMetrics = requestedMetricIds.filter((metricId) => {
+    const metric = getMetric(metricId);
+    if (!metric?.requiredPermission) return false;
+    return (
+      !permissions.has(metric.requiredPermission) &&
+      !permissions.has("analytics.admin") &&
+      !permissions.has("*")
+    );
+  });
 
-    const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
+  if (forbiddenMetrics.length > 0) {
+    throw forbidden(`Metric access denied: ${forbiddenMetrics.join(", ")}`);
+  }
 
-    const rows = await loadDatasetData({
-      datasetId: dataset.id,
-      columns: normalized.value.selectedFields,
-      filters: orgScopeFilters,
-      fieldsToMask,
+  const normalized = normalizePivotConfig({
+    dataset,
+    rows: data.rows,
+    columns: data.columns,
+    measures: data.measures,
+    filters: data.filters,
+  });
+
+  if (!normalized.ok) {
+    throw badRequest(normalized.errors.join(" "));
+  }
+
+  const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
+  const accessibleIds = new Set(accessibleFields.map((field) => field.id));
+  const requestedFields = new Set([
+    ...normalized.value.rowFields,
+    ...normalized.value.columnFields,
+    ...normalized.value.measures
+      .map((measure) => measure.field)
+      .filter((field): field is string => Boolean(field)),
+  ]);
+
+  const forbiddenFields = Array.from(requestedFields).filter(
+    (field) => !accessibleIds.has(field),
+  );
+
+  if (forbiddenFields.length > 0) {
+    throw forbidden(`Field access denied: ${forbiddenFields.join(", ")}`);
+  }
+
+  const orgScopeFilters = normalized.value.filters;
+
+  if (dataset.requiresOrgScope && scopedOrganizationId) {
+    const scopeField = dataset.orgScopeColumn ?? "organizationId";
+    orgScopeFilters.push({
+      field: scopeField,
+      operator: "eq",
+      value: scopedOrganizationId,
     });
+  }
 
-    const pivot = buildPivotResult(rows, {
-      rowFields: normalized.value.rowFields,
-      columnFields: normalized.value.columnFields,
-      measures: normalized.value.measures,
-    });
+  const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
+  const rawLimit = Math.min(
+    data.limit ?? QUERY_GUARDRAILS.maxRowsUi,
+    QUERY_GUARDRAILS.maxRowsUi,
+  );
+  const pivotLimit = QUERY_GUARDRAILS.maxPivotCells + 1;
 
+  const cacheKey = buildPivotCacheKey({
+    userId: user.id,
+    organizationId: scopedOrganizationId,
+    datasetId: dataset.id,
+    query: data,
+  });
+  const cached = getPivotCache(cacheKey);
+  if (cached) {
     const { logQuery } = await import("./governance");
     await logQuery({
       context: queryContext,
       queryType: "pivot",
       datasetId: dataset.id,
       pivotQuery: data,
-      rowsReturned: rows.length,
+      rowsReturned: cached.rowCount,
       executionTimeMs: 0,
     });
-
     return {
-      pivot,
-      rowCount: rows.length,
+      pivot: cached.pivot,
+      rowCount: cached.rowCount,
     };
+  }
+
+  const startedAt = Date.now();
+  let pivotResult: ReturnType<typeof buildPivotResult>;
+  let rowsReturned = 0;
+
+  const formatSettingValue = (value: string | number | boolean) => {
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? String(value) : "0";
+    }
+    if (typeof value === "boolean") {
+      return value ? "true" : "false";
+    }
+    return `'${String(value).replace(/'/g, "''")}'`;
+  };
+
+  const release = acquireConcurrencySlot(user.id, scopedOrganizationId);
+  try {
+    const plan = buildPivotSqlPlan({
+      dataset,
+      rowFields: normalized.value.rowFields,
+      columnFields: normalized.value.columnFields,
+      measures: normalized.value.measures,
+      filters: orgScopeFilters,
+      limit: pivotLimit,
+      maskedFieldIds: new Set(fieldsToMask),
+    });
+
+    const { getDb } = await import("~/db/server-helpers");
+    const { sql } = await import("drizzle-orm");
+    const db = await getDb();
+
+    try {
+      const result = await db.transaction(async (tx) => {
+        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.org_id = ${formatSettingValue(scopedOrganizationId ?? "")}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.is_global_admin = ${formatSettingValue(
+              String(isGlobalAdmin),
+            )}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL statement_timeout = ${formatSettingValue(
+              QUERY_GUARDRAILS.statementTimeoutMs,
+            )}`,
+          ),
+        );
+
+        return tx.execute<Record<string, unknown>>(plan.sql);
+      });
+
+      const rows = Array.isArray(result)
+        ? result
+        : ((result as { rows?: Array<Record<string, unknown>> }).rows ?? []);
+
+      if (rows.length > QUERY_GUARDRAILS.maxPivotCells) {
+        throw new Error("Too many categories; add filters or fewer dimensions.");
+      }
+
+      rowsReturned = rows.length;
+      pivotResult = buildPivotResultFromSqlRows({
+        rows,
+        rowDimensions: plan.rowDimensions,
+        columnDimensions: plan.columnDimensions,
+        measures: normalized.value.measures,
+        measureAliases: plan.measures,
+      });
+    } catch (error) {
+      const isMissingView =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code?: string }).code === "42P01";
+      const message = error instanceof Error ? error.message.toLowerCase() : "";
+      const shouldFallback =
+        isMissingView ||
+        message.includes("relation") ||
+        message.includes("bi_v_") ||
+        message.includes("does not exist");
+
+      if (!shouldFallback) {
+        throw error;
+      }
+
+      const rows = await loadDatasetData({
+        datasetId: dataset.id,
+        columns: normalized.value.selectedFields,
+        filters: orgScopeFilters,
+        fieldsToMask,
+        limit: rawLimit + 1,
+      });
+
+      if (rows.length > rawLimit) {
+        throw new Error("Query returned too many rows; add filters.");
+      }
+
+      rowsReturned = rows.length;
+      pivotResult = buildPivotResult(rows, {
+        rowFields: normalized.value.rowFields,
+        columnFields: normalized.value.columnFields,
+        measures: normalized.value.measures,
+      });
+    }
+  } finally {
+    release();
+  }
+
+  assertPivotCardinality(pivotResult.rows.length, pivotResult.columnKeys.length);
+
+  const executionTimeMs = Date.now() - startedAt;
+  setPivotCache(cacheKey, {
+    datasetId: dataset.id,
+    pivot: pivotResult,
+    rowCount: rowsReturned,
+  });
+
+  const { logQuery } = await import("./governance");
+  await logQuery({
+    context: queryContext,
+    queryType: "pivot",
+    datasetId: dataset.id,
+    pivotQuery: data,
+    rowsReturned,
+    executionTimeMs,
+  });
+
+  return {
+    pivot: pivotResult,
+    rowCount: rowsReturned,
+  };
+};
+
+export const executePivotQuery = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(pivotQuerySchema.parse)
+  .handler(async ({ data, context }) => {
+    const user = requireUser(context);
+    return runPivotQuery({ data, context, user });
+  });
+
+const pivotBatchSchema = z.object({
+  queries: z.array(
+    z.object({
+      widgetId: z.string().min(1),
+      query: pivotQuerySchema,
+    }),
+  ),
+});
+
+export const executePivotBatch = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(pivotBatchSchema.parse)
+  .handler(async ({ data, context }) => {
+    const user = requireUser(context);
+    const results: Array<{
+      widgetId: string;
+      pivot?: ReturnType<typeof buildPivotResult>;
+      rowCount?: number;
+      error?: string;
+    }> = [];
+
+    for (const entry of data.queries) {
+      try {
+        const result = await runPivotQuery({
+          data: entry.query,
+          context,
+          user,
+        });
+        results.push({
+          widgetId: entry.widgetId,
+          pivot: result.pivot,
+          rowCount: result.rowCount,
+        });
+      } catch (error) {
+        results.push({
+          widgetId: entry.widgetId,
+          error: error instanceof Error ? error.message : "Query failed",
+        });
+      }
+    }
+
+    return { results };
   });
 
 export const getDashboards = createServerFn({ method: "GET" })

@@ -444,6 +444,9 @@ export const createEvent = createServerFn({ method: "POST" })
         })
         .returning();
 
+      const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+      invalidatePivotCache("events");
+
       return {
         success: true,
         data: castEventJsonbFields(newEvent),
@@ -563,6 +566,9 @@ export const updateEvent = createServerFn({ method: "POST" })
         })
         .where(eq(events.id, data.eventId))
         .returning();
+
+      const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+      invalidatePivotCache("events");
 
       return {
         success: true,

@@ -165,12 +165,6 @@ export function buildPivotResult(
         }
 
         const value = executeAggregation(measure.aggregation, bucket.values);
-        if (measure.aggregation === "avg") {
-          cells[columnKey.key][measure.key] =
-            value !== null ? Number(value.toFixed(2)) : null;
-          continue;
-        }
-
         cells[columnKey.key][measure.key] = value;
       }
     }

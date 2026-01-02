@@ -20,6 +20,7 @@ import { loadDatasetData } from "./bi.data";
 import { buildPivotResult } from "./engine/pivot-aggregator";
 import { filterAccessibleFields, getFieldsToMask, queryIncludesPii } from "./governance";
 import { getDataset } from "./semantic";
+import { getMetric } from "./semantic/metrics.config";
 import type { JsonRecord, JsonValue } from "~/shared/lib/json";
 
 const ANALYTICS_ROLES: OrganizationRole[] = ["owner", "admin", "reporter"];
@@ -184,6 +185,23 @@ export const exportPivotResults = createServerFn({ method: "POST" })
       throw forbidden("Analytics export permission required");
     }
 
+    const requestedMetricIds = data.pivotQuery.measures
+      .map((measure) => measure.metricId)
+      .filter((value): value is string => Boolean(value));
+    const forbiddenMetrics = requestedMetricIds.filter((metricId) => {
+      const metric = getMetric(metricId);
+      if (!metric?.requiredPermission) return false;
+      return (
+        !permissions.has(metric.requiredPermission) &&
+        !permissions.has("analytics.admin") &&
+        !permissions.has("*")
+      );
+    });
+
+    if (forbiddenMetrics.length > 0) {
+      throw forbidden(`Metric access denied: ${forbiddenMetrics.join(", ")}`);
+    }
+
     const contextOrganizationId =
       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
 
@@ -337,6 +355,7 @@ export const exportPivotResults = createServerFn({ method: "POST" })
       fileKey: null,
     });
 
+    const includesPii = queryIncludesPii(Array.from(requestedFields), dataset.fields);
     const { logExport } = await import("./governance");
     await logExport({
       context: queryContext,
@@ -346,8 +365,24 @@ export const exportPivotResults = createServerFn({ method: "POST" })
       rowsReturned: exportRows.length,
       executionTimeMs: 0,
       format: data.format,
-      includesPii: queryIncludesPii(Array.from(requestedFields), dataset.fields),
+      includesPii,
       stepUpAuthUsed: true,
+    });
+    const { logAuditEntry } = await import("~/lib/audit");
+    await logAuditEntry({
+      action: "BI.EXPORT",
+      actionCategory: "EXPORT",
+      actorUserId: user.id,
+      actorOrgId: scopedOrganizationId,
+      targetType: "bi_dataset",
+      targetId: dataset.id,
+      metadata: {
+        datasetId: dataset.id,
+        format: data.format,
+        rowCount: exportRows.length,
+        includesPii,
+        stepUpAuthUsed: true,
+      },
     });
 
     return {

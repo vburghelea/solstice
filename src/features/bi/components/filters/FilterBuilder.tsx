@@ -18,6 +18,13 @@ import { EnumFilter } from "./EnumFilter";
 import { FilterGroup } from "./FilterGroup";
 import { NumericFilter } from "./NumericFilter";
 
+type FilterOption = {
+  key: string;
+  field: DatasetField;
+  datasetId?: string;
+  datasetName?: string;
+};
+
 const operatorLabels: Record<FilterOperator, string> = {
   eq: "Equals",
   neq: "Not equals",
@@ -55,18 +62,36 @@ const parseList = (value: string) =>
 
 export function FilterBuilder({
   fields,
+  fieldOptions,
   filters,
   onChange,
 }: {
-  fields: DatasetField[];
+  fields?: DatasetField[];
+  fieldOptions?: Array<{
+    key: string;
+    field: DatasetField;
+    datasetId?: string;
+    datasetName?: string;
+  }>;
   filters: FilterConfig[];
   onChange: (next: FilterConfig[]) => void;
 }) {
-  const filterableFields = fields.filter((field) => field.allowFilter);
-  const allowedFilters = useMemo(
-    () => buildAllowedFilters(buildDatasetStub(filterableFields)),
-    [filterableFields],
-  );
+  const resolvedOptions = useMemo<FilterOption[]>(() => {
+    if (fieldOptions && fieldOptions.length > 0) return fieldOptions;
+    return (fields ?? []).map((field) => ({
+      key: field.id,
+      field,
+    }));
+  }, [fieldOptions, fields]);
+
+  const filterableOptions = resolvedOptions.filter((option) => option.field.allowFilter);
+  const allowedFilters = useMemo(() => {
+    const normalizedFields = filterableOptions.map((option) => ({
+      ...option.field,
+      id: option.key,
+    }));
+    return buildAllowedFilters(buildDatasetStub(normalizedFields));
+  }, [filterableOptions]);
 
   const updateFilter = (index: number, patch: Partial<FilterConfig>) => {
     onChange(
@@ -75,13 +100,14 @@ export function FilterBuilder({
   };
 
   const handleAddFilter = () => {
-    const firstField = filterableFields[0];
-    if (!firstField) return;
-    const operators = allowedFilters[firstField.id]?.operators ?? [];
+    const firstOption = filterableOptions[0];
+    if (!firstOption) return;
+    const operators = allowedFilters[firstOption.key]?.operators ?? [];
     onChange([
       ...filters,
       {
-        field: firstField.id,
+        field: firstOption.field.id,
+        ...(firstOption.datasetId ? { datasetId: firstOption.datasetId } : {}),
         operator: getDefaultOperator(operators),
         value: "",
       },
@@ -98,8 +124,19 @@ export function FilterBuilder({
         <p className="text-muted-foreground text-xs">No filters applied.</p>
       ) : null}
       {filters.map((filter, index) => {
-        const field = filterableFields.find((item) => item.id === filter.field);
-        const operators = field ? (allowedFilters[field.id]?.operators ?? []) : [];
+        const selectedOption =
+          filterableOptions.find(
+            (option) =>
+              option.field.id === filter.field &&
+              (option.datasetId ?? null) === (filter.datasetId ?? null),
+          ) ??
+          filterableOptions.find((option) => option.field.id === filter.field) ??
+          null;
+        const field = selectedOption?.field ?? null;
+        const valueLabel = field?.name ?? "Filter";
+        const operators = selectedOption
+          ? (allowedFilters[selectedOption.key]?.operators ?? [])
+          : [];
 
         return (
           <div
@@ -109,25 +146,30 @@ export function FilterBuilder({
             <div className="space-y-1">
               <Label className="text-xs">Field</Label>
               <Select
-                value={filter.field}
+                value={selectedOption?.key ?? ""}
                 onValueChange={(value) => {
-                  const nextField = filterableFields.find((item) => item.id === value);
-                  if (!nextField) return;
-                  const nextOperators = allowedFilters[nextField.id]?.operators ?? [];
+                  const nextOption = filterableOptions.find(
+                    (option) => option.key === value,
+                  );
+                  if (!nextOption) return;
+                  const nextOperators = allowedFilters[nextOption.key]?.operators ?? [];
                   updateFilter(index, {
-                    field: value,
+                    field: nextOption.field.id,
+                    datasetId: nextOption.datasetId,
                     operator: getDefaultOperator(nextOperators),
                     value: "",
                   });
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-label="Filter field">
                   <SelectValue placeholder="Select field" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterableFields.map((field) => (
-                    <SelectItem key={field.id} value={field.id}>
-                      {field.name}
+                  {filterableOptions.map((option) => (
+                    <SelectItem key={option.key} value={option.key}>
+                      {option.datasetName
+                        ? `${option.datasetName} - ${option.field.name}`
+                        : option.field.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -146,7 +188,7 @@ export function FilterBuilder({
                   });
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-label="Filter operator">
                   <SelectValue placeholder="Operator" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,12 +208,14 @@ export function FilterBuilder({
                   <NumericFilter
                     operator={filter.operator}
                     value={filter.value}
+                    label={valueLabel}
                     onChange={(next) => updateFilter(index, { value: next })}
                   />
                 ) : field.dataType === "datetime" || field.dataType === "date" ? (
                   <DateFilter
                     operator={filter.operator}
                     value={filter.value}
+                    label={valueLabel}
                     onChange={(next) => updateFilter(index, { value: next })}
                     includeTime={field.dataType === "datetime"}
                   />
@@ -180,6 +224,7 @@ export function FilterBuilder({
                     operator={filter.operator}
                     value={filter.value}
                     enumValues={field.enumValues ?? []}
+                    label={valueLabel}
                     onChange={(next) => updateFilter(index, { value: next })}
                   />
                 ) : field.dataType === "boolean" ? (
@@ -189,7 +234,7 @@ export function FilterBuilder({
                       updateFilter(index, { value: next === "true" })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label={`${valueLabel} value`}>
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -201,6 +246,7 @@ export function FilterBuilder({
                   <Input
                     placeholder="Comma-separated values"
                     value={Array.isArray(filter.value) ? filter.value.join(", ") : ""}
+                    aria-label={`${valueLabel} values`}
                     onChange={(event) =>
                       updateFilter(index, { value: parseList(event.target.value) })
                     }
@@ -209,6 +255,7 @@ export function FilterBuilder({
                   <Input
                     placeholder="Value"
                     value={typeof filter.value === "string" ? filter.value : ""}
+                    aria-label={`${valueLabel} value`}
                     onChange={(event) =>
                       updateFilter(index, { value: event.target.value })
                     }
@@ -225,6 +272,7 @@ export function FilterBuilder({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemove(index)}
+                aria-label="Remove filter"
               >
                 <X className="h-4 w-4" />
               </Button>

@@ -74,6 +74,10 @@ were evaluated and not pursued.
 | **Admin/Owner**  | Manages org-wide sharing, dataset config | Org-wide sharing, dataset admin       |
 | **Global Admin** | Cross-org access for support/governance  | Unrestricted (audited)                |
 
+> **SIN personas**: Canonical persona definitions and IDs live in
+> `docs/sin-rfp/requirements/personas.md`. This section describes analytics
+> access by org role and is reused across tenants.
+>
 > **Note**: "Analyst" is a **permission set** (`analytics.author`, `analytics.sql`),
 > not a separate role. This aligns with existing org roles (`owner`, `admin`, `reporter`).
 

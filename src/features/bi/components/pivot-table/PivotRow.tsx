@@ -8,6 +8,7 @@ export function PivotRow({
   measures,
   rowTotals,
   showRowTotals,
+  measureFormatters,
 }: {
   row: PivotResult["rows"][number];
   rowFields: PivotResult["rowFields"];
@@ -15,6 +16,7 @@ export function PivotRow({
   measures: PivotResult["measures"];
   rowTotals: Record<string, number | null>;
   showRowTotals: boolean;
+  measureFormatters?: Map<string, (value: number | null) => string>;
 }) {
   return (
     <TableRow>
@@ -24,14 +26,20 @@ export function PivotRow({
       {columnKeys.map((column) =>
         measures.map((measure) => (
           <TableCell key={`${row.key}:${column.key}:${measure.key}`}>
-            {row.cells[column.key]?.[measure.key] ?? ""}
+            {measureFormatters?.get(measure.key)
+              ? measureFormatters.get(measure.key)!(
+                  row.cells[column.key]?.[measure.key] ?? null,
+                )
+              : (row.cells[column.key]?.[measure.key] ?? "")}
           </TableCell>
         )),
       )}
       {showRowTotals
         ? measures.map((measure) => (
             <TableCell key={`${row.key}:total:${measure.key}`}>
-              {rowTotals[measure.key] ?? ""}
+              {measureFormatters?.get(measure.key)
+                ? measureFormatters.get(measure.key)!(rowTotals[measure.key] ?? null)
+                : (rowTotals[measure.key] ?? "")}
             </TableCell>
           ))
         : null}

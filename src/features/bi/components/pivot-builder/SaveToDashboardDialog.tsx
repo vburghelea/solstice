@@ -23,7 +23,7 @@ import {
 import { addWidget, createDashboard } from "../../bi.mutations";
 import { getDashboards } from "../../bi.queries";
 import type { AggregationType, ChartType, FilterConfig } from "../../bi.schemas";
-import type { WidgetConfig } from "../../bi.types";
+import type { ChartOptions, WidgetConfig } from "../../bi.types";
 
 type WidgetType = "chart" | "pivot" | "kpi";
 
@@ -47,9 +47,16 @@ interface SaveToDashboardDialogProps {
   datasetId: string;
   rows: string[];
   columns: string[];
-  measures: Array<{ field: string; aggregation: AggregationType }>;
+  measures: Array<{
+    id?: string;
+    field: string;
+    aggregation: AggregationType;
+    metricId?: string;
+    label?: string;
+  }>;
   filters: FilterConfig[];
   chartType: ChartType;
+  chartOptions?: ChartOptions;
 }
 
 export function SaveToDashboardDialog({
@@ -61,6 +68,7 @@ export function SaveToDashboardDialog({
   measures,
   filters,
   chartType,
+  chartOptions,
 }: SaveToDashboardDialogProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -95,7 +103,13 @@ export function SaveToDashboardDialog({
         datasetId: string;
         rows: string[];
         columns: string[];
-        measures: Array<{ field: string | null; aggregation: AggregationType }>;
+        measures: Array<{
+          id?: string;
+          field: string | null;
+          aggregation: AggregationType;
+          metricId?: string;
+          label?: string;
+        }>;
         filters: FilterConfig[];
       };
       config: WidgetConfig;
@@ -156,8 +170,11 @@ export function SaveToDashboardDialog({
       rows,
       columns,
       measures: measures.map((m) => ({
+        ...(m.id ? { id: m.id } : {}),
         field: m.field as string | null,
         aggregation: m.aggregation,
+        ...(m.metricId ? { metricId: m.metricId } : {}),
+        ...(m.label ? { label: m.label } : {}),
       })),
       filters,
       limit: 1000,
@@ -171,6 +188,9 @@ export function SaveToDashboardDialog({
 
     if (widgetType === "chart") {
       config.chartType = chartType;
+      if (chartOptions) {
+        config.chartOptions = chartOptions;
+      }
     }
 
     try {

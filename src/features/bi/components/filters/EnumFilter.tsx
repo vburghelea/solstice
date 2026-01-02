@@ -19,17 +19,22 @@ export function EnumFilter({
   value,
   enumValues,
   onChange,
+  label,
 }: {
   operator: FilterOperator;
   value: FilterValue | undefined;
   enumValues?: Array<{ value: string; label: string }>;
   onChange: (next: FilterValue | undefined) => void;
+  label?: string;
 }) {
+  const labelPrefix = label ? `${label} ` : "";
+
   if (operator === "in" || operator === "not_in") {
     return (
       <Input
         placeholder="Comma-separated values"
         value={Array.isArray(value) ? value.join(", ") : ""}
+        aria-label={`${labelPrefix}values`}
         onChange={(event) => onChange(parseList(event.target.value))}
       />
     );
@@ -41,7 +46,7 @@ export function EnumFilter({
         value={typeof value === "string" ? value : ""}
         onValueChange={(next) => onChange(next)}
       >
-        <SelectTrigger>
+        <SelectTrigger aria-label={`${labelPrefix}value`}>
           <SelectValue placeholder="Select value" />
         </SelectTrigger>
         <SelectContent>
@@ -59,6 +64,7 @@ export function EnumFilter({
     <Input
       placeholder="Value"
       value={typeof value === "string" ? value : ""}
+      aria-label={`${labelPrefix}value`}
       onChange={(event) => onChange(event.target.value)}
     />
   );

@@ -11,6 +11,9 @@ export const QUERY_GUARDRAILS = {
   maxEstimatedCost: 100000,
   maxConcurrentPerUser: 2,
   maxConcurrentPerOrg: 5,
+  maxPivotRows: 500,
+  maxPivotColumns: 50,
+  maxPivotCells: 25000,
 } as const;
 
 const inflightByUser = new Map<string, number>();
@@ -62,6 +65,18 @@ export const stripTrailingSemicolons = (sqlText: string) => sqlText.replace(/;\s
 
 export const buildLimitedQuery = (sqlText: string, maxRows: number) =>
   `SELECT * FROM (${stripTrailingSemicolons(sqlText)}) AS bi_limit_subquery LIMIT ${maxRows}`;
+
+export const assertPivotCardinality = (rowCount: number, columnCount: number) => {
+  if (rowCount > QUERY_GUARDRAILS.maxPivotRows) {
+    throw new Error("Too many row categories; add filters or fewer dimensions.");
+  }
+  if (columnCount > QUERY_GUARDRAILS.maxPivotColumns) {
+    throw new Error("Too many column categories; add filters or fewer dimensions.");
+  }
+  if (rowCount * columnCount > QUERY_GUARDRAILS.maxPivotCells) {
+    throw new Error("Too many categories; add filters or fewer dimensions.");
+  }
+};
 
 const escapeLiteral = (value: string) => `'${value.replace(/'/g, "''")}'`;
 

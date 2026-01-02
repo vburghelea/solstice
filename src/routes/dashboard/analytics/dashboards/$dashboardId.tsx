@@ -11,9 +11,11 @@ import { DashboardFilters } from "~/features/bi/components/dashboard/DashboardFi
 import { DashboardShareDialog } from "~/features/bi/components/dashboard/DashboardShareDialog";
 import { EditWidgetDialog } from "~/features/bi/components/dashboard/EditWidgetDialog";
 import { getAvailableDatasets, getDatasetFields } from "~/features/bi/bi.queries";
+import { logBiTelemetryEvent } from "~/features/bi/bi.telemetry";
 import type { PivotQuery, WidgetType } from "~/features/bi/bi.schemas";
 import type { DatasetField, WidgetConfig } from "~/features/bi/bi.types";
 import { useDashboard } from "~/features/bi/hooks/use-dashboard";
+import type { FilterConfig } from "~/features/bi/bi.schemas";
 
 export const Route = createFileRoute("/dashboard/analytics/dashboards/$dashboardId")({
   component: DashboardDetailPage,
@@ -28,6 +30,7 @@ function DashboardDetailPage() {
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
   const [sharedWithInput, setSharedWithInput] = useState("");
   const [shareOrgWide, setShareOrgWide] = useState(false);
+  const [interactiveFilters, setInteractiveFilters] = useState<FilterConfig[]>([]);
   const dashboardHook = useDashboard(dashboardId);
   const datasetsQuery = useQuery({
     queryKey: ["bi-datasets"],
@@ -43,24 +46,41 @@ function DashboardDetailPage() {
       const responses = await Promise.all(
         datasets.map((dataset) => getDatasetFields({ data: { datasetId: dataset.id } })),
       );
-      return responses.flatMap((response) => response.fields ?? []);
+      return responses.map((response, index) => ({
+        datasetId: datasets[index]?.id ?? "",
+        datasetName: datasets[index]?.name ?? "",
+        fields: (response.fields ?? []) as DatasetField[],
+      }));
     },
     enabled: datasets.length > 0,
   });
 
-  const filterFields = useMemo(() => {
-    const fieldMap = new Map<string, DatasetField>();
-    const fields = (datasetFieldsQuery.data ?? []) as DatasetField[];
-    fields.forEach((field) => {
-      if (!fieldMap.has(field.id)) {
-        fieldMap.set(field.id, field);
+  const filterFieldOptions = useMemo(() => {
+    const options: Array<{
+      key: string;
+      field: DatasetField;
+      datasetId?: string;
+      datasetName?: string;
+    }> = [];
+    for (const entry of datasetFieldsQuery.data ?? []) {
+      for (const field of entry.fields ?? []) {
+        options.push({
+          key: `${entry.datasetId}::${field.id}`,
+          field,
+          datasetId: entry.datasetId,
+          datasetName: entry.datasetName,
+        });
       }
-    });
-    return Array.from(fieldMap.values());
+    }
+    return options;
   }, [datasetFieldsQuery.data]);
 
   const dashboard = dashboardHook.dashboard;
   const widgets = dashboardHook.widgets;
+  const activeFilters = useMemo(
+    () => [...(dashboard?.globalFilters ?? []), ...interactiveFilters],
+    [dashboard?.globalFilters, interactiveFilters],
+  );
   const sharedWithLabel = useMemo(
     () => (dashboard?.sharedWith ?? []).join(", "),
     [dashboard?.sharedWith],
@@ -87,6 +107,20 @@ function DashboardDetailPage() {
     setSharedWithInput(sharedWithLabel);
     setShareOrgWide(Boolean(dashboard.isOrgWide));
   }, [dashboard, sharedWithLabel]);
+
+  useEffect(() => {
+    setInteractiveFilters([]);
+  }, [dashboardId]);
+
+  useEffect(() => {
+    if (!dashboard) return;
+    void logBiTelemetryEvent({
+      data: {
+        event: "dashboard.view",
+        dashboardId: dashboard.id,
+      },
+    });
+  }, [dashboard]);
 
   if (dashboardHook.isLoading) {
     return (
@@ -159,6 +193,57 @@ function DashboardDetailPage() {
     toast.message(isEditing ? "Edit mode off" : "Edit mode on");
   };
 
+  const handleInteractiveFilterChange = (
+    filter: FilterConfig | null,
+    target?: { field: string; datasetId?: string },
+  ) => {
+    if (!target?.field) return;
+    if (!filter) {
+      setInteractiveFilters((prev) =>
+        prev.filter(
+          (entry) =>
+            entry.field !== target.field ||
+            (entry.datasetId ?? null) !== (target.datasetId ?? null),
+        ),
+      );
+      return;
+    }
+    setInteractiveFilters((prev) => {
+      const index = prev.findIndex(
+        (entry) =>
+          entry.field === filter.field &&
+          (entry.datasetId ?? null) === (filter.datasetId ?? null),
+      );
+      if (index === -1) return [...prev, filter];
+      const next = [...prev];
+      next[index] = filter;
+      return next;
+    });
+  };
+
+  const handleFilterAdd = (filters: FilterConfig[]) => {
+    setInteractiveFilters((prev) => {
+      const next = [...prev];
+      for (const filter of filters) {
+        const index = next.findIndex(
+          (entry) =>
+            entry.field === filter.field &&
+            (entry.datasetId ?? null) === (filter.datasetId ?? null),
+        );
+        if (index === -1) {
+          next.push(filter);
+        } else {
+          next[index] = filter;
+        }
+      }
+      return next;
+    });
+  };
+
+  const clearInteractiveFilters = () => {
+    setInteractiveFilters([]);
+  };
+
   const parseSharedWith = (value: string) => {
     const entries = value
       .split(",")
@@ -224,17 +309,41 @@ function DashboardDetailPage() {
         <CardHeader>
           <CardTitle>Global filters</CardTitle>
         </CardHeader>
-        <CardContent>
-          <DashboardFilters
-            fields={filterFields}
-            filters={dashboard.globalFilters ?? []}
-            editable={isEditing}
-            onChange={(next) =>
-              dashboardHook.updateDashboard.mutate({
-                data: { dashboardId: dashboard.id, globalFilters: next },
-              })
-            }
-          />
+        <CardContent className="space-y-3">
+          {isEditing ? (
+            <DashboardFilters
+              fieldOptions={filterFieldOptions}
+              filters={dashboard.globalFilters ?? []}
+              editable={isEditing}
+              onChange={(next) =>
+                dashboardHook.updateDashboard.mutate({
+                  data: { dashboardId: dashboard.id, globalFilters: next },
+                })
+              }
+            />
+          ) : (
+            <>
+              <DashboardFilters
+                fieldOptions={filterFieldOptions}
+                filters={activeFilters}
+              />
+              {interactiveFilters.length > 0 ? (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-muted-foreground text-xs">
+                    Interactive filters applied.
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={clearInteractiveFilters}
+                  >
+                    Clear active filters
+                  </Button>
+                </div>
+              ) : null}
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -242,11 +351,13 @@ function DashboardDetailPage() {
         key={isEditing ? "dashboard-edit" : "dashboard-view"}
         layout={dashboard.layout}
         widgets={widgets}
-        globalFilters={dashboard.globalFilters ?? []}
+        globalFilters={activeFilters}
         editable={isEditing}
         onPositionChange={handlePositionChange}
         onEditWidget={handleEditWidget}
         onRemoveWidget={handleRemoveWidget}
+        onFilterChange={handleInteractiveFilterChange}
+        onFilterAdd={handleFilterAdd}
       />
 
       <AddWidgetModal
@@ -272,7 +383,7 @@ function DashboardDetailPage() {
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
         widgets={exportableWidgets}
-        globalFilters={dashboard.globalFilters ?? []}
+        globalFilters={activeFilters}
       />
 
       {editingWidget && (

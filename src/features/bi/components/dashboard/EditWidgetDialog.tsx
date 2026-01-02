@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -28,22 +28,31 @@ import type {
   FilterConfig,
   WidgetType,
 } from "../../bi.schemas";
-import type { DatasetField, WidgetConfig } from "../../bi.types";
+import type { ChartOptions, DatasetField, WidgetConfig } from "../../bi.types";
+import { ControlPanel } from "../chart-config/ControlPanel";
+import { getChartControlPanel, getDefaultChartOptions } from "../chart-config/panels";
+import { getMetricsForDataset } from "../../semantic/metrics.config";
+import { createMeasureId, ensureMeasureId } from "../../utils/measure-utils";
+import { useAuth } from "~/features/auth";
 import { Plus, X } from "lucide-react";
+import type { AuthUser } from "~/lib/auth/types";
 
 const widgetTypeOptions: Array<{ value: WidgetType; label: string }> = [
   { value: "pivot", label: "Pivot Table" },
   { value: "chart", label: "Chart" },
   { value: "kpi", label: "KPI Card" },
   { value: "text", label: "Text" },
+  { value: "filter", label: "Filter" },
 ];
 
 const chartTypeOptions: Array<{ value: ChartType; label: string }> = [
   { value: "bar", label: "Bar Chart" },
   { value: "line", label: "Line Chart" },
-  { value: "pie", label: "Pie Chart" },
-  { value: "scatter", label: "Scatter Plot" },
   { value: "area", label: "Area Chart" },
+  { value: "pie", label: "Pie Chart" },
+  { value: "donut", label: "Donut Chart" },
+  { value: "heatmap", label: "Heatmap" },
+  { value: "scatter", label: "Scatter Plot" },
 ];
 
 const aggregationOptions: Array<{ value: AggregationType; label: string }> = [
@@ -53,6 +62,9 @@ const aggregationOptions: Array<{ value: AggregationType; label: string }> = [
   { value: "avg", label: "Average" },
   { value: "min", label: "Minimum" },
   { value: "max", label: "Maximum" },
+  { value: "median", label: "Median" },
+  { value: "stddev", label: "Std Dev" },
+  { value: "variance", label: "Variance" },
 ];
 
 interface EditWidgetDialogProps {
@@ -72,6 +84,7 @@ export function EditWidgetDialog({
   dashboardId,
   widget,
 }: EditWidgetDialogProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const config = widget.config ?? {};
   const query = config.query;
@@ -80,19 +93,47 @@ export function EditWidgetDialog({
   const [title, setTitle] = useState(config.title ?? "");
   const [widgetType, setWidgetType] = useState<WidgetType>(widget.widgetType);
   const [chartType, setChartType] = useState<ChartType>(config.chartType ?? "bar");
+  const [chartOptions, setChartOptions] = useState<ChartOptions>(
+    config.chartOptions ?? getDefaultChartOptions(config.chartType ?? "bar"),
+  );
   const [textContent, setTextContent] = useState(config.textContent ?? "");
+  const [filterDatasetId, setFilterDatasetId] = useState(config.filterDatasetId ?? "");
+  const [filterField, setFilterField] = useState(config.filterField ?? "");
+  const [filterType, setFilterType] = useState<WidgetConfig["filterType"]>(
+    config.filterType ?? "select",
+  );
   const [datasetId, setDatasetId] = useState(query?.datasetId ?? "");
   const [rows, setRows] = useState<string[]>(query?.rows ?? []);
   const [columns, setColumns] = useState<string[]>(query?.columns ?? []);
   const [measures, setMeasures] = useState<
-    Array<{ field: string | null; aggregation: AggregationType }>
+    Array<{
+      id: string;
+      field: string | null;
+      aggregation: AggregationType;
+      metricId?: string;
+      label?: string;
+    }>
   >(() => {
     const m = query?.measures ?? [];
-    const normalized = m.map((item) => ({
-      field: item.field ?? null,
-      aggregation: item.aggregation,
-    }));
-    return normalized.length > 0 ? normalized : [{ field: null, aggregation: "count" }];
+    const normalized = m.map((item) => {
+      const normalizedItem = ensureMeasureId({
+        id: item.id,
+        field: item.field ?? null,
+        aggregation: item.aggregation,
+        ...(item.metricId ? { metricId: item.metricId } : {}),
+        ...(item.label ? { label: item.label } : {}),
+      });
+      return {
+        id: normalizedItem.id,
+        field: normalizedItem.field ?? null,
+        aggregation: normalizedItem.aggregation,
+        ...(normalizedItem.metricId ? { metricId: normalizedItem.metricId } : {}),
+        ...(normalizedItem.label ? { label: normalizedItem.label } : {}),
+      };
+    });
+    return normalized.length > 0
+      ? normalized
+      : [{ id: createMeasureId(), field: null, aggregation: "count" }];
   });
   const [filters, setFilters] = useState<FilterConfig[]>(query?.filters ?? []);
 
@@ -103,19 +144,35 @@ export function EditWidgetDialog({
     setTitle(cfg.title ?? "");
     setWidgetType(widget.widgetType);
     setChartType(cfg.chartType ?? "bar");
+    setChartOptions(cfg.chartOptions ?? getDefaultChartOptions(cfg.chartType ?? "bar"));
     setTextContent(cfg.textContent ?? "");
+    setFilterDatasetId(cfg.filterDatasetId ?? "");
+    setFilterField(cfg.filterField ?? "");
+    setFilterType(cfg.filterType ?? "select");
     setDatasetId(q?.datasetId ?? "");
     setRows(q?.rows ?? []);
     setColumns(q?.columns ?? []);
     // Normalize measures to ensure field is string | null (not undefined)
-    const normalizedMeasures = (q?.measures ?? []).map((m) => ({
-      field: m.field ?? null,
-      aggregation: m.aggregation,
-    }));
+    const normalizedMeasures = (q?.measures ?? []).map((m) => {
+      const normalized = ensureMeasureId({
+        id: m.id,
+        field: m.field ?? null,
+        aggregation: m.aggregation,
+        ...(m.metricId ? { metricId: m.metricId } : {}),
+        ...(m.label ? { label: m.label } : {}),
+      });
+      return {
+        id: normalized.id,
+        field: normalized.field ?? null,
+        aggregation: normalized.aggregation,
+        ...(normalized.metricId ? { metricId: normalized.metricId } : {}),
+        ...(normalized.label ? { label: normalized.label } : {}),
+      };
+    });
     setMeasures(
       normalizedMeasures.length > 0
         ? normalizedMeasures
-        : [{ field: null, aggregation: "count" }],
+        : [{ id: createMeasureId(), field: null, aggregation: "count" }],
     );
     setFilters(q?.filters ?? []);
   }, [widget]);
@@ -135,11 +192,51 @@ export function EditWidgetDialog({
     enabled: open && Boolean(datasetId),
   });
   const fields = (fieldsQuery.data?.fields ?? []) as DatasetField[];
+  const filterFieldsQuery = useQuery({
+    queryKey: ["bi-fields", filterDatasetId],
+    queryFn: () => getDatasetFields({ data: { datasetId: filterDatasetId } }),
+    enabled: open && widgetType === "filter" && Boolean(filterDatasetId),
+  });
+  const filterFields = (filterFieldsQuery.data?.fields ?? []) as DatasetField[];
   // Dimensions can be grouped by; measures can be aggregated
   const dimensionFields = fields.filter((f) => f.allowGroupBy !== false);
   const measureFields = fields.filter(
     (f) => f.allowAggregate !== false && f.dataType === "number",
   );
+  const permissions = useMemo(() => {
+    const permissionSet = new Set<string>();
+    for (const assignment of (user as AuthUser | null)?.roles ?? []) {
+      const perms = assignment.role?.permissions ?? {};
+      for (const [key, enabled] of Object.entries(perms)) {
+        if (enabled) permissionSet.add(key);
+      }
+    }
+    return permissionSet;
+  }, [user]);
+  const metrics = useMemo(() => {
+    return getMetricsForDataset(datasetId).filter((metric) => {
+      if (!metric.requiredPermission) return true;
+      return (
+        permissions.has(metric.requiredPermission) ||
+        permissions.has("analytics.admin") ||
+        permissions.has("*")
+      );
+    });
+  }, [datasetId, permissions]);
+  const metricsById = useMemo(
+    () => new Map(metrics.map((metric) => [metric.id, metric])),
+    [metrics],
+  );
+  const chartControlPanel = useMemo(() => getChartControlPanel(chartType), [chartType]);
+
+  useEffect(() => {
+    const defaults = getDefaultChartOptions(chartType);
+    setChartOptions((prev) => ({ ...defaults, ...prev }));
+  }, [chartType]);
+
+  useEffect(() => {
+    setFilterField("");
+  }, [filterDatasetId]);
 
   // Update mutation
   const updateMutation = useMutation({
@@ -174,6 +271,18 @@ export function EditWidgetDialog({
 
     if (widgetType === "text") {
       newConfig.textContent = textContent;
+    } else if (widgetType === "filter") {
+      if (!filterDatasetId) {
+        toast.error("Please select a dataset");
+        return;
+      }
+      if (!filterField) {
+        toast.error("Please select a filter field");
+        return;
+      }
+      newConfig.filterDatasetId = filterDatasetId;
+      newConfig.filterField = filterField;
+      newConfig.filterType = filterType ?? "select";
     } else if (widgetType === "chart" || widgetType === "pivot" || widgetType === "kpi") {
       if (!datasetId) {
         toast.error("Please select a dataset");
@@ -191,6 +300,7 @@ export function EditWidgetDialog({
 
       if (widgetType === "chart") {
         newConfig.chartType = chartType;
+        newConfig.chartOptions = chartOptions;
       }
     }
 
@@ -201,7 +311,10 @@ export function EditWidgetDialog({
   };
 
   const addMeasure = () => {
-    setMeasures([...measures, { field: null, aggregation: "count" }]);
+    setMeasures([
+      ...measures,
+      { id: createMeasureId(), field: null, aggregation: "count" },
+    ]);
   };
 
   const removeMeasure = (index: number) => {
@@ -214,15 +327,46 @@ export function EditWidgetDialog({
     value: string,
   ) => {
     const newMeasures = [...measures];
+    const {
+      metricId: _metricId,
+      label: _label,
+      ...rest
+    } = newMeasures[index] ?? {
+      id: createMeasureId(),
+      field: null,
+      aggregation: "count" as AggregationType,
+    };
     if (field === "field") {
-      newMeasures[index] = { ...newMeasures[index], field: value || null };
+      newMeasures[index] = {
+        ...rest,
+        field: value || null,
+      };
     } else {
       newMeasures[index] = {
-        ...newMeasures[index],
+        ...rest,
         aggregation: value as AggregationType,
       };
     }
     setMeasures(newMeasures);
+  };
+
+  const addMetric = (metricId: string) => {
+    const metric = metricsById.get(metricId);
+    if (!metric) return;
+    if (measures.some((item) => item.metricId === metricId)) {
+      toast.message("Metric already added.");
+      return;
+    }
+    setMeasures((prev) => [
+      ...prev,
+      {
+        id: createMeasureId(metricId),
+        field: metric.fieldId ?? null,
+        aggregation: metric.aggregation ?? "count",
+        metricId,
+        label: metric.name,
+      },
+    ]);
   };
 
   const toggleDimension = (fieldId: string, dimension: "rows" | "columns") => {
@@ -254,13 +398,19 @@ export function EditWidgetDialog({
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="data" disabled={widgetType === "text"}>
               Data
             </TabsTrigger>
-            <TabsTrigger value="measures" disabled={widgetType === "text"}>
+            <TabsTrigger
+              value="measures"
+              disabled={widgetType === "text" || widgetType === "filter"}
+            >
               Measures
+            </TabsTrigger>
+            <TabsTrigger value="chart" disabled={widgetType !== "chart"}>
+              Chart
             </TabsTrigger>
           </TabsList>
 
@@ -330,63 +480,140 @@ export function EditWidgetDialog({
           </TabsContent>
 
           <TabsContent value="data" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Dataset</Label>
-              <Select value={datasetId} onValueChange={setDatasetId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a dataset" />
-                </SelectTrigger>
-                <SelectContent>
-                  {datasets.map((ds) => (
-                    <SelectItem key={ds.id} value={ds.id}>
-                      {ds.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {datasetId && dimensionFields.length > 0 && (
-              <div className="space-y-2">
-                <Label>Dimensions</Label>
-                <div className="grid gap-2">
-                  {dimensionFields.map((field) => {
-                    const inRows = rows.includes(field.id);
-                    const inColumns = columns.includes(field.id);
-                    return (
-                      <div
-                        key={field.id}
-                        className="flex items-center justify-between rounded border p-2"
-                      >
-                        <span className="text-sm">{field.name}</span>
-                        <div className="flex gap-1">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant={inRows ? "default" : "outline"}
-                            onClick={() => toggleDimension(field.id, "rows")}
-                          >
-                            Row
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant={inColumns ? "default" : "outline"}
-                            onClick={() => toggleDimension(field.id, "columns")}
-                          >
-                            Column
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
+            {widgetType === "filter" ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Dataset</Label>
+                  <Select value={filterDatasetId} onValueChange={setFilterDatasetId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a dataset" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {datasets.map((ds) => (
+                        <SelectItem key={ds.id} value={ds.id}>
+                          {ds.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Filter field</Label>
+                  <Select value={filterField} onValueChange={setFilterField}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a field" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterFields
+                        .filter((field) => field.allowFilter)
+                        .map((field) => (
+                          <SelectItem key={field.id} value={field.id}>
+                            {field.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Filter type</Label>
+                  <Select
+                    value={filterType ?? "select"}
+                    onValueChange={(value) =>
+                      setFilterType(value as WidgetConfig["filterType"])
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select filter type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="select">Select</SelectItem>
+                      <SelectItem value="date_range">Date range</SelectItem>
+                      <SelectItem value="search">Search</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label>Dataset</Label>
+                  <Select value={datasetId} onValueChange={setDatasetId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a dataset" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {datasets.map((ds) => (
+                        <SelectItem key={ds.id} value={ds.id}>
+                          {ds.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {datasetId && dimensionFields.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Dimensions</Label>
+                    <div className="grid gap-2">
+                      {dimensionFields.map((field) => {
+                        const inRows = rows.includes(field.id);
+                        const inColumns = columns.includes(field.id);
+                        return (
+                          <div
+                            key={field.id}
+                            className="flex items-center justify-between rounded border p-2"
+                          >
+                            <span className="text-sm">{field.name}</span>
+                            <div className="flex gap-1">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={inRows ? "default" : "outline"}
+                                onClick={() => toggleDimension(field.id, "rows")}
+                              >
+                                Row
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={inColumns ? "default" : "outline"}
+                                onClick={() => toggleDimension(field.id, "columns")}
+                              >
+                                Column
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
 
           <TabsContent value="measures" className="space-y-4 pt-4">
             <div className="space-y-2">
+              {metrics.length > 0 ? (
+                <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Metrics
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {metrics.map((metric) => (
+                      <Button
+                        key={metric.id}
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => addMetric(metric.id)}
+                      >
+                        {metric.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="flex items-center justify-between">
                 <Label>Measures</Label>
                 <Button type="button" size="sm" variant="outline" onClick={addMeasure}>
@@ -400,6 +627,7 @@ export function EditWidgetDialog({
                     <Select
                       value={measure.aggregation}
                       onValueChange={(v) => updateMeasure(index, "aggregation", v)}
+                      disabled={Boolean(measure.metricId)}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue />
@@ -413,7 +641,11 @@ export function EditWidgetDialog({
                       </SelectContent>
                     </Select>
 
-                    {measure.aggregation !== "count" && (
+                    {measure.metricId ? (
+                      <div className="flex-1 text-sm text-muted-foreground">
+                        Metric: {measure.label ?? metricsById.get(measure.metricId)?.name}
+                      </div>
+                    ) : measure.aggregation !== "count" ? (
                       <Select
                         value={measure.field ?? ""}
                         onValueChange={(v) => updateMeasure(index, "field", v)}
@@ -429,6 +661,10 @@ export function EditWidgetDialog({
                           ))}
                         </SelectContent>
                       </Select>
+                    ) : (
+                      <div className="flex-1 text-sm text-muted-foreground">
+                        Count all rows
+                      </div>
                     )}
 
                     {measures.length > 1 && (
@@ -437,6 +673,7 @@ export function EditWidgetDialog({
                         size="icon"
                         variant="ghost"
                         onClick={() => removeMeasure(index)}
+                        aria-label="Remove measure"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -445,6 +682,26 @@ export function EditWidgetDialog({
                 ))}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="chart" className="space-y-4 pt-4">
+            {widgetType === "chart" ? (
+              chartControlPanel ? (
+                <ControlPanel
+                  panel={chartControlPanel}
+                  value={chartOptions as Record<string, unknown>}
+                  onChange={(next) => setChartOptions(next as ChartOptions)}
+                />
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Chart controls are not available for this type.
+                </p>
+              )
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                Select a chart widget to configure chart options.
+              </p>
+            )}
           </TabsContent>
         </Tabs>
 

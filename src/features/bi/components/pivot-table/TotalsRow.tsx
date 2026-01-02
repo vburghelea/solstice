@@ -10,6 +10,7 @@ export function TotalsRow({
   grandTotals,
   showRowTotals,
   showGrandTotal,
+  measureFormatters,
 }: {
   label: string;
   rowFields: PivotResult["rowFields"];
@@ -19,6 +20,7 @@ export function TotalsRow({
   grandTotals: Record<string, number | null>;
   showRowTotals: boolean;
   showGrandTotal: boolean;
+  measureFormatters?: Map<string, (value: number | null) => string>;
 }) {
   return (
     <TableRow>
@@ -33,14 +35,20 @@ export function TotalsRow({
             key={`${label}:${column.key}:${measure.key}`}
             className="font-medium"
           >
-            {columnTotals[columnIndex]?.[measure.key] ?? ""}
+            {measureFormatters?.get(measure.key)
+              ? measureFormatters.get(measure.key)!(
+                  columnTotals[columnIndex]?.[measure.key] ?? null,
+                )
+              : (columnTotals[columnIndex]?.[measure.key] ?? "")}
           </TableCell>
         )),
       )}
       {showRowTotals && showGrandTotal
         ? measures.map((measure) => (
             <TableCell key={`${label}:grand:${measure.key}`} className="font-semibold">
-              {grandTotals[measure.key] ?? ""}
+              {measureFormatters?.get(measure.key)
+                ? measureFormatters.get(measure.key)!(grandTotals[measure.key] ?? null)
+                : (grandTotals[measure.key] ?? "")}
             </TableCell>
           ))
         : showRowTotals

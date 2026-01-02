@@ -21,8 +21,8 @@ describe("aggregators", () => {
       expect(aggregators.sum([-1, 2, -3, 4])).toBe(2);
     });
 
-    it("returns 0 for empty array", () => {
-      expect(aggregators.sum([])).toBe(0);
+    it("returns null for empty array", () => {
+      expect(aggregators.sum([])).toBeNull();
     });
   });
 

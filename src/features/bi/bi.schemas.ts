@@ -79,12 +79,24 @@ export type FilterValue = z.infer<typeof filterValueSchema>;
 
 export const filterSchema = z.object({
   field: z.string().min(1),
+  datasetId: z.string().optional(),
   operator: filterOperatorSchema,
   value: filterValueSchema.optional(),
   label: z.string().optional(),
 });
 
 export type FilterConfig = z.infer<typeof filterSchema>;
+
+export const fieldValueSuggestionsSchema = z.object({
+  datasetId: z.string().min(1),
+  fieldId: z.string().min(1),
+  organizationId: z.uuid().optional(),
+  search: z.string().optional(),
+  limit: z.number().int().min(1).max(100).default(25),
+  filters: z.array(filterSchema).default([]),
+});
+
+export type FieldValueSuggestionsRequest = z.infer<typeof fieldValueSuggestionsSchema>;
 
 // =============================================================================
 // Dataset Definitions
@@ -112,12 +124,22 @@ export const formatOptionsSchema = z.object({
 
 export type FormatOptions = z.infer<typeof formatOptionsSchema>;
 
+export const datasetFreshnessSchema = z.object({
+  sourceSystem: z.string().min(1),
+  updateCadence: z.string().min(1),
+  lastUpdatedField: z.string().optional(),
+});
+
+export type DatasetFreshness = z.infer<typeof datasetFreshnessSchema>;
+
 export const datasetFieldSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   description: z.string().optional(),
   sourceColumn: z.string().min(1),
   sourceTable: z.string().optional(),
+  derivedFrom: z.string().optional(),
+  timeGrain: z.enum(["day", "week", "month", "quarter"]).optional(),
   dataType: z.enum([
     "string",
     "number",
@@ -160,6 +182,7 @@ export const datasetDefinitionSchema = z.object({
   fields: z.array(datasetFieldSchema),
   isPublic: z.boolean().optional(),
   allowedRoles: z.array(z.string()).optional(),
+  freshness: datasetFreshnessSchema.optional(),
 });
 
 export type DatasetDefinition = z.infer<typeof datasetDefinitionSchema>;
@@ -169,7 +192,9 @@ export type DatasetDefinition = z.infer<typeof datasetDefinitionSchema>;
 // =============================================================================
 
 export const pivotMeasureSchema = z.object({
+  id: z.string().min(1).optional(),
   field: z.string().min(1).nullable().optional(),
+  metricId: z.string().min(1).optional(),
   aggregation: aggregationTypeSchema,
   label: z.string().optional(),
 });

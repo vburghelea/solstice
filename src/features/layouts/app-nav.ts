@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Code,
   CreditCard,
+  Database,
   FileText,
   Files,
   Home,
@@ -101,6 +102,19 @@ const portalItems: NavItem[] = [
     to: "/dashboard/analytics/sql",
     feature: "sin_analytics_sql_workbench",
     requiresOrgRole: analyticsRoles,
+  },
+  {
+    icon: Database,
+    label: "Data Catalog",
+    to: "/dashboard/analytics/catalog",
+    feature: "sin_analytics",
+    requiresOrgRole: analyticsRoles,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Analytics Audit",
+    to: "/dashboard/analytics/audit",
+    feature: "sin_admin_audit",
   },
   {
     icon: Files,

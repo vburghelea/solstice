@@ -8,9 +8,13 @@
 
 ## Executive Summary
 
-The current BI implementation is a **governed data access layer with basic reporting capabilities**—not a full BI platform. This is appropriate for its intended purpose (org-scoped data access with compliance controls), but should not be positioned as competing with dedicated BI tools.
+The current BI implementation is a **governed data access layer with basic
+reporting capabilities**. The intended positioning is a governed data explorer +
+reporting tool + full BI platform competitive with Tableau/PowerBI, but today's
+feature set is still early against that bar.
 
-**Overall Assessment:** Functional data explorer with chart variety (30-35% feature parity with commercial BI tools)
+**Overall Assessment:** Functional data explorer with chart variety (~30-35%
+parity today; target is full BI parity)
 
 ---
 
@@ -124,14 +128,14 @@ Initial assessment was incorrect due to testing with a user lacking analytics pe
 
 ## Product Positioning Assessment
 
-| Aspect                        | Rating         | Notes                                                                     |
-| ----------------------------- | -------------- | ------------------------------------------------------------------------- |
-| **Feature Completeness**      | 30-35%         | 9 chart types, query execution works; missing config UI and interactivity |
-| **UX Polish**                 | 40%            | Clean but static; no delight, no progressive disclosure                   |
-| **Power User Appeal**         | 50%            | SQL Workbench is decent; analysts might use it                            |
-| **Business User Appeal**      | 20%            | Too technical, no pre-built dashboards, no templates                      |
-| **vs Metabase (open source)** | Behind         | Metabase offers more out-of-box for free                                  |
-| **vs Looker/Tableau**         | Not comparable | Different product category                                                |
+| Aspect                        | Rating | Notes                                                                     |
+| ----------------------------- | ------ | ------------------------------------------------------------------------- |
+| **Feature Completeness**      | 30-35% | 9 chart types, query execution works; missing config UI and interactivity |
+| **UX Polish**                 | 40%    | Clean but static; no delight, no progressive disclosure                   |
+| **Power User Appeal**         | 50%    | SQL Workbench is decent; analysts might use it                            |
+| **Business User Appeal**      | 20%    | Too technical, no pre-built dashboards, no templates                      |
+| **vs Metabase (open source)** | Behind | Metabase offers more out-of-box for free                                  |
+| **vs Looker/Tableau**         | Behind | Target parity; current gaps remain in interactivity, dashboards, and UX   |
 
 ---
 
@@ -142,12 +146,12 @@ Initial assessment was incorrect due to testing with a user lacking analytics pe
 3. **SQL power users** — Direct SQL access for technical staff
 4. **Simple ad-hoc queries** — Basic counts and aggregations
 
-## What This System Is Not
+## What This System Is Not Yet
 
-1. Not a replacement for dedicated BI tools
-2. Not something business teams would use daily for decision-making
-3. Not a "self-service analytics" platform
-4. Not a dashboard/reporting solution for executives
+1. Not yet a replacement for dedicated BI tools
+2. Not yet something business teams would use daily for decision-making
+3. Not yet a "self-service analytics" platform
+4. Not yet a dashboard/reporting solution for executives
 
 ---
 
@@ -196,7 +200,9 @@ Initial assessment was incorrect due to testing with a user lacking analytics pe
 
 ### Positioning Recommendation
 
-Position as a **"Governed Data Explorer"** rather than a **"BI Platform"**. Set expectations appropriately and consider integrating with or recommending external BI tools for advanced analytics needs.
+Position as a **"Governed Data Explorer + Reporting + Full BI Platform"**. Set
+expectations about current gaps while signaling the target parity with
+Tableau/PowerBI.
 
 ---
 
@@ -234,9 +240,14 @@ Result:
 
 ## Conclusion
 
-The BI implementation is functional and appropriate for its governance-focused use case. However, if the goal is to provide meaningful analytics capabilities to end users, significant investment is needed. Consider whether building vs. integrating with existing BI tools is the right strategic choice.
+The BI implementation is functional and appropriate for its governance-focused
+use case. However, if the goal is full BI parity, significant investment is
+needed to close gaps in interactivity, dashboards, and analysis workflows.
 
-For the SIN Portal's immediate needs (basic reporting, data access controls, compliance), the current implementation may be sufficient. For broader analytics needs, recommend evaluating embedded BI solutions or partnerships with established BI vendors.
+For the SIN Portal's immediate needs (basic reporting, data access controls,
+compliance), the current implementation may be sufficient. For broader analytics
+needs, continue the BI platform roadmap and make the parity target explicit in
+planning and resourcing.
 
 ---
 

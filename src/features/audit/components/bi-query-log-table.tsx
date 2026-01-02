@@ -73,15 +73,17 @@ export function BiQueryLogTable() {
           <Input
             placeholder="User ID"
             value={userId}
+            aria-label="Filter by user ID"
             onChange={(event) => setUserId(event.target.value)}
           />
           <Input
             placeholder="Organization ID"
             value={organizationId}
+            aria-label="Filter by organization ID"
             onChange={(event) => setOrganizationId(event.target.value)}
           />
           <Select value={queryType} onValueChange={setQueryType}>
-            <SelectTrigger className="h-9">
+            <SelectTrigger className="h-9" aria-label="Filter by query type">
               <SelectValue placeholder="Query type" />
             </SelectTrigger>
             <SelectContent>
@@ -96,11 +98,13 @@ export function BiQueryLogTable() {
           <Input
             type="date"
             value={fromDate}
+            aria-label="Filter from date"
             onChange={(event) => setFromDate(event.target.value)}
           />
           <Input
             type="date"
             value={toDate}
+            aria-label="Filter to date"
             onChange={(event) => setToDate(event.target.value)}
           />
         </div>

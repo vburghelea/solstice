@@ -4,23 +4,37 @@ import { getDataset } from "~/features/bi/semantic";
 export const mergeDashboardFilters = (
   query: PivotQuery | null | undefined,
   globalFilters: FilterConfig[],
-): PivotQuery | null => {
-  if (!query) return null;
+): { query: PivotQuery | null; ignoredFilters: FilterConfig[] } => {
+  if (!query) return { query: null, ignoredFilters: [] };
 
   const baseFilters = query.filters ?? [];
   if (globalFilters.length === 0) {
-    return { ...query, filters: baseFilters };
+    return { query: { ...query, filters: baseFilters }, ignoredFilters: [] };
   }
 
   const dataset = getDataset(query.datasetId);
   if (!dataset) {
-    return { ...query, filters: baseFilters };
+    return { query: { ...query, filters: baseFilters }, ignoredFilters: [] };
   }
 
   const allowedFields = new Set(dataset.fields.map((field) => field.id));
-  const applicableFilters = globalFilters.filter((filter) =>
-    allowedFields.has(filter.field),
-  );
+  const applicableFilters: FilterConfig[] = [];
+  const ignoredFilters: FilterConfig[] = [];
 
-  return { ...query, filters: [...baseFilters, ...applicableFilters] };
+  for (const filter of globalFilters) {
+    if (filter.datasetId && filter.datasetId !== query.datasetId) {
+      ignoredFilters.push(filter);
+      continue;
+    }
+    if (!allowedFields.has(filter.field)) {
+      ignoredFilters.push(filter);
+      continue;
+    }
+    applicableFilters.push(filter);
+  }
+
+  return {
+    query: { ...query, filters: [...baseFilters, ...applicableFilters] },
+    ignoredFilters,
+  };
 };

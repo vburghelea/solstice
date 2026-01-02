@@ -16,12 +16,14 @@ export function PivotTable({
   showColumnTotals = true,
   showGrandTotal = true,
   fieldLabels,
+  measureFormatters,
 }: {
   pivot: PivotResult;
   showRowTotals?: boolean;
   showColumnTotals?: boolean;
   showGrandTotal?: boolean;
   fieldLabels?: Map<string, string>;
+  measureFormatters?: Map<string, (value: number | null) => string>;
 }) {
   const rowTotals = pivot.rows.map((row) => {
     const totals: Record<string, number | null> = {};
@@ -75,6 +77,7 @@ export function PivotTable({
               measures={pivot.measures}
               rowTotals={rowTotals[index] ?? {}}
               showRowTotals={showRowTotals}
+              {...(measureFormatters ? { measureFormatters } : {})}
             />
           ))}
           {showColumnTotals ? (
@@ -87,6 +90,7 @@ export function PivotTable({
               grandTotals={grandTotals}
               showRowTotals={showRowTotals}
               showGrandTotal={showGrandTotal}
+              {...(measureFormatters ? { measureFormatters } : {})}
             />
           ) : null}
         </TableBody>

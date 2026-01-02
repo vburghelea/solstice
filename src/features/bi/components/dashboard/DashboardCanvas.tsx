@@ -1,13 +1,17 @@
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import { useQuery } from "@tanstack/react-query";
 import ReactGridLayout, {
   WidthProvider,
   type Layout,
   type LegacyReactGridLayoutProps,
 } from "react-grid-layout/legacy";
+import { useMemo, type ComponentProps } from "react";
 import { DashboardWidget } from "./DashboardWidget";
-import type { FilterConfig, WidgetType } from "../../bi.schemas";
+import type { FilterConfig, PivotResult, WidgetType } from "../../bi.schemas";
 import type { WidgetConfig } from "../../bi.types";
+import { executePivotBatch } from "../../bi.queries";
+import { mergeDashboardFilters } from "./dashboard-utils";
 
 const GridLayout = WidthProvider(ReactGridLayout);
 
@@ -26,6 +30,8 @@ export function DashboardCanvas({
   onPositionChange,
   onEditWidget,
   onRemoveWidget,
+  onFilterChange,
+  onFilterAdd,
 }: {
   layout: {
     columns: number;
@@ -46,6 +52,11 @@ export function DashboardCanvas({
   onPositionChange: (widgetId: string, position: WidgetPosition) => void;
   onEditWidget?: (widgetId: string) => void;
   onRemoveWidget: (widgetId: string) => void;
+  onFilterChange?: (
+    filter: FilterConfig | null,
+    target?: { field: string; datasetId?: string },
+  ) => void;
+  onFilterAdd?: (filters: FilterConfig[]) => void;
 }) {
   const gridLayout: Layout = widgets.map((widget) => ({
     i: widget.id,
@@ -87,6 +98,59 @@ export function DashboardCanvas({
     });
   };
 
+  const batchQueries = useMemo(() => {
+    return widgets
+      .filter(
+        (widget) =>
+          widget.widgetType === "chart" ||
+          widget.widgetType === "pivot" ||
+          widget.widgetType === "kpi",
+      )
+      .map((widget) => {
+        const config = (widget.config ?? {}) as WidgetConfig;
+        const { query } = config;
+        const { query: mergedQuery } = mergeDashboardFilters(
+          query ?? null,
+          globalFilters,
+        );
+        if (!mergedQuery) return null;
+        return { widgetId: widget.id, query: mergedQuery };
+      })
+      .filter(
+        (
+          entry,
+        ): entry is { widgetId: string; query: NonNullable<WidgetConfig["query"]> } =>
+          Boolean(entry?.query),
+      );
+  }, [globalFilters, widgets]);
+
+  const batchQuery = useQuery({
+    queryKey: ["bi-dashboard-batch", batchQueries],
+    queryFn: () => executePivotBatch({ data: { queries: batchQueries } }),
+    enabled: batchQueries.length > 0,
+    refetchOnMount: !editable,
+    refetchOnWindowFocus: !editable,
+    refetchOnReconnect: !editable,
+    staleTime: editable ? Infinity : 0,
+  });
+
+  const batchResults = useMemo(() => {
+    return new Map(
+      (batchQuery.data?.results ?? []).map((result) => [result.widgetId, result]),
+    );
+  }, [batchQuery.data?.results]);
+
+  const resolvePrefetchedResult = (widgetId: string) =>
+    batchResults.get(widgetId) as
+      | {
+          widgetId: string;
+          pivot?: PivotResult;
+          rowCount?: number;
+          error?: string;
+        }
+      | undefined;
+  type DashboardWidgetProps = ComponentProps<typeof DashboardWidget>;
+
   return (
     <GridLayout
       key={editable ? "dashboard-edit" : "dashboard-view"}
@@ -103,23 +167,33 @@ export function DashboardCanvas({
       margin={[16, 16]}
       containerPadding={[0, 0]}
     >
-      {widgets.map((widget) => (
-        <div
-          key={widget.id}
-          data-grid={{ x: widget.x, y: widget.y, w: widget.w, h: widget.h }}
-        >
-          {[
-            <DashboardWidget
-              key={`widget-${widget.id}`}
-              widget={widget}
-              globalFilters={globalFilters}
-              editable={editable}
-              {...(onEditWidget ? { onEdit: () => onEditWidget(widget.id) } : {})}
-              onRemove={() => onRemoveWidget(widget.id)}
-            />,
-          ]}
-        </div>
-      ))}
+      {widgets.map((widget) => {
+        const prefetchedResult = resolvePrefetchedResult(
+          widget.id,
+        ) as DashboardWidgetProps["prefetchedResult"];
+        return (
+          <div
+            key={widget.id}
+            data-grid={{ x: widget.x, y: widget.y, w: widget.w, h: widget.h }}
+          >
+            {[
+              <DashboardWidget
+                key={`widget-${widget.id}`}
+                widget={widget}
+                globalFilters={globalFilters}
+                editable={editable}
+                prefetchedLoading={batchQuery.isLoading}
+                {...(prefetchedResult ? { prefetchedResult } : {})}
+                {...(batchQuery.error ? { prefetchedError: batchQuery.error } : {})}
+                {...(onFilterChange ? { onFilterChange } : {})}
+                {...(onFilterAdd ? { onFilterAdd } : {})}
+                {...(onEditWidget ? { onEdit: () => onEditWidget(widget.id) } : {})}
+                onRemove={() => onRemoveWidget(widget.id)}
+              />,
+            ]}
+          </div>
+        );
+      })}
     </GridLayout>
   );
 }

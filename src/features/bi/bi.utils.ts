@@ -7,6 +7,7 @@ import {
   type FilterType,
   type NormalizedFilter,
 } from "./engine/filters";
+import { getMetric } from "./semantic/metrics.config";
 
 const operatorsByType: Record<FilterType, AllowedFilterConfig["operators"]> = {
   string: [
@@ -124,28 +125,44 @@ export const normalizePivotConfig = (params: {
   }
 
   const measures: PivotMeasureMeta[] = params.measures.map((measure) => {
-    if (measure.aggregation !== "count" && !measure.field) {
+    const metric = measure.metricId ? getMetric(measure.metricId) : undefined;
+    if (measure.metricId && !metric) {
+      errors.push(`Metric '${measure.metricId}' is not defined`);
+    }
+
+    if (metric && metric.datasetId !== params.dataset.id) {
+      errors.push(`Metric '${metric.id}' is not available for this dataset`);
+    }
+
+    const aggregation = metric?.aggregation ?? measure.aggregation;
+    const fieldId =
+      metric?.fieldId ?? metric?.expression ?? (measure.field ? measure.field : null);
+
+    if (aggregation !== "count" && !fieldId) {
       errors.push("Measures require a field for non-count aggregations.");
     }
 
-    if (measure.field) {
-      const definition = fieldById.get(measure.field);
+    if (fieldId) {
+      const definition = fieldById.get(fieldId);
       if (!definition) {
-        errors.push(`Measure field '${measure.field}' is not in dataset`);
+        errors.push(`Measure field '${fieldId}' is not in dataset`);
       } else if (!definition.allowAggregate) {
-        errors.push(`Measure field '${measure.field}' does not allow aggregation`);
+        errors.push(`Measure field '${fieldId}' does not allow aggregation`);
       }
     }
 
-    const field = measure.field ?? null;
-    const key = `${measure.aggregation}:${field ?? "count"}`;
+    const key = metric?.id
+      ? `metric:${metric.id}`
+      : (measure.id ?? `${aggregation}:${fieldId ?? "count"}`);
     const label =
-      measure.aggregation === "count"
+      metric?.name ??
+      (aggregation === "count"
         ? "Count"
-        : `${measure.aggregation.toUpperCase()}(${field ?? "-"})`;
+        : `${aggregation.toUpperCase()}(${fieldId ?? "-"})`);
+
     return {
-      field,
-      aggregation: measure.aggregation,
+      field: fieldId,
+      aggregation,
       key,
       label: measure.label ?? label,
     };

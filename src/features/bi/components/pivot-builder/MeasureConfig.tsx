@@ -24,11 +24,13 @@ const aggregationLabels: Record<AggregationType, string> = {
 export function MeasureConfig({
   aggregation,
   options,
+  disabled,
   onChange,
   onRemove,
 }: {
   aggregation: AggregationType;
   options: AggregationType[];
+  disabled?: boolean;
   onChange: (next: AggregationType) => void;
   onRemove?: () => void;
 }) {
@@ -37,6 +39,7 @@ export function MeasureConfig({
       <Select
         value={aggregation}
         onValueChange={(value) => onChange(value as AggregationType)}
+        disabled={Boolean(disabled)}
       >
         <SelectTrigger className="h-7 w-36">
           <SelectValue />
@@ -50,7 +53,13 @@ export function MeasureConfig({
         </SelectContent>
       </Select>
       {onRemove ? (
-        <Button type="button" variant="ghost" size="icon" onClick={onRemove}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          aria-label="Remove measure"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       ) : null}

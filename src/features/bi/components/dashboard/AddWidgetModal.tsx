@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,13 +20,17 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import type { ChartType, PivotQuery, WidgetType } from "../../bi.schemas";
-import type { WidgetConfig } from "../../bi.types";
+import type { DatasetField, WidgetConfig } from "../../bi.types";
+import { getDatasetFields } from "../../bi.queries";
+import { getDefaultChartOptions } from "../chart-config/panels";
+import { createMeasureId } from "../../utils/measure-utils";
 
 const widgetOptions: Array<{ value: WidgetType; label: string }> = [
   { value: "chart", label: "Chart" },
   { value: "pivot", label: "Pivot" },
   { value: "kpi", label: "KPI" },
   { value: "text", label: "Text" },
+  { value: "filter", label: "Filter" },
 ];
 
 const chartOptions: Array<{ value: ChartType; label: string }> = [
@@ -62,6 +67,9 @@ export function AddWidgetModal({
   const [datasetId, setDatasetId] = useState("");
   const [chartType, setChartType] = useState<ChartType>("bar");
   const [textContent, setTextContent] = useState("");
+  const [filterField, setFilterField] = useState("");
+  const [filterType, setFilterType] =
+    useState<NonNullable<WidgetConfig["filterType"]>>("select");
 
   useEffect(() => {
     if (!datasetId && datasets.length > 0) {
@@ -69,12 +77,25 @@ export function AddWidgetModal({
     }
   }, [datasetId, datasets]);
 
+  useEffect(() => {
+    setFilterField("");
+  }, [datasetId, widgetType]);
+
   const reset = () => {
     setWidgetType("chart");
     setTitle("");
     setTextContent("");
     setChartType("bar");
+    setFilterField("");
+    setFilterType("select");
   };
+
+  const fieldsQuery = useQuery({
+    queryKey: ["bi-fields", datasetId],
+    queryFn: () => getDatasetFields({ data: { datasetId } }),
+    enabled: Boolean(datasetId) && widgetType === "filter",
+  });
+  const fields = (fieldsQuery.data?.fields ?? []) as DatasetField[];
 
   const handleAdd = () => {
     if (!title.trim()) {
@@ -85,14 +106,14 @@ export function AddWidgetModal({
     const basePosition = {
       x: 0,
       y: widgetsCount * 4,
-      w: widgetType === "kpi" ? 3 : 4,
-      h: widgetType === "text" ? 3 : 4,
+      w: widgetType === "kpi" || widgetType === "filter" ? 3 : 4,
+      h: widgetType === "text" ? 3 : widgetType === "filter" ? 2 : 4,
     };
 
     let query: PivotQuery | undefined;
     const config: WidgetConfig = { title };
 
-    if (widgetType !== "text") {
+    if (widgetType !== "text" && widgetType !== "filter") {
       if (!datasetId) {
         toast.error("Select a dataset for this widget.");
         return;
@@ -101,7 +122,7 @@ export function AddWidgetModal({
         datasetId,
         rows: [],
         columns: [],
-        measures: [{ field: null, aggregation: "count" }],
+        measures: [{ id: createMeasureId(), field: null, aggregation: "count" }],
         filters: [],
         limit: 1000,
       };
@@ -111,10 +132,25 @@ export function AddWidgetModal({
 
     if (widgetType === "chart") {
       config.chartType = chartType;
+      config.chartOptions = getDefaultChartOptions(chartType);
     }
 
     if (widgetType === "text") {
       config.textContent = textContent;
+    }
+
+    if (widgetType === "filter") {
+      if (!datasetId) {
+        toast.error("Select a dataset for this widget.");
+        return;
+      }
+      if (!filterField) {
+        toast.error("Select a field to filter.");
+        return;
+      }
+      config.filterDatasetId = datasetId;
+      config.filterField = filterField;
+      config.filterType = filterType;
     }
 
     const payload = {
@@ -175,6 +211,53 @@ export function AddWidgetModal({
                       {dataset.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+
+          {widgetType === "filter" ? (
+            <div className="space-y-1">
+              <Label>Filter field</Label>
+              <Select value={filterField} onValueChange={setFilterField}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select field" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fields.length === 0 ? (
+                    <div className="text-muted-foreground p-2 text-center text-sm">
+                      No filterable fields.
+                    </div>
+                  ) : (
+                    fields
+                      .filter((field) => field.allowFilter)
+                      .map((field) => (
+                        <SelectItem key={field.id} value={field.id}>
+                          {field.name}
+                        </SelectItem>
+                      ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+
+          {widgetType === "filter" ? (
+            <div className="space-y-1">
+              <Label>Filter type</Label>
+              <Select
+                value={filterType}
+                onValueChange={(value) =>
+                  setFilterType(value as NonNullable<WidgetConfig["filterType"]>)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select filter type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="select">Select</SelectItem>
+                  <SelectItem value="date_range">Date range</SelectItem>
+                  <SelectItem value="search">Search</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -3,6 +3,10 @@
 **Date:** 2025-12-29
 **Purpose:** Realistic user stories and navigation flows to uncover gaps in SIN implementation
 
+**Canonical personas:** `docs/sin-rfp/requirements/personas.md` (IDs + scope).
+**Current focus:** Sections 2, 3, 8, 9, 10, 11 (viaSport + PSO staff). Sections 1
+and 4-7 are deferred for now (platform and operations personas).
+
 ---
 
 ## Table of Contents
@@ -99,6 +103,8 @@ Gaps:
 ## 2. viaSport Admin (Governing Body)
 
 **Context:** A viaSport staff member who administers the entire BC amateur sport ecosystem. Manages PSOs (Provincial Sport Organizations like BC Soccer, BC Hockey), collects annual reports, allocates funding, and ensures compliance.
+
+**Persona ID:** VS_ADMIN
 
 ### User Stories
 
@@ -205,6 +211,8 @@ Gaps:
 ## 3. BC Soccer Admin (PSO)
 
 **Context:** An administrator at BC Soccer, a Provincial Sport Organization under viaSport. Manages hundreds of clubs, thousands of teams, and tens of thousands of players. Responsible for submitting reports to viaSport and collecting data from clubs.
+
+**Persona ID:** PSO_ADMIN
 
 ### User Stories
 
@@ -683,6 +691,8 @@ Gaps:
 
 **Context:** A viaSport analyst or data steward responsible for data governance, analytics, data quality, and reporting to internal and external stakeholders.
 
+**Persona ID:** VS_DATA_STEWARD
+
 ### User Stories
 
 #### Data Governance & Catalog
@@ -745,6 +755,8 @@ Gaps:
 
 **Context:** A viaSport staff member who manages templates, tutorials, and responds to user support requests to help the sector onboard smoothly.
 
+**Persona ID:** VS_SUPPORT_COORD
+
 ### User Stories
 
 #### Templates & Guidance
@@ -800,6 +812,8 @@ Gaps:
 
 **Context:** A viaSport staff member responsible for privacy compliance, DSAR processing, legal holds, and retention governance.
 
+**Persona ID:** VS_PRIVACY_OFFICER
+
 ### User Stories
 
 #### DSAR & Privacy Operations
@@ -851,6 +865,8 @@ Gaps:
 ## 11. Integration & Data Warehouse Admin
 
 **Context:** A systems administrator responsible for data integration, warehousing, and external API connectivity with legacy systems or partner platforms.
+
+**Persona ID:** VS_INTEGRATION_ADMIN
 
 ### User Stories
 

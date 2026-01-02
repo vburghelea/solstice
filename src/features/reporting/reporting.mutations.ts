@@ -273,6 +273,9 @@ export const createReportingTask = createServerFn({ method: "POST" })
       });
     }
 
+    const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+    invalidatePivotCache("reporting_submissions");
+
     return created ?? null;
   });
 
@@ -536,6 +539,9 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
       targetId: updated.id,
       targetOrgId: updated.organizationId,
     });
+
+    const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
+    invalidatePivotCache("reporting_submissions");
 
     return updated;
   });

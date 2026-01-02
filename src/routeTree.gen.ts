@@ -59,6 +59,8 @@ import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/ev
 import { Route as DashboardEventsSlugRouteImport } from "./routes/dashboard/events/$slug";
 import { Route as DashboardAnalyticsSqlRouteImport } from "./routes/dashboard/analytics/sql";
 import { Route as DashboardAnalyticsExploreRouteImport } from "./routes/dashboard/analytics/explore";
+import { Route as DashboardAnalyticsCatalogRouteImport } from "./routes/dashboard/analytics/catalog";
+import { Route as DashboardAnalyticsAuditRouteImport } from "./routes/dashboard/analytics/audit";
 import { Route as DashboardAdminSinRouteImport } from "./routes/dashboard/admin/sin";
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as ApiWebhooksSquareRouteImport } from "./routes/api/webhooks/square";
@@ -344,6 +346,17 @@ const DashboardAnalyticsExploreRoute =
     path: "/explore",
     getParentRoute: () => DashboardAnalyticsRouteRoute,
   } as any);
+const DashboardAnalyticsCatalogRoute =
+  DashboardAnalyticsCatalogRouteImport.update({
+    id: "/catalog",
+    path: "/catalog",
+    getParentRoute: () => DashboardAnalyticsRouteRoute,
+  } as any);
+const DashboardAnalyticsAuditRoute = DashboardAnalyticsAuditRouteImport.update({
+  id: "/audit",
+  path: "/audit",
+  getParentRoute: () => DashboardAnalyticsRouteRoute,
+} as any);
 const DashboardAdminSinRoute = DashboardAdminSinRouteImport.update({
   id: "/sin",
   path: "/sin",
@@ -562,6 +575,8 @@ export interface FileRoutesByFullPath {
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/admin/sin": typeof DashboardAdminSinRouteWithChildren;
+  "/dashboard/analytics/audit": typeof DashboardAnalyticsAuditRoute;
+  "/dashboard/analytics/catalog": typeof DashboardAnalyticsCatalogRoute;
   "/dashboard/analytics/explore": typeof DashboardAnalyticsExploreRoute;
   "/dashboard/analytics/sql": typeof DashboardAnalyticsSqlRoute;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
@@ -638,6 +653,8 @@ export interface FileRoutesByTo {
   "/api/test/cleanup": typeof ApiTestCleanupRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/analytics/audit": typeof DashboardAnalyticsAuditRoute;
+  "/dashboard/analytics/catalog": typeof DashboardAnalyticsCatalogRoute;
   "/dashboard/analytics/explore": typeof DashboardAnalyticsExploreRoute;
   "/dashboard/analytics/sql": typeof DashboardAnalyticsSqlRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
@@ -721,6 +738,8 @@ export interface FileRoutesById {
   "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/admin/sin": typeof DashboardAdminSinRouteWithChildren;
+  "/dashboard/analytics/audit": typeof DashboardAnalyticsAuditRoute;
+  "/dashboard/analytics/catalog": typeof DashboardAnalyticsCatalogRoute;
   "/dashboard/analytics/explore": typeof DashboardAnalyticsExploreRoute;
   "/dashboard/analytics/sql": typeof DashboardAnalyticsSqlRoute;
   "/dashboard/events/$slug": typeof DashboardEventsSlugRouteWithChildren;
@@ -807,6 +826,8 @@ export interface FileRouteTypes {
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
     | "/dashboard/admin/sin"
+    | "/dashboard/analytics/audit"
+    | "/dashboard/analytics/catalog"
     | "/dashboard/analytics/explore"
     | "/dashboard/analytics/sql"
     | "/dashboard/events/$slug"
@@ -883,6 +904,8 @@ export interface FileRouteTypes {
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
+    | "/dashboard/analytics/audit"
+    | "/dashboard/analytics/catalog"
     | "/dashboard/analytics/explore"
     | "/dashboard/analytics/sql"
     | "/dashboard/events/create"
@@ -965,6 +988,8 @@ export interface FileRouteTypes {
     | "/api/webhooks/square"
     | "/dashboard/admin/roles"
     | "/dashboard/admin/sin"
+    | "/dashboard/analytics/audit"
+    | "/dashboard/analytics/catalog"
     | "/dashboard/analytics/explore"
     | "/dashboard/analytics/sql"
     | "/dashboard/events/$slug"
@@ -1385,6 +1410,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAnalyticsExploreRouteImport;
       parentRoute: typeof DashboardAnalyticsRouteRoute;
     };
+    "/dashboard/analytics/catalog": {
+      id: "/dashboard/analytics/catalog";
+      path: "/catalog";
+      fullPath: "/dashboard/analytics/catalog";
+      preLoaderRoute: typeof DashboardAnalyticsCatalogRouteImport;
+      parentRoute: typeof DashboardAnalyticsRouteRoute;
+    };
+    "/dashboard/analytics/audit": {
+      id: "/dashboard/analytics/audit";
+      path: "/audit";
+      fullPath: "/dashboard/analytics/audit";
+      preLoaderRoute: typeof DashboardAnalyticsAuditRouteImport;
+      parentRoute: typeof DashboardAnalyticsRouteRoute;
+    };
     "/dashboard/admin/sin": {
       id: "/dashboard/admin/sin";
       path: "/sin";
@@ -1683,6 +1722,8 @@ const DashboardAdminRouteRouteWithChildren =
   DashboardAdminRouteRoute._addFileChildren(DashboardAdminRouteRouteChildren);
 
 interface DashboardAnalyticsRouteRouteChildren {
+  DashboardAnalyticsAuditRoute: typeof DashboardAnalyticsAuditRoute;
+  DashboardAnalyticsCatalogRoute: typeof DashboardAnalyticsCatalogRoute;
   DashboardAnalyticsExploreRoute: typeof DashboardAnalyticsExploreRoute;
   DashboardAnalyticsSqlRoute: typeof DashboardAnalyticsSqlRoute;
   DashboardAnalyticsIndexRoute: typeof DashboardAnalyticsIndexRoute;
@@ -1693,6 +1734,8 @@ interface DashboardAnalyticsRouteRouteChildren {
 
 const DashboardAnalyticsRouteRouteChildren: DashboardAnalyticsRouteRouteChildren =
   {
+    DashboardAnalyticsAuditRoute: DashboardAnalyticsAuditRoute,
+    DashboardAnalyticsCatalogRoute: DashboardAnalyticsCatalogRoute,
     DashboardAnalyticsExploreRoute: DashboardAnalyticsExploreRoute,
     DashboardAnalyticsSqlRoute: DashboardAnalyticsSqlRoute,
     DashboardAnalyticsIndexRoute: DashboardAnalyticsIndexRoute,

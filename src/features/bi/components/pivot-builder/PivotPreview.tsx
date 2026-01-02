@@ -1,9 +1,18 @@
 import { useMemo } from "react";
-import type { ChartType, PivotResult } from "../../bi.schemas";
+import { Loader2 } from "lucide-react";
+import type {
+  AggregationType,
+  ChartType,
+  PivotMeasure,
+  PivotResult,
+} from "../../bi.schemas";
 import { buildPivotChartOptions } from "../charts/pivot-chart";
-import { ChartContainer } from "../charts/ChartContainer";
+import { ChartWrapper } from "../charts/ChartWrapper";
 import { KpiCard } from "../charts/KpiCard";
 import { PivotTable } from "../pivot-table/PivotTable";
+import { Button } from "~/components/ui/button";
+import { buildMeasureFormatters } from "../../utils/formatting";
+import type { ChartOptions, DatasetField } from "../../bi.types";
 import {
   Select,
   SelectContent,
@@ -30,6 +39,13 @@ export function PivotPreview({
   showColumnTotals,
   showGrandTotal,
   fieldLabels,
+  fieldsById,
+  chartOptions,
+  rows,
+  columns,
+  measures,
+  isLoading,
+  onApplySample,
 }: {
   pivot: PivotResult | null;
   chartType: ChartType;
@@ -39,16 +55,64 @@ export function PivotPreview({
   showColumnTotals: boolean;
   showGrandTotal: boolean;
   fieldLabels?: Map<string, string>;
+  fieldsById?: Map<string, DatasetField>;
+  chartOptions?: ChartOptions;
+  rows: string[];
+  columns: string[];
+  measures: PivotMeasure[];
+  isLoading?: boolean;
+  onApplySample?: () => void;
 }) {
   const chartOption = useMemo(() => {
     if (!pivot || !selectedMeasureKey) return null;
-    return buildPivotChartOptions(pivot, chartType, selectedMeasureKey);
-  }, [pivot, chartType, selectedMeasureKey]);
+    return buildPivotChartOptions(
+      pivot,
+      chartType,
+      selectedMeasureKey,
+      chartOptions,
+      fieldsById,
+    );
+  }, [pivot, chartType, selectedMeasureKey, chartOptions, fieldsById]);
+  const selectedMeasureLabel =
+    pivot?.measures.find((measure) => measure.key === selectedMeasureKey)?.label ??
+    "Value";
+  const chartAriaLabel = `${chartType} chart preview`;
+  const chartAriaDescription = `Preview of ${selectedMeasureLabel}`;
+  const measureFormatters = useMemo(() => {
+    if (!pivot || !fieldsById) return undefined;
+    return buildMeasureFormatters(pivot.measures, fieldsById);
+  }, [fieldsById, pivot]);
 
   if (!pivot) {
+    if (isLoading) {
+      return (
+        <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading preview...
+          </div>
+        </div>
+      );
+    }
+
+    const hasMeasures = measures.length > 0;
+    const hasDimensions = rows.length + columns.length > 0;
     return (
-      <div className="rounded-md border border-dashed p-8 text-center text-muted-foreground">
-        Run a query to preview results.
+      <div className="space-y-3 rounded-md border border-dashed p-8 text-center text-muted-foreground">
+        {!hasMeasures ? (
+          <p>Add a measure (like Count) to see totals.</p>
+        ) : !hasDimensions ? (
+          <>
+            <p>Drop a field into Rows or Columns to see a breakdown.</p>
+            {onApplySample ? (
+              <Button type="button" size="sm" variant="outline" onClick={onApplySample}>
+                Try a sample query
+              </Button>
+            ) : null}
+          </>
+        ) : (
+          <p>Run a query to preview results.</p>
+        )}
       </div>
     );
   }
@@ -59,7 +123,7 @@ export function PivotPreview({
     <div className="space-y-3">
       {showMeasureSelector ? (
         <Select value={selectedMeasureKey} onValueChange={onMeasureChange}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger className="w-64" aria-label="Select measure">
             <SelectValue placeholder="Select measure" />
           </SelectTrigger>
           <SelectContent>
@@ -78,6 +142,7 @@ export function PivotPreview({
           showRowTotals={showRowTotals}
           showColumnTotals={showColumnTotals}
           showGrandTotal={showGrandTotal}
+          {...(measureFormatters ? { measureFormatters } : {})}
           {...(fieldLabels ? { fieldLabels } : {})}
         />
       ) : chartType === "kpi" ? (
@@ -89,7 +154,11 @@ export function PivotPreview({
           value={sumMeasure(pivot, selectedMeasureKey) ?? "-"}
         />
       ) : chartOption ? (
-        <ChartContainer option={chartOption} />
+        <ChartWrapper
+          options={chartOption}
+          ariaLabel={chartAriaLabel}
+          ariaDescription={chartAriaDescription}
+        />
       ) : (
         <div className="rounded-md border border-dashed p-8 text-center text-muted-foreground">
           Select a chart type to preview results.

@@ -14,6 +14,7 @@ export {
   datasetJoinSchema,
   exportFormatSchema,
   exportRequestSchema,
+  fieldValueSuggestionsSchema,
   filterOperatorSchema,
   filterSchema,
   filterValueSchema,
@@ -36,6 +37,7 @@ export type {
   DatasetJoin,
   ExportFormat,
   ExportRequest,
+  FieldValueSuggestionsRequest,
   FilterConfig,
   FilterOperator,
   FilterValue,
@@ -74,11 +76,13 @@ export type {
 // =============================================================================
 
 export {
+  executePivotBatch,
   executePivotQuery,
   getAvailableDatasets,
   getDashboard,
   getDashboards,
   getDatasetFields,
+  getFieldValueSuggestions,
   getSqlSchema,
   executeSqlQuery,
   listBiQueryLogs,

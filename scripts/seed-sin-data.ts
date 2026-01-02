@@ -19,33 +19,61 @@
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
+import { createHash, createHmac } from "crypto";
 import dotenv from "dotenv";
 import { like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import type {
+  DashboardLayout,
+  PivotConfig,
+  PivotQuery,
+  WidgetConfig,
+} from "../src/features/bi/bi.types";
 import type { JsonRecord } from "../src/shared/lib/json";
 import {
+  accountLocks,
   account,
+  auditLogs,
+  biDashboards,
+  biDashboardWidgets,
+  biQueryLog,
+  dataCatalogEntries,
+  dataQualityRuns,
   delegatedAccess,
   forms,
+  formSubmissionVersions,
   formSubmissions,
   formVersions,
+  importJobErrors,
+  importJobs,
   importMappingTemplates,
+  legalHolds,
+  notificationEmailDeliveries,
+  notificationPreferences,
   notificationTemplates,
   notifications,
   organizationMembers,
+  organizationInviteLinks,
+  organizationInviteLinkUses,
+  organizationJoinRequests,
   organizations,
   policyDocuments,
+  privacyRequests,
   reportingCycles,
+  reportingSubmissionHistory,
   reportingSubmissions,
   reportingTasks,
   retentionPolicies,
   roles,
   savedReports,
+  scheduledNotifications,
+  securityEvents,
   session,
   submissionFiles,
   supportRequests,
   templates,
+  tutorialCompletions,
   twoFactor,
   user,
   userPolicyAcceptances,
@@ -148,12 +176,16 @@ const IDS = {
   quarterlyFinFormId: "a0000000-0000-4000-8002-000000000002",
   demographicsFormId: "a0000000-0000-4000-8002-000000000003",
   coachingFormId: "a0000000-0000-4000-8002-000000000004",
+  bcHockeyFacilitiesFormId: "a0000000-0000-4000-8002-000000000005",
+  bcHockeySafetyFormId: "a0000000-0000-4000-8002-000000000006",
 
   // Form Versions (RFC 4122 compliant UUIDs)
   annualStatsFormV1Id: "a0000000-0000-4000-8003-000000000001",
   quarterlyFinFormV1Id: "a0000000-0000-4000-8003-000000000002",
   demographicsFormV1Id: "a0000000-0000-4000-8003-000000000003",
   coachingFormV1Id: "a0000000-0000-4000-8003-000000000004",
+  bcHockeyFacilitiesFormV1Id: "a0000000-0000-4000-8003-000000000005",
+  bcHockeySafetyFormV1Id: "a0000000-0000-4000-8003-000000000006",
 
   // Reporting Cycles (RFC 4122 compliant UUIDs)
   fy2425CycleId: "a0000000-0000-4000-8004-000000000001",
@@ -165,6 +197,9 @@ const IDS = {
   annualTask2Id: "a0000000-0000-4000-8005-000000000002",
   annualTask3Id: "a0000000-0000-4000-8005-000000000003",
   quarterlyTask1Id: "a0000000-0000-4000-8005-000000000004",
+  annualTask4Id: "a0000000-0000-4000-8005-000000000005",
+  annualTask5Id: "a0000000-0000-4000-8005-000000000006",
+  quarterlyTask2Id: "a0000000-0000-4000-8005-000000000007",
 
   // Policy Documents (RFC 4122 compliant UUIDs)
   privacyPolicyId: "a0000000-0000-4000-8006-000000000001",
@@ -173,6 +208,11 @@ const IDS = {
   // Form Submissions (RFC 4122 compliant UUIDs)
   annualStatsSubmissionId: "a0000000-0000-4000-8007-000000000001",
   quarterlyFinSubmissionId: "a0000000-0000-4000-8007-000000000002",
+  bcHockeyDraftSubmissionId: "a0000000-0000-4000-8007-000000000003",
+  bcHockeyChangesRequestedSubmissionId: "a0000000-0000-4000-8007-000000000004",
+  bcHockeyUnderReviewSubmissionId: "a0000000-0000-4000-8007-000000000005",
+  bcHockeyApprovedSubmissionId: "a0000000-0000-4000-8007-000000000006",
+  bcHockeyRejectedSubmissionId: "a0000000-0000-4000-8007-000000000007",
 
   // Submission Files (RFC 4122 compliant UUIDs)
   quarterlyFinFileId: "a0000000-0000-4000-8008-000000000001",
@@ -196,6 +236,111 @@ const IDS = {
   // Notifications (RFC 4122 compliant UUIDs)
   notificationId1: "a0000000-0000-4000-8013-000000000001",
   notificationId2: "a0000000-0000-4000-8013-000000000002",
+
+  // Organization Join Requests (RFC 4122 compliant UUIDs)
+  joinRequestPendingId: "a0000000-0000-4000-8014-000000000001",
+  joinRequestApprovedId: "a0000000-0000-4000-8014-000000000002",
+  joinRequestDeniedId: "a0000000-0000-4000-8014-000000000003",
+
+  // Delegated Access (RFC 4122 compliant UUIDs)
+  delegatedAccessId1: "a0000000-0000-4000-8014-000000000004",
+
+  // Organization Invite Links (RFC 4122 compliant UUIDs)
+  inviteLinkAutoApproveId: "a0000000-0000-4000-8015-000000000001",
+  inviteLinkApprovalId: "a0000000-0000-4000-8015-000000000002",
+  inviteLinkExpiredId: "a0000000-0000-4000-8015-000000000003",
+
+  // Invite Link Uses (RFC 4122 compliant UUIDs)
+  inviteLinkUseId1: "a0000000-0000-4000-8016-000000000001",
+
+  // Import Jobs (RFC 4122 compliant UUIDs)
+  importJobPendingId: "a0000000-0000-4000-8017-000000000001",
+  importJobValidatingId: "a0000000-0000-4000-8017-000000000002",
+  importJobFailedId: "a0000000-0000-4000-8017-000000000003",
+  importJobCompletedId: "a0000000-0000-4000-8017-000000000004",
+  importJobRolledBackId: "a0000000-0000-4000-8017-000000000005",
+
+  // Import Job Errors (RFC 4122 compliant UUIDs)
+  importJobErrorId1: "a0000000-0000-4000-8018-000000000001",
+  importJobErrorId2: "a0000000-0000-4000-8018-000000000002",
+
+  // Notification Preferences (RFC 4122 compliant UUIDs)
+  notificationPrefReportingId: "a0000000-0000-4000-8019-000000000001",
+  notificationPrefSecurityId: "a0000000-0000-4000-8019-000000000002",
+  notificationPrefSupportId: "a0000000-0000-4000-8019-000000000003",
+  notificationPrefSystemId: "a0000000-0000-4000-8019-000000000004",
+
+  // Scheduled Notifications (RFC 4122 compliant UUIDs)
+  scheduledNotificationId1: "a0000000-0000-4000-8020-000000000001",
+  scheduledNotificationId2: "a0000000-0000-4000-8020-000000000002",
+
+  // Data Catalog Entries (RFC 4122 compliant UUIDs)
+  dataCatalogEntryId1: "a0000000-0000-4000-8021-000000000001",
+  dataCatalogEntryId2: "a0000000-0000-4000-8021-000000000002",
+  dataCatalogEntryId3: "a0000000-0000-4000-8021-000000000003",
+
+  // Data Quality Runs (RFC 4122 compliant UUIDs)
+  dataQualityRunId1: "a0000000-0000-4000-8022-000000000001",
+  dataQualityRunId2: "a0000000-0000-4000-8022-000000000002",
+
+  // Security Events (RFC 4122 compliant UUIDs)
+  securityEventId1: "a0000000-0000-4000-8023-000000000001",
+  securityEventId2: "a0000000-0000-4000-8023-000000000002",
+
+  // Account Locks (RFC 4122 compliant UUIDs)
+  accountLockId1: "a0000000-0000-4000-8024-000000000001",
+  accountLockId2: "a0000000-0000-4000-8024-000000000002",
+
+  // Privacy Requests (RFC 4122 compliant UUIDs)
+  privacyRequestId1: "a0000000-0000-4000-8025-000000000001",
+  privacyRequestId2: "a0000000-0000-4000-8025-000000000002",
+  privacyRequestId3: "a0000000-0000-4000-8025-000000000003",
+  privacyRequestId4: "a0000000-0000-4000-8025-000000000004",
+
+  // Legal Holds (RFC 4122 compliant UUIDs)
+  legalHoldId1: "a0000000-0000-4000-8026-000000000001",
+  legalHoldId2: "a0000000-0000-4000-8026-000000000002",
+
+  // Form Submission Versions (RFC 4122 compliant UUIDs)
+  submissionVersionId1: "a0000000-0000-4000-8027-000000000001",
+  submissionVersionId2: "a0000000-0000-4000-8027-000000000002",
+
+  // Reporting Submissions (RFC 4122 compliant UUIDs)
+  reportingSubmissionAnnualId: "a0000000-0000-4000-8028-000000000001",
+  reportingSubmissionQuarterlyId: "a0000000-0000-4000-8028-000000000002",
+  reportingSubmissionChangesRequestedId: "a0000000-0000-4000-8028-000000000003",
+  reportingSubmissionOverdueId: "a0000000-0000-4000-8028-000000000004",
+  reportingSubmissionUnderReviewId: "a0000000-0000-4000-8028-000000000005",
+
+  // Reporting Submission History (RFC 4122 compliant UUIDs)
+  reportingHistoryId1: "a0000000-0000-4000-8029-000000000001",
+  reportingHistoryId2: "a0000000-0000-4000-8029-000000000002",
+
+  // BI Dashboards (RFC 4122 compliant UUIDs)
+  biDashboardId1: "a0000000-0000-4000-8030-000000000001",
+  biDashboardId2: "a0000000-0000-4000-8030-000000000002",
+
+  // BI Dashboard Widgets (RFC 4122 compliant UUIDs)
+  biWidgetId1: "a0000000-0000-4000-8031-000000000001",
+  biWidgetId2: "a0000000-0000-4000-8031-000000000002",
+  biWidgetId3: "a0000000-0000-4000-8031-000000000003",
+
+  // BI Query Logs (RFC 4122 compliant UUIDs)
+  biQueryLogId1: "a0000000-0000-4000-8032-000000000001",
+  biQueryLogId2: "a0000000-0000-4000-8032-000000000002",
+  biQueryLogId3: "a0000000-0000-4000-8032-000000000003",
+
+  // Tutorial Progress (RFC 4122 compliant UUIDs)
+  tutorialCompletionId1: "a0000000-0000-4000-8033-000000000001",
+  tutorialCompletionId2: "a0000000-0000-4000-8033-000000000002",
+
+  // Policy Acceptances (RFC 4122 compliant UUIDs)
+  policyAcceptanceId1: "a0000000-0000-4000-8034-000000000001",
+  policyAcceptanceId2: "a0000000-0000-4000-8034-000000000002",
+
+  // Audit Logs (RFC 4122 compliant UUIDs)
+  auditLogId1: "a0000000-0000-4000-8035-000000000001",
+  auditLogId2: "a0000000-0000-4000-8035-000000000002",
 } as const;
 
 /**
@@ -209,6 +354,62 @@ async function encryptBackupCodes(codes: string[], secretKey: string): Promise<s
   });
   return encrypted;
 }
+
+const stableStringify = (value: unknown): string => {
+  if (value === null || value === undefined) {
+    return JSON.stringify(value);
+  }
+
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  }
+
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, val]) => `"${key}":${stableStringify(val)}`);
+    return `{${entries.join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+};
+
+const hashValue = (value: unknown): string =>
+  createHash("sha256").update(stableStringify(value)).digest("hex");
+
+const hashQuery = (query: JsonRecord | string): string =>
+  createHash("sha256")
+    .update(typeof query === "string" ? query : JSON.stringify(query))
+    .digest("hex");
+
+const computeBiChecksum = (params: {
+  id: string;
+  userId: string;
+  organizationId: string | null;
+  queryType: "pivot" | "sql" | "export";
+  queryHash: string;
+  rowsReturned: number;
+  executionTimeMs: number;
+  previousLogId: string | null;
+  createdAt: Date;
+  previousChecksum: string | null;
+  secret: string;
+}): string => {
+  const payload = JSON.stringify({
+    id: params.id,
+    userId: params.userId,
+    organizationId: params.organizationId,
+    queryType: params.queryType,
+    queryHash: params.queryHash,
+    rowsReturned: params.rowsReturned,
+    executionTimeMs: params.executionTimeMs,
+    previousLogId: params.previousLogId,
+    createdAt: params.createdAt.toISOString(),
+    previousChecksum: params.previousChecksum ?? "",
+  });
+
+  return createHmac("sha256", params.secret).update(payload).digest("hex");
+};
 
 async function seed() {
   console.log("🌱 Seeding viaSport SIN test data...");
@@ -254,24 +455,44 @@ async function seed() {
     await db.execute(sql`UPDATE organizations SET parent_org_id = NULL`);
 
     // Now delete in correct order for FK constraints
+    await db.delete(biDashboardWidgets);
+    await db.delete(biDashboards);
+    await db.delete(biQueryLog);
+    await db.delete(dataCatalogEntries);
+    await db.delete(dataQualityRuns);
+    await db.delete(accountLocks);
+    await db.delete(securityEvents);
+    await db.delete(legalHolds);
+    await db.delete(privacyRequests);
+    await db.delete(notificationEmailDeliveries);
+    await db.delete(notificationPreferences);
+    await db.delete(notifications);
+    await db.delete(scheduledNotifications);
+    await db.delete(notificationTemplates);
+    await db.delete(organizationInviteLinkUses);
+    await db.delete(organizationInviteLinks);
+    await db.delete(organizationJoinRequests);
+    await db.delete(reportingSubmissionHistory);
     await db.delete(reportingSubmissions);
     await db.delete(reportingTasks);
     await db.delete(reportingCycles);
     await db.delete(submissionFiles);
+    await db.delete(formSubmissionVersions);
     await db.delete(formSubmissions);
+    await db.delete(importJobErrors);
+    await db.delete(importJobs);
     await db.delete(importMappingTemplates);
     await db.delete(formVersions);
     await db.delete(forms);
     await db.delete(savedReports);
     await db.delete(supportRequests);
     await db.delete(templates);
-    await db.delete(notifications);
     await db.delete(delegatedAccess);
     await db.delete(organizationMembers);
     await db.delete(retentionPolicies);
     await db.delete(userPolicyAcceptances);
     await db.delete(policyDocuments);
-    await db.delete(notificationTemplates);
+    await db.delete(tutorialCompletions);
     await db.delete(userRoles);
 
     // Delete twoFactor records for test users
@@ -374,6 +595,7 @@ async function seed() {
         email: "member@example.com",
         name: "Regular Member",
         roleId: null,
+        profileComplete: false,
       },
     ];
 
@@ -382,6 +604,7 @@ async function seed() {
         userData.roleId === "solstice-admin" || userData.roleId === "viasport-admin";
 
       const now = new Date();
+      const profileComplete = userData.profileComplete ?? true;
       await db
         .insert(user)
         .values({
@@ -389,7 +612,7 @@ async function seed() {
           email: userData.email,
           name: userData.name,
           emailVerified: true,
-          profileComplete: true,
+          profileComplete,
           profileVersion: 1,
           createdAt: now,
           updatedAt: now,
@@ -401,7 +624,7 @@ async function seed() {
             email: userData.email,
             name: userData.name,
             emailVerified: true,
-            profileComplete: true,
+            profileComplete,
             profileVersion: 1,
             mfaRequired: isGlobalAdmin,
             updatedAt: now,
@@ -499,6 +722,8 @@ async function seed() {
       type: "governing_body" | "pso" | "league" | "club" | "affiliate";
       parentOrgId?: string;
       status?: "pending" | "active" | "suspended" | "archived";
+      isDiscoverable?: boolean;
+      joinRequestsEnabled?: boolean;
       settings?: JsonRecord;
       metadata?: JsonRecord;
     }) => {
@@ -507,6 +732,8 @@ async function seed() {
       const metadata: JsonRecord = data.metadata ?? {};
       const status = data.status ?? "active";
       const parentOrgId = data.parentOrgId ?? null;
+      const isDiscoverable = data.isDiscoverable ?? false;
+      const joinRequestsEnabled = data.joinRequestsEnabled ?? false;
 
       await db
         .insert(organizations)
@@ -517,6 +744,8 @@ async function seed() {
           type: data.type,
           parentOrgId,
           status,
+          isDiscoverable,
+          joinRequestsEnabled,
           settings,
           metadata,
           createdAt: now,
@@ -530,6 +759,8 @@ async function seed() {
             type: data.type,
             parentOrgId,
             status,
+            isDiscoverable,
+            joinRequestsEnabled,
             settings,
             metadata,
             updatedAt: now,
@@ -544,6 +775,8 @@ async function seed() {
       slug: "viasport-bc",
       type: "governing_body",
       status: "active",
+      isDiscoverable: false,
+      joinRequestsEnabled: false,
       settings: { fiscalYearEnd: "03-31" },
       metadata: { established: 2010 },
     });
@@ -551,9 +784,45 @@ async function seed() {
 
     // PSOs under viaSport
     const psos = [
-      { id: IDS.bcHockeyId, name: "BC Hockey", slug: "bc-hockey" },
-      { id: IDS.bcSoccerId, name: "BC Soccer", slug: "bc-soccer" },
-      { id: IDS.bcAthleticsId, name: "BC Athletics", slug: "bc-athletics" },
+      {
+        id: IDS.bcHockeyId,
+        name: "BC Hockey",
+        slug: "bc-hockey",
+        isDiscoverable: true,
+        joinRequestsEnabled: true,
+        metadata: {
+          reporting: {
+            fiscalYearStart: "2024-04-01",
+            fiscalYearEnd: "2025-03-31",
+            reportingPeriodStart: "2024-04-01",
+            reportingPeriodEnd: "2024-09-30",
+            agreementId: "VS-BC-2024-001",
+            agreementName: "viaSport Annual Grant",
+            agreementStart: "2024-04-01",
+            agreementEnd: "2025-03-31",
+            nccpStatus: "Active",
+            nccpNumber: "NCCP-BC-1234",
+            primaryContactName: "Jordan Lee",
+            primaryContactEmail: "jordan.lee@bchockey.ca",
+            primaryContactPhone: "604-555-0199",
+            reportingFrequency: "Annual",
+          },
+        },
+      },
+      {
+        id: IDS.bcSoccerId,
+        name: "BC Soccer",
+        slug: "bc-soccer",
+        isDiscoverable: true,
+        joinRequestsEnabled: false,
+      },
+      {
+        id: IDS.bcAthleticsId,
+        name: "BC Athletics",
+        slug: "bc-athletics",
+        isDiscoverable: false,
+        joinRequestsEnabled: false,
+      },
     ];
 
     for (const pso of psos) {
@@ -563,7 +832,6 @@ async function seed() {
         parentOrgId: IDS.viasportBcId,
         status: "active",
         settings: {},
-        metadata: {},
       });
       console.log(`   ✓ ${pso.name} (pso)`);
     }
@@ -605,6 +873,8 @@ async function seed() {
         name: "North Shore Winter Club",
         slug: "north-shore-winter",
         parentId: IDS.vanMinorHockeyId,
+        isDiscoverable: true,
+        joinRequestsEnabled: true,
       },
       {
         id: IDS.victoriaHockeyId,
@@ -674,9 +944,113 @@ async function seed() {
     console.log(`   ✓ Created ${memberships.length} organization memberships\n`);
 
     // ========================================
-    // PHASE 6: Create forms
+    // PHASE 6: Seed organization access data
     // ========================================
-    console.log("Phase 6: Creating forms...");
+    console.log("Phase 6: Seeding organization access data...");
+
+    const inviteTokens = {
+      autoApprove: "sin-invite-auto-approve-001",
+      approvalRequired: "sin-invite-approval-001",
+      expired: "sin-invite-expired-001",
+    };
+
+    await db.insert(organizationJoinRequests).values([
+      {
+        id: IDS.joinRequestPendingId,
+        organizationId: IDS.bcHockeyId,
+        userId: IDS.memberId,
+        status: "pending",
+        requestedRole: "member",
+        message: "Interested in joining the organization.",
+      },
+      {
+        id: IDS.joinRequestApprovedId,
+        organizationId: IDS.bcHockeyId,
+        userId: IDS.clubReporterId,
+        status: "approved",
+        requestedRole: "reporter",
+        message: "Requesting reporter access for data submissions.",
+        resolvedBy: IDS.viasportStaffId,
+        resolvedAt: new Date(),
+        resolutionNotes: "Approved for upcoming reporting cycle.",
+      },
+      {
+        id: IDS.joinRequestDeniedId,
+        organizationId: IDS.bcSoccerId,
+        userId: IDS.memberId,
+        status: "denied",
+        requestedRole: "viewer",
+        message: "Looking for view-only access.",
+        resolvedBy: IDS.viasportStaffId,
+        resolvedAt: new Date(),
+        resolutionNotes: "Denied - organization access restricted.",
+      },
+    ]);
+
+    await db.insert(organizationInviteLinks).values([
+      {
+        id: IDS.inviteLinkAutoApproveId,
+        organizationId: IDS.bcHockeyId,
+        token: inviteTokens.autoApprove,
+        role: "member",
+        autoApprove: true,
+        maxUses: 5,
+        useCount: 1,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+        createdBy: IDS.viasportStaffId,
+      },
+      {
+        id: IDS.inviteLinkApprovalId,
+        organizationId: IDS.bcHockeyId,
+        token: inviteTokens.approvalRequired,
+        role: "reporter",
+        autoApprove: false,
+        maxUses: null,
+        useCount: 0,
+        expiresAt: null,
+        createdBy: IDS.viasportStaffId,
+      },
+      {
+        id: IDS.inviteLinkExpiredId,
+        organizationId: IDS.bcSoccerId,
+        token: inviteTokens.expired,
+        role: "viewer",
+        autoApprove: true,
+        maxUses: 3,
+        useCount: 0,
+        expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+        createdBy: IDS.viasportStaffId,
+      },
+    ]);
+
+    await db.insert(organizationInviteLinkUses).values([
+      {
+        id: IDS.inviteLinkUseId1,
+        linkId: IDS.inviteLinkAutoApproveId,
+        userId: IDS.clubReporterId,
+        usedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+      },
+    ]);
+
+    await db.insert(delegatedAccess).values([
+      {
+        id: IDS.delegatedAccessId1,
+        delegateUserId: IDS.clubReporterId,
+        organizationId: IDS.bcHockeyId,
+        scope: "analytics",
+        grantedBy: IDS.viasportStaffId,
+        grantedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 90),
+        notes: "Delegated analytics access for reporting support.",
+      },
+    ]);
+
+    console.log("   ✓ Seeded join requests, invite links, and delegated access\n");
+
+    // ========================================
+    // PHASE 7: Create forms
+    // ========================================
+    console.log("Phase 7: Creating forms...");
 
     const formsData = [
       {
@@ -887,11 +1261,94 @@ async function seed() {
           settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
         },
       },
+      {
+        id: IDS.bcHockeyFacilitiesFormId,
+        versionId: IDS.bcHockeyFacilitiesFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        name: "Facility Usage Survey",
+        slug: "facility-usage",
+        description: "Facility usage and access tracking for BC Hockey programs",
+        status: "published" as const,
+        definition: {
+          fields: [
+            {
+              key: "primary_venue",
+              type: "text",
+              label: "Primary Venue",
+              required: true,
+            },
+            {
+              key: "secondary_venue",
+              type: "text",
+              label: "Secondary Venue",
+              required: false,
+            },
+            {
+              key: "weekly_ice_hours",
+              type: "number",
+              label: "Weekly Ice Hours",
+              required: true,
+            },
+            {
+              key: "season_length_weeks",
+              type: "number",
+              label: "Season Length (weeks)",
+              required: true,
+            },
+            {
+              key: "facility_notes",
+              type: "textarea",
+              label: "Facility Notes",
+              required: false,
+            },
+          ],
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
+        },
+      },
+      {
+        id: IDS.bcHockeySafetyFormId,
+        versionId: IDS.bcHockeySafetyFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        name: "Safety Compliance Checklist",
+        slug: "safety-compliance",
+        description: "Track safety protocols and compliance requirements",
+        status: "published" as const,
+        definition: {
+          fields: [
+            {
+              key: "concussion_protocol",
+              type: "checkbox",
+              label: "Concussion protocol is in place",
+              required: true,
+            },
+            {
+              key: "first_aid_certified",
+              type: "checkbox",
+              label: "Staff have current first aid certification",
+              required: true,
+            },
+            {
+              key: "emergency_plan_reviewed",
+              type: "checkbox",
+              label: "Emergency action plan reviewed",
+              required: true,
+            },
+            {
+              key: "safety_notes",
+              type: "textarea",
+              label: "Safety Notes",
+              required: false,
+            },
+          ],
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
+        },
+      },
     ];
 
     for (const form of formsData) {
       await db.insert(forms).values({
         id: form.id,
+        organizationId: form.organizationId ?? null,
         name: form.name,
         slug: form.slug,
         description: form.description,
@@ -913,9 +1370,9 @@ async function seed() {
     console.log("");
 
     // ========================================
-    // PHASE 7: Create reporting cycles
+    // PHASE 8: Create reporting cycles
     // ========================================
-    console.log("Phase 7: Creating reporting cycles...");
+    console.log("Phase 8: Creating reporting cycles...");
 
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -952,12 +1409,17 @@ async function seed() {
     console.log("   ✓ Created 3 reporting cycles\n");
 
     // ========================================
-    // PHASE 8: Create reporting tasks
+    // PHASE 9: Create reporting tasks
     // ========================================
-    console.log("Phase 8: Creating reporting tasks...");
+    console.log("Phase 9: Creating reporting tasks...");
 
+    const formatDateOnly = (date: Date) => date.toISOString().slice(0, 10);
     const dueDateAnnual = new Date(currentYear + 1, 3, 30); // April 30 next year
     const dueDateQuarterly = new Date(currentYear, 4, 15); // May 15 this year
+    const dueSoon = new Date();
+    dueSoon.setDate(dueSoon.getDate() + 10);
+    const overdueDate = new Date();
+    overdueDate.setDate(overdueDate.getDate() - 10);
 
     await db.insert(reportingTasks).values([
       {
@@ -967,7 +1429,7 @@ async function seed() {
         organizationType: "pso",
         title: "Annual Statistics Report - PSOs",
         description: "All PSOs must submit annual participant statistics",
-        dueDate: dueDateAnnual.toISOString().slice(0, 10),
+        dueDate: formatDateOnly(dueDateAnnual),
         reminderConfig: { daysBeforeDue: [30, 14, 7, 1] },
       },
       {
@@ -977,7 +1439,7 @@ async function seed() {
         organizationType: "pso",
         title: "Coaching Certification Report - PSOs",
         description: "Annual coaching certification data",
-        dueDate: dueDateAnnual.toISOString().slice(0, 10),
+        dueDate: formatDateOnly(dueDateAnnual),
         reminderConfig: { daysBeforeDue: [30, 14, 7] },
       },
       {
@@ -987,7 +1449,7 @@ async function seed() {
         organizationId: IDS.bcHockeyId,
         title: "Annual Financial Summary - BC Hockey",
         description: "Year-end financial summary for BC Hockey",
-        dueDate: dueDateAnnual.toISOString().slice(0, 10),
+        dueDate: formatDateOnly(dueDateAnnual),
         reminderConfig: { daysBeforeDue: [30, 14, 7, 1] },
       },
       {
@@ -997,21 +1459,57 @@ async function seed() {
         organizationType: "pso",
         title: "Q1 Financial Report - All PSOs",
         description: "Quarterly financial summary",
-        dueDate: dueDateQuarterly.toISOString().slice(0, 10),
+        dueDate: formatDateOnly(dueDateQuarterly),
         reminderConfig: { daysBeforeDue: [14, 7, 1] },
       },
+      {
+        id: IDS.annualTask4Id,
+        cycleId: IDS.fy2425CycleId,
+        formId: IDS.bcHockeyFacilitiesFormId,
+        organizationId: IDS.bcHockeyId,
+        title: "Facility Usage Survey - BC Hockey",
+        description: "Facility usage survey for the current season",
+        dueDate: formatDateOnly(dueSoon),
+        reminderConfig: { daysBeforeDue: [7, 3, 1] },
+      },
+      {
+        id: IDS.annualTask5Id,
+        cycleId: IDS.fy2425CycleId,
+        formId: IDS.bcHockeySafetyFormId,
+        organizationId: IDS.bcHockeyId,
+        title: "Safety Compliance Checklist - BC Hockey",
+        description: "Annual safety compliance and protocol checklist",
+        dueDate: formatDateOnly(overdueDate),
+        reminderConfig: { daysBeforeDue: [7, 1] },
+      },
+      {
+        id: IDS.quarterlyTask2Id,
+        cycleId: IDS.q12025CycleId,
+        formId: IDS.quarterlyFinFormId,
+        organizationId: IDS.bcHockeyId,
+        title: "Q2 Financial Check-in - BC Hockey",
+        description: "Mid-season financial check-in",
+        dueDate: formatDateOnly(dueSoon),
+        reminderConfig: { daysBeforeDue: [14, 7] },
+      },
     ]);
-    console.log("   ✓ Created 4 reporting tasks\n");
+    console.log("   ✓ Created 7 reporting tasks\n");
 
     // ========================================
-    // PHASE 9: Create sample submissions
+    // PHASE 10: Create sample submissions
     // ========================================
-    console.log("Phase 9: Creating sample form submissions...");
+    console.log("Phase 10: Creating sample form submissions...");
 
-    // Create a submission for BC Hockey
-    const bcHockeySubmissionId = IDS.annualStatsSubmissionId;
+    const submittedAtAnnual = new Date(Date.now() - 1000 * 60 * 60 * 24 * 20);
+    const submittedAtQuarterly = new Date(Date.now() - 1000 * 60 * 60 * 24 * 12);
+    const submittedAtChangesRequested = new Date(Date.now() - 1000 * 60 * 60 * 24 * 8);
+    const submittedAtUnderReview = new Date(Date.now() - 1000 * 60 * 60 * 24 * 4);
+    const reviewedAtQuarterly = new Date(Date.now() - 1000 * 60 * 60 * 24 * 7);
+    const reviewedAtChangesRequested = new Date(Date.now() - 1000 * 60 * 60 * 24 * 2);
+
+    // Annual stats submission
     await db.insert(formSubmissions).values({
-      id: bcHockeySubmissionId,
+      id: IDS.annualStatsSubmissionId,
       formId: IDS.annualStatsFormId,
       formVersionId: IDS.annualStatsFormV1Id,
       organizationId: IDS.bcHockeyId,
@@ -1029,19 +1527,10 @@ async function seed() {
         notes: "Growth of 8% in female participation this year.",
       },
       completenessScore: 100,
-      submittedAt: new Date(),
+      submittedAt: submittedAtAnnual,
     });
 
-    await db.insert(reportingSubmissions).values({
-      taskId: IDS.annualTask1Id,
-      organizationId: IDS.bcHockeyId,
-      formSubmissionId: bcHockeySubmissionId,
-      status: "submitted",
-      submittedAt: new Date(),
-      submittedBy: IDS.psoAdminId,
-    });
-    console.log("   ✓ BC Hockey annual stats (submitted)");
-
+    // Quarterly financial submission (with optional file)
     const supportingDocs = await uploadSeedArtifact({
       key: `submissions/${IDS.quarterlyFinSubmissionId}/supporting-docs.csv`,
       body: "category,amount,currency\nFacility rentals,12450,CAD\nEquipment,7320,CAD\n",
@@ -1082,7 +1571,7 @@ async function seed() {
       status: "submitted",
       payload: quarterlyPayload,
       completenessScore: 100,
-      submittedAt: new Date(),
+      submittedAt: submittedAtQuarterly,
     });
 
     if (supportingDocs) {
@@ -1099,20 +1588,326 @@ async function seed() {
       });
     }
 
-    await db.insert(reportingSubmissions).values({
-      taskId: IDS.quarterlyTask1Id,
-      organizationId: IDS.bcHockeyId,
-      formSubmissionId: IDS.quarterlyFinSubmissionId,
-      status: "submitted",
-      submittedAt: new Date(),
-      submittedBy: IDS.psoAdminId,
-    });
-    console.log("   ✓ BC Hockey quarterly financials (submitted)\n");
+    // Additional form submissions for varied statuses
+    await db.insert(formSubmissions).values([
+      {
+        id: IDS.bcHockeyDraftSubmissionId,
+        formId: IDS.bcHockeyFacilitiesFormId,
+        formVersionId: IDS.bcHockeyFacilitiesFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        submitterId: IDS.psoAdminId,
+        status: "draft",
+        payload: {
+          primary_venue: "North Shore Arena",
+          secondary_venue: "Burnaby Ice Center",
+          weekly_ice_hours: 96,
+          season_length_weeks: 30,
+          facility_notes: "Draft response - pending review.",
+        },
+        completenessScore: 65,
+      },
+      {
+        id: IDS.bcHockeyChangesRequestedSubmissionId,
+        formId: IDS.bcHockeyFacilitiesFormId,
+        formVersionId: IDS.bcHockeyFacilitiesFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        submitterId: IDS.psoAdminId,
+        status: "changes_requested",
+        payload: {
+          primary_venue: "North Shore Arena",
+          secondary_venue: "Burnaby Ice Center",
+          weekly_ice_hours: 80,
+          season_length_weeks: 28,
+          facility_notes: "Updated after preliminary review.",
+        },
+        completenessScore: 85,
+        submittedAt: submittedAtChangesRequested,
+        reviewedAt: reviewedAtChangesRequested,
+        reviewedBy: IDS.viasportStaffId,
+        reviewNotes: "Please confirm weekly ice hours and venue details.",
+      },
+      {
+        id: IDS.bcHockeyUnderReviewSubmissionId,
+        formId: IDS.quarterlyFinFormId,
+        formVersionId: IDS.quarterlyFinFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        submitterId: IDS.psoAdminId,
+        status: "under_review",
+        payload: {
+          revenue_grants: 52000,
+          revenue_fees: 22800,
+          revenue_events: 4100,
+          revenue_other: 900,
+          expenses_programs: 34000,
+          expenses_admin: 9200,
+          expenses_facilities: 8300,
+          supporting_docs: null,
+        },
+        completenessScore: 92,
+        submittedAt: submittedAtUnderReview,
+      },
+      {
+        id: IDS.bcHockeyApprovedSubmissionId,
+        formId: IDS.bcHockeySafetyFormId,
+        formVersionId: IDS.bcHockeySafetyFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        submitterId: IDS.psoAdminId,
+        status: "approved",
+        payload: {
+          concussion_protocol: true,
+          first_aid_certified: true,
+          emergency_plan_reviewed: true,
+          safety_notes: "All staff certified for the season.",
+        },
+        completenessScore: 100,
+        submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 18),
+        reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15),
+        reviewedBy: IDS.viasportStaffId,
+      },
+      {
+        id: IDS.bcHockeyRejectedSubmissionId,
+        formId: IDS.bcHockeySafetyFormId,
+        formVersionId: IDS.bcHockeySafetyFormV1Id,
+        organizationId: IDS.bcHockeyId,
+        submitterId: IDS.psoAdminId,
+        status: "rejected",
+        payload: {
+          concussion_protocol: false,
+          first_aid_certified: false,
+          emergency_plan_reviewed: false,
+          safety_notes: "Missing updated certifications.",
+        },
+        completenessScore: 45,
+        submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+        reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 25),
+        reviewedBy: IDS.viasportStaffId,
+        reviewNotes: "Please provide updated certification evidence.",
+      },
+    ]);
+
+    await db.insert(formSubmissionVersions).values([
+      {
+        id: IDS.submissionVersionId1,
+        submissionId: IDS.bcHockeyChangesRequestedSubmissionId,
+        versionNumber: 1,
+        payloadSnapshot: {
+          primary_venue: "North Shore Arena",
+          secondary_venue: "Burnaby Ice Center",
+          weekly_ice_hours: 72,
+          season_length_weeks: 26,
+          facility_notes: "Initial submission.",
+        },
+        changedBy: IDS.psoAdminId,
+        changeReason: "Initial submission",
+      },
+      {
+        id: IDS.submissionVersionId2,
+        submissionId: IDS.bcHockeyChangesRequestedSubmissionId,
+        versionNumber: 2,
+        payloadSnapshot: {
+          primary_venue: "North Shore Arena",
+          secondary_venue: "Burnaby Ice Center",
+          weekly_ice_hours: 80,
+          season_length_weeks: 28,
+          facility_notes: "Adjusted after feedback.",
+        },
+        changedBy: IDS.psoAdminId,
+        changeReason: "Updated after reviewer feedback",
+      },
+    ]);
+
+    await db.insert(reportingSubmissions).values([
+      {
+        id: IDS.reportingSubmissionAnnualId,
+        taskId: IDS.annualTask1Id,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: IDS.annualStatsSubmissionId,
+        status: "submitted",
+        submittedAt: submittedAtAnnual,
+        submittedBy: IDS.psoAdminId,
+      },
+      {
+        id: IDS.reportingSubmissionQuarterlyId,
+        taskId: IDS.quarterlyTask1Id,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: IDS.quarterlyFinSubmissionId,
+        status: "approved",
+        submittedAt: submittedAtQuarterly,
+        submittedBy: IDS.psoAdminId,
+        reviewedAt: reviewedAtQuarterly,
+        reviewedBy: IDS.viasportStaffId,
+        reviewNotes: "Financials approved.",
+      },
+      {
+        id: IDS.reportingSubmissionChangesRequestedId,
+        taskId: IDS.annualTask4Id,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: IDS.bcHockeyChangesRequestedSubmissionId,
+        status: "changes_requested",
+        submittedAt: submittedAtChangesRequested,
+        submittedBy: IDS.psoAdminId,
+        reviewedAt: reviewedAtChangesRequested,
+        reviewedBy: IDS.viasportStaffId,
+        reviewNotes: "Clarify weekly ice hours and venue access.",
+      },
+      {
+        id: IDS.reportingSubmissionOverdueId,
+        taskId: IDS.annualTask5Id,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: null,
+        status: "overdue",
+      },
+      {
+        id: IDS.reportingSubmissionUnderReviewId,
+        taskId: IDS.quarterlyTask2Id,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: IDS.bcHockeyUnderReviewSubmissionId,
+        status: "under_review",
+        submittedAt: submittedAtUnderReview,
+        submittedBy: IDS.psoAdminId,
+      },
+    ]);
+
+    await db.insert(reportingSubmissionHistory).values([
+      {
+        id: IDS.reportingHistoryId1,
+        reportingSubmissionId: IDS.reportingSubmissionChangesRequestedId,
+        action: "submitted",
+        actorId: IDS.psoAdminId,
+        notes: "Submitted facility usage survey.",
+        formSubmissionVersionId: IDS.submissionVersionId1,
+      },
+      {
+        id: IDS.reportingHistoryId2,
+        reportingSubmissionId: IDS.reportingSubmissionChangesRequestedId,
+        action: "changes_requested",
+        actorId: IDS.viasportStaffId,
+        notes: "Requested updates to facility usage details.",
+        formSubmissionVersionId: IDS.submissionVersionId1,
+      },
+    ]);
+
+    console.log("   ✓ Created reporting and form submissions\n");
 
     // ========================================
-    // PHASE 10: Create import mapping templates
+    // PHASE 11: Create import jobs
     // ========================================
-    console.log("Phase 10: Creating import mapping templates...");
+    console.log("Phase 11: Creating import jobs...");
+
+    await db.insert(importJobs).values([
+      {
+        id: IDS.importJobPendingId,
+        organizationId: IDS.bcHockeyId,
+        type: "csv",
+        lane: "interactive",
+        sourceFileKey: "imports/bc-hockey/pending-upload.csv",
+        sourceFileHash: "seed-pending-hash",
+        sourceRowCount: 120,
+        targetFormId: IDS.annualStatsFormId,
+        mappingTemplateId: IDS.importTemplateId1,
+        status: "pending",
+        progressCheckpoint: 0,
+        stats: { rowsProcessed: 0 },
+        createdBy: IDS.psoAdminId,
+      },
+      {
+        id: IDS.importJobValidatingId,
+        organizationId: IDS.bcHockeyId,
+        type: "csv",
+        lane: "interactive",
+        sourceFileKey: "imports/bc-hockey/validating-upload.csv",
+        sourceFileHash: "seed-validating-hash",
+        sourceRowCount: 95,
+        targetFormId: IDS.annualStatsFormId,
+        mappingTemplateId: IDS.importTemplateId1,
+        status: "validating",
+        progressCheckpoint: 42,
+        stats: { rowsProcessed: 42 },
+        createdBy: IDS.psoAdminId,
+        startedAt: new Date(Date.now() - 1000 * 60 * 15),
+      },
+      {
+        id: IDS.importJobFailedId,
+        organizationId: IDS.bcHockeyId,
+        type: "csv",
+        lane: "batch",
+        sourceFileKey: "imports/bc-hockey/failed-upload.csv",
+        sourceFileHash: "seed-failed-hash",
+        sourceRowCount: 140,
+        targetFormId: IDS.annualStatsFormId,
+        mappingTemplateId: IDS.importTemplateId1,
+        status: "failed",
+        progressCheckpoint: 67,
+        stats: { rowsProcessed: 67, errors: 5 },
+        errorReportKey: "imports/errors/bc-hockey-failed.csv",
+        errorSummary: { missingFields: 3, invalidValues: 2 },
+        createdBy: IDS.psoAdminId,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      },
+      {
+        id: IDS.importJobCompletedId,
+        organizationId: IDS.bcHockeyId,
+        type: "csv",
+        lane: "interactive",
+        sourceFileKey: "imports/bc-hockey/completed-upload.csv",
+        sourceFileHash: "seed-completed-hash",
+        sourceRowCount: 210,
+        targetFormId: IDS.annualStatsFormId,
+        mappingTemplateId: IDS.importTemplateId1,
+        status: "completed",
+        progressCheckpoint: 210,
+        stats: { rowsProcessed: 210 },
+        createdBy: IDS.psoAdminId,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 23),
+      },
+      {
+        id: IDS.importJobRolledBackId,
+        organizationId: IDS.bcHockeyId,
+        type: "excel",
+        lane: "batch",
+        sourceFileKey: "imports/bc-hockey/rolled-back.xlsx",
+        sourceFileHash: "seed-rolledback-hash",
+        sourceRowCount: 60,
+        targetFormId: IDS.annualStatsFormId,
+        mappingTemplateId: IDS.importTemplateId1,
+        status: "rolled_back",
+        progressCheckpoint: 60,
+        stats: { rowsProcessed: 60 },
+        createdBy: IDS.psoAdminId,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 6),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
+      },
+    ]);
+
+    await db.insert(importJobErrors).values([
+      {
+        id: IDS.importJobErrorId1,
+        jobId: IDS.importJobFailedId,
+        rowNumber: 12,
+        fieldKey: "total_participants",
+        errorType: "required",
+        errorMessage: "Total Participants is required.",
+        rawValue: "",
+      },
+      {
+        id: IDS.importJobErrorId2,
+        jobId: IDS.importJobFailedId,
+        rowNumber: 24,
+        fieldKey: "male_participants",
+        errorType: "invalid",
+        errorMessage: "Value must be a number.",
+        rawValue: "N/A",
+      },
+    ]);
+
+    console.log("   ✓ Created import jobs and errors\n");
+
+    // ========================================
+    // PHASE 12: Create import mapping templates
+    // ========================================
+    console.log("Phase 12: Creating import mapping templates...");
 
     await db.insert(importMappingTemplates).values([
       {
@@ -1134,9 +1929,9 @@ async function seed() {
     console.log("   ✓ Created import mapping templates\n");
 
     // ========================================
-    // PHASE 11: Create saved reports
+    // PHASE 13: Create saved reports
     // ========================================
-    console.log("Phase 11: Creating saved reports...");
+    console.log("Phase 13: Creating saved reports...");
 
     await db.insert(savedReports).values({
       id: IDS.savedReportId1,
@@ -1153,9 +1948,9 @@ async function seed() {
     console.log("   ✓ Created saved reports\n");
 
     // ========================================
-    // PHASE 12: Create templates
+    // PHASE 14: Create templates
     // ========================================
-    console.log("Phase 12: Creating templates...");
+    console.log("Phase 14: Creating templates...");
 
     if (!artifactsBucket) {
       console.warn("   ⚠️  SIN_ARTIFACTS_BUCKET not set; skipping template uploads.");
@@ -1242,9 +2037,254 @@ async function seed() {
     }
 
     // ========================================
-    // PHASE 13: Create support requests + notifications
+    // PHASE 15: Create BI dashboards + query logs
     // ========================================
-    console.log("Phase 13: Creating support requests and notifications...");
+    console.log("Phase 15: Creating BI dashboards and query logs...");
+
+    const dashboardLayout: DashboardLayout = {
+      columns: 12,
+      rowHeight: 120,
+      compactType: "vertical",
+    };
+
+    const submissionStatusQuery: PivotQuery = {
+      datasetId: "reporting_submissions",
+      organizationId: IDS.bcHockeyId,
+      rows: ["status"],
+      columns: [],
+      measures: [{ field: "id", aggregation: "count", label: "Submissions" }],
+      filters: [],
+      limit: 1000,
+    };
+
+    const overdueKpiQuery: PivotQuery = {
+      datasetId: "reporting_submissions",
+      organizationId: IDS.bcHockeyId,
+      rows: [],
+      columns: [],
+      measures: [{ field: "id", aggregation: "count", label: "Overdue" }],
+      filters: [{ field: "status", operator: "eq", value: "overdue" }],
+      limit: 1000,
+    };
+
+    const submissionStatusPivotConfig: PivotConfig = {
+      rows: ["status"],
+      columns: [],
+      measures: [{ field: "id", aggregation: "count", label: "Submissions" }],
+    };
+
+    const submissionStatusWidgetConfig: WidgetConfig = {
+      title: "Submissions by status",
+      chartType: "bar",
+      query: submissionStatusQuery,
+    };
+
+    const overdueKpiWidgetConfig: WidgetConfig = {
+      title: "Overdue submissions",
+      subtitle: "Immediate attention",
+      query: overdueKpiQuery,
+    };
+
+    const sandboxWidgetConfig: WidgetConfig = {
+      title: "Sandbox notes",
+      textContent: "Draft space for upcoming analytics widgets.",
+    };
+
+    await db.insert(biDashboards).values([
+      {
+        id: IDS.biDashboardId1,
+        organizationId: IDS.bcHockeyId,
+        name: "BC Hockey Reporting Overview",
+        description: "Submission status and compliance snapshot",
+        layout: dashboardLayout,
+        globalFilters: [],
+        ownerId: IDS.viasportStaffId,
+        sharedWith: [IDS.psoAdminId],
+        isOrgWide: true,
+        isPublished: true,
+      },
+      {
+        id: IDS.biDashboardId2,
+        organizationId: null,
+        name: "Personal Analytics Sandbox",
+        description: "Scratchpad for draft widgets and notes",
+        layout: dashboardLayout,
+        globalFilters: [],
+        ownerId: IDS.viasportStaffId,
+        sharedWith: [],
+        isOrgWide: false,
+        isPublished: false,
+      },
+    ]);
+
+    await db.insert(biDashboardWidgets).values([
+      {
+        id: IDS.biWidgetId1,
+        dashboardId: IDS.biDashboardId1,
+        widgetType: "chart",
+        x: 0,
+        y: 0,
+        w: 6,
+        h: 4,
+        config: submissionStatusWidgetConfig,
+      },
+      {
+        id: IDS.biWidgetId2,
+        dashboardId: IDS.biDashboardId1,
+        widgetType: "kpi",
+        x: 6,
+        y: 0,
+        w: 3,
+        h: 2,
+        config: overdueKpiWidgetConfig,
+      },
+      {
+        id: IDS.biWidgetId3,
+        dashboardId: IDS.biDashboardId2,
+        widgetType: "text",
+        x: 0,
+        y: 0,
+        w: 6,
+        h: 2,
+        config: sandboxWidgetConfig,
+      },
+    ]);
+
+    const biLogBaseTime = new Date(Date.now() - 1000 * 60 * 60 * 8);
+    const biLogEntries = [
+      {
+        id: IDS.biQueryLogId1,
+        userId: IDS.viasportStaffId,
+        organizationId: IDS.bcHockeyId,
+        queryType: "pivot" as const,
+        queryHash: hashQuery(submissionStatusQuery),
+        datasetId: null,
+        sqlQuery: null,
+        parameters: null,
+        pivotConfig: submissionStatusPivotConfig,
+        rowsReturned: 6,
+        executionTimeMs: 184,
+        createdAt: new Date(biLogBaseTime.getTime() + 1000 * 60 * 5),
+      },
+      {
+        id: IDS.biQueryLogId2,
+        userId: IDS.viasportStaffId,
+        organizationId: IDS.bcHockeyId,
+        queryType: "sql" as const,
+        queryHash: hashQuery(
+          "SELECT status, COUNT(*) FROM reporting_submissions GROUP BY status;",
+        ),
+        datasetId: null,
+        sqlQuery: "SELECT status, COUNT(*) FROM reporting_submissions GROUP BY status;",
+        parameters: { organizationId: IDS.bcHockeyId },
+        pivotConfig: null,
+        rowsReturned: 6,
+        executionTimeMs: 92,
+        createdAt: new Date(biLogBaseTime.getTime() + 1000 * 60 * 18),
+      },
+      {
+        id: IDS.biQueryLogId3,
+        userId: IDS.viasportStaffId,
+        organizationId: IDS.bcHockeyId,
+        queryType: "export" as const,
+        queryHash: hashQuery(
+          "SELECT * FROM reporting_submissions WHERE organization_id = $1;",
+        ),
+        datasetId: null,
+        sqlQuery: "SELECT * FROM reporting_submissions WHERE organization_id = $1;",
+        parameters: { organizationId: IDS.bcHockeyId },
+        pivotConfig: null,
+        rowsReturned: 5,
+        executionTimeMs: 210,
+        createdAt: new Date(biLogBaseTime.getTime() + 1000 * 60 * 30),
+      },
+    ];
+
+    const biLogRows: Array<typeof biQueryLog.$inferInsert> = [];
+    let previousLogId: string | null = null;
+    let previousChecksum: string | null = null;
+
+    for (const entry of biLogEntries) {
+      const checksum: string | null = authSecret
+        ? computeBiChecksum({
+            id: entry.id,
+            userId: entry.userId,
+            organizationId: entry.organizationId,
+            queryType: entry.queryType,
+            queryHash: entry.queryHash,
+            rowsReturned: entry.rowsReturned,
+            executionTimeMs: entry.executionTimeMs,
+            previousLogId,
+            createdAt: entry.createdAt,
+            previousChecksum,
+            secret: authSecret,
+          })
+        : null;
+
+      biLogRows.push({
+        ...entry,
+        previousLogId,
+        checksum,
+      });
+
+      previousLogId = entry.id;
+      previousChecksum = checksum ?? previousChecksum;
+    }
+
+    await db.insert(biQueryLog).values(biLogRows);
+
+    console.log("   ✓ Created BI dashboards, widgets, and query logs\n");
+
+    // ========================================
+    // PHASE 16: Create data catalog entries
+    // ========================================
+    console.log("Phase 16: Creating data catalog entries...");
+
+    await db.insert(dataCatalogEntries).values([
+      {
+        id: IDS.dataCatalogEntryId1,
+        organizationId: null,
+        sourceType: "form",
+        sourceId: IDS.annualStatsFormId,
+        title: "Annual Statistics Report",
+        description: "Annual participant and activity statistics for PSOs",
+        tags: ["form", "reporting"],
+        metadata: { slug: "annual-stats", status: "published" },
+        sourceUpdatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
+        createdBy: IDS.viasportStaffId,
+      },
+      {
+        id: IDS.dataCatalogEntryId2,
+        organizationId: IDS.bcHockeyId,
+        sourceType: "import_template",
+        sourceId: IDS.importTemplateId1,
+        title: "BC Hockey Annual Stats Mapping",
+        description: "Mapping template for annual stats submissions",
+        tags: ["import", "template"],
+        metadata: { targetFormId: IDS.annualStatsFormId },
+        sourceUpdatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8),
+        createdBy: IDS.viasportStaffId,
+      },
+      {
+        id: IDS.dataCatalogEntryId3,
+        organizationId: IDS.bcHockeyId,
+        sourceType: "saved_report",
+        sourceId: IDS.savedReportId1,
+        title: "BC Hockey Submission Health",
+        description: "Track completeness and submissions over time",
+        tags: ["report", "analytics"],
+        metadata: { dataSource: "form_submissions", isOrgWide: true },
+        sourceUpdatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+        createdBy: IDS.viasportStaffId,
+      },
+    ]);
+
+    console.log("   ✓ Created data catalog entries\n");
+
+    // ========================================
+    // PHASE 17: Create support requests + notifications
+    // ========================================
+    console.log("Phase 17: Creating support requests and notifications...");
 
     await db.insert(supportRequests).values([
       {
@@ -1295,9 +2335,9 @@ async function seed() {
     console.log("   ✓ Created support requests and notifications\n");
 
     // ========================================
-    // PHASE 14: Create notification templates
+    // PHASE 18: Create notification templates
     // ========================================
-    console.log("Phase 14: Creating notification templates...");
+    console.log("Phase 18: Creating notification templates...");
 
     await db.insert(notificationTemplates).values([
       {
@@ -1332,13 +2372,312 @@ async function seed() {
           "You have been added as a {{role}} for {{org_name}}. Log in to access your dashboard.",
         isSystem: true,
       },
+      {
+        key: "monthly_update",
+        category: "system",
+        subject: "viaSport SIN Monthly Update",
+        bodyTemplate:
+          "The latest SIN monthly update is ready for {{org_name}}. Visit the portal for details.",
+        isSystem: false,
+        createdBy: IDS.viasportStaffId,
+      },
     ]);
-    console.log("   ✓ Created 4 notification templates\n");
+    console.log("   ✓ Created 5 notification templates\n");
 
     // ========================================
-    // PHASE 15: Create policy documents
+    // PHASE 19: Create notification preferences + schedules
     // ========================================
-    console.log("Phase 15: Creating policy documents...");
+    console.log("Phase 19: Creating notification preferences and schedules...");
+
+    await db.insert(notificationPreferences).values([
+      {
+        id: IDS.notificationPrefReportingId,
+        userId: IDS.viasportStaffId,
+        category: "reporting",
+        channelEmail: true,
+        channelInApp: true,
+        emailFrequency: "daily_digest",
+      },
+      {
+        id: IDS.notificationPrefSecurityId,
+        userId: IDS.viasportStaffId,
+        category: "security",
+        channelEmail: true,
+        channelInApp: false,
+        emailFrequency: "immediate",
+      },
+      {
+        id: IDS.notificationPrefSupportId,
+        userId: IDS.viasportStaffId,
+        category: "support",
+        channelEmail: false,
+        channelInApp: true,
+        emailFrequency: "weekly_digest",
+      },
+      {
+        id: IDS.notificationPrefSystemId,
+        userId: IDS.viasportStaffId,
+        category: "system",
+        channelEmail: true,
+        channelInApp: true,
+        emailFrequency: "immediate",
+      },
+    ]);
+
+    const scheduledDueDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 10);
+    await db.insert(scheduledNotifications).values([
+      {
+        id: IDS.scheduledNotificationId1,
+        templateKey: "reporting_reminder",
+        userId: IDS.clubReporterId,
+        organizationId: IDS.bcHockeyId,
+        scheduledFor: new Date(Date.now() + 1000 * 60 * 60 * 6),
+        variables: {
+          task_name: "Facility Usage Survey",
+          days_remaining: 10,
+          due_date: formatDateOnly(scheduledDueDate),
+        },
+      },
+      {
+        id: IDS.scheduledNotificationId2,
+        templateKey: "changes_requested",
+        organizationId: IDS.bcHockeyId,
+        roleFilter: "reporter",
+        scheduledFor: new Date(Date.now() - 1000 * 60 * 60 * 4),
+        failedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        errorMessage: "Email service timeout",
+        retryCount: 2,
+        variables: {
+          task_name: "Facility Usage Survey",
+          review_notes: "Please confirm weekly ice hours and venue access.",
+        },
+      },
+    ]);
+
+    await db.insert(notificationEmailDeliveries).values([
+      {
+        notificationId: IDS.notificationId1,
+        userId: IDS.clubReporterId,
+        messageId: "seed-email-001",
+        sentAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      },
+    ]);
+
+    console.log("   ✓ Created notification preferences and schedules\n");
+
+    // ========================================
+    // PHASE 20: Create tutorial progress
+    // ========================================
+    console.log("Phase 20: Creating tutorial progress...");
+
+    await db.insert(tutorialCompletions).values([
+      {
+        id: IDS.tutorialCompletionId1,
+        userId: IDS.psoAdminId,
+        tutorialId: "onboarding",
+        status: "completed",
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 18),
+      },
+      {
+        id: IDS.tutorialCompletionId2,
+        userId: IDS.psoAdminId,
+        tutorialId: "data_upload",
+        status: "dismissed",
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12),
+        dismissedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 11),
+      },
+    ]);
+
+    console.log("   ✓ Created tutorial progress\n");
+
+    // ========================================
+    // PHASE 21: Create security events + account locks
+    // ========================================
+    console.log("Phase 21: Creating security events and account locks...");
+
+    await db.insert(securityEvents).values([
+      {
+        id: IDS.securityEventId1,
+        userId: IDS.viasportStaffId,
+        eventType: "mfa_challenge",
+        ipAddress: "203.0.113.10",
+        userAgent: "SeedScript/1.0",
+        geoCountry: "CA",
+        geoRegion: "BC",
+        riskScore: 12,
+        riskFactors: ["new_device"],
+        metadata: { method: "totp" },
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6),
+      },
+      {
+        id: IDS.securityEventId2,
+        userId: IDS.memberId,
+        eventType: "login_failed",
+        ipAddress: "198.51.100.23",
+        userAgent: "SeedScript/1.0",
+        geoCountry: "CA",
+        geoRegion: "BC",
+        riskScore: 72,
+        riskFactors: ["multiple_failures"],
+        metadata: { attempts: 5 },
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+      },
+    ]);
+
+    await db.insert(accountLocks).values([
+      {
+        id: IDS.accountLockId1,
+        userId: IDS.memberId,
+        reason: "Too many failed sign-in attempts",
+        lockedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        unlockAt: new Date(Date.now() + 1000 * 60 * 60 * 6),
+        metadata: { attempts: 6 },
+      },
+      {
+        id: IDS.accountLockId2,
+        userId: IDS.clubReporterId,
+        reason: "Manual security hold",
+        lockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+        unlockedBy: IDS.viasportStaffId,
+        unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+        unlockReason: "Identity verified",
+        metadata: { reasonCode: "manual_review" },
+      },
+    ]);
+
+    console.log("   ✓ Created security events and account locks\n");
+
+    // ========================================
+    // PHASE 22: Create data quality runs
+    // ========================================
+    console.log("Phase 22: Creating data quality runs...");
+
+    await db.insert(dataQualityRuns).values([
+      {
+        id: IDS.dataQualityRunId1,
+        status: "success",
+        summary: { checksRun: 12, warnings: 1, failures: 0 },
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 12),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 11),
+      },
+      {
+        id: IDS.dataQualityRunId2,
+        status: "failed",
+        summary: { checksRun: 12, warnings: 2, failures: 1 },
+        errorMessage: "Missing required fields in form submissions.",
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
+        completedAt: new Date(Date.now() - 1000 * 60 * 60 * 4),
+      },
+    ]);
+
+    console.log("   ✓ Created data quality run history\n");
+
+    // ========================================
+    // PHASE 23: Create audit log entries (if empty)
+    // ========================================
+    console.log("Phase 23: Creating audit log entries...");
+
+    const [{ count: auditCount }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(auditLogs);
+
+    if (Number(auditCount) === 0) {
+      const auditSeedEntries = [
+        {
+          id: IDS.auditLogId1,
+          action: "organization.update",
+          actionCategory: "ADMIN",
+          actorUserId: IDS.viasportStaffId,
+          actorOrgId: IDS.viasportBcId,
+          actorIp: "203.0.113.10",
+          actorUserAgent: "SeedScript/1.0",
+          targetType: "organization",
+          targetId: IDS.bcHockeyId,
+          targetOrgId: IDS.bcHockeyId,
+          changes: {
+            "metadata.reportingFrequency": { old: "Annual", new: "Quarterly" },
+          },
+          metadata: { source: "seed" },
+          requestId: "seed-audit-001",
+        },
+        {
+          id: IDS.auditLogId2,
+          action: "reporting.submission.review",
+          actionCategory: "DATA",
+          actorUserId: IDS.viasportStaffId,
+          actorOrgId: IDS.bcHockeyId,
+          actorIp: "203.0.113.10",
+          actorUserAgent: "SeedScript/1.0",
+          targetType: "reporting_submission",
+          targetId: IDS.reportingSubmissionQuarterlyId,
+          targetOrgId: IDS.bcHockeyId,
+          changes: { status: { old: "submitted", new: "approved" } },
+          metadata: { source: "seed" },
+          requestId: "seed-audit-002",
+        },
+      ];
+
+      const auditRows = [];
+      let previousAuditHash: string | null = null;
+      let auditTimestamp = new Date(Date.now() - 1000 * 60 * 60 * 2);
+
+      for (const entry of auditSeedEntries) {
+        const occurredAt = new Date(auditTimestamp.getTime());
+        const payload = {
+          id: entry.id,
+          occurredAt,
+          action: entry.action,
+          actionCategory: entry.actionCategory,
+          actorUserId: entry.actorUserId ?? null,
+          actorOrgId: entry.actorOrgId ?? null,
+          actorIp: entry.actorIp ?? null,
+          actorUserAgent: entry.actorUserAgent ?? null,
+          targetType: entry.targetType ?? null,
+          targetId: entry.targetId ?? null,
+          targetOrgId: entry.targetOrgId ?? null,
+          changes: entry.changes ?? null,
+          metadata: entry.metadata ?? {},
+          requestId: entry.requestId,
+          prevHash: previousAuditHash,
+        };
+
+        const entryHash = hashValue(payload);
+
+        auditRows.push({
+          id: entry.id,
+          occurredAt,
+          createdAt: occurredAt,
+          actorUserId: entry.actorUserId ?? null,
+          actorOrgId: entry.actorOrgId ?? null,
+          actorIp: entry.actorIp ?? null,
+          actorUserAgent: entry.actorUserAgent ?? null,
+          action: entry.action,
+          actionCategory: entry.actionCategory,
+          targetType: entry.targetType ?? null,
+          targetId: entry.targetId ?? null,
+          targetOrgId: entry.targetOrgId ?? null,
+          changes: entry.changes ?? null,
+          metadata: entry.metadata ?? {},
+          requestId: entry.requestId,
+          prevHash: previousAuditHash,
+          entryHash,
+        });
+
+        previousAuditHash = entryHash;
+        auditTimestamp = new Date(auditTimestamp.getTime() + 1000 * 60 * 10);
+      }
+
+      await db.insert(auditLogs).values(auditRows);
+      console.log("   ✓ Created audit log entries\n");
+    } else {
+      console.log("   → Audit logs already present; skipping audit seed.\n");
+    }
+
+    // ========================================
+    // PHASE 24: Create policy documents
+    // ========================================
+    console.log("Phase 24: Creating policy documents...");
 
     await db.insert(policyDocuments).values([
       {
@@ -1363,9 +2702,110 @@ async function seed() {
     console.log("   ✓ Created privacy policy and terms of service\n");
 
     // ========================================
-    // PHASE 16: Create retention policies
+    // PHASE 25: Create privacy requests + legal holds
     // ========================================
-    console.log("Phase 16: Creating retention policies...");
+    console.log("Phase 25: Creating privacy requests and legal holds...");
+
+    await db.insert(userPolicyAcceptances).values([
+      {
+        id: IDS.policyAcceptanceId1,
+        userId: IDS.viasportStaffId,
+        policyId: IDS.privacyPolicyId,
+        acceptedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+        ipAddress: "203.0.113.10",
+        userAgent: "SeedScript/1.0",
+      },
+      {
+        id: IDS.policyAcceptanceId2,
+        userId: IDS.psoAdminId,
+        policyId: IDS.privacyPolicyId,
+        acceptedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 18),
+        ipAddress: "198.51.100.17",
+        userAgent: "SeedScript/1.0",
+      },
+    ]);
+
+    const privacyRequestAt1 = new Date(Date.now() - 1000 * 60 * 60 * 24 * 14);
+    const privacyRequestAt2 = new Date(Date.now() - 1000 * 60 * 60 * 24 * 9);
+    const privacyRequestAt3 = new Date(Date.now() - 1000 * 60 * 60 * 24 * 5);
+    const privacyRequestAt4 = new Date(Date.now() - 1000 * 60 * 60 * 24 * 2);
+
+    await db.insert(privacyRequests).values([
+      {
+        id: IDS.privacyRequestId1,
+        userId: IDS.memberId,
+        type: "access",
+        status: "pending",
+        requestedAt: privacyRequestAt1,
+        details: { scope: "profile" },
+        createdAt: privacyRequestAt1,
+      },
+      {
+        id: IDS.privacyRequestId2,
+        userId: IDS.clubReporterId,
+        type: "correction",
+        status: "processing",
+        requestedAt: privacyRequestAt2,
+        processedBy: IDS.viasportStaffId,
+        processedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+        details: { correction: "Update phone number on file." },
+        createdAt: privacyRequestAt2,
+      },
+      {
+        id: IDS.privacyRequestId3,
+        userId: IDS.psoAdminId,
+        type: "export",
+        status: "completed",
+        requestedAt: privacyRequestAt3,
+        processedBy: IDS.viasportStaffId,
+        processedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+        resultUrl: "https://example.com/privacy-exports/export-001.csv",
+        resultExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        resultNotes: "Export available for 7 days.",
+        createdAt: privacyRequestAt3,
+      },
+      {
+        id: IDS.privacyRequestId4,
+        userId: IDS.memberId,
+        type: "erasure",
+        status: "rejected",
+        requestedAt: privacyRequestAt4,
+        processedBy: IDS.viasportStaffId,
+        processedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        rejectionReason: "Retention policy requires seven-year storage.",
+        createdAt: privacyRequestAt4,
+      },
+    ]);
+
+    await db.insert(legalHolds).values([
+      {
+        id: IDS.legalHoldId1,
+        scopeType: "organization",
+        scopeId: IDS.bcHockeyId,
+        dataType: "reporting_submissions",
+        reason: "Grant compliance audit",
+        appliedBy: IDS.viasportStaffId,
+        appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+      },
+      {
+        id: IDS.legalHoldId2,
+        scopeType: "user",
+        scopeId: IDS.memberId,
+        dataType: "user_profile",
+        reason: "Privacy review follow-up",
+        appliedBy: IDS.viasportStaffId,
+        appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60),
+        releasedBy: IDS.viasportStaffId,
+        releasedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 45),
+      },
+    ]);
+
+    console.log("   ✓ Created privacy requests and legal holds\n");
+
+    // ========================================
+    // PHASE 26: Create retention policies
+    // ========================================
+    console.log("Phase 26: Creating retention policies...");
 
     await db.insert(retentionPolicies).values([
       { dataType: "audit_logs", retentionDays: 2555, archiveAfterDays: 365 }, // 7 years
@@ -1389,7 +2829,7 @@ async function seed() {
     console.log(
       "Organizations created: 10 (1 governing body, 3 PSOs, 2 leagues, 4 clubs)",
     );
-    console.log("Forms created: 4 (3 published, 1 draft)");
+    console.log("Forms created: 6 (5 published, 1 draft)");
     console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)\n");
     console.log("-".repeat(60));
     console.log("🔐 FAKE MFA FOR TESTING (admin users only):");

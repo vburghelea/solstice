@@ -644,14 +644,28 @@ Use Playwright to verify UI changes on localhost:5173.
 2. If browser already in use, close first: `mcp__playwright__browser_close`
 3. Always verify UI behavior with MCP before writing/updating E2E tests
 
+### Test Users and Access Rights (sin-dev)
+
+**IMPORTANT:** Platform roles and organization roles are separate. A user can be a "Platform Admin" but still have no access to org-scoped features like Analytics unless they also have an organization membership.
+
+| User                         | Password        | Platform Role  | Org Membership                 | MFA | Can Access                         |
+| ---------------------------- | --------------- | -------------- | ------------------------------ | --- | ---------------------------------- |
+| `admin@example.com`          | testpassword123 | Solstice Admin | **None**                       | Yes | Platform admin pages only          |
+| `viasport-staff@example.com` | testpassword123 | viaSport Admin | viaSport BC: **owner**         | Yes | **Everything** including Analytics |
+| `pso-admin@example.com`      | testpassword123 | None           | BC Hockey: **admin**           | No  | BC Hockey org features, Analytics  |
+| `club-reporter@example.com`  | testpassword123 | None           | North Shore Club: **reporter** | No  | Club reporting, Analytics          |
+| `member@example.com`         | testpassword123 | None           | Vancouver Minor: **viewer**    | No  | View-only access, NO Analytics     |
+
+**For testing Analytics/BI features, use `viasport-staff@example.com`** (has both platform admin and org owner roles).
+
 ### MFA Authentication for Agents
 
 When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-dev), use **TOTP codes** instead of backup codes. TOTP codes regenerate every 30 seconds and are reusable.
 
-**Test Users with MFA:**
+**Users with MFA enabled:**
 
-- `admin@example.com` / `testpassword123` (Platform Admin)
-- `viasport-staff@example.com` / `testpassword123` (viaSport Staff)
+- `admin@example.com` / `testpassword123` (Platform Admin - but NO org membership)
+- `viasport-staff@example.com` / `testpassword123` (Platform Admin + viaSport BC owner - **use this for full access**)
 
 **TOTP Secret (for authenticator apps):** `JJBFGV2ZGNCFARKIKBFTGUCYKA`
 

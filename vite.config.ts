@@ -177,6 +177,48 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
     },
+    // Build optimizations for FCP improvement
+    // See docs/tickets/PERF-001-performance-optimizations.md
+    build: {
+      rollupOptions: {
+        output: {
+          // Use a function for manualChunks to conditionally split chunks
+          // This prevents issues with SSR where react is externalized
+          manualChunks(id) {
+            // Only apply to node_modules
+            if (!id.includes("node_modules")) {
+              return undefined;
+            }
+            // Split vendor chunks for parallel loading
+            if (
+              id.includes("react-dom") ||
+              (id.includes("react") && !id.includes("react-"))
+            ) {
+              return "vendor-react";
+            }
+            if (
+              id.includes("@tanstack/react-router") ||
+              id.includes("@tanstack/react-query") ||
+              id.includes("@tanstack/react-start") ||
+              id.includes("@tanstack/react-router-ssr-query")
+            ) {
+              return "vendor-tanstack";
+            }
+            if (
+              id.includes("@radix-ui/react-dialog") ||
+              id.includes("@radix-ui/react-dropdown-menu") ||
+              id.includes("@radix-ui/react-popover") ||
+              id.includes("@radix-ui/react-select") ||
+              id.includes("@radix-ui/react-tabs")
+            ) {
+              return "vendor-ui";
+            }
+            return undefined;
+          },
+        },
+      },
+      chunkSizeWarningLimit: 600,
+    },
     optimizeDeps: {
       include: [
         "react",

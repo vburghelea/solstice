@@ -367,6 +367,31 @@ export default $config({
         SQUARE_LOCATION_ID: secrets.squareLocationId.value,
         SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
       },
+      // Performance tuning for perf/prod environments
+      // See docs/tickets/PERF-001-performance-optimizations.md
+      server: {
+        // More CPU => faster cold starts and execution
+        memory: "1024 MB",
+        // Longer timeout for cold starts with VPC/RDS
+        timeout: "20 seconds",
+        // Bundle optimizations
+        nodejs: {
+          esbuild: {
+            minify: true,
+            treeShaking: true,
+            external: ["@playwright/test", "vitest", "typescript"],
+          },
+        },
+        // Provisioned concurrency for warm capacity in perf/prod
+        // Reduces cold start errors under load
+        transform: {
+          function: (args) => {
+            if (isProd || isPerf) {
+              args.provisionedConcurrency = 2;
+            }
+          },
+        },
+      },
     });
 
     new sst.aws.Cron("ScheduledNotifications", {

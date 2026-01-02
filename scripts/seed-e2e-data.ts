@@ -544,14 +544,24 @@ async function seed() {
       updatedAt: new Date(),
     });
 
-    await db.insert(organizationMembers).values({
-      userId: adminUserId,
-      organizationId: e2eOrgId,
-      role: "owner",
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    await db.insert(organizationMembers).values([
+      {
+        userId: adminUserId,
+        organizationId: e2eOrgId,
+        role: "owner",
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId: testUserId,
+        organizationId: e2eOrgId,
+        role: "member",
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
 
     await db.insert(forms).values({
       id: e2eFormId,

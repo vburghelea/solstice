@@ -86,6 +86,15 @@ export default defineConfig({
       },
       testMatch: /.*\.(auth|dashboard|profile|teams|shared)\.spec\.ts/,
     },
+
+    // Performance tests - run with single worker
+    {
+      name: "performance",
+      use: {
+        ...devices["Desktop Chrome"],
+      },
+      testMatch: /.*\.perf\.spec\.ts/,
+    },
   ],
 
   /* Run your local dev server before starting the tests */

@@ -1,4 +1,5 @@
 import type { PivotResult } from "../../bi.schemas";
+import type { DatasetField } from "../../bi.types";
 import { Table, TableBody, TableHeader } from "~/components/ui/table";
 import { PivotHeader } from "./PivotHeader";
 import { PivotRow } from "./PivotRow";
@@ -17,6 +18,7 @@ export function PivotTable({
   showGrandTotal = true,
   fieldLabels,
   measureFormatters,
+  fieldsById,
 }: {
   pivot: PivotResult;
   showRowTotals?: boolean;
@@ -24,6 +26,7 @@ export function PivotTable({
   showGrandTotal?: boolean;
   fieldLabels?: Map<string, string>;
   measureFormatters?: Map<string, (value: number | null) => string>;
+  fieldsById?: Map<string, DatasetField>;
 }) {
   const rowTotals = pivot.rows.map((row) => {
     const totals: Record<string, number | null> = {};
@@ -65,6 +68,7 @@ export function PivotTable({
             measures={pivot.measures}
             showRowTotals={showRowTotals}
             {...(fieldLabels ? { fieldLabels } : {})}
+            {...(fieldsById ? { fieldsById } : {})}
           />
         </TableHeader>
         <TableBody>
@@ -78,6 +82,7 @@ export function PivotTable({
               rowTotals={rowTotals[index] ?? {}}
               showRowTotals={showRowTotals}
               {...(measureFormatters ? { measureFormatters } : {})}
+              {...(fieldsById ? { fieldsById } : {})}
             />
           ))}
           {showColumnTotals ? (

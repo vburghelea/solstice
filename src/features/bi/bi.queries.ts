@@ -294,6 +294,16 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
       return { values: [] };
     }
 
+    const search = data.search?.trim() ?? "";
+    const suggestionsConfig = targetField.suggestions;
+    const strategy =
+      suggestionsConfig?.strategy ??
+      (targetField.dataType === "uuid" || targetField.dataType === "number"
+        ? "require_search"
+        : "auto");
+    const minSearchLength = suggestionsConfig?.minSearchLength ?? 2;
+    const hasSearch = search.length >= minSearchLength;
+
     const allowedFilters = buildAllowedFilters(dataset);
     const normalizedFilters: NormalizedFilter[] = [];
     const filtersToApply = scopedFilters.filter((filter) => {
@@ -307,6 +317,13 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
       } catch {
         continue;
       }
+    }
+
+    const hasFilterContext = normalizedFilters.length > 0;
+    if (strategy === "disabled") return { values: [] };
+    if (strategy === "require_search" && !hasSearch) return { values: [] };
+    if (strategy === "require_filters" && !(hasFilterContext || hasSearch)) {
+      return { values: [] };
     }
 
     if (dataset.requiresOrgScope && scopedOrganizationId) {
@@ -324,7 +341,6 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
     );
     whereConditions.push(sql`${fieldExpr} IS NOT NULL`);
 
-    const search = data.search?.trim();
     if (search) {
       whereConditions.push(
         sql`CAST(${fieldExpr} AS TEXT) ILIKE ${sql.param(`%${search}%`)}`,
@@ -337,7 +353,8 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
         : sql``;
 
     const MAX_SUGGESTIONS = 50;
-    const limit = Math.min(data.limit ?? 25, MAX_SUGGESTIONS);
+    const maxValues = suggestionsConfig?.maxValues ?? MAX_SUGGESTIONS;
+    const limit = Math.min(data.limit ?? 25, maxValues, MAX_SUGGESTIONS);
     const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const viewName = quoteIdentifier(`bi_v_${dataset.id}`);
     const baseAlias = quoteIdentifier("base");
@@ -457,6 +474,13 @@ export const getSqlSchema = createServerFn({ method: "GET" })
     if (data.datasetId && selected.length === 0) {
       throw badRequest(`Unknown dataset: ${data.datasetId}`);
     }
+
+    const { assertSqlWorkbenchReady } = await import("./governance/sql-workbench-gate");
+    await assertSqlWorkbenchReady({
+      organizationId: contextOrganizationId,
+      isGlobalAdmin,
+      datasetIds: selected.map((dataset) => dataset.id),
+    });
 
     type SchemaColumnRow = {
       table_name: string;

@@ -232,7 +232,12 @@ export function DashboardWidget({
         {...(editable && onRemove ? { onRemove } : {})}
       />
       {ignoredFilters.length > 0 ? (
-        <div className="flex items-center gap-2 border-b bg-amber-50 px-3 py-1 text-[11px] text-amber-700">
+        <div
+          className={
+            "flex items-center gap-2 border-b bg-amber-50 px-3 py-1 " +
+            "text-[11px] text-amber-700"
+          }
+        >
           <AlertTriangle className="h-3.5 w-3.5" />
           <span>Some global filters don't apply to this widget.</span>
         </div>
@@ -258,7 +263,12 @@ export function DashboardWidget({
           </p>
         ) : !mergedQuery ? (
           // No query configured
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
+          <div
+            className={
+              "flex h-full flex-col items-center justify-center gap-2 " +
+              "text-muted-foreground"
+            }
+          >
             <Settings2 className="h-8 w-8 opacity-50" />
             <p className="text-sm">No data source configured</p>
             {editable && <p className="text-xs">Click edit to configure</p>}
@@ -270,7 +280,12 @@ export function DashboardWidget({
           </div>
         ) : queryErrorMessage ? (
           // Error state
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-destructive">
+          <div
+            className={
+              "flex h-full flex-col items-center justify-center gap-2 " +
+              "text-destructive"
+            }
+          >
             <AlertCircle className="h-8 w-8 opacity-70" />
             <p className="text-sm">Failed to load data</p>
             <p className="text-muted-foreground text-xs">{queryErrorMessage}</p>
@@ -294,6 +309,7 @@ export function DashboardWidget({
             <PivotTable
               pivot={pivot}
               {...(measureFormatters ? { measureFormatters } : {})}
+              {...(fieldsById ? { fieldsById } : {})}
             />
           ) : (
             <p className="text-muted-foreground text-sm">No data returned</p>

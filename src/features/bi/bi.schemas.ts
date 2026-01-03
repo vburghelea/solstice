@@ -124,6 +124,23 @@ export const formatOptionsSchema = z.object({
 
 export type FormatOptions = z.infer<typeof formatOptionsSchema>;
 
+export const fieldSuggestionStrategySchema = z.enum([
+  "auto",
+  "require_search",
+  "require_filters",
+  "disabled",
+]);
+
+export type FieldSuggestionStrategy = z.infer<typeof fieldSuggestionStrategySchema>;
+
+export const fieldSuggestionSchema = z.object({
+  strategy: fieldSuggestionStrategySchema.default("auto"),
+  minSearchLength: z.number().int().min(1).max(20).optional(),
+  maxValues: z.number().int().min(1).max(100).optional(),
+});
+
+export type FieldSuggestionConfig = z.infer<typeof fieldSuggestionSchema>;
+
 export const datasetFreshnessSchema = z.object({
   sourceSystem: z.string().min(1),
   updateCadence: z.string().min(1),
@@ -169,6 +186,7 @@ export const datasetFieldSchema = z.object({
       }),
     )
     .optional(),
+  suggestions: fieldSuggestionSchema.optional(),
 });
 
 export type DatasetField = z.infer<typeof datasetFieldSchema>;
@@ -276,6 +294,15 @@ export const sqlQuerySchema = z.object({
 });
 
 export type SqlQueryRequest = z.infer<typeof sqlQuerySchema>;
+
+export const sqlExportRequestSchema = z.object({
+  sql: z.string().min(1),
+  parameters: jsonRecordSchema.optional(),
+  datasetId: z.string().min(1).optional(),
+  format: exportFormatSchema,
+});
+
+export type SqlExportRequest = z.infer<typeof sqlExportRequestSchema>;
 
 export const sqlSchemaRequestSchema = z.object({
   datasetId: z.string().min(1).optional(),

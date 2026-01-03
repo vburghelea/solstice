@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { executeSqlWorkbenchQuery } from "../bi.sql-executor";
 import * as guardrails from "../governance/query-guardrails";
+import { resetSqlWorkbenchGateCache } from "../governance/sql-workbench-gate";
 
 const getDbMock = vi.fn();
 const logQueryMock = vi.fn();
@@ -17,7 +18,30 @@ describe("executeSqlWorkbenchQuery", () => {
   beforeEach(() => {
     getDbMock.mockReset();
     logQueryMock.mockReset();
+    resetSqlWorkbenchGateCache();
   });
+
+  const mockDb = (
+    txExecute: (query: { queryChunks?: unknown[] }) => Promise<unknown>,
+  ) => {
+    const metadataExecute = vi
+      .fn()
+      .mockResolvedValueOnce([{ exists: 1 }])
+      .mockResolvedValueOnce([{ table_name: "bi_v_organizations" }])
+      .mockResolvedValueOnce([
+        { relname: "bi_v_organizations", reloptions: ["security_barrier=true"] },
+      ])
+      .mockResolvedValueOnce([
+        { table_name: "bi_v_organizations", privilege_type: "SELECT" },
+      ])
+      .mockResolvedValueOnce([]);
+
+    getDbMock.mockResolvedValue({
+      execute: metadataExecute,
+      transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
+        cb({ execute: txExecute }),
+    });
+  };
 
   it("applies session settings and limits", async () => {
     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
@@ -29,10 +53,7 @@ describe("executeSqlWorkbenchQuery", () => {
       return [];
     });
 
-    getDbMock.mockResolvedValue({
-      transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
-        cb({ execute: txExecute }),
-    });
+    mockDb(txExecute);
 
     await executeSqlWorkbenchQuery({
       sqlText: "SELECT * FROM organizations",
@@ -93,10 +114,7 @@ describe("executeSqlWorkbenchQuery", () => {
       return [];
     });
 
-    getDbMock.mockResolvedValue({
-      transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
-        cb({ execute: txExecute }),
-    });
+    mockDb(txExecute);
 
     await expect(
       executeSqlWorkbenchQuery({
@@ -126,10 +144,7 @@ describe("executeSqlWorkbenchQuery", () => {
       return [];
     });
 
-    getDbMock.mockResolvedValue({
-      transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
-        cb({ execute: txExecute }),
-    });
+    mockDb(txExecute);
 
     await executeSqlWorkbenchQuery({
       sqlText: "SELECT * FROM organizations",
@@ -168,10 +183,7 @@ describe("executeSqlWorkbenchQuery", () => {
       return [];
     });
 
-    getDbMock.mockResolvedValue({
-      transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
-        cb({ execute: txExecute }),
-    });
+    mockDb(txExecute);
 
     await executeSqlWorkbenchQuery({
       sqlText: "SELECT * FROM organizations",

@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 import { Loader2 } from "lucide-react";
-import type {
-  AggregationType,
-  ChartType,
-  PivotMeasure,
-  PivotResult,
-} from "../../bi.schemas";
+import type { ChartType, PivotMeasure, PivotResult } from "../../bi.schemas";
 import { buildPivotChartOptions } from "../charts/pivot-chart";
 import { ChartWrapper } from "../charts/ChartWrapper";
 import { KpiCard } from "../charts/KpiCard";
@@ -86,7 +81,11 @@ export function PivotPreview({
   if (!pivot) {
     if (isLoading) {
       return (
-        <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
+        <div
+          className={
+            "flex h-64 items-center justify-center rounded-md " + "border border-dashed"
+          }
+        >
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading preview...
@@ -98,7 +97,12 @@ export function PivotPreview({
     const hasMeasures = measures.length > 0;
     const hasDimensions = rows.length + columns.length > 0;
     return (
-      <div className="space-y-3 rounded-md border border-dashed p-8 text-center text-muted-foreground">
+      <div
+        className={
+          "space-y-3 rounded-md border border-dashed p-8 " +
+          "text-center text-muted-foreground"
+        }
+      >
         {!hasMeasures ? (
           <p>Add a measure (like Count) to see totals.</p>
         ) : !hasDimensions ? (
@@ -144,6 +148,7 @@ export function PivotPreview({
           showGrandTotal={showGrandTotal}
           {...(measureFormatters ? { measureFormatters } : {})}
           {...(fieldLabels ? { fieldLabels } : {})}
+          {...(fieldsById ? { fieldsById } : {})}
         />
       ) : chartType === "kpi" ? (
         <KpiCard
@@ -160,7 +165,11 @@ export function PivotPreview({
           ariaDescription={chartAriaDescription}
         />
       ) : (
-        <div className="rounded-md border border-dashed p-8 text-center text-muted-foreground">
+        <div
+          className={
+            "rounded-md border border-dashed p-8 " + "text-center text-muted-foreground"
+          }
+        >
           Select a chart type to preview results.
         </div>
       )}

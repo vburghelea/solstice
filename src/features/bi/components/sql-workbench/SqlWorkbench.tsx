@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { getStepUpErrorMessage, useStepUpPrompt } from "~/features/auth/step-up";
+import { exportSqlResults } from "~/features/bi/bi.mutations";
 import {
   executeSqlQuery,
   getAvailableDatasets,
@@ -47,12 +49,14 @@ export function SqlWorkbench() {
   const [sqlText, setSqlText] = useState("");
   const [datasetId, setDatasetId] = useState("");
   const [paramValues, setParamValues] = useState<Record<string, string>>({});
+  const [exportFormat, setExportFormat] = useState<"csv" | "xlsx" | "json">("csv");
   const [history, setHistory] = useLocalStorage<QueryHistoryEntry[]>(
     "bi.sql.history",
     [],
   );
   const [rows, setRows] = useState<JsonRecord[]>([]);
   const editorViewRef = useRef<EditorView | null>(null);
+  const { requestStepUp } = useStepUpPrompt();
 
   const datasetsQuery = useQuery({
     queryKey: ["bi-datasets"],
@@ -185,6 +189,50 @@ export function SqlWorkbench() {
     },
   });
 
+  const exportMutation = useMutation({
+    mutationFn: async () => {
+      if (!sqlText.trim()) {
+        throw new Error("SQL query is required.");
+      }
+      if (!datasetId) {
+        throw new Error("Select a dataset to export.");
+      }
+      return exportSqlResults({
+        data: {
+          sql: sqlText,
+          parameters: paramValues,
+          datasetId,
+          format: exportFormat,
+        },
+      });
+    },
+    onSuccess: (result) => {
+      if (!result?.data) return;
+      const encoding = result.encoding ?? "utf-8";
+      const blobData =
+        encoding === "base64"
+          ? Uint8Array.from(atob(result.data), (char) => char.charCodeAt(0))
+          : result.data;
+      const blob = new Blob([blobData], {
+        type: result.mimeType ?? "text/csv",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.fileName ?? "sql-export.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (error) => {
+      const message = getStepUpErrorMessage(error);
+      if (message) {
+        requestStepUp(message);
+        return;
+      }
+      toast.error(error instanceof Error ? error.message : "SQL export failed.");
+    },
+  });
+
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <div className="space-y-4">
@@ -237,12 +285,37 @@ export function SqlWorkbench() {
               </div>
             ) : null}
 
-            <Button
-              onClick={() => queryMutation.mutate()}
-              disabled={queryMutation.isPending}
-            >
-              Run query
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={() => queryMutation.mutate()}
+                disabled={queryMutation.isPending}
+              >
+                Run query
+              </Button>
+              <Select
+                value={exportFormat}
+                onValueChange={(value) =>
+                  setExportFormat(value as "csv" | "xlsx" | "json")
+                }
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Export format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="csv">CSV</SelectItem>
+                  <SelectItem value="xlsx">Excel</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => exportMutation.mutate()}
+                disabled={exportMutation.isPending}
+              >
+                {exportMutation.isPending ? "Exporting..." : "Export"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

@@ -12,6 +12,7 @@ import {
   stripTrailingSemicolons,
 } from "./governance/query-guardrails";
 import { DATASETS, getDataset } from "./semantic";
+import { assertSqlWorkbenchReady } from "./governance/sql-workbench-gate";
 
 const PLACEHOLDER_PATTERN = /\{\{([a-zA-Z_][\w]*)\}\}/g;
 
@@ -138,10 +139,12 @@ export const executeSqlWorkbenchQuery = async (params: {
   datasetId?: string;
   context: QueryContext;
   maxRows?: number;
+  logQuery?: boolean;
 }): Promise<SqlExecutionResult> => {
   const { sqlText, datasetId, context } = params;
   const parameters = params.parameters ?? {};
   const maxRows = params.maxRows ?? QUERY_GUARDRAILS.maxRowsUi;
+  const shouldLog = params.logQuery ?? true;
 
   const release = acquireConcurrencySlot(context.userId, context.organizationId);
   const startedAt = Date.now();
@@ -159,6 +162,12 @@ export const executeSqlWorkbenchQuery = async (params: {
     if (selectedDatasets.length === 0) {
       throw new Error("No datasets available for SQL workbench");
     }
+
+    await assertSqlWorkbenchReady({
+      organizationId: context.organizationId ?? null,
+      isGlobalAdmin: context.isGlobalAdmin,
+      datasetIds: selectedDatasets.map((dataset) => dataset.id),
+    });
 
     const tableMapping = buildTableMapping(selectedDatasets);
     const rewritten = rewriteSqlTables(stripTrailingSemicolons(sqlText), tableMapping);
@@ -224,18 +233,20 @@ export const executeSqlWorkbenchQuery = async (params: {
     const normalizedRows = rows.map((row) => normalizeSqlRow(row));
     const executionTimeMs = Date.now() - startedAt;
 
-    const { logQuery } = await import("./governance");
-    const logParams = {
-      context,
-      queryType: "sql" as const,
-      sqlQuery: rewritten.sql,
-      parameters,
-      rowsReturned: normalizedRows.length,
-      executionTimeMs,
-      ...(datasetId ? { datasetId } : {}),
-    };
+    if (shouldLog) {
+      const { logQuery } = await import("./governance");
+      const logParams = {
+        context,
+        queryType: "sql" as const,
+        sqlQuery: rewritten.sql,
+        parameters,
+        rowsReturned: normalizedRows.length,
+        executionTimeMs,
+        ...(datasetId ? { datasetId } : {}),
+      };
 
-    await logQuery(logParams);
+      await logQuery(logParams);
+    }
 
     return {
       rows: normalizedRows,

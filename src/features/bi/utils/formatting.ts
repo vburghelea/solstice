@@ -99,6 +99,7 @@ export const formatDimensionValue = (
   field?: DatasetField,
   locale?: string,
 ): string => {
+  if (value === "***") return "Masked";
   if (value === null || value === undefined || value === "") return "-";
   const resolvedLocale = resolveLocale(locale);
 

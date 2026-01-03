@@ -12,13 +12,19 @@ import {
   exportRequestSchema,
   filterSchema,
   pivotQuerySchema,
+  sqlExportRequestSchema,
   widgetTypeSchema,
 } from "./bi.schemas";
 import type { QueryContext } from "./bi.types";
 import { normalizePivotConfig } from "./bi.utils";
 import { loadDatasetData } from "./bi.data";
 import { buildPivotResult } from "./engine/pivot-aggregator";
-import { filterAccessibleFields, getFieldsToMask, queryIncludesPii } from "./governance";
+import {
+  filterAccessibleFields,
+  getFieldsToMask,
+  QUERY_GUARDRAILS,
+  queryIncludesPii,
+} from "./governance";
 import { getDataset } from "./semantic";
 import { getMetric } from "./semantic/metrics.config";
 import type { JsonRecord, JsonValue } from "~/shared/lib/json";
@@ -282,12 +288,20 @@ export const exportPivotResults = createServerFn({ method: "POST" })
 
     const fieldsToMask = getFieldsToMask(accessibleFields, queryContext, true);
 
+    const exportLimit = QUERY_GUARDRAILS.maxRowsExport;
     const rows = await loadDatasetData({
       datasetId: dataset.id,
       columns: normalized.value.selectedFields,
       filters: orgScopeFilters,
       fieldsToMask,
+      limit: exportLimit + 1,
     });
+
+    if (rows.length > exportLimit) {
+      throw badRequest(
+        `Export exceeds ${exportLimit.toLocaleString()} rows. Add filters to reduce.`,
+      );
+    }
 
     const pivot = buildPivotResult(rows, {
       rowFields: normalized.value.rowFields,
@@ -382,6 +396,155 @@ export const exportPivotResults = createServerFn({ method: "POST" })
         rowCount: exportRows.length,
         includesPii,
         stepUpAuthUsed: true,
+      },
+    });
+
+    return {
+      data: exportPayload,
+      fileName,
+      mimeType,
+      encoding,
+    };
+  });
+
+export const exportSqlResults = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .inputValidator(sqlExportRequestSchema.parse)
+  .handler(async ({ data, context }) => {
+    await assertFeatureEnabled("sin_analytics_sql_workbench");
+    const user = requireUser(context);
+    const { badRequest, forbidden } = await import("~/lib/server/errors");
+
+    const { getCurrentSession, requireRecentAuth } =
+      await import("~/lib/auth/guards/step-up");
+    const session = await getCurrentSession();
+    await requireRecentAuth(user.id, session);
+
+    const { PermissionService } = await import("~/features/roles/permission.service");
+    const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+    const roleAssignments = await PermissionService.getUserRoles(user.id);
+    const permissions = extractPermissionSet(roleAssignments);
+
+    if (!hasAnalyticsPermission(permissions, "analytics.sql")) {
+      throw forbidden("Analytics SQL permission required");
+    }
+    if (!hasAnalyticsPermission(permissions, "analytics.export")) {
+      throw forbidden("Analytics export permission required");
+    }
+
+    const contextOrganizationId =
+      (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+
+    let orgRole: OrganizationRole | null = null;
+    if (contextOrganizationId && !isGlobalAdmin) {
+      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+      const access = await requireOrganizationAccess(
+        { userId: user.id, organizationId: contextOrganizationId },
+        { roles: ANALYTICS_ROLES },
+      );
+      orgRole = access.role as OrganizationRole;
+    }
+
+    const queryContext: QueryContext = {
+      userId: user.id,
+      organizationId: contextOrganizationId,
+      orgRole,
+      isGlobalAdmin,
+      permissions,
+      hasRecentAuth: true,
+      timestamp: new Date(),
+    };
+
+    const { executeSqlWorkbenchQuery } = await import("./bi.sql-executor");
+    const result = await executeSqlWorkbenchQuery({
+      sqlText: data.sql,
+      parameters: data.parameters ?? {},
+      context: queryContext,
+      maxRows: QUERY_GUARDRAILS.maxRowsExport + 1,
+      ...(data.datasetId ? { datasetId: data.datasetId } : {}),
+      logQuery: false,
+    });
+
+    if (result.rowCount > QUERY_GUARDRAILS.maxRowsExport) {
+      throw badRequest(
+        `Export exceeds ${QUERY_GUARDRAILS.maxRowsExport.toLocaleString()} rows. ` +
+          "Add filters to reduce.",
+      );
+    }
+
+    const exportRows = result.rows as Array<Record<string, unknown>>;
+    const columns = exportRows[0] ? Object.keys(exportRows[0]) : [];
+
+    let exportPayload = "";
+    let fileName = "sql-export.csv";
+    let mimeType = "text/csv";
+    let encoding: "base64" | "utf-8" = "utf-8";
+
+    if (data.format === "xlsx") {
+      const module = await import("xlsx");
+      const XLSX = "default" in module ? module.default : module;
+      const worksheet = XLSX.utils.json_to_sheet(exportRows, { header: columns });
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "SQL");
+      exportPayload = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
+      fileName = "sql-export.xlsx";
+      mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      encoding = "base64";
+    } else if (data.format === "json") {
+      exportPayload = JSON.stringify(exportRows, null, 2);
+      fileName = "sql-export.json";
+      mimeType = "application/json";
+    } else {
+      const { toCsv } = await import("~/shared/lib/csv");
+      exportPayload = toCsv(exportRows);
+    }
+
+    const { getDb } = await import("~/db/server-helpers");
+    const { exportHistory } = await import("~/db/schema");
+    const db = await getDb();
+    await db.insert(exportHistory).values({
+      userId: user.id,
+      organizationId: contextOrganizationId,
+      reportId: null,
+      exportType: data.format,
+      dataSource: data.datasetId ?? "sql_workbench",
+      filtersUsed: {
+        sql: data.sql,
+        parameters: data.parameters ?? {},
+      } as JsonRecord,
+      rowCount: exportRows.length,
+      fileKey: null,
+    });
+
+    const { logExport } = await import("./governance");
+    await logExport({
+      context: queryContext,
+      queryType: "export",
+      ...(data.datasetId ? { datasetId: data.datasetId } : {}),
+      sqlQuery: result.sql,
+      parameters: data.parameters ?? {},
+      rowsReturned: exportRows.length,
+      executionTimeMs: result.executionTimeMs,
+      format: data.format,
+      includesPii: false,
+      stepUpAuthUsed: true,
+    });
+
+    const { logAuditEntry } = await import("~/lib/audit");
+    await logAuditEntry({
+      action: "BI.EXPORT",
+      actionCategory: "EXPORT",
+      actorUserId: user.id,
+      actorOrgId: contextOrganizationId,
+      targetType: data.datasetId ? "bi_dataset" : "bi_sql",
+      targetId: data.datasetId ?? null,
+      metadata: {
+        datasetId: data.datasetId ?? null,
+        format: data.format,
+        rowCount: exportRows.length,
+        includesPii: false,
+        stepUpAuthUsed: true,
+        queryType: "sql",
       },
     });
 

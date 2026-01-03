@@ -59,6 +59,18 @@ export interface FormatOptions {
   currency?: string;
 }
 
+export type FieldSuggestionStrategy =
+  | "auto"
+  | "require_search"
+  | "require_filters"
+  | "disabled";
+
+export interface FieldSuggestionConfig {
+  strategy?: FieldSuggestionStrategy;
+  minSearchLength?: number;
+  maxValues?: number;
+}
+
 export interface DatasetField {
   id: string;
   name: string;
@@ -86,6 +98,7 @@ export interface DatasetField {
   allowAggregate?: boolean;
   defaultAggregation?: AggregationType;
   enumValues?: Array<{ value: string; label: string }>;
+  suggestions?: FieldSuggestionConfig;
 }
 
 export interface DatasetConfig {

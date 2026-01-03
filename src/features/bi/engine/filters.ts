@@ -149,6 +149,11 @@ const toComparable = (value: unknown): string | number | null => {
   return null;
 };
 
+const normalizeString = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  return value.toLowerCase();
+};
+
 /**
  * Apply a single filter to a value
  */
@@ -212,17 +217,23 @@ export function matchesFilter(
       return false;
     }
     case "contains":
-      return typeof value === "string" && typeof filterValue === "string"
-        ? value.includes(filterValue)
-        : false;
+      return (() => {
+        const left = normalizeString(value);
+        const right = normalizeString(filterValue);
+        return left && right ? left.includes(right) : false;
+      })();
     case "starts_with":
-      return typeof value === "string" && typeof filterValue === "string"
-        ? value.startsWith(filterValue)
-        : false;
+      return (() => {
+        const left = normalizeString(value);
+        const right = normalizeString(filterValue);
+        return left && right ? left.startsWith(right) : false;
+      })();
     case "ends_with":
-      return typeof value === "string" && typeof filterValue === "string"
-        ? value.endsWith(filterValue)
-        : false;
+      return (() => {
+        const left = normalizeString(value);
+        const right = normalizeString(filterValue);
+        return left && right ? left.endsWith(right) : false;
+      })();
     default: {
       const _exhaustiveCheck: never = operator;
       throw new Error(`Unknown operator: ${_exhaustiveCheck}`);

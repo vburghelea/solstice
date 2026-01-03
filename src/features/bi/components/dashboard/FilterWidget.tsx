@@ -47,6 +47,54 @@ const resolveOperator = (
   return "in";
 };
 
+type FilterPrimitive = string | number | boolean | null;
+
+const toKey = (value: FilterPrimitive) => `${typeof value}:${String(value)}`;
+
+const parseManualValue = (
+  rawValue: string,
+  dataType?: DatasetField["dataType"],
+): { ok: true; value: FilterPrimitive } | { ok: false; error: string } => {
+  const trimmed = rawValue.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Enter at least one value." };
+  }
+  if (dataType === "number") {
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) {
+      return { ok: false, error: "Enter valid numbers (comma-separated)." };
+    }
+    return { ok: true, value: parsed };
+  }
+  if (dataType === "boolean") {
+    const normalized = trimmed.toLowerCase();
+    if (normalized === "true" || normalized === "false") {
+      return { ok: true, value: normalized === "true" };
+    }
+    return { ok: false, error: 'Use "true" or "false" for boolean values.' };
+  }
+  return { ok: true, value: trimmed };
+};
+
+const parseManualValues = (input: string, dataType?: DatasetField["dataType"]) => {
+  const entries = input
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (entries.length === 0) {
+    return { values: [] as FilterPrimitive[], error: null as string | null };
+  }
+  const values: FilterPrimitive[] = [];
+  for (const entry of entries) {
+    const parsed = parseManualValue(entry, dataType);
+    if (!parsed.ok) {
+      return { values, error: parsed.error };
+    }
+    values.push(parsed.value);
+  }
+  return { values, error: null as string | null };
+};
+
 export function FilterWidget({
   config,
   field,
@@ -71,6 +119,8 @@ export function FilterWidget({
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [manualInput, setManualInput] = useState("");
+  const [manualError, setManualError] = useState<string | null>(null);
 
   useEffect(() => {
     setSearch("");
@@ -85,11 +135,30 @@ export function FilterWidget({
   }, [search]);
 
   const enumValues = field?.enumValues ?? [];
-  const selectedValues = useMemo(() => {
+  const selectedValues = useMemo<FilterPrimitive[]>(() => {
     if (value?.value === undefined || value?.value === null) return [];
     const entries = Array.isArray(value.value) ? value.value : [value.value];
-    return entries.map((entry) => String(entry));
+    return entries.filter(
+      (entry): entry is FilterPrimitive =>
+        entry === null ||
+        typeof entry === "string" ||
+        typeof entry === "number" ||
+        typeof entry === "boolean",
+    );
   }, [value?.value]);
+  const selectedKeys = useMemo(
+    () => new Set(selectedValues.map(toKey)),
+    [selectedValues],
+  );
+  const selectedDisplayValue = useMemo(
+    () => selectedValues.map((entry) => String(entry)).join(", "),
+    [selectedValues],
+  );
+
+  useEffect(() => {
+    setManualInput(selectedDisplayValue);
+    setManualError(null);
+  }, [fieldId, selectedDisplayValue]);
 
   const updateValue = (nextValue: FilterConfig["value"]) => {
     if (!fieldId) return;
@@ -107,14 +176,13 @@ export function FilterWidget({
     );
   };
 
-  const toggleEnumValue = (enumValue: string) => {
-    const values = new Set(selectedValues);
-    if (values.has(enumValue)) {
-      values.delete(enumValue);
-    } else {
-      values.add(enumValue);
+  const toggleValue = (nextValue: FilterPrimitive) => {
+    const key = toKey(nextValue);
+    const values = selectedValues.filter((entry) => toKey(entry) !== key);
+    if (!selectedKeys.has(key)) {
+      values.push(nextValue);
     }
-    updateValue(Array.from(values));
+    updateValue(values);
   };
 
   const suggestionFilters = useMemo(() => {
@@ -127,6 +195,29 @@ export function FilterWidget({
       return true;
     });
   }, [datasetId, fieldId, filters]);
+
+  const suggestionStrategy =
+    field?.suggestions?.strategy ??
+    (field?.dataType === "uuid" || field?.dataType === "number"
+      ? "require_search"
+      : "auto");
+  const minSearchLength = field?.suggestions?.minSearchLength ?? 2;
+  const requiresSearch = suggestionStrategy === "require_search";
+  const requiresFilters = suggestionStrategy === "require_filters";
+  const hasSearch = debouncedSearch.length >= minSearchLength;
+  const hasFilters = suggestionFilters.length > 0;
+  const suggestionsAllowed = suggestionStrategy !== "disabled";
+  const suggestionsReady =
+    suggestionsAllowed &&
+    (!requiresSearch || hasSearch) &&
+    (!requiresFilters || hasFilters || hasSearch);
+  const suggestionHint = !suggestionsAllowed
+    ? "Suggestions disabled for this field."
+    : requiresSearch && !hasSearch
+      ? `Type at least ${minSearchLength} characters to see values.`
+      : requiresFilters && !hasFilters && !hasSearch
+        ? "Add a filter or search to see values."
+        : null;
 
   const suggestionQuery = useQuery({
     queryKey: [
@@ -147,6 +238,7 @@ export function FilterWidget({
         },
       }),
     enabled:
+      suggestionsReady &&
       filterType === "select" &&
       Boolean(fieldId) &&
       Boolean(datasetId) &&
@@ -160,7 +252,12 @@ export function FilterWidget({
 
   if (!fieldId) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
+      <div
+        className={
+          "flex h-full flex-col items-center justify-center gap-2 " +
+          "text-muted-foreground"
+        }
+      >
         <p className="text-sm">No filter configured</p>
         <p className="text-xs">Edit this widget to select a field.</p>
       </div>
@@ -170,7 +267,11 @@ export function FilterWidget({
   return (
     <div className="space-y-3">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <p
+          className={
+            "text-xs font-semibold uppercase tracking-wide " + "text-muted-foreground"
+          }
+        >
           Filter
         </p>
         <p className="text-sm font-medium">{field?.name ?? fieldId}</p>
@@ -197,8 +298,8 @@ export function FilterWidget({
           {enumValues.map((entry) => (
             <label key={entry.value} className="flex items-center gap-2 text-sm">
               <Checkbox
-                checked={selectedValues.includes(entry.value)}
-                onCheckedChange={() => toggleEnumValue(entry.value)}
+                checked={selectedKeys.has(toKey(entry.value))}
+                onCheckedChange={() => toggleValue(entry.value)}
                 disabled={disabled}
               />
               {entry.label}
@@ -218,10 +319,17 @@ export function FilterWidget({
             />
           </div>
           <div className="space-y-2 rounded-md border bg-muted/20 p-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <p
+              className={
+                "text-[11px] font-semibold uppercase tracking-wide " +
+                "text-muted-foreground"
+              }
+            >
               Top values
             </p>
-            {suggestionQuery.isLoading ? (
+            {suggestionHint ? (
+              <p className="text-xs text-muted-foreground">{suggestionHint}</p>
+            ) : suggestionQuery.isLoading ? (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 Loading values...
@@ -233,12 +341,12 @@ export function FilterWidget({
             ) : (
               <div className="max-h-40 space-y-2 overflow-auto">
                 {suggestionValues.map((entry) => {
-                  const entryKey = String(entry.value);
+                  const entryKey = toKey(entry.value);
                   return (
                     <label key={entryKey} className="flex items-center gap-2 text-sm">
                       <Checkbox
-                        checked={selectedValues.includes(entryKey)}
-                        onCheckedChange={() => toggleEnumValue(entryKey)}
+                        checked={selectedKeys.has(entryKey)}
+                        onCheckedChange={() => toggleValue(entry.value)}
                         disabled={disabled}
                       />
                       <span>{formatDimensionValue(entry.value, field)}</span>
@@ -261,17 +369,21 @@ export function FilterWidget({
               id={valuesInputId}
               disabled={disabled}
               placeholder="e.g. Active, Pending"
-              value={selectedValues.join(", ")}
+              value={manualInput}
               aria-label={`${fieldLabel || "Filter"} values`}
-              onChange={(event) =>
-                updateValue(
-                  event.target.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean),
-                )
-              }
+              onChange={(event) => {
+                const next = event.target.value;
+                setManualInput(next);
+                const parsed = parseManualValues(next, field?.dataType);
+                setManualError(parsed.error);
+                if (!parsed.error) {
+                  updateValue(parsed.values);
+                }
+              }}
             />
+            {manualError ? (
+              <p className="text-xs text-destructive">{manualError}</p>
+            ) : null}
           </div>
         </div>
       )}

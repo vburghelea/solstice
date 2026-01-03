@@ -11,6 +11,20 @@ import type { DatasetConfig, DatasetField } from "../bi.types";
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
+const applySuggestionDefaults = (fields: DatasetField[]) =>
+  fields.map((field): DatasetField => {
+    if (field.suggestions || field.dataType !== "uuid") {
+      return field;
+    }
+    return {
+      ...field,
+      suggestions: {
+        strategy: "require_search",
+        minSearchLength: 2,
+      },
+    };
+  });
+
 const timeGrainsForField = (field: DatasetField) => {
   if (field.dataType !== "date" && field.dataType !== "datetime") return [];
   if (field.dataType === "date") return ["week", "month", "quarter"] as const;
@@ -42,7 +56,7 @@ const withTimeGrainFields = (fields: DatasetField[]) => [
   ...fields.flatMap((field) => buildTimeGrainFields(field)),
 ];
 
-const organizationBaseFields: DatasetField[] = [
+const organizationBaseFields: DatasetField[] = applySuggestionDefaults([
   {
     id: "id",
     name: "ID",
@@ -135,11 +149,11 @@ const organizationBaseFields: DatasetField[] = [
     allowFilter: true,
     allowSort: true,
   },
-];
+]);
 
 const organizationFields = withTimeGrainFields(organizationBaseFields);
 
-const reportingSubmissionBaseFields: DatasetField[] = [
+const reportingSubmissionBaseFields: DatasetField[] = applySuggestionDefaults([
   {
     id: "id",
     name: "Submission ID",
@@ -264,11 +278,11 @@ const reportingSubmissionBaseFields: DatasetField[] = [
     allowGroupBy: true,
     allowFilter: true,
   },
-];
+]);
 
 const reportingSubmissionFields = withTimeGrainFields(reportingSubmissionBaseFields);
 
-const formSubmissionBaseFields: DatasetField[] = [
+const formSubmissionBaseFields: DatasetField[] = applySuggestionDefaults([
   {
     id: "id",
     name: "Submission ID",
@@ -441,11 +455,11 @@ const formSubmissionBaseFields: DatasetField[] = [
     allowGroupBy: true,
     allowFilter: true,
   },
-];
+]);
 
 const formSubmissionFields = withTimeGrainFields(formSubmissionBaseFields);
 
-const eventBaseFields: DatasetField[] = [
+const eventBaseFields: DatasetField[] = applySuggestionDefaults([
   {
     id: "id",
     name: "Event ID",
@@ -529,7 +543,7 @@ const eventBaseFields: DatasetField[] = [
     allowGroupBy: true,
     allowFilter: true,
   },
-];
+]);
 
 const eventFields = withTimeGrainFields(eventBaseFields);
 

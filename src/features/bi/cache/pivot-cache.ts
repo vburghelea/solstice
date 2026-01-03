@@ -17,7 +17,10 @@ const pivotCache = new Map<string, PivotCacheEntry>();
 const datasetIndex = new Map<string, Set<string>>();
 
 const stableStringify = (value: unknown): string => {
-  if (value === null || value === undefined) {
+  if (value === undefined) {
+    return JSON.stringify("__undefined__");
+  }
+  if (value === null) {
     return JSON.stringify(value);
   }
   if (Array.isArray(value)) {

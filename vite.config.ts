@@ -196,14 +196,7 @@ export default defineConfig(({ mode }) => {
             ) {
               return "vendor-react";
             }
-            if (
-              id.includes("@tanstack/react-router") ||
-              id.includes("@tanstack/react-query") ||
-              id.includes("@tanstack/react-start") ||
-              id.includes("@tanstack/react-router-ssr-query")
-            ) {
-              return "vendor-tanstack";
-            }
+            // Keep TanStack with React to avoid cross-chunk cycles.
             if (
               id.includes("@radix-ui/react-dialog") ||
               id.includes("@radix-ui/react-dropdown-menu") ||

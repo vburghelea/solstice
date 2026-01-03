@@ -152,6 +152,9 @@ Required SST secrets:
 - `BetterAuthSecret` - Auth session secret
 - `GoogleClientId` / `GoogleClientSecret` - Google OAuth
 - `BaseUrl` - Production URL (CloudFront distribution)
+  - **Keep this in sync with the current CloudFront URL per stage.** If the
+    distribution URL changes, update `BaseUrl` for that stage or auth will fail
+    with "invalid origin".
 - `SquareEnv`, `SquareApplicationId`, `SquareAccessToken`, `SquareLocationId`, `SquareWebhookSignatureKey` - Square payments
 - `SendgridApiKey`, `SendgridFromEmail` - Email service
 

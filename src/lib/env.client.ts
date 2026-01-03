@@ -6,8 +6,7 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
-const runtimeEnv: Record<string, string | boolean | undefined> =
-  typeof import.meta !== "undefined" && "env" in import.meta ? import.meta.env : {};
+const runtimeEnv: Record<string, string | boolean | undefined> = import.meta.env ?? {};
 
 export const env = createEnv({
   clientPrefix: "VITE_",

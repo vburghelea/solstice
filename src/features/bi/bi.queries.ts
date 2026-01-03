@@ -10,7 +10,6 @@ import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   biQueryLogFilterSchema,
   fieldValueSuggestionsSchema,
-  filterSchema,
   pivotQuerySchema,
   sqlQuerySchema,
   sqlSchemaRequestSchema,

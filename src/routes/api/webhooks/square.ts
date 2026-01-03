@@ -30,7 +30,7 @@ async function finalizeCheckoutFromWebhook({
     return;
   }
 
-  const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+  const { getDb } = await import("~/db/server-helpers");
   const db = await getDb();
 
   let session = null as typeof checkoutSessions.$inferSelect | null;
@@ -230,7 +230,7 @@ async function handleRefundEvent({
     return;
   }
 
-  const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+  const { getDb } = await import("~/db/server-helpers");
   const db = await getDb();
 
   const now = new Date();
@@ -408,7 +408,7 @@ async function handleRefundEvent({
   }
 
   try {
-    const [{ getEmailService }] = await Promise.all([import("~/lib/email/sendgrid")]);
+    const { getEmailService } = await import("~/lib/email/sendgrid");
     const emailService = await getEmailService();
     const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
     const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";

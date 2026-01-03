@@ -29,7 +29,7 @@ export const handler = awslambda.streamifyResponse(
     try {
       const request = awsRequest(event, context);
       response = await nitroApp.fetch(request);
-    } catch (err) {
+    } catch {
       // If Nitro throws before we can build a Response, send a plain 500
       const meta = {
         statusCode: 500,

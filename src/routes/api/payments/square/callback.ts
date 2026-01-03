@@ -156,7 +156,8 @@ export const Route = createFileRoute("/api/payments/square/callback")({
                     paymentStatus: "pending",
                     updatedAt: now,
                     paymentMetadata: {
-                      ...(row.registration.paymentMetadata ?? {}),
+                      ...((row.registration.paymentMetadata as Record<string, unknown>) ??
+                        {}),
                       cancelledAt: nowIso,
                     },
                   })

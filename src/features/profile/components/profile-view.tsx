@@ -135,21 +135,11 @@ export function ProfileView() {
       try {
         setFormError(null); // Clear any previous errors
 
-        // Debug logging to check what we're sending
-        console.log("Form value:", value);
-        console.log("Data to submit:", dataToSubmit);
-        console.log("Data to submit keys:", Object.keys(dataToSubmit));
-        console.log("Privacy settings in dataToSubmit:", dataToSubmit["privacySettings"]);
-
         // Make sure we're not sending an empty object
         if (Object.keys(dataToSubmit).length === 0) {
-          console.error("No data to submit!");
           setFormError("No changes detected");
           return;
         }
-
-        console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
-        console.log("Data type:", typeof dataToSubmit);
 
         const result = (await updateUserProfile({
           data: dataToSubmit as PartialProfileInputType,

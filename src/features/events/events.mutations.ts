@@ -71,7 +71,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
       const nowIso = isoTimestamp(clock);
 
       try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const { getDb } = await import("~/db/server-helpers");
         const db = await getDb();
         const user = requireUser(context);
 
@@ -380,7 +380,7 @@ export const createEvent = createServerFn({ method: "POST" })
     await assertFeatureEnabled("events");
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const { getDb } = await import("~/db/server-helpers");
 
       const db = await getDb();
       const user = requireUser(context);
@@ -475,7 +475,7 @@ export const updateEvent = createServerFn({ method: "POST" })
     await assertFeatureEnabled("events");
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const { getDb } = await import("~/db/server-helpers");
 
       const db = await getDb();
       const user = requireUser(context);
@@ -607,7 +607,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
     }): Promise<EventOperationResult<EventRegistrationResultPayload>> => {
       await assertFeatureEnabled("events");
       try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const { getDb } = await import("~/db/server-helpers");
 
         const db = await getDb();
         const user = requireUser(context);
@@ -1362,7 +1362,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       await assertFeatureEnabled("events");
       try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const { getDb } = await import("~/db/server-helpers");
 
         const db = await getDb();
         const user = requireUser(context);
@@ -1475,7 +1475,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       await assertFeatureEnabled("events");
       try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const { getDb } = await import("~/db/server-helpers");
 
         const db = await getDb();
         const user = requireUser(context);
@@ -1586,7 +1586,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
     }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       await assertFeatureEnabled("events");
       try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const { getDb } = await import("~/db/server-helpers");
 
         const db = await getDb();
         const user = requireUser(context);

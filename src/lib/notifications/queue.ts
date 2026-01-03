@@ -14,7 +14,7 @@ export const enqueueNotification = createServerOnlyFn(
       ...payload,
       notificationId,
       metadata: {
-        ...(payload.metadata ?? {}),
+        ...payload.metadata,
         notificationId,
       },
     };

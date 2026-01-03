@@ -24,7 +24,7 @@ export function markEtransferPaidMetadata(
   actorId: ActorId,
   clock?: Clock,
 ): EventPaymentMetadata {
-  const metadata: EventPaymentMetadata = { ...(existing ?? {}) };
+  const metadata: EventPaymentMetadata = { ...existing };
   metadata.markedPaidAt = isoTimestamp(clock);
   metadata.markedPaidBy = actorId;
   return metadata;
@@ -36,7 +36,7 @@ export function markEtransferReminderMetadata(
   actorId: ActorId,
   clock?: Clock,
 ): EventPaymentMetadata {
-  const metadata: EventPaymentMetadata = { ...(existing ?? {}) };
+  const metadata: EventPaymentMetadata = { ...existing };
   metadata.lastReminderAt = isoTimestamp(clock);
   metadata.lastReminderBy = actorId;
   return metadata;
@@ -50,7 +50,7 @@ export function appendCancellationNote(
   existing: EventPaymentMetadata | undefined,
   note: string | undefined,
 ): EventPaymentMetadata {
-  const metadata: EventPaymentMetadata = { ...(existing ?? {}) };
+  const metadata: EventPaymentMetadata = { ...existing };
   if (note) {
     const existingNotes = metadata.notes ? metadata.notes.split("\n") : [];
     if (!existingNotes.includes(note)) {

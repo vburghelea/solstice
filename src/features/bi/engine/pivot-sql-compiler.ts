@@ -293,8 +293,7 @@ export const buildPivotResultFromSqlRows = (params: {
       rowEntry.cells[columnKey] = {};
     }
 
-    params.measureAliases.forEach((measure, index) => {
-      const meta = params.measures[index];
+    params.measureAliases.forEach((measure) => {
       const rawValue = row[measure.alias];
       if (rawValue === null || rawValue === undefined) {
         rowEntry.cells[columnKey][measure.key] = null;

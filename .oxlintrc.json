@@ -20,6 +20,8 @@
     "**/*.gen.ts",
     "drizzle",
     ".drizzle",
-    ".tanstack"
+    ".tanstack",
+    "scripts",
+    "performance"
   ]
 }

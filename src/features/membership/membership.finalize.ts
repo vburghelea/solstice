@@ -115,7 +115,7 @@ export async function finalizeMembershipPurchase({
     endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
 
     const membershipMetadata: Record<string, unknown> = {
-      ...(purchase.metadata ?? {}),
+      ...purchase.metadata,
       sessionId,
       purchasedAt: nowIso,
       squareTransactionId: paymentId,

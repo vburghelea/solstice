@@ -465,7 +465,7 @@ export default $config({
 
     // Get the Lambda function name from the web deployment
     // Note: SST creates the function with a generated name, we'll use pattern matching
-    const webFunctionNamePattern = `solstice-${stage}-Web*`;
+    const _webFunctionNamePattern = `solstice-${stage}-Web*`;
 
     // SNS Topic for alarm notifications (create only for production)
     const alarmTopic =

@@ -63,7 +63,6 @@ function ManageTeamPage() {
   const queryClient = useQueryClient();
   const { teamId } = Route.useParams();
   const { teamData } = Route.useLoaderData();
-  console.log("ManageTeamPage - teamData:", teamData);
   const { team } = teamData || {};
   const [serverError, setServerError] = useState<string | null>(null);
 

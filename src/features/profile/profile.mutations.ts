@@ -60,7 +60,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
       const currentUser = requireUser(context);
 
@@ -156,7 +156,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
   .inputValidator(zod$(profileInputSchema))
   .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
       const currentUser = requireUser(context);
 
@@ -211,7 +211,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
   .inputValidator(zod$(privacySettingsSchema))
   .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
       const currentUser = requireUser(context);
 

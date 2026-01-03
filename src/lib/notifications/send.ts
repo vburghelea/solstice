@@ -214,8 +214,8 @@ export const sendNotification = createServerOnlyFn(
 
           if (allowInApp) {
             const nextMetadata: JsonRecord = {
-              ...(existingMetadata ?? {}),
-              ...(payload.metadata ?? {}),
+              ...existingMetadata,
+              ...payload.metadata,
               emailSentAt: sentAt.toISOString(),
               ...(emailMessageId ? { emailMessageId } : {}),
             };

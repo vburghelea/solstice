@@ -173,7 +173,7 @@ export async function ensureLegacyCheckoutSession({
         currency: legacyEventSession.currency,
         expiresAt: legacyEventSession.expiresAt,
         metadata: {
-          ...(legacyEventSession.metadata ?? {}),
+          ...((legacyEventSession.metadata as Record<string, unknown>) ?? {}),
           legacySessionId: legacyEventSession.id,
           legacySessionType: "event_payment_session",
         },
@@ -244,7 +244,7 @@ export async function ensureLegacyCheckoutSession({
       currency: legacyMembershipSession.currency,
       expiresAt: legacyMembershipSession.expiresAt,
       metadata: {
-        ...(legacyMembershipSession.metadata ?? {}),
+        ...((legacyMembershipSession.metadata as Record<string, unknown>) ?? {}),
         legacySessionId: legacyMembershipSession.id,
         legacySessionType: "membership_payment_session",
       },
@@ -281,7 +281,7 @@ export async function ensureLegacyCheckoutSession({
           membershipName: membershipType.name,
           legacySessionId: legacyMembershipSession.id,
           legacySessionType: "membership_payment_session",
-          ...(legacyMembershipSession.metadata ?? {}),
+          ...((legacyMembershipSession.metadata as Record<string, unknown>) ?? {}),
         },
       })
       .returning();

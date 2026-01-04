@@ -74,7 +74,7 @@ describe("Route Guards", () => {
       expect(() => redirectIfAuthenticated({ user: mockUser })).toThrow(
         "Redirect to /dashboard",
       );
-      expect(redirect).toHaveBeenCalledWith({ to: "/dashboard" });
+      expect(redirect).toHaveBeenCalledWith({ to: "/dashboard", statusCode: 302 });
     });
 
     it("allows unauthenticated users through", () => {
@@ -85,7 +85,7 @@ describe("Route Guards", () => {
       expect(() =>
         redirectIfAuthenticated({ user: mockUser, redirectTo: "/home" }),
       ).toThrow("Redirect to /home");
-      expect(redirect).toHaveBeenCalledWith({ to: "/home" });
+      expect(redirect).toHaveBeenCalledWith({ to: "/home", statusCode: 302 });
     });
   });
 });

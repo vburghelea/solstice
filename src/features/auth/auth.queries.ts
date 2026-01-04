@@ -21,41 +21,64 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     }
 
     // Import schema and ORM inside the handler
-    const { eq } = await import("drizzle-orm");
-    const { user } = await import("~/db/schema");
-
-    // Fetch the full user data from the database
     const db = await getDb();
-    const dbUser = await db
-      .select()
-      .from(user)
-      .where(eq(user.id, session.user.id))
-      .limit(1);
+    const { eq } = await import("drizzle-orm");
+    const { user, roles, userRoles } = await import("~/db/schema");
 
-    if (!dbUser[0]) {
+    // Fetch user data and roles in parallel using the SAME db instance
+    // This avoids the extra db() acquisition that PermissionService.getUserRoles() would do
+    const [dbUserRows, roleRows] = await Promise.all([
+      db
+        .select({
+          profileComplete: user.profileComplete,
+          dateOfBirth: user.dateOfBirth,
+          emergencyContact: user.emergencyContact,
+          gender: user.gender,
+          pronouns: user.pronouns,
+          phone: user.phone,
+          privacySettings: user.privacySettings,
+          profileVersion: user.profileVersion,
+          profileUpdatedAt: user.profileUpdatedAt,
+          mfaRequired: user.mfaRequired,
+          mfaEnrolledAt: user.mfaEnrolledAt,
+          twoFactorEnabled: user.twoFactorEnabled,
+        })
+        .from(user)
+        .where(eq(user.id, session.user.id))
+        .limit(1),
+      db
+        .select({
+          id: userRoles.id,
+          userId: userRoles.userId,
+          roleId: userRoles.roleId,
+          teamId: userRoles.teamId,
+          eventId: userRoles.eventId,
+          assignedBy: userRoles.assignedBy,
+          assignedAt: userRoles.assignedAt,
+          expiresAt: userRoles.expiresAt,
+          notes: userRoles.notes,
+          role: {
+            id: roles.id,
+            name: roles.name,
+            description: roles.description,
+            permissions: roles.permissions,
+          },
+        })
+        .from(userRoles)
+        .innerJoin(roles, eq(userRoles.roleId, roles.id))
+        .where(eq(userRoles.userId, session.user.id)),
+    ]);
+
+    const dbUser = dbUserRows[0];
+    if (!dbUser) {
       return null;
     }
-
-    // Fetch user roles
-    const { PermissionService } = await import("~/features/roles/permission.service");
-    const userRoles = await PermissionService.getUserRoles(session.user.id);
 
     // Map the database user to our extended User type
     return {
       ...session.user,
-      profileComplete: dbUser[0].profileComplete,
-      dateOfBirth: dbUser[0].dateOfBirth,
-      emergencyContact: dbUser[0].emergencyContact,
-      gender: dbUser[0].gender,
-      pronouns: dbUser[0].pronouns,
-      phone: dbUser[0].phone,
-      privacySettings: dbUser[0].privacySettings,
-      profileVersion: dbUser[0].profileVersion,
-      profileUpdatedAt: dbUser[0].profileUpdatedAt,
-      mfaRequired: dbUser[0].mfaRequired,
-      mfaEnrolledAt: dbUser[0].mfaEnrolledAt,
-      twoFactorEnabled: dbUser[0].twoFactorEnabled,
-      roles: userRoles,
+      ...dbUser,
+      roles: roleRows,
     };
   },
 );

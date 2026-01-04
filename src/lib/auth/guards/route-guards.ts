@@ -54,6 +54,7 @@ export function redirectIfAuthenticated({
   if (user) {
     throw redirect({
       to: redirectTo,
+      statusCode: 302,
     });
   }
 }

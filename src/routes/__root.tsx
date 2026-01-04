@@ -18,11 +18,8 @@ import {
 } from "~/features/auth/auth.queries";
 import { StepUpProvider } from "~/features/auth/step-up";
 import { OrgContextProvider } from "~/features/organizations/org-context";
-import { validateActiveOrganization } from "~/features/organizations/organizations.queries";
-import {
-  getLatestPolicyDocument,
-  listUserPolicyAcceptances,
-} from "~/features/privacy/privacy.queries";
+// Note: validateActiveOrganization removed - using direct resolveOrganizationAccess to avoid redundant session validation
+// Note: getLatestPolicyDocument/listUserPolicyAcceptances removed - using inline DB queries to avoid redundant session validation
 import appCss from "~/styles.css?url";
 import { getBrand } from "~/tenant";
 import { getTenantKey } from "~/tenant/tenant-env";
@@ -92,6 +89,32 @@ export const Route = createRootRouteWithContext<{
 }>()({
   beforeLoad: async ({ context, location }) => {
     try {
+      const isServer = typeof window === "undefined";
+
+      /**
+       * IMPORTANT: Short-circuit /auth/* on the server.
+       * We only need to know whether a valid session exists to redirect away.
+       * Doing full getCurrentUser() hydration first can delay redirect until after
+       * SSR streaming has started, which can yield the empty octet-stream response.
+       */
+      if (isServer && location.pathname.startsWith("/auth")) {
+        const [{ getRequest }, { getSessionFromHeaders }] = await Promise.all([
+          import("@tanstack/react-start/server"),
+          import("~/lib/auth/session"),
+        ]);
+
+        const { headers } = getRequest();
+        const session = await getSessionFromHeaders(headers);
+
+        if (session?.user) {
+          // Force a real HTTP redirect response before streaming begins
+          throw redirect({ to: "/dashboard", statusCode: 302 });
+        }
+
+        // Unauthenticated: render auth pages without full SSR user hydration
+        return { user: null, activeOrganizationId: null };
+      }
+
       const resolveActiveOrganizationId = async () => {
         if (typeof window === "undefined") {
           const { getRequest } = await import("@tanstack/react-start/server");
@@ -129,8 +152,7 @@ export const Route = createRootRouteWithContext<{
 
       const candidateOrganizationId = await resolveActiveOrganizationId();
 
-      // Check if we're on the server or client
-      if (typeof window === "undefined") {
+      if (isServer) {
         // Server: use the server function
         const user = await getCurrentUser();
 
@@ -141,15 +163,41 @@ export const Route = createRootRouteWithContext<{
             throw redirect({ to: "/onboarding" });
           }
 
-          // Then check policy acceptance (only on server to avoid client navigation issues)
-          const policy = await getLatestPolicyDocument({ data: "privacy_policy" });
-          if (policy) {
-            const acceptances = await listUserPolicyAcceptances();
-            const hasAccepted = acceptances.some(
-              (acceptance) => acceptance.policyId === policy.id,
-            );
-            if (!hasAccepted) {
-              // Redirect to onboarding which now handles policy acceptance
+          // Then check policy acceptance (server-only), using inline DB queries
+          // to avoid calling server fns that re-run session validation
+          const { getDb } = await import("~/db/server-helpers");
+          const db = await getDb();
+          const { policyDocuments, userPolicyAcceptances } = await import("~/db/schema");
+          const { and, desc, eq, isNotNull, lte } = await import("drizzle-orm");
+
+          const today = new Date().toISOString().slice(0, 10);
+
+          const [policy] = await db
+            .select({ id: policyDocuments.id })
+            .from(policyDocuments)
+            .where(
+              and(
+                eq(policyDocuments.type, "privacy_policy"),
+                isNotNull(policyDocuments.publishedAt),
+                lte(policyDocuments.effectiveDate, today),
+              ),
+            )
+            .orderBy(desc(policyDocuments.effectiveDate))
+            .limit(1);
+
+          if (policy?.id) {
+            const [acceptance] = await db
+              .select({ id: userPolicyAcceptances.id })
+              .from(userPolicyAcceptances)
+              .where(
+                and(
+                  eq(userPolicyAcceptances.userId, user.id),
+                  eq(userPolicyAcceptances.policyId, policy.id),
+                ),
+              )
+              .limit(1);
+
+            if (!acceptance) {
               throw redirect({ to: "/onboarding" });
             }
           }
@@ -157,10 +205,21 @@ export const Route = createRootRouteWithContext<{
 
         let activeOrganizationId: string | null = null;
         if (candidateOrganizationId && user?.id) {
-          const access = await validateActiveOrganization({
-            data: { organizationId: candidateOrganizationId },
-          });
-          activeOrganizationId = access?.organizationId ?? null;
+          // Avoid validateActiveOrganization() server fn (it re-validates session via middleware).
+          // We already have user.id; call the underlying access resolver directly.
+          const isUuid =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+              candidateOrganizationId,
+            );
+          if (isUuid) {
+            const { resolveOrganizationAccess } =
+              await import("~/features/organizations/organizations.access");
+            const access = await resolveOrganizationAccess({
+              userId: user.id,
+              organizationId: candidateOrganizationId,
+            });
+            activeOrganizationId = access?.organizationId ?? null;
+          }
         }
 
         if (candidateOrganizationId && !activeOrganizationId) {
@@ -180,10 +239,22 @@ export const Route = createRootRouteWithContext<{
 
         let activeOrganizationId: string | null = null;
         if (candidateOrganizationId && user?.id) {
-          const access = await validateActiveOrganization({
-            data: { organizationId: candidateOrganizationId },
-          });
-          activeOrganizationId = access?.organizationId ?? null;
+          // Use direct access resolver on client too for consistency
+          const isUuid =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+              candidateOrganizationId,
+            );
+          if (isUuid) {
+            // On client, we still need to call a server function, but we can use
+            // a lighter-weight one. For now, keep the existing pattern but note
+            // that this could be optimized further by caching org access.
+            const { validateActiveOrganization } =
+              await import("~/features/organizations/organizations.queries");
+            const access = await validateActiveOrganization({
+              data: { organizationId: candidateOrganizationId },
+            });
+            activeOrganizationId = access?.organizationId ?? null;
+          }
         }
 
         if (candidateOrganizationId && !activeOrganizationId) {

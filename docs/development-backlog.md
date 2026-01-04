@@ -1,6 +1,6 @@
 # Development Backlog
 
-**Last Updated**: December 1, 2025
+**Last Updated**: January 3, 2026
 
 This backlog lists the active roadmap items for Solstice. Tickets are grouped by priority (P0 is highest). Each ticket contains the problem statement, desired outcome, implementation guidance, and links to relevant files.
 
@@ -173,6 +173,68 @@ This can be added later without changing the query logic.
 | [`src/db/schema/events.schema.ts`](../src/db/schema/events.schema.ts)               | Event schema reference              |
 | [`src/db/schema/teams.schema.ts`](../src/db/schema/teams.schema.ts)                 | Team schema reference               |
 | [`src/db/schema/membership.schema.ts`](../src/db/schema/membership.schema.ts)       | Member count source                 |
+
+---
+
+### AUTH-1: Fix Better Auth octet-stream responses and improve TTFB (sin-dev)
+
+| Field        | Details                             |
+| ------------ | ----------------------------------- |
+| **Status**   | 🟠 Investigate                      |
+| **Priority** | 🟠 High (auth + tooling disruption) |
+
+#### Problem Statement
+
+When a valid `__Secure-solstice.session_token` cookie is present, the CloudFront
+distribution intermittently returns `Content-Type: application/octet-stream`
+with a `0`-byte body for `/` and `/auth/*` routes. Chrome treats this as a file
+download and Playwright/Chrome DevTools fail with `net::ERR_ABORTED`, blocking
+automation and login flows. Without the cookie, `/auth/login` returns normal
+HTML.
+
+Performance traces (no throttling) on authenticated routes show high TTFB that
+dominates LCP:
+
+| Route                      | TTFB   | LCP    |
+| -------------------------- | ------ | ------ |
+| `/dashboard/sin`           | 686ms  | 1137ms |
+| `/dashboard/sin/reporting` | 1063ms | 1150ms |
+| `/dashboard/sin/imports`   | 1128ms | 1158ms |
+| `/dashboard/sin/forms`     | 1265ms | 1299ms |
+| `/dashboard/sin/support`   | 1032ms | 1092ms |
+
+#### Desired Outcome
+
+- Authenticated navigation never returns `application/octet-stream` or empty
+  HTML; `/` and `/auth/*` respond with valid HTML or redirects.
+- Playwright/Chrome DevTools can consistently navigate without triggering a
+  download.
+- Reduce authenticated TTFB by 30–50% on sin-dev (target sub-500ms median).
+
+#### Implementation Guidance
+
+- Reproduce with a session cookie: log in, then request `/auth/login` or `/` and
+  inspect headers/body for content-type + empty body.
+- Inspect `src/nitro/aws-lambda-response-streaming.mjs` for default
+  `application/octet-stream` fallbacks or stream termination when a `Response`
+  has a `null`/streamed body; ensure `text/html` + body are preserved.
+- Verify Better Auth responses and `redirectIfAuthenticated` do not produce an
+  empty body that the adapter mishandles; capture `Server-Timing` or debug logs
+  for the auth path.
+- Add server timing around `getCurrentUser` + org/role checks and parallelize or
+  cache within the request to avoid duplicate DB calls.
+- Evaluate query plans and indexes for session/user/org lookups; confirm RDS
+  Proxy settings and connection reuse in the Lambda runtime.
+
+#### Relevant files
+
+- `src/nitro/aws-lambda-response-streaming.mjs`
+- `src/routes/auth/route.tsx`
+- `src/routes/__root.tsx`
+- `src/features/auth/auth.queries.ts`
+- `src/lib/auth/server-helpers.ts`
+- `src/lib/auth/session.ts`
+- `sst.config.ts`
 
 ---
 

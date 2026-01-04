@@ -10,6 +10,11 @@ vi.mock("~/lib/auth-client", () => ({
   },
 }));
 
+// Mock tenant to QC for consistent test behavior
+vi.mock("~/tenant/tenant-env", () => ({
+  getTenantKey: () => "qc" as const,
+}));
+
 describe("AdminLayout with Router", () => {
   beforeEach(() => {
     vi.clearAllMocks();

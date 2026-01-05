@@ -2430,7 +2430,7 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 |        |                  |                 |                 |
 |   +----+-----+      +-----+-----+     +-----+-----+           |
 |   |    S3    |      |    SQS    |     |   Redis   |           |
-|   | Storage  |      |  Queue    |     | (Upstash) |           |
+|   | Storage  |      |  Queue    |     |  Cache    |           |
 |   +----------+      +-----------+     +-----------+           |
 |                                                               |
 |   +-----------+    +------------+    +-----------+            |
@@ -2448,7 +2448,7 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL on AWS RDS                                        |
-| Caching        | Redis (Upstash) for rate limiting, BI caching, permissions   |
+| Caching        | Redis for rate limiting, BI caching, permissions             |
 | Infrastructure | SST, AWS Lambda, CloudFront, ECS Fargate                     |
 | Authentication | Better Auth with TOTP MFA                                    |
 | Monitoring     | AWS CloudWatch, CloudTrail                                   |

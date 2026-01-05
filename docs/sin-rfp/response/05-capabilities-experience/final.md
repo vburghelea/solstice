@@ -2,248 +2,164 @@
 
 ## Demonstrated Success Delivering Similar Systems
 
-Austin Wallace Tech brings demonstrated experience delivering enterprise-scale information management systems across sports and data-intensive industries.
+Austin Wallace Tech brings experience delivering information systems in sports and data-intensive environments.
 
 ### Austin Wallace: Enterprise Data Engineering
 
-| Organization                              | Role                | Achievements                                                                                                                                                                                                 |
-| ----------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Clio** (2024 to Present)                | Data Engineer       | Owns 10+ Databricks pipelines processing production workloads. Unlocked $1M+ in value through AI analysis. Authored company-wide AI best practices guide, increasing responsible AI adoption 20x.            |
-| **New Jersey Devils, NHL** (2022 to 2024) | Sole Data Developer | Built end-to-end data platform processing 10 million rows per game of NHL tracking data (10,000x increase in data volume). Developed 40+ dbt models supporting multi-million dollar player salary decisions. |
-| **Teck Resources** (2020 to 2022)         | Data Developer      | Transformed legacy PostgreSQL stored procedures into testable Python pipelines using Terraform and Azure infrastructure.                                                                                     |
+| Organization                          | Role                | Achievements                                                                                 |
+| ------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------- |
+| Clio (2024 to Present)                | Data Engineer       | Owns Databricks pipelines processing production workloads. Authored AI best practices guide. |
+| New Jersey Devils, NHL (2022 to 2024) | Sole Data Developer | Built data platform processing 10 million rows per game. Developed 40+ dbt models.           |
+| Teck Resources (2020 to 2022)         | Data Developer      | Modernized legacy PostgreSQL processes with Terraform and Python.                            |
 
 ### Will Siddal: Full-Stack Development
 
-| Organization                      | Role                 | Achievements                                                                                                                                                                               |
-| --------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Teck Resources** (2022 to 2024) | Full Stack Developer | Built mission-critical reporting pipelines processing billions of rows annually. Developed internal tools using React and TypeScript. Managed cloud infrastructure on AWS using Terraform. |
+| Organization                  | Role                 | Achievements                                                                                               |
+| ----------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Teck Resources (2022 to 2024) | Full Stack Developer | Built reporting pipelines processing billions of rows. Developed internal tools with React and TypeScript. |
 
-### The Solstice Prototype as Proof of Capability
+### The Solstice Prototype as Proof
 
-The most relevant demonstration of our capability is the Solstice platform itself: a working prototype built specifically for viaSport's Strength in Numbers requirements.
+The most relevant evidence is the Solstice prototype itself, built for viaSport requirements.
 
-| Metric           | Value                                                               |
-| ---------------- | ------------------------------------------------------------------- |
-| Codebase         | 20,000+ lines of tested TypeScript                                  |
-| Requirements Met | Majority of system requirements implemented; remaining items scoped |
-| Load Testing     | 20.1 million rows, sub-250ms response times                         |
-| Server Errors    | Zero under concurrent load                                          |
-
-This is not a theoretical proposal. viaSport can evaluate a working system.
+| Metric                | Value                                                |
+| --------------------- | ---------------------------------------------------- |
+| Requirements coverage | Majority of System Requirements Addendum implemented |
+| Load testing          | 20.1 million rows, sub-250ms p95 latency             |
+| Server errors         | Zero under concurrent load                           |
+| Codebase size         | 97,000+ lines of TypeScript (app plus tests)         |
 
 ## Partners and Subcontractors
 
 ### Team Structure
 
-| Role                     | Team Member    | Responsibilities                                                       | Status      |
-| ------------------------ | -------------- | ---------------------------------------------------------------------- | ----------- |
-| Project Lead / Architect | Austin Wallace | Architecture, data engineering, project management, delivery oversight | Committed   |
-| Senior Developer         | Will Siddal    | Frontend/backend development, feature implementation                   | Committed   |
-| Security Expert          | TBD            | Security review, penetration testing, compliance validation            | In progress |
-| UX Designer              | TBD            | User research, interface design, accessibility audit                   | In progress |
-
-The core team is based in British Columbia; remaining roles are expected to be BC-based (TBD).
+| Role                     | Team Member    | Responsibilities                                            | Status      |
+| ------------------------ | -------------- | ----------------------------------------------------------- | ----------- |
+| Project Lead / Architect | Austin Wallace | Architecture, data engineering, delivery oversight          | Committed   |
+| Senior Developer         | Will Siddal    | Frontend and backend development                            | Committed   |
+| Security Expert          | TBD            | Security review, penetration testing, compliance validation | In progress |
+| UX Designer              | TBD            | User research, interface refinement, accessibility audit    | In progress |
 
 ### Oversight Mechanisms
 
-Austin Wallace, as Project Lead, maintains direct oversight of all project work:
-
-- **Daily coordination** with development team on implementation priorities
-- **Weekly deliverable reviews** with full team
-- **Code review requirements** for all changes before merge
-- **Security sign-off** required for authentication and access control changes
-- **Direct accountability** to viaSport with no organizational layers in between
+- Daily coordination on implementation priorities
+- Weekly deliverable reviews
+- Code review required for all changes
+- Security sign-off for auth and access control changes
+- Direct accountability to viaSport with no organizational layers
 
 ### Continuity of Services
 
-The architecture and deployment approach ensures continuity regardless of team changes:
+Continuity is supported by:
 
-- **Infrastructure as Code**: All AWS resources defined in SST, reproducible from version control
-- **Comprehensive Documentation**: Architecture decisions, deployment procedures, and operational runbooks maintained in the repository
-- **Automated Testing**: CI validates core workflows and regressions on each change
-- **Operational Runbooks**: Environment setup, deployment, and recovery procedures documented for continuity
-
-In the event of team member departure, knowledge transfer is supported by the codebase itself. The principal-led structure ensures Austin Wallace remains the constant point of accountability.
+- Infrastructure as code (SST)
+- Automated testing and CI
+- Operational runbooks and documentation
+- Principal-led delivery continuity
 
 ## Relevant Non-Profit, Public Sector, and Sport Clients
 
-### Direct Sport Sector Experience
+### Sport Sector Experience
 
-| Organization                            | Relationship              | Scope                                                                                                                                                                                                          |
-| --------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **International Quidditch Association** | Chair, Board of Directors | Led governance, data, and technology strategy for 30+ national governing bodies across six continents. Managed compliance, reporting, and information systems for one of the fastest-growing sports worldwide. |
-| **Volunteer Media Organization**        | CEO                       | Grew organization to 70 staff across 30 countries. Managed international coordination, operations, and communications infrastructure.                                                                          |
+| Organization                        | Relationship              | Scope                                                                           |
+| ----------------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
+| International Quidditch Association | Chair, Board of Directors | Led governance, data, and technology strategy for 30+ national governing bodies |
+| Volunteer Media Organization        | CEO                       | Managed operations for a 70-person volunteer organization                       |
 
-This is not vendor experience serving the sport sector from the outside. Austin Wallace has led amateur sport organizations from the inside, understanding the governance challenges, resource constraints, and stakeholder dynamics that viaSport navigates daily.
+### Public and Enterprise Experience
 
-### Team Experience with Public Sector and Enterprise Clients
-
-| Team Member    | Organization            | Sector                                                         |
-| -------------- | ----------------------- | -------------------------------------------------------------- |
-| Austin Wallace | Teck Resources          | Resource sector, publicly traded                               |
-| Austin Wallace | New Jersey Devils (NHL) | Professional sports                                            |
-| Austin Wallace | Clio                    | Legal technology (serves law firms, including public interest) |
-| Will Siddal    | Teck Resources          | Resource sector, publicly traded                               |
+| Team Member    | Organization   | Sector                                    |
+| -------------- | -------------- | ----------------------------------------- |
+| Austin Wallace | Teck Resources | Publicly traded resource sector           |
+| Austin Wallace | Clio           | Legal technology, public interest clients |
+| Will Siddal    | Teck Resources | Publicly traded resource sector           |
 
 ## Case Studies
 
-### Primary: Solstice Platform (for viaSport)
+### Primary Case Study: Solstice Platform (viaSport)
 
-**Context:** viaSport issued an RFP to replace legacy information management systems (BCAR and BCSI) serving 60+ Provincial Sport Organizations. The RFP specified 25 system requirements across data management, reporting, security, training, and user interface.
+**Context:** viaSport requires replacement of BCAR and BCSI with a modern information system.
 
-**Approach:** Rather than responding with a proposal document, Austin Wallace Tech built a working prototype that demonstrates capability through a functioning system.
+**Approach:** Build a working prototype that meets the System Requirements Addendum and demonstrate performance at scale.
 
 **Deliverables:**
 
-| Component               | Description                                                             |
-| ----------------------- | ----------------------------------------------------------------------- |
-| Data Submission Portal  | Form builder, file uploads, submission tracking, version history        |
-| Native BI Platform      | Pivot tables, charts, export to CSV/Excel/JSON with tenancy enforcement |
-| Role-Based Access       | Organization-scoped permissions, field-level access control             |
-| Security Infrastructure | MFA, anomaly detection, tamper-evident audit logs                       |
-| Import Tooling          | CSV/Excel import with mapping, validation, preview, rollback            |
-| Training Framework      | Guided walkthroughs, help center, templates hub                         |
+- Data submission portal with form builder and file uploads
+- Native analytics with pivots, charts, and export
+- Role-based access control and organization scoping
+- MFA, anomaly detection, and tamper-evident audit logs
+- Import tooling with mapping, validation, preview, rollback
+- Guided walkthroughs and help center
 
 **Results:**
 
-- Majority of system requirements addressed; remaining items scheduled in the implementation plan
-- Load tested with 20.1 million rows
-- Sub-250ms response times (p95) under concurrent load
-- Zero server errors
-- Live prototype available for viaSport evaluation
+- 20.1M rows tested, sub-250ms p95 latency
+- Zero server errors under concurrent load
+- Prototype available for evaluator validation
 
-### Supporting: Qdrill (Production Sports Application)
+### Supporting Case Study: Qdrill
 
-**Context:** A training application used by competitive athletes, including members of Team Canada.
+A production training application used by competitive athletes, including Team Canada. Demonstrates ability to ship and operate a real user-facing sports application.
 
-**Scope:** 87,000+ lines of code. Full-stack application with user authentication, data persistence, and real-time features.
+### Supporting Case Study: New Jersey Devils Data Platform
 
-**Relevance:** Demonstrates ability to ship user-facing sports software to production with real users and real data.
-
-### Supporting: New Jersey Devils Data Platform
-
-**Context:** The NHL requires teams to process large volumes of tracking data for player evaluation and game strategy.
-
-**Scope:** 10 million rows per game. 40+ dbt models. Supported multi-million dollar player salary decisions.
-
-**Relevance:** Demonstrates enterprise-scale data engineering in a sports context, with high stakes for data accuracy and reliability.
+Processed 10 million rows per game for NHL tracking data and supported multi-million dollar decision making.
 
 ## Automation and AI
 
 ### Automation (Production-Ready)
 
-The platform includes comprehensive automation for operational efficiency:
-
-| Feature                 | Schedule        | Purpose                                                            |
-| ----------------------- | --------------- | ------------------------------------------------------------------ |
-| Scheduled Notifications | Every 5 minutes | Process queued notifications, send email digests                   |
-| Retention Enforcement   | Daily           | Purge data past retention period, archive audit logs to S3 Glacier |
-| Data Quality Monitor    | Daily           | Scan submissions for completeness, flag data quality issues        |
-| Notification Queue      | Event-driven    | Asynchronous email delivery with retry and dead-letter queue       |
-| Batch Import Worker     | On-demand       | Process large CSV/Excel imports via ECS Fargate with checkpointing |
-| Health Monitoring       | On-demand       | Database and service health checks with alerting                   |
-| Audit Logging           | Real-time       | Immutable logging of all system actions                            |
-
-**Technical Infrastructure:**
-
-| Service         | Purpose                                            |
-| --------------- | -------------------------------------------------- |
-| AWS EventBridge | Cron scheduling for periodic jobs                  |
-| AWS Lambda      | Serverless job execution                           |
-| AWS SQS FIFO    | Notification queue with deduplication              |
-| AWS ECS Fargate | Batch processing (2 vCPU, 4 GB RAM, checkpointing) |
-| AWS SES         | Email delivery with bounce handling                |
-| AWS CloudWatch  | Metrics, alarms, and centralized logging           |
+| Feature                 | Schedule        | Purpose                                     |
+| ----------------------- | --------------- | ------------------------------------------- |
+| Scheduled notifications | Every 5 minutes | Process reminder and alert queue            |
+| Retention enforcement   | Daily           | Archive and purge data per policy           |
+| Data quality monitoring | Daily           | Detect missing fields and validation errors |
+| Batch import worker     | On demand       | Process large imports with checkpointing    |
+| Health monitoring       | On demand       | Service health checks with alerts           |
 
 ### AI Features (Roadmap)
 
-The platform architecture is AI-ready, with specific features to be prioritized in collaboration with viaSport during the Planning phase.
+AI features will be prioritized with viaSport during Planning:
 
-**Proposed AI Features for Year 1:**
+| Feature                | Description                         | Benefit                 |
+| ---------------------- | ----------------------------------- | ----------------------- |
+| AI report narratives   | Generate summaries from submissions | Reduce manual reporting |
+| Natural language query | Ask questions in plain English      | Self-service analytics  |
+| Data quality AI        | Detect anomalies in submissions     | Improve integrity       |
+| Submission assistant   | Contextual form guidance            | Reduce errors           |
 
-| Feature                | Description                                                 | Benefit                                        |
-| ---------------------- | ----------------------------------------------------------- | ---------------------------------------------- |
-| AI Report Narratives   | Generate board-ready summaries from submitted data          | Reduce manual report writing                   |
-| Natural Language Query | Ask questions about data in plain English                   | Self-service analytics for non-technical users |
-| Data Quality AI        | Automatically detect anomalies and errors in submissions    | Improve data integrity                         |
-| Submission Assistant   | Help PSOs complete forms correctly with contextual guidance | Reduce errors and support requests             |
-
-**Why AI is Roadmap, Not Day-One:**
-
-The RFP identifies AI-enabled features as desirable, not required. Our approach prioritizes:
-
-1. Delivering core functionality first
-2. Gathering real usage data to inform AI priorities
-3. Collaborating with viaSport to identify highest-value AI applications
-4. Implementing AI features with proper validation and testing
-
-Austin Wallace's experience at Clio (authored company-wide AI best practices, achieved 20x increase in responsible AI adoption) informs this measured approach.
+AI is a roadmap item, not a day-one dependency.
 
 ## Responsible AI Approach
 
-When AI features are implemented, the following principles will govern their development and deployment:
-
-### Transparency
-
-- Clear indication when AI generates or assists with content
-- Explanation of AI confidence levels where applicable
-- Documentation of AI model sources and capabilities
-
-### Human-in-the-Loop
-
-- AI-generated reports require human review before publication
-- AI suggestions are recommendations, not automatic actions
-- Users can override or reject AI outputs
-
-### Privacy Protection
-
-- AI models do not train on viaSport data without explicit consent
-- PII is excluded from AI processing where not essential
-- AI features respect the same access controls as the rest of the platform
-
-### Bias Awareness
-
-- Regular review of AI outputs for unintended patterns
-- Diverse test cases during AI feature development
-- Feedback mechanisms for users to flag problematic outputs
+- Transparent labeling of AI-generated content
+- Human review before publishing AI outputs
+- No model training on viaSport data without consent
+- Bias review and feedback mechanisms
 
 ## Open Standards, APIs, and Open Source
 
 ### Open Standards
 
-| Standard        | Usage                          |
-| --------------- | ------------------------------ |
-| TOTP (RFC 6238) | Multi-factor authentication    |
-| CSV/Excel       | Data import and export formats |
-| JSON            | Data interchange               |
-| TLS 1.2+        | Transport security             |
-| AES-256         | Encryption at rest             |
+- TOTP (RFC 6238) for MFA
+- CSV and Excel for import and export
+- JSON for data interchange
+- TLS 1.2+ for transport security
+- AES-256 for encryption at rest
 
 ### APIs
 
-The platform provides internal APIs and integration points. External APIs and webhooks can be exposed as needed and scoped collaboratively with viaSport during Planning.
+Internal APIs are structured for extension. External integrations will be scoped with viaSport during Discovery.
 
-**Note:** Integration requirements (e.g., third-party databases or services) will be defined with viaSport before implementation.
-
-### Open Source
-
-The platform is built on industry-standard open source technologies:
+### Open Source Foundations
 
 | Layer          | Technologies                                                 |
 | -------------- | ------------------------------------------------------------ |
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL                                                   |
-| Infrastructure | SST (infrastructure as code)                                 |
+| Infrastructure | SST                                                          |
 | Testing        | Vitest, Playwright, Testing Library                          |
 | Validation     | Zod                                                          |
 
-This open source foundation ensures:
-
-- **No vendor lock-in** for core technologies
-- **Community support** and ongoing development
-- **Auditability** of underlying code
-- **Portability** if future migration is needed
-- **Talent availability** for future development
-
-The application code itself is proprietary, owned by Austin Wallace Tech, with full source code access provided to viaSport as part of the engagement.
+The application code is proprietary to Austin Wallace Tech, with source access available under mutually agreed terms.

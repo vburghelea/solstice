@@ -2,144 +2,252 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                            | Status | Implementation                                                    |
-| ---------- | -------------------------------- | ------ | ----------------------------------------------------------------- |
-| UI-AGG-001 | User Access & Account Control    | Comply | Login, MFA, recovery, RBAC, admin management                      |
-| UI-AGG-002 | Personalized Dashboard           | Comply | Role-aware dashboards with relevant data and actions              |
-| UI-AGG-003 | Responsive & Inclusive Design    | Comply | Radix primitives, WCAG-aligned design, Lighthouse metrics on file |
-| UI-AGG-004 | Task & Notification Management   | Comply | Automated notifications, email delivery, task reminders           |
-| UI-AGG-005 | Content Navigation & Interaction | Comply | Command palette, search, filtering, categorization                |
-| UI-AGG-006 | User Support & Feedback          | Comply | In-app support requests with status tracking                      |
-| UI-AGG-007 | Consistent Visual Language       | Comply | Design system with tenant branding configuration                  |
+| Req ID     | Title                                   | Status | Built Today                            | Remaining Scope                      |
+| ---------- | --------------------------------------- | ------ | -------------------------------------- | ------------------------------------ |
+| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC             | None                                 |
+| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                  | None                                 |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility        | Formal audit before submission (TBD) |
+| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications  | None                                 |
+| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette     | None                                 |
+| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support requests and admin response UI | None                                 |
+| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding      | viaSport branding configuration      |
 
-## UI-AGG-001: User Access & Account Control
+## UI-AGG-001: User Access and Account Control
 
-**Requirement:** The system shall support secure login/logout (MFA), individual and organizational account registration, account recovery, and system administrator account management with role-based access.
+**Requirement:**
 
-**Implementation:**
+> The system shall support secure login/logout (MFA), individual and organizational account registration, account recovery, and system administrator account management with role-based access.
 
-| Capability           | Description                                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Secure Login         | Email/password authentication with TOTP-based multi-factor authentication                                    |
-| Logout               | Secure session termination; session cookies invalidated                                                      |
-| Account Registration | Individual registration with email verification; organization onboarding via invitation or approval workflow |
-| Account Recovery     | Secure password reset via time-limited email token                                                           |
-| Admin Management     | System administrators can create, modify, and deactivate user accounts                                       |
-| Role Assignment      | Administrators can assign and modify user roles within their organization                                    |
+**Acceptance Criteria:**
 
-**Evidence:** Login flow tested in E2E tests; MFA and account management functional in prototype.
+> Users and system admin can perform account-related tasks securely.
+
+**How We Meet It:**
+
+- Secure login with MFA and session management.
+- Password recovery via time-limited tokens.
+- Admin tools for user management and role assignment.
+
+**Built Today:**
+
+- MFA enrollment and recovery flows.
+- Organization invite and join request workflows.
+- Admin settings panel for user access management.
+
+**Remaining Scope:**
+
+- None. Fully implemented.
+
+**Approach:**
+Validate account flows during UAT and incorporate viaSport policy guidance.
+
+**Evidence:**
+
+- `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-login-20251228-1953.png`
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-001-settings-20251228-1953.png`
 
 ## UI-AGG-002: Personalized Dashboard
 
-**Requirement:** The system shall provide the capability to create personalized dashboard for each user role, summarizing relevant data, actions, and reporting progress.
+**Requirement:**
 
-**Implementation:**
+> The system shall provide the capability to create personalized dashboard for each user role, summarizing relevant data, actions, and reporting progress.
 
-| Capability         | Description                                                                            |
-| ------------------ | -------------------------------------------------------------------------------------- |
-| Role-Aware Content | Dashboard displays different widgets based on user role                                |
-| Admin Dashboard    | Overdue reporting, pending join requests, system overview                              |
-| Reporter Dashboard | Changes requested, submitted reports, upcoming deadlines                               |
-| Viewer Dashboard   | Submitted reports, imports in progress, recent activity                                |
-| Reporting Progress | Visual indicators for submission status across reporting periods                       |
-| Quick Actions      | Common actions (submit form, run report, view notifications) accessible from dashboard |
+**Acceptance Criteria:**
 
-**Evidence:** Dashboard role-awareness verified via code review; different content displayed by role in prototype.
+> Users can view personalized dashboards based on their roles.
 
-## UI-AGG-003: Responsive & Inclusive Design
+**How We Meet It:**
 
-**Requirement:** The system shall provide a responsive interface across devices and include accessibility features such as screen reader compatibility, color contrast tools, and etc.
+- Dashboards show different cards and metrics by role.
+- Reporting status and tasks surface at the top of the portal.
+- Admin dashboards include cross-org visibility.
 
-**Implementation:**
+**Built Today:**
 
-| Capability            | Description                                                                  |
-| --------------------- | ---------------------------------------------------------------------------- |
-| Responsive Layout     | Mobile-first design; interface adapts to desktop, tablet, and mobile screens |
-| Radix UI Primitives   | Built on Radix UI, which provides accessible components by default           |
-| Screen Reader Support | ARIA labels, semantic HTML, and keyboard navigation throughout               |
-| Color Contrast        | Color scheme designed to meet WCAG AA contrast requirements                  |
-| Focus Management      | Visible focus indicators; logical tab order                                  |
-| Tailwind + shadcn/ui  | Consistent, accessible component library                                     |
+- Role-aware portal dashboard.
+- Reporting status and overdue indicators.
+- Quick actions for forms, analytics, and imports.
 
-**Performance Metrics (Lighthouse, latest prototype run; date TBD):**
+**Remaining Scope:**
 
-| Metric                   | Value  | Target  | Status |
-| ------------------------ | ------ | ------- | ------ |
-| Performance Score        | 93/100 | >80     | Pass   |
-| Largest Contentful Paint | 2284ms | <2500ms | Pass   |
-| Time to First Byte       | 380ms  | <500ms  | Pass   |
-| Total Blocking Time      | 88ms   | <300ms  | Pass   |
-| Cumulative Layout Shift  | 0      | <0.1    | Pass   |
+- None. Fully implemented.
 
-**Note:** Formal WCAG audit available on request; platform adheres to WCAG accessibility standards.
+**Approach:**
+Refine dashboard widgets based on viaSport priorities.
 
-**Evidence:** Lighthouse scores documented; accessibility checks performed during QA.
+**Evidence:**
 
-## UI-AGG-004: Task & Notification Management
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-002-dashboard-20251228-1953.png`
 
-**Requirement:** The system shall enable automated and customizable notification messages and task reminders that alert users of pending actions and updates, both on the platform and via email.
+## UI-AGG-003: Responsive and Inclusive Design
 
-**Implementation:**
+**Requirement:**
 
-| Capability               | Description                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------------- |
-| Automated Notifications  | System-generated notifications for deadlines, status changes, and administrative actions |
-| Customizable Templates   | Notification templates configurable by administrators (scope defined with viaSport)      |
-| Email Delivery           | Notifications delivered via AWS SES to user's email address                              |
-| In-App Notifications     | Real-time notification feed; unread count displayed in navigation bar                    |
-| Task Reminders           | Configurable reminder schedules (7 days, 3 days, 1 day before deadline)                  |
-| Notification Preferences | Notification preferences configurable by role (scope defined with viaSport)              |
+> The system shall provide a responsive interface across devices and include accessibility features such as screen reader compatibility, color contrast tools, and etc.
 
-**Evidence:** Email delivery verified in dev; in-app notifications functional in prototype (date on file).
+**Acceptance Criteria:**
 
-## UI-AGG-005: Content Navigation & Interaction
+> System is functional on all devices and meets accessibility compliance.
 
-**Requirement:** The system shall allow users to efficiently locate and interact with information using robust categorization, search and filtering capabilities.
+**How We Meet It:**
 
-**Implementation:**
+- Mobile-first layout with responsive breakpoints.
+- Accessible UI primitives with keyboard navigation and ARIA labels.
+- Color contrast and focus indicators baked into the design system.
 
-| Capability      | Description                                                                            |
-| --------------- | -------------------------------------------------------------------------------------- |
-| Command Palette | Keyboard-accessible search (Cmd+K / Ctrl+K) for quick navigation to any page or action |
-| Search          | Search within lists and records; global search can be enabled as needed                |
-| Filtering       | Multi-criteria filtering on list views                                                 |
-| Categorization  | Content organized by type, organization, status, and date                              |
-| Pagination      | Large datasets paginated for performance; configurable page size                       |
-| Sorting         | Column-based sorting on all tabular data                                               |
+**Built Today:**
 
-**Evidence:** Command palette and list filtering functional in prototype; search capabilities available where enabled.
+- Responsive portal and admin screens.
+- A11y scan completed and recorded.
+- Keyboard navigation and accessible components across workflows.
 
-## UI-AGG-006: User Support & Feedback
+**Remaining Scope:**
 
-**Requirement:** The system shall enable users to submit support inquiries and feedback and allow administrators to respond through a managed interface.
+- Formal accessibility audit before submission (TBD).
 
-**Implementation:**
+**Approach:**
+Run formal audit and remediate findings prior to submission.
 
-| Capability           | Description                                                                  |
-| -------------------- | ---------------------------------------------------------------------------- |
-| Support Request Form | In-app form for submitting questions, issues, feature requests, and feedback |
-| Category Selection   | Users categorize requests for efficient routing                              |
-| Status Tracking      | Requests have status (submitted, in progress, resolved); users see updates   |
-| Admin Interface      | Administrators can view, respond to, and resolve support requests            |
-| Email Notifications  | Users notified via email when their request receives a response              |
+**Evidence:**
 
-**Evidence:** Support request workflow implemented in prototype; status tracking functional.
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-003-mobile-20251228-1953.png`
+- `docs/sin-rfp/review-plans/evidence/a11y-scan-20251231.json`
 
-## UI-AGG-007: Consistent Visual Language & Branding
+## UI-AGG-004: Task and Notification Management
 
-**Requirement:** The system shall maintain a consistent design style, color scheme, and branding across all modules.
+**Requirement:**
 
-**Implementation:**
+> The system shall enable automated and customizable notification messages and task reminders that alert users of pending actions and updates, both on the platform and via email.
 
-| Capability         | Description                                                         |
-| ------------------ | ------------------------------------------------------------------- |
-| Design System      | Unified component library via shadcn/ui ensures visual consistency  |
-| Color Scheme       | Configurable color palette applied consistently across all modules  |
-| Typography         | Consistent font family, sizes, and weights throughout the interface |
-| Tenant Branding    | Configurable logo, primary colors, and organization name per tenant |
-| Icon Library       | Consistent iconography across the interface                         |
-| Spacing and Layout | Standardized spacing scale and layout patterns across all screens   |
+**Acceptance Criteria:**
 
-**Note:** viaSport-specific branding (logo, colors) will be configured during the Planning phase.
+> Users receive timely and relevant notifications and reminders.
 
-**Evidence:** Design system applied consistently across prototype; branding configuration available in admin settings.
+**How We Meet It:**
+
+- Scheduled reminders are generated from reporting tasks.
+- In-app notifications surface updates and status changes.
+- Email delivery uses AWS SES with delivery logging.
+
+**Built Today:**
+
+- Notification scheduler and in-app notification feed.
+- Email delivery with SES logging.
+- Reminder cadence configurable per task.
+
+**Remaining Scope:**
+
+- None. Fully implemented.
+
+**Approach:**
+Tune reminder cadence with viaSport during Discovery.
+
+**Evidence:**
+
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-004-notifications-20251228-1953.png`
+- `docs/sin-rfp/review-plans/evidence/NOTIFICATIONS-DELIVERY-sin-dev-20251231.md`
+
+## UI-AGG-005: Content Navigation and Interaction
+
+**Requirement:**
+
+> The system shall allow users to efficiently locate and interact with information using robust categorization, search and filtering capabilities.
+
+**Acceptance Criteria:**
+
+> Users can retrieve accurate results through search and filter functions.
+
+**How We Meet It:**
+
+- Global search and command palette support quick navigation.
+- List views include filtering, sorting, and pagination.
+- Data catalog and template hubs provide structured categorization.
+
+**Built Today:**
+
+- Command palette with actions and global search results.
+- List filtering and sorting across forms, templates, and reporting.
+- Data catalog and templates hub.
+
+**Remaining Scope:**
+
+- None. Fully implemented.
+
+**Approach:**
+Expand search datasets as viaSport priorities are defined.
+
+**Evidence:**
+
+- `src/features/search/components/global-search-command-palette.tsx`
+- `docs/sin-rfp/review-plans/evidence/DM-AGG-003-data-catalog-20251228-1953.png`
+
+## UI-AGG-006: User Support and Feedback Mechanism
+
+**Requirement:**
+
+> The system shall enable users to submit support inquiries and feedback and allow administrators to respond through a managed interface.
+
+**Acceptance Criteria:**
+
+> Users can submit and receive responses to inquiries within the system.
+
+**How We Meet It:**
+
+- Support requests are submitted in-app with category and priority.
+- Admin panel manages responses and status updates.
+- Users receive email and in-app updates on responses.
+
+**Built Today:**
+
+- Support request form with attachments and priority.
+- Admin support queue with status tracking.
+- Audit logging for support actions.
+
+**Remaining Scope:**
+
+- None. Fully implemented.
+
+**Approach:**
+Confirm SLA targets and escalation rules with viaSport.
+
+**Evidence:**
+
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-006-support-20251228-1953.png`
+- `docs/sin-rfp/review-plans/evidence/UI-AGG-006-support-admin-20251228-1953.png`
+
+## UI-AGG-007: Consistent Visual Language and Branding
+
+**Requirement:**
+
+> The system shall maintain a consistent design style, color scheme, and branding across all modules.
+
+**Acceptance Criteria:**
+
+> All UI components follow a standardized visual style.
+
+**How We Meet It:**
+
+- Design system components are shared across all screens.
+- Tenant branding supports logo and color configuration.
+- Typography, spacing, and iconography are standardized.
+
+**Built Today:**
+
+- shadcn/ui component system applied across the portal.
+- Tenant branding configuration available in admin settings.
+- Consistent navigation and layout patterns.
+
+**Remaining Scope:**
+
+- viaSport branding assets and theme configuration (TBD).
+
+**viaSport Dependencies:**
+
+- Logo, color palette, and typography guidance.
+
+**Approach:**
+Apply viaSport branding during Discovery and validate in UAT.
+
+**Evidence:**
+
+- `docs/sin-rfp/review-plans/evidence/ADMIN-SIN-overview-20251228-1953.png`

@@ -4,88 +4,99 @@
 
 ### Austin Wallace Tech
 
-Austin Wallace Tech is a British Columbia-based technology consulting firm incorporated in 2025 and headquartered in Victoria, BC. The company was founded specifically to deliver information management solutions to the amateur sport sector, with viaSport's Strength in Numbers project as its primary engagement.
+Austin Wallace Tech is a British Columbia based technology consulting firm incorporated in 2025 and headquartered in Victoria, BC. The company was founded to deliver information management solutions for the sport sector, with the Strength in Numbers platform as its primary engagement.
 
 | Attribute     | Details                                     |
 | ------------- | ------------------------------------------- |
 | Incorporation | 2025                                        |
 | Headquarters  | Victoria, British Columbia                  |
-| Staff         | 1 principal + contracted specialists        |
+| Staff         | 1 principal plus contracted specialists     |
 | Structure     | Incorporated company with contracted team   |
 | Primary Focus | Sport sector information management systems |
 
-Austin Wallace Tech operates as a principal-led consultancy. This structure ensures that the person who architected and built the working prototype will lead delivery through to production. There are no hand-offs between sales, architecture, and delivery teams. viaSport will have direct access to the technical decision-maker throughout the engagement.
+Austin Wallace Tech operates as a principal-led consultancy. The person who architected and built the working prototype will lead delivery through production. There are no hand-offs between sales, architecture, and delivery teams.
 
-### Principal: Austin Wallace, Project Lead and Data Engineer
+## Principal: Austin Wallace, Project Lead and Data Engineer
 
-Austin Wallace brings 9+ years of enterprise data engineering experience combined with executive leadership in international amateur sport governance.
+Austin Wallace brings 9+ years of enterprise data engineering experience with executive leadership in amateur sport governance.
 
-**Professional Experience:**
+**Professional Experience**
 
-- **Clio (Aug 2024 to Present):** Data Engineer. Owns 10+ Databricks pipelines processing production workloads on Delta Lake. Unlocked over $1 million in value through AI assistant analysis. Authored company-wide AI best practices guide that increased responsible AI adoption 20x.
+- **Clio (Aug 2024 to Present):** Data Engineer. Owns 10+ Databricks pipelines processing production workloads. Authored company-wide AI best practices guide.
+- **New Jersey Devils, NHL (May 2022 to Aug 2024):** Sole Data Developer. Built an end-to-end data platform processing 10 million rows per game of NHL tracking data. Developed 40+ dbt models supporting multi-million dollar player salary decisions.
+- **Teck Resources (Oct 2020 to May 2022):** Data Developer. Modernized legacy PostgreSQL stored procedures into testable Python pipelines using Terraform and Azure.
 
-- **New Jersey Devils, NHL (May 2022 to Aug 2024):** Sole Data Developer. Built end-to-end data platform processing 10 million rows per game of NHL tracking data, a 10,000x increase in data volume. Developed 40+ dbt models supporting multi-million dollar player salary decisions. Supported 10 analysts and managers.
+**Sport Sector Leadership**
 
-- **Teck Resources (Oct 2020 to May 2022):** Data Developer. Transformed legacy PostgreSQL stored procedures into testable Python pipelines using Terraform and Azure infrastructure.
+- **Chair, Board of Directors, International Quidditch Association:** Led data and technology strategy for 30+ national governing bodies.
+- **CEO, Volunteer Media Organization:** Managed operations for a 70-person volunteer organization across 30 countries.
 
-**Sport Sector Leadership:**
+**Education**
 
-- **Chair, Board of Directors, International Quidditch Association:** Led data and technology strategy for 30+ national governing bodies across six continents. Oversaw governance, compliance, and information systems for one of the fastest-growing sports worldwide.
+- **B.Sc., University of British Columbia:** Analytical Sports Management, a custom degree combining business, statistics, and machine learning.
 
-- **CEO, Volunteer Media Organization:** Grew organization to 70 staff across 30 countries, managing international coordination and operations.
-
-**Education:**
-
-- **B.Sc., University of British Columbia:** Analytical Sports Management. A custom degree combining business, statistics, and machine learning, including graduate-level coursework. Designed specifically for the intersection of sport administration and data analysis.
-
-**Technical Skills:** Databricks, Snowflake, dbt, PostgreSQL, Python, SQL, Terraform, AWS, Azure, Data Modeling, Batch and Near-Real-Time Pipelines, Responsible AI Enablement.
-
-### Team Member: Will Siddal, Senior Developer
+## Team Member: Will Siddal, Senior Developer
 
 Will Siddal brings 2+ years of full-stack development experience at Teck Resources, one of Canada's largest mining companies.
 
-**Professional Experience:**
+**Professional Experience**
 
-- **Teck Resources (2022 to 2024):** Full Stack Developer. Built mission-critical reporting pipelines processing billions of rows annually. Developed internal tools using React and TypeScript. Managed cloud infrastructure on AWS using Terraform.
+- **Teck Resources (2022 to 2024):** Full Stack Developer. Built reporting pipelines processing billions of rows annually. Developed internal tools using React and TypeScript. Managed AWS infrastructure using Terraform.
 
-**Technical Skills:** Python, React, TypeScript, AWS, Terraform, PostgreSQL, Snowflake, modern frontend frameworks.
+**Education**
 
-**Education:** Simon Fraser University. Based in British Columbia.
+- Simon Fraser University. Based in British Columbia.
 
-### Additional Team Members
+## Additional Team Members
 
-Security Expert and UX Designer positions are in progress and will be named in the final submission. We expect both roles to be filled with British Columbia-based professionals with relevant enterprise experience.
+Security Expert and UX Designer roles are in progress and will be named before submission. These positions will be filled with British Columbia based professionals with relevant enterprise experience.
+
+| Role            | Status |
+| --------------- | ------ |
+| Security Expert | TBD    |
+| UX Designer     | TBD    |
+
+## Continuity of Services
+
+Continuity is supported by the architecture and delivery model:
+
+- **Infrastructure as Code:** All AWS resources are defined in SST and version controlled.
+- **Operational Runbooks:** Deployment and recovery procedures are documented and maintained.
+- **Automated Testing:** CI tests provide regression coverage for core workflows.
+- **Principal Accountability:** Austin Wallace remains the constant delivery lead through rollout.
+
+If a team member changes, the codebase, infrastructure definitions, and operational documentation enable efficient transition.
 
 ## Proposed Solution Statement
 
-Austin Wallace Tech proposes the Solstice platform: a purpose-built information management system designed specifically for viaSport's Strength in Numbers requirements.
+Austin Wallace Tech proposes the Solstice platform, a purpose-built information management system aligned to the Strength in Numbers requirements.
 
 ### Key Differentiators
 
 **1. Working Prototype, Not a Proposal**
 
-A functional prototype already exists, addressing the majority of the System Requirements Addendum items today. This prototype has been load-tested with 20.1 million rows of data, achieving sub-250 millisecond response times with zero server errors. viaSport can evaluate a working system, not a proposal document.
+A functional prototype already exists and is available for evaluation. It addresses the majority of System Requirements Addendum items today and has been load-tested at production scale with 20.1 million rows.
 
 **2. Principal-Led Delivery**
 
-The architect and sole developer of the prototype will lead delivery. This eliminates the risk of knowledge transfer failures between sales, design, and implementation teams. viaSport will work directly with the person who understands the system most deeply.
+The architect and primary developer of the prototype will lead delivery. This reduces knowledge transfer risk and provides direct accountability.
 
 **3. Domain Expertise in Sport Data**
 
-Austin Wallace's background combines enterprise data engineering (Devils, Clio, Teck) with executive leadership in amateur sport governance (IQA Chair, 30+ national governing bodies). His UBC degree in Analytical Sports Management was designed specifically for this intersection. This is not a vendor who "also does sports." This is a team that understands sport sector data challenges from firsthand experience.
+Austin Wallace combines enterprise data engineering experience with leadership in amateur sport governance. This team understands sport sector reporting and data governance from firsthand experience.
 
 **4. British Columbia Based**
 
-The core team is based in British Columbia; remaining roles are expected to be BC-based (TBD). This proximity supports local context, regulatory alignment, and sector familiarity.
+The core team is based in British Columbia and remaining roles are expected to be BC based.
 
 **5. Canadian Data Residency**
 
-All data is hosted exclusively in AWS ca-central-1 (Montreal), ensuring compliance with Canadian privacy statutes including PIPEDA. No data leaves Canadian jurisdiction.
+All data is hosted in AWS ca-central-1 (Canada). No data leaves Canadian jurisdiction.
 
 ### Benefits to viaSport
 
-- **Reduced Risk:** Evaluate a working system before committing, not a vendor's promises.
-- **Accelerated Timeline:** 18 weeks to full rollout because the platform already exists.
-- **Direct Accountability:** Principal-led delivery with no organizational layers between viaSport and the technical team.
-- **Sector Understanding:** A team that has led amateur sport organizations, not just built software for them.
-- **Long-term Sustainability:** Modern architecture (serverless, infrastructure as code) minimizes ongoing operational burden.
+- **Reduced Risk:** Evaluate a working system before committing.
+- **Accelerated Timeline:** 18 weeks to rollout because the platform exists today.
+- **Direct Accountability:** Principal-led delivery with no organizational layers.
+- **Sector Understanding:** Experience leading amateur sport organizations, not just building software.
+- **Sustainability:** Serverless architecture and infrastructure as code reduce operating overhead.

@@ -4,32 +4,21 @@
 
 ### Testing Layers
 
-The platform uses a multi-layer testing strategy to catch issues at different levels:
-
-| Layer            | Tool                     | Purpose                                      | Frequency    |
-| ---------------- | ------------------------ | -------------------------------------------- | ------------ |
-| Unit/Integration | Vitest + Testing Library | Component and function testing               | Every commit |
-| End-to-End       | Playwright               | Full user flow testing                       | Every commit |
-| Property-Based   | Custom                   | Access control, audit integrity verification | Every commit |
-| Performance      | Lighthouse, k6           | Load testing, Core Web Vitals                | Pre-release  |
-| Security         | Manual + automated       | MFA, sessions, audit hash chain              | Pre-release  |
+| Layer                | Tool                     | Purpose                          | Frequency    |
+| -------------------- | ------------------------ | -------------------------------- | ------------ |
+| Unit and Integration | Vitest + Testing Library | Component and function testing   | Every commit |
+| End-to-End           | Playwright               | Full user flow testing           | Every commit |
+| Property-Based       | fast-check               | Access control, audit integrity  | Every commit |
+| Performance          | Lighthouse, k6           | Load testing and Core Web Vitals | Pre-release  |
+| Security             | Manual plus automated    | MFA, sessions, audit hash chain  | Pre-release  |
 
 ### Automated Testing
 
-Automated tests run on commits and pull requests through the CI/CD pipeline. Merges are gated by passing tests where applicable.
-
-**Test Coverage:**
-
-- Unit tests for business logic and utility functions
-- Integration tests for database operations and API endpoints
-- End-to-end tests for critical user flows (login, data submission, reporting)
-- Property-based tests for access control rules (verifying users cannot access data outside their organization)
+Automated tests run in CI and gate merges where applicable. Coverage focuses on core workflows: login, data submission, reporting, analytics, and access control.
 
 ### Performance Testing
 
-Performance testing is conducted in the sin-perf environment with production-scale data.
-
-**Load Test Results (latest run; date TBD):**
+Performance testing is conducted in sin-perf with production-scale data. Final validation runs will be executed before submission (TBD).
 
 | Metric              | Value             | Target           | Status   |
 | ------------------- | ----------------- | ---------------- | -------- |
@@ -39,45 +28,25 @@ Performance testing is conducted in the sin-perf environment with production-sca
 | Concurrent users    | 15                | N/A              | Pass     |
 | Server errors (5xx) | 0                 | 0                | Pass     |
 
-**Data Distribution:**
+Evidence: `docs/sin-rfp/review-plans/evidence/` (final run TBD).
 
-| Table                    | Rows  |
-| ------------------------ | ----- |
-| form_submissions         | 10.0M |
-| audit_logs               | 7.0M  |
-| notifications            | 2.0M  |
-| bi_query_log             | 1.0M  |
-| form_submission_versions | 0.1M  |
+### Core Web Vitals
 
-The platform handles 20 million rows with sub-250ms response times and zero server errors under concurrent load.
-
-**Core Web Vitals (Lighthouse, latest prototype run; date TBD):**
-
-| Metric                   | Value  | Target  | Status |
-| ------------------------ | ------ | ------- | ------ |
-| Performance Score        | 93/100 | >80     | Pass   |
-| Largest Contentful Paint | 2284ms | <2500ms | Pass   |
-| Time to First Byte       | 380ms  | <500ms  | Pass   |
-| Total Blocking Time      | 88ms   | <300ms  | Pass   |
-| Cumulative Layout Shift  | 0      | <0.1    | Pass   |
+Lighthouse results from the prototype are recorded in Appendix C. Final Lighthouse runs will be completed before submission (TBD).
 
 ### Security Testing
 
-Security testing validates the platform's protection mechanisms:
+Security testing validates:
 
-| Area               | Testing Approach                                    |
-| ------------------ | --------------------------------------------------- |
-| Authentication     | MFA flow validation (TOTP, backup codes)            |
-| Session management | Session expiry, concurrent session limits           |
-| Access control     | Role-based access enforcement, organization scoping |
-| Audit integrity    | Hash chain verification, tamper detection           |
-| Anomaly detection  | Login pattern analysis, account lock triggers       |
+- MFA and password recovery
+- Session expiry and step-up authentication
+- Role-based access enforcement
+- Audit log integrity and hash chain verification
+- Account lockout and anomaly detection
 
-Security testing is conducted before each release and after any changes to authentication or authorization logic.
+Evidence includes `docs/sin-rfp/review-plans/evidence/SECURITY-LOCKOUT-sin-dev-20251231.md` and audit hash chain tests in `src/lib/audit/__tests__/audit-hash-chain.pbt.test.ts`.
 
 ### Defect Management
-
-Defects discovered during testing are classified by severity:
 
 | Severity | Definition                             | Response Time |
 | -------- | -------------------------------------- | ------------- |
@@ -86,24 +55,22 @@ Defects discovered during testing are classified by severity:
 | Medium   | Non-critical functionality affected    | Within sprint |
 | Low      | Cosmetic or minor UX issues            | Backlog       |
 
-Defects will be tracked in a shared ticketing system accessible to viaSport.
+Defects are tracked in a shared system accessible to viaSport.
 
 ## User Acceptance Testing Strategy
 
 ### UAT Approach
 
-User Acceptance Testing validates that the platform meets viaSport's requirements from the user's perspective. Our UAT approach emphasizes collaboration and early feedback:
+User Acceptance Testing validates that the platform meets viaSport requirements from the user perspective.
 
-| Element       | Approach                                                   |
-| ------------- | ---------------------------------------------------------- |
-| Environment   | Dedicated sin-perf environment with production-like data   |
-| Access        | viaSport testers receive accounts with appropriate roles   |
-| Visibility    | Test scenarios mapped to requirements, progress tracked    |
-| Communication | Weekly demos, immediate platform access, visible ticketing |
+| Element       | Approach                                      |
+| ------------- | --------------------------------------------- |
+| Environment   | sin-perf with production-like data            |
+| Access        | Role-based test accounts for viaSport testers |
+| Visibility    | Test scenarios mapped to requirement IDs      |
+| Communication | Weekly demos and visible ticketing            |
 
 ### UAT Timeline
-
-UAT is scheduled for 4 weeks during the implementation timeline:
 
 | Week   | Focus                                                   |
 | ------ | ------------------------------------------------------- |
@@ -114,48 +81,21 @@ UAT is scheduled for 4 weeks during the implementation timeline:
 
 ### Test Scenarios
 
-Test scenarios are structured around the System Requirements Addendum:
-
-| Category                 | Example Scenarios                                                       |
-| ------------------------ | ----------------------------------------------------------------------- |
-| Data Management (DM-AGG) | Submit form, upload file, import CSV, validate data quality             |
-| Reporting (RP-AGG)       | Track submission status, run analytics query, export data               |
-| Security (SEC-AGG)       | Login with MFA, verify role-based access, review audit log              |
-| Training (TO-AGG)        | Complete guided walkthrough, search help center, submit support request |
-| User Interface (UI-AGG)  | Navigate dashboard, use command palette, receive notification           |
-
-### Test Accounts
-
-viaSport testers receive role-appropriate accounts:
-
-| Role           | Access Level                 | Test Focus                                    |
-| -------------- | ---------------------------- | --------------------------------------------- |
-| viaSport Admin | Full platform access         | Administrative functions, cross-org analytics |
-| PSO Admin      | Organization-scoped admin    | User management, reporting oversight          |
-| PSO Reporter   | Organization-scoped reporter | Data submission, form completion              |
-| Viewer         | Read-only                    | Dashboard viewing, report access              |
-
-### Feedback Process
-
-1. **Immediate access:** viaSport can use the platform at any time, not just during scheduled test sessions.
-2. **Weekly demos:** Scheduled sessions to walk through new features and gather feedback.
-3. **Visible ticketing:** All issues logged in a shared system where viaSport can see status and priority.
-4. **Direct communication:** Questions and concerns addressed within one business day.
+| Category        | Example Scenarios                                   |
+| --------------- | --------------------------------------------------- |
+| Data Management | Submit form, upload file, run import, validate data |
+| Reporting       | Track submission status, run analytics, export data |
+| Security        | Login with MFA, verify access, review audit log     |
+| Training        | Complete walkthrough, search help center            |
+| UI              | Navigate dashboard, receive notification            |
 
 ### Sign-Off Criteria
 
 UAT sign-off requires:
 
-1. All critical and high-severity defects resolved
-2. All test scenarios executed with documented results
+1. All critical and high severity defects resolved
+2. Test scenarios executed with documented results
 3. No blocking issues for go-live
 4. Written sign-off from viaSport project sponsor
 
-### Post-UAT
-
-After UAT sign-off:
-
-- Medium and low-severity defects addressed during viaSport Training phase
-- Platform deployed to production
-- Monitoring enabled for production issues
-- Support process activated
+After UAT sign-off, the platform is promoted to production and monitoring is enabled.

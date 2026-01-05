@@ -1,73 +1,114 @@
-# System Requirements: Training & Onboarding (TO-AGG)
+# System Requirements: Training and Onboarding (TO-AGG)
 
 ## Compliance Summary
 
-| Req ID     | Title                          | Status | Implementation                                                |
-| ---------- | ------------------------------ | ------ | ------------------------------------------------------------- |
-| TO-AGG-001 | Template Support & Integration | Comply | Centralized templates hub with contextual access              |
-| TO-AGG-002 | Guided Learning & Walkthroughs | Comply | Interactive tutorials with per-user progress tracking         |
-| TO-AGG-003 | Reference Materials & Support  | Comply | Searchable help center with guides, FAQ, and support requests |
+| Req ID     | Title                            | Status | Built Today                         | Remaining Scope                  |
+| ---------- | -------------------------------- | ------ | ----------------------------------- | -------------------------------- |
+| TO-AGG-001 | Template Support and Integration | Built  | Templates hub with contextual links | viaSport templates content       |
+| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Guided tours and walkthroughs       | Final content review (TBD)       |
+| TO-AGG-003 | Reference Materials and Support  | Built  | Help center with guides and FAQ     | Content refinement with viaSport |
 
-## TO-AGG-001: Template Support & Integration
+## TO-AGG-001: Template Support and Integration
 
-**Requirement:** The system shall provide a centralized templates tab and offer contextual template access directly from each data entry item to guide users through required formats.
+**Requirement:**
 
-**Implementation:**
+> The system shall provide a centralized templates tab and offer contextual template access directly from each data entry item to guide users through required formats.
 
-| Capability           | Description                                                                          |
-| -------------------- | ------------------------------------------------------------------------------------ |
-| Templates Hub        | Centralized repository of all templates accessible from main navigation              |
-| Category Filtering   | Templates organized by type: import templates, form templates, reporting templates   |
-| Contextual Access    | Relevant templates linked directly from forms, imports, and reporting screens        |
-| Template Formats     | CSV/Excel templates with correct column headers and formatting; sample data included |
-| Download and Preview | Users can preview template structure and download in preferred format                |
+**Acceptance Criteria:**
 
-**Note:** Template content will be refined during the Planning phase based on viaSport's specific data formats and requirements.
+> Users can easily locate and access the correct template when needed.
 
-**Evidence:** Templates hub implemented in prototype; contextual links active on import and form screens.
+**How We Meet It:**
 
-## TO-AGG-002: Guided Learning & Walkthroughs
+- Templates hub centralizes all templates in one location.
+- Contextual links surface templates from forms, imports, and reporting.
+- Templates are tagged by context for search and filtering.
 
-**Requirement:** The system shall offer onboarding and data upload tutorials to help users navigate key processes, especially during their first-time use.
+**Built Today:**
 
-**Implementation:**
+- Templates hub UI with context filters.
+- Admin panel to manage global and organization templates.
+- Contextual links on form, reporting, and import screens.
 
-| Capability             | Description                                                                                   |
-| ---------------------- | --------------------------------------------------------------------------------------------- |
-| Onboarding Tour        | First-time users receive a guided tour highlighting key platform areas                        |
-| Step-by-Step Tutorials | Interactive walkthroughs for common tasks: submitting forms, uploading files, running reports |
-| UI Highlighting        | Tutorial steps highlight relevant UI elements with explanatory tooltips                       |
-| Progress Tracking      | Per-user tracking of completed tutorials; users can resume or restart walkthroughs            |
-| Contextual Triggers    | Tutorials can be triggered from help icons throughout the interface                           |
+**Remaining Scope:**
 
-**Note:** Tutorial content will be updated based on UX interviews with viaSport stakeholders to ensure alignment with actual user workflows.
+- viaSport specific templates and sample data (TBD).
 
-**Evidence:** Tutorial framework implemented; guided tour functional in prototype.
+**viaSport Dependencies:**
 
-## TO-AGG-003: Reference Materials & Support
+- Template content and formatting requirements.
 
-**Requirement:** The system shall provide categorized guides and a frequently asked questions (FAQ) section to help users resolve issues and understand system functionality.
+**Approach:**
+Collect templates during Discovery and load into the hub prior to UAT.
 
-**Implementation:**
+**Evidence:**
 
-| Capability              | Description                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------ |
-| Help Center             | Searchable knowledge base with guides organized by category                          |
-| FAQ Section             | Frequently asked questions organized by topic; answers include screenshots and links |
-| Keyword Search          | Full-text search across all help content; results ranked by relevance                |
-| Role-Based Content      | Help content filtered by user role to show relevant information                      |
-| In-App Support Requests | Users can submit support inquiries directly from the platform                        |
-| Request Tracking        | Support requests have status tracking; users receive notifications on updates        |
+- `docs/sin-rfp/review-plans/evidence/TO-AGG-001-templates-20251228-1953.png`
+- `docs/sin-rfp/review-plans/evidence/TO-AGG-001-templates-admin-20251228-1953.png`
 
-**Help Center Content Types:**
+## TO-AGG-002: Guided Learning and Walkthroughs
 
-| Content Type           | Examples                                                |
-| ---------------------- | ------------------------------------------------------- |
-| Getting Started Guides | Account setup, first login, dashboard overview          |
-| How-To Articles        | Submit a form, upload a file, run a report, export data |
-| FAQ                    | Common questions organized by category                  |
-| Troubleshooting        | Login issues, validation errors, browser compatibility  |
+**Requirement:**
 
-**Note:** Help center content will be developed collaboratively with viaSport to ensure it addresses real PSO pain points and common questions.
+> The system shall offer onboarding and data upload tutorials to help users navigate key processes, especially during their first-time use.
 
-**Evidence:** Help center implemented; searchable guides and FAQ functional in prototype.
+**Acceptance Criteria:**
+
+> Users can complete tasks independently with support from walkthroughs.
+
+**How We Meet It:**
+
+- Guided walkthroughs highlight key UI elements.
+- Tutorials cover onboarding and data upload workflows.
+- Progress tracking allows users to resume or restart.
+
+**Built Today:**
+
+- Guided tours for onboarding and data upload.
+- Tutorial panel with progress tracking.
+- Contextual launch points on portal pages.
+
+**Remaining Scope:**
+
+- Final content review with viaSport stakeholders (TBD).
+
+**Approach:**
+Refine tutorial copy and steps during Discovery and UAT.
+
+**Evidence:**
+
+- `src/features/tutorials/tutorials.config.ts`
+- `src/features/tutorials/components/tutorial-panel.tsx`
+
+## TO-AGG-003: Reference Materials and Support
+
+**Requirement:**
+
+> The system shall provide categorized guides and a frequently asked questions (FAQ) section to help users resolve issues and understand system functionality.
+
+**Acceptance Criteria:**
+
+> Users can find accurate answers and instructional material without needing direct support.
+
+**How We Meet It:**
+
+- Help center organizes guides by role and category.
+- FAQ entries surface common questions.
+- Search filters content by keyword.
+
+**Built Today:**
+
+- Help center with searchable guides and FAQ.
+- Role-based content filtering.
+- In-app support requests for escalation.
+
+**Remaining Scope:**
+
+- Content refinement based on viaSport terminology (TBD).
+
+**Approach:**
+Review help content during Discovery and incorporate viaSport feedback.
+
+**Evidence:**
+
+- `docs/sin-rfp/review-plans/evidence/TO-AGG-003-help-center-20251228-1953.png`

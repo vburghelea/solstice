@@ -2,150 +2,134 @@
 
 ## Cloud Provider Services
 
-### AWS Services
+The platform is built on Amazon Web Services in the ca-central-1 (Montreal) region.
 
-The platform is built entirely on Amazon Web Services, deployed in the ca-central-1 (Montreal) region for Canadian data residency.
-
-| Service             | Purpose                                                                     |
-| ------------------- | --------------------------------------------------------------------------- |
-| **CloudFront**      | Content delivery network for static assets and edge caching                 |
-| **Lambda**          | Serverless application compute                                              |
-| **RDS PostgreSQL**  | Managed relational database                                                 |
-| **S3**              | Object storage for documents, imports, and audit archives                   |
-| **SQS**             | Message queues for asynchronous notification processing                     |
-| **SES**             | Transactional email delivery                                                |
-| **EventBridge**     | Cron scheduling for automated jobs (retention, notifications, data quality) |
-| **CloudWatch**      | Metrics, logs, and alarms                                                   |
-| **CloudTrail**      | API audit logging                                                           |
-| **GuardDuty**       | Threat detection                                                            |
-| **Secrets Manager** | Credential storage with rotation                                            |
-| **KMS**             | Encryption key management                                                   |
+| Service         | Purpose                                    |
+| --------------- | ------------------------------------------ |
+| CloudFront      | CDN for static assets and edge caching     |
+| Lambda          | Serverless application compute             |
+| RDS PostgreSQL  | Managed relational database                |
+| S3              | Object storage for documents and imports   |
+| SQS             | Message queues for notifications           |
+| SES             | Transactional email delivery               |
+| EventBridge     | Scheduled jobs for retention and reminders |
+| CloudWatch      | Metrics, logs, alarms                      |
+| CloudTrail      | API audit logging                          |
+| GuardDuty       | Threat detection                           |
+| Secrets Manager | Credential storage with rotation           |
+| KMS             | Encryption key management                  |
 
 ### Why AWS
 
-| Factor           | Rationale                                            |
-| ---------------- | ---------------------------------------------------- |
-| Canadian region  | ca-central-1 provides data residency compliance      |
-| Serverless-first | Reduces operational burden, no server patching       |
-| Mature services  | Battle-tested, well-documented, strong SLAs          |
-| SST integration  | Infrastructure as Code tooling purpose-built for AWS |
+| Factor           | Rationale                      |
+| ---------------- | ------------------------------ |
+| Canadian region  | Data residency compliance      |
+| Serverless-first | Reduced operational burden     |
+| Mature services  | Strong SLAs and documentation  |
+| SST integration  | Infrastructure as code for AWS |
 
 ### Why Serverless
 
-The serverless architecture provides specific benefits for viaSport:
+Serverless provides:
 
-1. **No infrastructure management:** AWS handles server provisioning, patching, and scaling.
-2. **Automatic scaling:** Application scales up during peak periods (reporting deadlines) and scales down during quiet periods.
-3. **Cost efficiency:** Pay only for actual compute time, not idle capacity.
-4. **High availability:** Lambda automatically distributes across multiple Availability Zones.
+1. No server management or patching
+2. Automatic scaling during peak reporting periods
+3. Pay-per-use cost efficiency
+4. High availability across availability zones
 
 ### Infrastructure as Code
 
-All infrastructure is defined in TypeScript using SST (Serverless Stack). This approach provides:
+Infrastructure is defined in TypeScript using SST. This provides:
 
-| Benefit            | Description                                                                   |
-| ------------------ | ----------------------------------------------------------------------------- |
-| Reproducibility    | Any environment can be recreated from code                                    |
-| Version control    | Infrastructure changes tracked in git alongside application code              |
-| Audit trail        | Full history of what changed, when, and by whom                               |
-| Disaster recovery  | Entire stack can be rebuilt from code if needed                               |
-| Environment parity | Development, performance testing, and production use identical configurations |
+- Reproducible environments
+- Version control for infrastructure changes
+- Disaster recovery from code
+- Environment parity across dev, perf, and prod
 
 ## Development and Customization Process
 
 ### Environment Strategy
 
-| Environment | Purpose                           | Infrastructure Tier                               |
-| ----------- | --------------------------------- | ------------------------------------------------- |
-| sin-dev     | Development and testing           | Minimal (t4g.micro, single-AZ)                    |
-| sin-perf    | Performance testing, load testing | Production-like (t4g.large, 200GB)                |
-| sin-prod    | Production                        | Full (t4g.large, 200GB, Multi-AZ, 35-day backups) |
+| Environment | Purpose                 | Infrastructure Tier                         |
+| ----------- | ----------------------- | ------------------------------------------- |
+| sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                 |
+| sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ                |
+| sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups |
 
-Each environment is fully isolated with its own:
-
-- Database instance
-- S3 buckets
-- Lambda functions
-- Secrets
-- Domain/URL
+Each environment is isolated with its own database, storage, and credentials.
 
 ### Development Workflow
 
 ```
 Developer writes code
-        ↓
-Pre-commit hooks run (lint, type check, format)
-        ↓
-Automated tests run
-        ↓
+        |
+        v
+Pre-commit checks (lint, type check, format)
+        |
+        v
+Automated tests
+        |
+        v
 Code review and merge
-        ↓
+        |
+        v
 Deploy to sin-dev (automatic)
-        ↓
+        |
+        v
 Deploy to sin-perf (manual, for load testing)
-        ↓
+        |
+        v
 Deploy to sin-prod (manual, after UAT sign-off)
 ```
 
 ### Quality Gates
 
-Deployments are gated by standard quality checks:
-
-| Gate          | Tooling                    | Purpose                        |
-| ------------- | -------------------------- | ------------------------------ |
-| Linting       | Project linting rules      | Code style and error detection |
-| Type checking | TypeScript                 | Compile-time error detection   |
-| Formatting    | Project formatter          | Consistent code style          |
-| Unit tests    | Automated unit tests       | Component and function testing |
-| E2E tests     | Automated end-to-end tests | Full user flow testing         |
+| Gate          | Tooling           | Purpose                        |
+| ------------- | ----------------- | ------------------------------ |
+| Linting       | oxlint and ESLint | Code quality                   |
+| Type checking | TypeScript        | Compile-time validation        |
+| Formatting    | oxfmt             | Consistent style               |
+| Unit tests    | Vitest            | Component and function testing |
+| E2E tests     | Playwright        | Full user flow testing         |
 
 ### Deployment Process
 
-Deployments are executed using SST:
+Deployments are executed with SST:
 
 ```
 npx sst deploy --stage sin-prod
 ```
 
-This single command:
-
-1. Builds the application
-2. Synthesizes infrastructure changes
-3. Deploys Lambda functions
-4. Updates database schema (if needed)
-5. Invalidates CDN cache
-6. Reports deployment status
+This builds the application, deploys infrastructure, and updates application services. Database schema changes are applied through versioned migrations when required.
 
 ### Rollback
 
-If issues are discovered after deployment:
-
-- Previous Lambda versions remain available for instant rollback
-- Database migrations are versioned with rollback plans as needed
-- SST maintains deployment history for reference
+- Previous Lambda versions remain available for quick rollback.
+- Database migrations include rollback plans when needed.
+- SST maintains deployment history for audit and recovery.
 
 ### Customization Capabilities
 
-The platform supports customization without code changes:
+The platform supports configuration without code changes:
 
-| Customization         | Method                                     |
-| --------------------- | ------------------------------------------ |
-| Branding              | Tenant configuration (logo, colors, name)  |
-| Forms                 | Form builder UI for custom data collection |
-| Roles and permissions | Admin UI for role management               |
-| Notifications         | Configurable notification templates        |
-| Retention policies    | Admin-configurable retention periods       |
+| Customization         | Method                                        |
+| --------------------- | --------------------------------------------- |
+| Branding              | Tenant configuration (logo, colors, name)     |
+| Forms                 | Form builder UI for custom data collection    |
+| Roles and permissions | Admin UI for role management                  |
+| Notifications         | Configurable templates and reminder schedules |
+| Retention policies    | Admin-configurable retention periods          |
 
 ### Change Management
 
-Changes to the production environment follow a defined process:
+Changes to production follow a defined process:
 
-1. Change request submitted (by viaSport or development team)
+1. Change request submitted
 2. Impact assessment (scope, risk, timeline)
 3. Development and testing in sin-dev
-4. Performance validation in sin-perf (if applicable)
-5. UAT in sin-perf
+4. Performance validation in sin-perf
+5. UAT sign-off
 6. Deployment to sin-prod
 7. Post-deployment verification
 
-Emergency changes (security patches, critical bug fixes) follow an expedited process with retrospective documentation.
+Emergency changes follow an expedited process with retrospective documentation.

@@ -437,16 +437,10 @@ export const exportSqlResults = createServerFn({ method: "POST" })
     const roleAssignments = await PermissionService.getUserRoles(user.id);
     const permissions = extractPermissionSet(roleAssignments);
 
-    if (!hasAnalyticsPermission(permissions, "analytics.sql")) {
-      throw forbidden("Analytics SQL permission required");
-    }
-    if (!hasAnalyticsPermission(permissions, "analytics.export")) {
-      throw forbidden("Analytics export permission required");
-    }
-
     const contextOrganizationId =
       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
 
+    // Check org role BEFORE permission check - org admins/owners get SQL access
     let orgRole: OrganizationRole | null = null;
     if (contextOrganizationId && !isGlobalAdmin) {
       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
@@ -455,6 +449,19 @@ export const exportSqlResults = createServerFn({ method: "POST" })
         { roles: ANALYTICS_ROLES },
       );
       orgRole = access.role as OrganizationRole;
+    }
+
+    // Per SPEC-bi-platform.md: org admin/owner get SQL access, reporters need analytics.sql permission
+    const orgRoleAllowsSql = orgRole === "admin" || orgRole === "owner";
+    if (
+      !isGlobalAdmin &&
+      !orgRoleAllowsSql &&
+      !hasAnalyticsPermission(permissions, "analytics.sql")
+    ) {
+      throw forbidden("Analytics SQL permission required");
+    }
+    if (!hasAnalyticsPermission(permissions, "analytics.export")) {
+      throw forbidden("Analytics export permission required");
     }
 
     const queryContext: QueryContext = {

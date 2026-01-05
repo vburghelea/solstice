@@ -2,14 +2,14 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                     | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | ----------------------------------------------- | ---------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, data quality monitoring       | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, mapping templates, rollback      | Legacy extraction scope and mapping      |
+| Req ID     | Title                                 | Status  | Built Today                                         | Remaining Scope                          |
+| ---------- | ------------------------------------- | ------- | --------------------------------------------------- | ---------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking     | viaSport templates and field definitions |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging        | External integrations and mapping rules  |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                     | Catalog taxonomy refinement              |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds  | Threshold tuning with viaSport           |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement           | Final DR and retention validation (TBD)  |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file field imports, ECS batch worker | Legacy extraction scope and mapping      |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -145,9 +145,10 @@ Refine catalog categories during Discovery. See Section 03 Platform Design for g
 
 **Built Today:**
 
-- Server side validation with Zod schemas and form rules.
-- Data quality monitoring job with alerting for missing fields and low completeness.
-- Admin dashboard view for data quality metrics.
+- Server-side validation with Zod schemas and form rules.
+- Data quality monitoring job with threshold evaluation and change-only admin notifications.
+- Global alert thresholds with optional org-level overrides via organization settings.
+- Admin dashboard view for data quality metrics with notification link.
 
 **Remaining Scope:**
 
@@ -223,9 +224,10 @@ Run final DR and retention validation in sin-perf or sin-prod. See Section 03 Da
 **Built Today:**
 
 - Import wizard with upload, mapping, preview, and commit flow.
+- File field import pipeline supporting JSON file payloads with validation (fileName, mimeType, sizeBytes, storageKey).
 - Mapping template library and reusable mappings.
-- Rollback support using import job ID and 7 day rollback window.
-- Batch processing lane with ECS Fargate in perf and prod.
+- Rollback support using import job ID and 7-day rollback window.
+- Batch processing lane with ECS Fargate worker (verified deployed in sin-dev).
 
 **Remaining Scope:**
 

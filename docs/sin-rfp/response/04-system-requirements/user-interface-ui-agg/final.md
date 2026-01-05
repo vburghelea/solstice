@@ -2,15 +2,15 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                   | Status | Built Today                            | Remaining Scope                      |
-| ---------- | --------------------------------------- | ------ | -------------------------------------- | ------------------------------------ |
-| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC             | None                                 |
-| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                  | None                                 |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility        | Formal audit before submission (TBD) |
-| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications  | None                                 |
-| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette     | None                                 |
-| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support requests and admin response UI | None                                 |
-| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding      | viaSport branding configuration      |
+| Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                      |
+| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------------------ |
+| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                                 |
+| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                                 |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | Formal audit before submission (TBD) |
+| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications     | None                                 |
+| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                                 |
+| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support with priority, SLA, notifications | None                                 |
+| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding         | viaSport branding configuration      |
 
 ## UI-AGG-001: User Access and Account Control
 
@@ -199,8 +199,9 @@ Expand search datasets as viaSport priorities are defined.
 
 **Built Today:**
 
-- Support request form with attachments and priority.
-- Admin support queue with status tracking.
+- Support request form with attachments, priority selection (Low/Normal/High/Urgent), and SLA targets.
+- Admin support queue with status tracking and response form.
+- Response and status changes dispatch in-app and email notifications.
 - Audit logging for support actions.
 
 **Remaining Scope:**

@@ -2,12 +2,12 @@
 
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                | Remaining Scope                       |
-| ----------- | --------------------------------- | ------ | ------------------------------------------ | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission     | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Anomaly detection, account lockout, alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls  | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain        | None                                  |
+| Req ID      | Title                             | Status | Built Today                                         | Remaining Scope                       |
+| ----------- | --------------------------------- | ------ | --------------------------------------------------- | ------------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission              | None                                  |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Redis rate limiting, pre-auth lockout, admin alerts | None                                  |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls           | Compliance package and pen test (TBD) |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                 | None                                  |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -23,12 +23,14 @@
 
 - MFA with TOTP and backup codes is supported.
 - Password reset uses time-limited email tokens.
+- Password complexity enforced on signup and reset (uppercase, lowercase, number, symbol).
 - RBAC and organization scoping are enforced in the API layer.
 - Organization owners and admins manage invites and join requests.
 
 **Built Today:**
 
 - MFA enrollment and recovery flows.
+- Server-side password policy enforcement (validated: weak passwords blocked with inline errors).
 - Role-based permissions and org membership enforcement.
 - User invitation and join request workflows.
 
@@ -60,12 +62,15 @@ Continue to validate flows during UAT. See Section 03 Testing and QA.
 - Security events are recorded with risk scores and thresholds.
 - Failed logins trigger account flagging and lockouts.
 - Admins receive security alerts for anomalous behavior.
+- Rate limiting protects authentication and API endpoints.
 
 **Built Today:**
 
-- Login failure and MFA failure thresholds with account lockouts.
-- Security event logging and admin alerting.
-- GuardDuty enabled for infrastructure level monitoring.
+- Pre-auth lockout gating blocks sign-in for locked users before authentication.
+- Rate limiting with Redis-backed sliding window algorithm (5 requests/15 min for auth, in-memory fallback).
+- Login failure thresholds: 5 failures in 15 minutes triggers 30-minute account lockout.
+- Security event logging to `security_events` table with CloudWatch metrics.
+- Admin notifications for login anomalies and account lockouts.
 
 **Remaining Scope:**
 

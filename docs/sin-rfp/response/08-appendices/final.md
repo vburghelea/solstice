@@ -48,13 +48,13 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 |   +-----------+    +-----------+    +-----------+             |
 |        |                  |                 |                 |
 |   +----+-----+      +-----+-----+     +-----+-----+           |
-|   |    S3    |      |    SQS    |     |    SES    |           |
-|   | Storage  |      |  Queue    |     |   Email   |           |
+|   |    S3    |      |    SQS    |     |   Redis   |           |
+|   | Storage  |      |  Queue    |     | (Upstash) |           |
 |   +----------+      +-----------+     +-----------+           |
 |                                                               |
 |   +-----------+    +------------+    +-----------+            |
-|   |EventBridge|    | CloudWatch |    | GuardDuty |            |
-|   | Scheduler |    | Monitoring |    |  Threat   |            |
+|   |EventBridge|    | CloudWatch |    |    SES    |            |
+|   | Scheduler |    | Monitoring |    |   Email   |            |
 |   +-----------+    +------------+    +-----------+            |
 |                                                               |
 +---------------------------------------------------------------+
@@ -67,7 +67,8 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL on AWS RDS                                        |
-| Infrastructure | SST, AWS Lambda, CloudFront                                  |
+| Caching        | Redis (Upstash) for rate limiting, BI caching, permissions   |
+| Infrastructure | SST, AWS Lambda, CloudFront, ECS Fargate                     |
 | Authentication | Better Auth with TOTP MFA                                    |
 | Monitoring     | AWS CloudWatch, CloudTrail                                   |
 

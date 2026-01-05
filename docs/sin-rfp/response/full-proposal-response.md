@@ -955,9 +955,9 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates                      |
 | DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations                   |
 | DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement             |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, data quality monitoring       | Threshold tuning with viaSport          |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation, alerting with thresholds            | Threshold tuning with viaSport          |
 | DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD) |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, mapping templates, rollback      | Legacy extraction and mapping           |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file imports, ECS batch worker   | Legacy extraction and mapping           |
 
 ## Reporting (RP-AGG)
 
@@ -971,32 +971,32 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 ## Security (SEC-AGG)
 
-| Req ID      | Title                             | Status | Built Today                               | Remaining                             |
-| ----------- | --------------------------------- | ------ | ----------------------------------------- | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping                    | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Anomaly detection, lockouts, alerts       | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain           | None                                  |
+| Req ID      | Title                             | Status | Built Today                                   | Remaining                             |
+| ----------- | --------------------------------- | ------ | --------------------------------------------- | ------------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping       | None                                  |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Redis rate limiting, pre-auth lockout, alerts | None                                  |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls     | Compliance package and pen test (TBD) |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain               | None                                  |
 
 ## Training and Onboarding (TO-AGG)
 
-| Req ID     | Title                            | Status | Built Today                         | Remaining                  |
-| ---------- | -------------------------------- | ------ | ----------------------------------- | -------------------------- |
-| TO-AGG-001 | Template Support and Integration | Built  | Templates hub with contextual links | viaSport templates         |
-| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Guided tours and walkthroughs       | Final content review (TBD) |
-| TO-AGG-003 | Reference Materials and Support  | Built  | Help center with guides and FAQ     | Content refinement         |
+| Req ID     | Title                            | Status | Built Today                           | Remaining                  |
+| ---------- | -------------------------------- | ------ | ------------------------------------- | -------------------------- |
+| TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates         |
+| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD) |
+| TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement         |
 
 ## User Interface (UI-AGG)
 
-| Req ID     | Title                                   | Status | Built Today                         | Remaining                |
-| ---------- | --------------------------------------- | ------ | ----------------------------------- | ------------------------ |
-| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC          | None                     |
-| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards               | None                     |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI, accessibility scans  | Formal audit (TBD)       |
-| UI-AGG-004 | Task and Notification Management        | Built  | Notifications and reminders         | None                     |
-| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette  | None                     |
-| UI-AGG-006 | User Support and Feedback               | Built  | Support requests and admin response | None                     |
-| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and theming           | viaSport branding assets |
+| Req ID     | Title                                   | Status | Built Today                               | Remaining                |
+| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------ |
+| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                     |
+| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                     |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI, accessibility scans        | Formal audit (TBD)       |
+| UI-AGG-004 | Task and Notification Management        | Built  | Notifications and reminders               | None                     |
+| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                     |
+| UI-AGG-006 | User Support and Feedback               | Built  | Support with priority, SLA, notifications | None                     |
+| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and theming                 | viaSport branding assets |
 
 ## Summary
 
@@ -1015,14 +1015,14 @@ Three requirements are partial due to integration and metadata dependencies that
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                     | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | ----------------------------------------------- | ---------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, data quality monitoring       | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, mapping templates, rollback      | Legacy extraction scope and mapping      |
+| Req ID     | Title                                 | Status  | Built Today                                         | Remaining Scope                          |
+| ---------- | ------------------------------------- | ------- | --------------------------------------------------- | ---------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking     | viaSport templates and field definitions |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging        | External integrations and mapping rules  |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                     | Catalog taxonomy refinement              |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds  | Threshold tuning with viaSport           |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement           | Final DR and retention validation (TBD)  |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file field imports, ECS batch worker | Legacy extraction scope and mapping      |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -1158,9 +1158,10 @@ Refine catalog categories during Discovery. See Section 03 Platform Design for g
 
 **Built Today:**
 
-- Server side validation with Zod schemas and form rules.
-- Data quality monitoring job with alerting for missing fields and low completeness.
-- Admin dashboard view for data quality metrics.
+- Server-side validation with Zod schemas and form rules.
+- Data quality monitoring job with threshold evaluation and change-only admin notifications.
+- Global alert thresholds with optional org-level overrides via organization settings.
+- Admin dashboard view for data quality metrics with notification link.
 
 **Remaining Scope:**
 
@@ -1236,9 +1237,10 @@ Run final DR and retention validation in sin-perf or sin-prod. See Section 03 Da
 **Built Today:**
 
 - Import wizard with upload, mapping, preview, and commit flow.
+- File field import pipeline supporting JSON file payloads with validation (fileName, mimeType, sizeBytes, storageKey).
 - Mapping template library and reusable mappings.
-- Rollback support using import job ID and 7 day rollback window.
-- Batch processing lane with ECS Fargate in perf and prod.
+- Rollback support using import job ID and 7-day rollback window.
+- Batch processing lane with ECS Fargate worker (verified deployed in sin-dev).
 
 **Remaining Scope:**
 
@@ -1449,12 +1451,12 @@ Continue to expand datasets and templates as viaSport priorities are defined.
 
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                | Remaining Scope                       |
-| ----------- | --------------------------------- | ------ | ------------------------------------------ | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission     | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Anomaly detection, account lockout, alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls  | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain        | None                                  |
+| Req ID      | Title                             | Status | Built Today                                         | Remaining Scope                       |
+| ----------- | --------------------------------- | ------ | --------------------------------------------------- | ------------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission              | None                                  |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Redis rate limiting, pre-auth lockout, admin alerts | None                                  |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls           | Compliance package and pen test (TBD) |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                 | None                                  |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -1470,12 +1472,14 @@ Continue to expand datasets and templates as viaSport priorities are defined.
 
 - MFA with TOTP and backup codes is supported.
 - Password reset uses time-limited email tokens.
+- Password complexity enforced on signup and reset (uppercase, lowercase, number, symbol).
 - RBAC and organization scoping are enforced in the API layer.
 - Organization owners and admins manage invites and join requests.
 
 **Built Today:**
 
 - MFA enrollment and recovery flows.
+- Server-side password policy enforcement (validated: weak passwords blocked with inline errors).
 - Role-based permissions and org membership enforcement.
 - User invitation and join request workflows.
 
@@ -1507,12 +1511,15 @@ Continue to validate flows during UAT. See Section 03 Testing and QA.
 - Security events are recorded with risk scores and thresholds.
 - Failed logins trigger account flagging and lockouts.
 - Admins receive security alerts for anomalous behavior.
+- Rate limiting protects authentication and API endpoints.
 
 **Built Today:**
 
-- Login failure and MFA failure thresholds with account lockouts.
-- Security event logging and admin alerting.
-- GuardDuty enabled for infrastructure level monitoring.
+- Pre-auth lockout gating blocks sign-in for locked users before authentication.
+- Rate limiting with Redis-backed sliding window algorithm (5 requests/15 min for auth, in-memory fallback).
+- Login failure thresholds: 5 failures in 15 minutes triggers 30-minute account lockout.
+- Security event logging to `security_events` table with CloudWatch metrics.
+- Admin notifications for login anomalies and account lockouts.
 
 **Remaining Scope:**
 
@@ -1599,11 +1606,11 @@ Continue to validate audit integrity during UAT and provide evidence in Appendix
 
 ## Compliance Summary
 
-| Req ID     | Title                            | Status | Built Today                         | Remaining Scope                  |
-| ---------- | -------------------------------- | ------ | ----------------------------------- | -------------------------------- |
-| TO-AGG-001 | Template Support and Integration | Built  | Templates hub with contextual links | viaSport templates content       |
-| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Guided tours and walkthroughs       | Final content review (TBD)       |
-| TO-AGG-003 | Reference Materials and Support  | Built  | Help center with guides and FAQ     | Content refinement with viaSport |
+| Req ID     | Title                            | Status | Built Today                           | Remaining Scope                  |
+| ---------- | -------------------------------- | ------ | ------------------------------------- | -------------------------------- |
+| TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates content       |
+| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD)       |
+| TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement with viaSport |
 
 ## TO-AGG-001: Template Support and Integration
 
@@ -1623,9 +1630,10 @@ Continue to validate audit integrity during UAT and provide evidence in Appendix
 
 **Built Today:**
 
-- Templates hub UI with context filters.
+- Templates hub UI with inline preview URLs and version grouping.
 - Admin panel to manage global and organization templates.
-- Contextual links on form, reporting, and import screens.
+- Contextual links on form detail pages with preview/download actions.
+- Template shortcuts surfaced on form, reporting, and import screens.
 
 **Remaining Scope:**
 
@@ -1661,8 +1669,9 @@ Collect templates during Discovery and load into the hub prior to UAT.
 
 **Built Today:**
 
-- Guided tours for onboarding and data upload.
-- Tutorial panel with progress tracking.
+- Onboarding tour auto-launches after first organization selection when no prior progress exists.
+- Guided tours for onboarding and data upload with restart controls.
+- Tutorial panel with progress tracking and dismissal.
 - Contextual launch points on portal pages.
 
 **Remaining Scope:**
@@ -1696,8 +1705,8 @@ Refine tutorial copy and steps during Discovery and UAT.
 **Built Today:**
 
 - Help center with searchable guides and FAQ.
-- Role-based content filtering.
-- In-app support requests for escalation.
+- Role-scoped content with audience badges visible to users.
+- In-app support requests with priority selection, SLA targets, and response notifications.
 
 **Remaining Scope:**
 
@@ -1714,15 +1723,15 @@ Review help content during Discovery and incorporate viaSport feedback.
 
 ## Compliance Summary
 
-| Req ID     | Title                                   | Status | Built Today                            | Remaining Scope                      |
-| ---------- | --------------------------------------- | ------ | -------------------------------------- | ------------------------------------ |
-| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC             | None                                 |
-| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                  | None                                 |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility        | Formal audit before submission (TBD) |
-| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications  | None                                 |
-| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette     | None                                 |
-| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support requests and admin response UI | None                                 |
-| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding      | viaSport branding configuration      |
+| Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                      |
+| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------------------ |
+| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                                 |
+| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                                 |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | Formal audit before submission (TBD) |
+| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications     | None                                 |
+| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                                 |
+| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support with priority, SLA, notifications | None                                 |
+| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding         | viaSport branding configuration      |
 
 ## UI-AGG-001: User Access and Account Control
 
@@ -1911,8 +1920,9 @@ Expand search datasets as viaSport priorities are defined.
 
 **Built Today:**
 
-- Support request form with attachments and priority.
-- Admin support queue with status tracking.
+- Support request form with attachments, priority selection (Low/Normal/High/Urgent), and SLA targets.
+- Admin support queue with status tracking and response form.
+- Response and status changes dispatch in-app and email notifications.
 - Audit logging for support actions.
 
 **Remaining Scope:**
@@ -2419,13 +2429,13 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 |   +-----------+    +-----------+    +-----------+             |
 |        |                  |                 |                 |
 |   +----+-----+      +-----+-----+     +-----+-----+           |
-|   |    S3    |      |    SQS    |     |    SES    |           |
-|   | Storage  |      |  Queue    |     |   Email   |           |
+|   |    S3    |      |    SQS    |     |   Redis   |           |
+|   | Storage  |      |  Queue    |     | (Upstash) |           |
 |   +----------+      +-----------+     +-----------+           |
 |                                                               |
 |   +-----------+    +------------+    +-----------+            |
-|   |EventBridge|    | CloudWatch |    | GuardDuty |            |
-|   | Scheduler |    | Monitoring |    |  Threat   |            |
+|   |EventBridge|    | CloudWatch |    |    SES    |            |
+|   | Scheduler |    | Monitoring |    |   Email   |            |
 |   +-----------+    +------------+    +-----------+            |
 |                                                               |
 +---------------------------------------------------------------+
@@ -2438,7 +2448,8 @@ A working prototype is available for viaSport evaluation. Credentials are listed
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL on AWS RDS                                        |
-| Infrastructure | SST, AWS Lambda, CloudFront                                  |
+| Caching        | Redis (Upstash) for rate limiting, BI caching, permissions   |
+| Infrastructure | SST, AWS Lambda, CloudFront, ECS Fargate                     |
 | Authentication | Better Auth with TOTP MFA                                    |
 | Monitoring     | AWS CloudWatch, CloudTrail                                   |
 

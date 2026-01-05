@@ -2,11 +2,11 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                            | Status | Built Today                         | Remaining Scope                  |
-| ---------- | -------------------------------- | ------ | ----------------------------------- | -------------------------------- |
-| TO-AGG-001 | Template Support and Integration | Built  | Templates hub with contextual links | viaSport templates content       |
-| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Guided tours and walkthroughs       | Final content review (TBD)       |
-| TO-AGG-003 | Reference Materials and Support  | Built  | Help center with guides and FAQ     | Content refinement with viaSport |
+| Req ID     | Title                            | Status | Built Today                           | Remaining Scope                  |
+| ---------- | -------------------------------- | ------ | ------------------------------------- | -------------------------------- |
+| TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates content       |
+| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD)       |
+| TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement with viaSport |
 
 ## TO-AGG-001: Template Support and Integration
 
@@ -26,9 +26,10 @@
 
 **Built Today:**
 
-- Templates hub UI with context filters.
+- Templates hub UI with inline preview URLs and version grouping.
 - Admin panel to manage global and organization templates.
-- Contextual links on form, reporting, and import screens.
+- Contextual links on form detail pages with preview/download actions.
+- Template shortcuts surfaced on form, reporting, and import screens.
 
 **Remaining Scope:**
 
@@ -64,8 +65,9 @@ Collect templates during Discovery and load into the hub prior to UAT.
 
 **Built Today:**
 
-- Guided tours for onboarding and data upload.
-- Tutorial panel with progress tracking.
+- Onboarding tour auto-launches after first organization selection when no prior progress exists.
+- Guided tours for onboarding and data upload with restart controls.
+- Tutorial panel with progress tracking and dismissal.
 - Contextual launch points on portal pages.
 
 **Remaining Scope:**
@@ -99,8 +101,8 @@ Refine tutorial copy and steps during Discovery and UAT.
 **Built Today:**
 
 - Help center with searchable guides and FAQ.
-- Role-based content filtering.
-- In-app support requests for escalation.
+- Role-scoped content with audience badges visible to users.
+- In-app support requests with priority selection, SLA targets, and response notifications.
 
 **Remaining Scope:**
 

@@ -363,17 +363,19 @@ See Appendix C for performance evidence and planned final runs.
 
 The platform is hosted entirely on Amazon Web Services in a serverless architecture that reduces infrastructure overhead.
 
-| Component        | AWS Service     | Purpose                                    |
-| ---------------- | --------------- | ------------------------------------------ |
-| Application Tier | Lambda          | Serverless compute, auto-scaling           |
-| Database         | RDS PostgreSQL  | Managed relational database                |
-| Object Storage   | S3              | Documents, import files, audit archives    |
-| CDN              | CloudFront      | Edge caching, static asset delivery        |
-| Message Queue    | SQS             | Asynchronous notification processing       |
-| Email            | SES             | Transactional email delivery               |
-| Scheduling       | EventBridge     | Scheduled jobs for retention and reminders |
-| Secrets          | Secrets Manager | Credential storage                         |
-| Encryption Keys  | KMS             | Key management for encryption at rest      |
+| Component        | AWS Service         | Purpose                                    |
+| ---------------- | ------------------- | ------------------------------------------ |
+| Application Tier | Lambda              | Serverless compute, auto-scaling           |
+| Database         | RDS PostgreSQL      | Managed relational database                |
+| Caching          | ElastiCache Redis   | Rate limiting, BI caching, permissions     |
+| Object Storage   | S3                  | Documents, import files, audit archives    |
+| CDN              | CloudFront          | Edge caching, static asset delivery        |
+| Message Queue    | SQS                 | Asynchronous notification processing       |
+| Batch Processing | ECS Fargate         | Large file import processing               |
+| Email            | SES                 | Transactional email delivery               |
+| Scheduling       | EventBridge         | Scheduled jobs for retention and reminders |
+| Secrets          | SSM Parameter Store | Credential storage                         |
+| Encryption Keys  | KMS                 | Key management for encryption at rest      |
 
 ### Data Residency
 
@@ -576,20 +578,21 @@ Import tooling is ready today. Extraction approach will be finalized during Disc
 
 The platform is built on Amazon Web Services in the ca-central-1 (Montreal) region.
 
-| Service         | Purpose                                    |
-| --------------- | ------------------------------------------ |
-| CloudFront      | CDN for static assets and edge caching     |
-| Lambda          | Serverless application compute             |
-| RDS PostgreSQL  | Managed relational database                |
-| S3              | Object storage for documents and imports   |
-| SQS             | Message queues for notifications           |
-| SES             | Transactional email delivery               |
-| EventBridge     | Scheduled jobs for retention and reminders |
-| CloudWatch      | Metrics, logs, alarms                      |
-| CloudTrail      | API audit logging                          |
-| GuardDuty       | Threat detection                           |
-| Secrets Manager | Credential storage with rotation           |
-| KMS             | Encryption key management                  |
+| Service             | Purpose                                    |
+| ------------------- | ------------------------------------------ |
+| CloudFront          | CDN for static assets and edge caching     |
+| Lambda              | Serverless application compute             |
+| RDS PostgreSQL      | Managed relational database                |
+| ElastiCache Redis   | Rate limiting, caching, permissions        |
+| S3                  | Object storage for documents and imports   |
+| SQS                 | Message queues for notifications           |
+| ECS Fargate         | Batch import processing                    |
+| SES                 | Transactional email delivery               |
+| EventBridge         | Scheduled jobs for retention and reminders |
+| CloudWatch          | Metrics, logs, alarms                      |
+| CloudTrail          | API audit logging                          |
+| SSM Parameter Store | Credential storage                         |
+| KMS                 | Encryption key management                  |
 
 ### Why AWS
 
@@ -2495,12 +2498,12 @@ All data is hosted in AWS ca-central-1 (Canada). No data is stored or processed 
 
 ### Encryption
 
-| Scope              | Standard            |
-| ------------------ | ------------------- |
-| In Transit         | TLS 1.2+            |
-| At Rest (Database) | AES-256 via AWS KMS |
-| At Rest (Storage)  | AES-256 via AWS KMS |
-| Secrets            | AWS Secrets Manager |
+| Scope              | Standard                |
+| ------------------ | ----------------------- |
+| In Transit         | TLS 1.2+                |
+| At Rest (Database) | AES-256 via AWS KMS     |
+| At Rest (Storage)  | AES-256 via AWS KMS     |
+| Secrets            | AWS SSM Parameter Store |
 
 ### Authentication
 

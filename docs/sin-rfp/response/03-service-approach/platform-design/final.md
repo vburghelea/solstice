@@ -4,20 +4,21 @@
 
 The platform is built on Amazon Web Services in the ca-central-1 (Montreal) region.
 
-| Service         | Purpose                                    |
-| --------------- | ------------------------------------------ |
-| CloudFront      | CDN for static assets and edge caching     |
-| Lambda          | Serverless application compute             |
-| RDS PostgreSQL  | Managed relational database                |
-| S3              | Object storage for documents and imports   |
-| SQS             | Message queues for notifications           |
-| SES             | Transactional email delivery               |
-| EventBridge     | Scheduled jobs for retention and reminders |
-| CloudWatch      | Metrics, logs, alarms                      |
-| CloudTrail      | API audit logging                          |
-| GuardDuty       | Threat detection                           |
-| Secrets Manager | Credential storage with rotation           |
-| KMS             | Encryption key management                  |
+| Service             | Purpose                                    |
+| ------------------- | ------------------------------------------ |
+| CloudFront          | CDN for static assets and edge caching     |
+| Lambda              | Serverless application compute             |
+| RDS PostgreSQL      | Managed relational database                |
+| ElastiCache Redis   | Rate limiting, caching, permissions        |
+| S3                  | Object storage for documents and imports   |
+| SQS                 | Message queues for notifications           |
+| ECS Fargate         | Batch import processing                    |
+| SES                 | Transactional email delivery               |
+| EventBridge         | Scheduled jobs for retention and reminders |
+| CloudWatch          | Metrics, logs, alarms                      |
+| CloudTrail          | API audit logging                          |
+| SSM Parameter Store | Credential storage                         |
+| KMS                 | Encryption key management                  |
 
 ### Why AWS
 

@@ -114,12 +114,12 @@ All data is hosted in AWS ca-central-1 (Canada). No data is stored or processed 
 
 ### Encryption
 
-| Scope              | Standard            |
-| ------------------ | ------------------- |
-| In Transit         | TLS 1.2+            |
-| At Rest (Database) | AES-256 via AWS KMS |
-| At Rest (Storage)  | AES-256 via AWS KMS |
-| Secrets            | AWS Secrets Manager |
+| Scope              | Standard                |
+| ------------------ | ----------------------- |
+| In Transit         | TLS 1.2+                |
+| At Rest (Database) | AES-256 via AWS KMS     |
+| At Rest (Storage)  | AES-256 via AWS KMS     |
+| Secrets            | AWS SSM Parameter Store |
 
 ### Authentication
 

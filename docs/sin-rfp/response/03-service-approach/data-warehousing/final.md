@@ -6,17 +6,19 @@
 
 The platform is hosted entirely on Amazon Web Services in a serverless architecture that reduces infrastructure overhead.
 
-| Component        | AWS Service     | Purpose                                    |
-| ---------------- | --------------- | ------------------------------------------ |
-| Application Tier | Lambda          | Serverless compute, auto-scaling           |
-| Database         | RDS PostgreSQL  | Managed relational database                |
-| Object Storage   | S3              | Documents, import files, audit archives    |
-| CDN              | CloudFront      | Edge caching, static asset delivery        |
-| Message Queue    | SQS             | Asynchronous notification processing       |
-| Email            | SES             | Transactional email delivery               |
-| Scheduling       | EventBridge     | Scheduled jobs for retention and reminders |
-| Secrets          | Secrets Manager | Credential storage                         |
-| Encryption Keys  | KMS             | Key management for encryption at rest      |
+| Component        | AWS Service         | Purpose                                    |
+| ---------------- | ------------------- | ------------------------------------------ |
+| Application Tier | Lambda              | Serverless compute, auto-scaling           |
+| Database         | RDS PostgreSQL      | Managed relational database                |
+| Caching          | ElastiCache Redis   | Rate limiting, BI caching, permissions     |
+| Object Storage   | S3                  | Documents, import files, audit archives    |
+| CDN              | CloudFront          | Edge caching, static asset delivery        |
+| Message Queue    | SQS                 | Asynchronous notification processing       |
+| Batch Processing | ECS Fargate         | Large file import processing               |
+| Email            | SES                 | Transactional email delivery               |
+| Scheduling       | EventBridge         | Scheduled jobs for retention and reminders |
+| Secrets          | SSM Parameter Store | Credential storage                         |
+| Encryption Keys  | KMS                 | Key management for encryption at rest      |
 
 ### Data Residency
 

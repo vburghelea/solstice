@@ -1,4 +1,13 @@
-import { index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
 import { organizations } from "./organizations.schema";
 
@@ -16,6 +25,13 @@ export const supportRequestCategoryEnum = pgEnum("support_request_category", [
   "feedback",
 ]);
 
+export const supportRequestPriorityEnum = pgEnum("support_request_priority", [
+  "low",
+  "normal",
+  "high",
+  "urgent",
+]);
+
 export const supportRequests = pgTable(
   "support_requests",
   {
@@ -27,7 +43,9 @@ export const supportRequests = pgTable(
     subject: text("subject").notNull(),
     message: text("message").notNull(),
     category: supportRequestCategoryEnum("category").notNull().default("question"),
+    priority: supportRequestPriorityEnum("priority").notNull().default("normal"),
     status: supportRequestStatusEnum("status").notNull().default("open"),
+    slaTargetAt: timestamp("sla_target_at", { withTimezone: true }),
     responseMessage: text("response_message"),
     respondedBy: text("responded_by").references(() => user.id),
     respondedAt: timestamp("responded_at", { withTimezone: true }),
@@ -44,5 +62,27 @@ export const supportRequests = pgTable(
   ],
 );
 
+export const supportRequestAttachments = pgTable(
+  "support_request_attachments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requestId: uuid("request_id")
+      .notNull()
+      .references(() => supportRequests.id, { onDelete: "cascade" }),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    storageKey: text("storage_key").notNull(),
+    uploadedBy: text("uploaded_by").references(() => user.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("support_request_attachments_request_idx").on(table.requestId, table.createdAt),
+    uniqueIndex("support_request_attachments_key_unique").on(table.storageKey),
+  ],
+);
+
 export type SupportRequest = typeof supportRequests.$inferSelect;
 export type NewSupportRequest = typeof supportRequests.$inferInsert;
+export type SupportRequestAttachment = typeof supportRequestAttachments.$inferSelect;
+export type NewSupportRequestAttachment = typeof supportRequestAttachments.$inferInsert;

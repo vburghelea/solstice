@@ -2,13 +2,13 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                | Status | Implementation                                                    |
-| ---------- | ------------------------------------ | ------ | ----------------------------------------------------------------- |
-| RP-AGG-001 | Data Validation & Submission Rules   | Comply | Form and file validation with error messaging                     |
-| RP-AGG-002 | Reporting Information Management     | Comply | Organization metadata, contacts, fiscal periods, delegated access |
-| RP-AGG-003 | Reporting Flow & Support             | Comply | Automated reminders, resubmission tracking, dashboards            |
-| RP-AGG-004 | Reporting Configuration & Collection | Comply | Form builder, file management, admin configuration                |
-| RP-AGG-005 | Self-Service Analytics & Data Export | Comply | Native BI platform with pivots, charts, export                    |
+| Req ID     | Title                                | Status  | Implementation                                                                      |
+| ---------- | ------------------------------------ | ------- | ----------------------------------------------------------------------------------- |
+| RP-AGG-001 | Data Validation & Submission Rules   | Comply  | Form and file validation with error messaging                                       |
+| RP-AGG-002 | Reporting Information Management     | Partial | Core metadata and access controls; program-specific fields configured with viaSport |
+| RP-AGG-003 | Reporting Flow & Support             | Comply  | Automated reminders, resubmission tracking, dashboards                              |
+| RP-AGG-004 | Reporting Configuration & Collection | Comply  | Form builder, file management, admin configuration                                  |
+| RP-AGG-005 | Self-Service Analytics & Data Export | Comply  | Native BI platform with pivots, charts, export                                      |
 
 ## RP-AGG-001: Data Validation & Submission Rules
 
@@ -40,7 +40,7 @@
 | Delegated Access      | Owners can delegate reporter or viewer access to other users within their organization                                  |
 | Metadata Extensions   | Custom metadata fields can be added via form builder for contribution agreements, NCCP, and other program-specific data |
 
-**Note:** Specific metadata fields for contribution agreements and NCCP will be configured during the Planning phase based on viaSport's data dictionary.
+**Note:** Specific metadata fields for contribution agreements and NCCP will be configured during the Planning phase based on viaSport's data dictionary; this is the remaining scope for full compliance.
 
 ## RP-AGG-003: Reporting Flow & Support
 
@@ -53,10 +53,10 @@
 | Automated Reminders   | Scheduled notifications for upcoming deadlines; configurable lead times (7 days, 3 days, 1 day) |
 | Resubmission Tracking | Full history of submissions per form; users can view previous versions and track changes        |
 | Status Dashboards     | Role-based dashboards showing submission status, pending actions, and overdue items             |
-| Email Delivery        | Notifications delivered via AWS SES; delivery verified December 2025                            |
+| Email Delivery        | Notifications delivered via AWS SES; delivery verified in a dev environment (evidence on file)  |
 | In-App Notifications  | Real-time notification feed within the platform; unread count displayed in navigation           |
 
-**Evidence:** Email delivery tested December 31, 2025; scheduled notification processed and delivered successfully.
+**Evidence:** Email delivery tested in dev; scheduled notification processed and delivered successfully (date on file).
 
 ## RP-AGG-004: Reporting Configuration & Collection
 

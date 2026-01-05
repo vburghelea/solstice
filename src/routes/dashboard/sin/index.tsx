@@ -325,7 +325,10 @@ function SinPortalHome() {
         ))}
       </div>
 
-      <TutorialPanel />
+      <TutorialPanel
+        autoLaunchTutorialId="onboarding"
+        autoLaunchReady={Boolean(activeOrganizationId)}
+      />
     </div>
   );
 }

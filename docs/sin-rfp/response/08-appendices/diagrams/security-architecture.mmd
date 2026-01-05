@@ -1,0 +1,38 @@
+flowchart TB
+  User[Users / Admins]:::user -->|TLS 1.2+| Edge[CloudFront + WAF]:::edge -->|TLS 1.2+| API[App API - Lambda]:::app
+
+  subgraph AuthN["Authentication - Better Auth"]
+    BA[Better Auth]:::security --> MFA[MFA TOTP + backup codes]:::security
+    BA --> Sess[Session Tokens]:::security
+  end
+
+  API --> BA
+
+  API --> AuthZ[Authorization: RBAC + org scope + feature gates]:::security
+  AuthZ --> DAL[Data Access Layer]:::app
+  DAL --> RDS[(RDS PostgreSQL)]:::data
+  DAL --> S3[(S3 Object Storage)]:::data
+
+  KMS[AWS KMS]:::security
+  KMS -. encrypts at rest .-> RDS
+  KMS -. encrypts at rest .-> S3
+
+  API --> Audit[Audit Log - append-only hash chain]:::audit
+  API --> Monitor[CloudWatch + CloudTrail + GuardDuty]:::security
+
+  subgraph Legend
+    L1[User / Client]:::user
+    L2[Edge]:::edge
+    L3[App / Service]:::app
+    L4[Data Store]:::data
+    L5[Security Control]:::security
+    L6[Audit Log]:::audit
+  end
+
+  classDef edge fill:#E3EEF8,stroke:#2E5F8A,color:#1C3D5A;
+  classDef app fill:#E6F4EA,stroke:#2E7D32,color:#1B5E20;
+  classDef data fill:#FFF3E0,stroke:#EF6C00,color:#4E342E;
+  classDef queue fill:#E0F2F1,stroke:#00796B,color:#004D40;
+  classDef security fill:#ECEFF1,stroke:#546E7A,color:#263238;
+  classDef user fill:#F5F5F5,stroke:#616161,color:#212121;
+  classDef audit fill:#FBE9E7,stroke:#D84315,color:#4E342E;

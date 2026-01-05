@@ -216,7 +216,7 @@ describe("executeSqlWorkbenchQuery", () => {
   it("propagates concurrency guardrail errors", async () => {
     const acquireSpy = vi
       .spyOn(guardrails, "acquireConcurrencySlot")
-      .mockImplementation(() => {
+      .mockImplementation(async () => {
         throw new Error("Too many concurrent SQL queries for this user");
       });
 

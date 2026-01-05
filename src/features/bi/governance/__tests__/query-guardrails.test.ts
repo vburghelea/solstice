@@ -25,16 +25,16 @@ describe("query guardrails", () => {
     expect(result).toBe("SELECT * FROM orgs WHERE id = 'org-1' AND active = TRUE");
   });
 
-  it("enforces concurrency limits", () => {
-    const releases: Array<() => void> = [];
+  it("enforces concurrency limits", async () => {
+    const releases: Array<() => Promise<void>> = [];
     try {
-      releases.push(acquireConcurrencySlot("user-1", "org-1"));
-      releases.push(acquireConcurrencySlot("user-1", "org-1"));
-      expect(() => acquireConcurrencySlot("user-1", "org-1")).toThrow(
+      releases.push(await acquireConcurrencySlot("user-1", "org-1"));
+      releases.push(await acquireConcurrencySlot("user-1", "org-1"));
+      await expect(acquireConcurrencySlot("user-1", "org-1")).rejects.toThrow(
         "Too many concurrent SQL queries for this user",
       );
     } finally {
-      releases.forEach((release) => release());
+      await Promise.all(releases.map((release) => release()));
     }
   });
 });

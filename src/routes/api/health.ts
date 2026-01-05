@@ -25,6 +25,12 @@ interface HealthCheckResult {
       count?: number;
       message?: string;
     };
+    redis?: {
+      status: "connected" | "error" | "disabled";
+      latencyMs?: number;
+      lastError?: string | null;
+      message?: string;
+    };
     square: {
       status: "configured" | "not_configured";
       environment: string;
@@ -73,6 +79,7 @@ export const Route = createFileRoute("/api/health")({
           },
           services: {
             database: { status: "error", message: "Not checked yet" },
+            redis: { status: "disabled" },
             square: {
               status: process.env["SQUARE_ACCESS_TOKEN"]
                 ? "configured"
@@ -159,6 +166,47 @@ export const Route = createFileRoute("/api/health")({
             if (checks.status === "healthy") {
               checks.status = "degraded";
             }
+          }
+        }
+
+        // Check Redis connection (optional, can degrade health when unavailable)
+        try {
+          const { getRedis, getRedisConfig } = await import("~/lib/redis/client");
+          const redisConfig = await getRedisConfig();
+          if (!redisConfig.enabled) {
+            checks.services.redis = { status: "disabled" };
+          } else {
+            const redis = await getRedis();
+            if (!redis) {
+              checks.services.redis = {
+                status: "error",
+                message: "Redis is enabled but not configured",
+              };
+              if (redisConfig.required) {
+                checks.status = "unhealthy";
+              } else if (checks.status === "healthy") {
+                checks.status = "degraded";
+              }
+            } else {
+              const redisStart = Date.now();
+              await redis.ping();
+              checks.services.redis = {
+                status: "connected",
+                latencyMs: Date.now() - redisStart,
+              };
+            }
+          }
+        } catch (error) {
+          const { getRedisConfig } = await import("~/lib/redis/client");
+          const redisConfig = await getRedisConfig();
+          checks.services.redis = {
+            status: "error",
+            lastError: error instanceof Error ? error.message : "Redis ping failed",
+          };
+          if (redisConfig.required) {
+            checks.status = "unhealthy";
+          } else if (checks.status === "healthy") {
+            checks.status = "degraded";
           }
         }
 

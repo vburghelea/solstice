@@ -27,6 +27,51 @@ export const applySecurityRules = createServerOnlyFn(
 
     const db = await getDb();
     const now = Date.now();
+    const baseMetadata = {
+      userId: params.userId,
+      ipAddress: params.ipAddress ?? null,
+      userAgent: params.userAgent ?? null,
+      geoCountry: params.geoCountry ?? null,
+      geoRegion: params.geoRegion ?? null,
+    };
+    let adminIds: string[] | null = null;
+
+    const resolveAdminIds = async () => {
+      if (adminIds) return adminIds;
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      adminIds = await PermissionService.getGlobalAdminUserIds();
+      return adminIds;
+    };
+
+    const notifyAdmins = async (payload: {
+      type: string;
+      title: string;
+      body: string;
+      metadata?: Record<string, unknown>;
+    }) => {
+      const { enqueueNotification } = await import("~/lib/notifications/queue");
+      const admins = await resolveAdminIds();
+      if (admins.length === 0) return;
+
+      await Promise.all(
+        admins.map((adminId) =>
+          enqueueNotification({
+            userId: adminId,
+            type: payload.type,
+            category: "security",
+            title: payload.title,
+            body: payload.body,
+            link: "/dashboard/admin/sin/security",
+            ...(payload.metadata && {
+              metadata: payload.metadata as Record<
+                string,
+                import("~/shared/lib/json").JsonValue
+              >,
+            }),
+          }),
+        ),
+      );
+    };
 
     const countRecent = async (eventType: string, windowMs: number) => {
       const windowStart = new Date(now - windowMs);
@@ -68,13 +113,30 @@ export const applySecurityRules = createServerOnlyFn(
 
       const flagCount = await countRecent("login_fail", thresholds.flagWindowMs);
       if (flagCount === thresholds.flagThreshold) {
-        await recordSecurityEvent({
+        const flaggedEvent = await recordSecurityEvent({
           userId: params.userId,
           eventType: "account_flagged",
           riskScore: 40,
           riskFactors: ["failed_logins"],
           metadata: { threshold: "flag_3_in_15m" },
         });
+
+        if (flaggedEvent) {
+          await notifyAdmins({
+            type: "security_account_flagged",
+            title: "Account flagged for review",
+            body: "A user account was flagged after repeated failed logins.",
+            metadata: {
+              ...baseMetadata,
+              eventId: flaggedEvent.id,
+              eventType: flaggedEvent.eventType,
+              riskScore: flaggedEvent.riskScore,
+              riskFactors: flaggedEvent.riskFactors,
+              threshold: "flag_3_in_15m",
+              reason: "failed_logins",
+            },
+          });
+        }
       }
     }
 
@@ -103,13 +165,30 @@ export const applySecurityRules = createServerOnlyFn(
 
       const flagCount = await countRecent("mfa_fail", thresholds.flagWindowMs);
       if (flagCount === thresholds.flagThreshold) {
-        await recordSecurityEvent({
+        const flaggedEvent = await recordSecurityEvent({
           userId: params.userId,
           eventType: "account_flagged",
           riskScore: 40,
           riskFactors: ["mfa_failures"],
           metadata: { threshold: "flag_2_in_5m" },
         });
+
+        if (flaggedEvent) {
+          await notifyAdmins({
+            type: "security_account_flagged",
+            title: "Account flagged for review",
+            body: "A user account was flagged after repeated MFA failures.",
+            metadata: {
+              ...baseMetadata,
+              eventId: flaggedEvent.id,
+              eventType: flaggedEvent.eventType,
+              riskScore: flaggedEvent.riskScore,
+              riskFactors: flaggedEvent.riskFactors,
+              threshold: "flag_2_in_5m",
+              reason: "mfa_failures",
+            },
+          });
+        }
       }
     }
 
@@ -173,7 +252,7 @@ export const applySecurityRules = createServerOnlyFn(
         }
 
         if (riskScore > 0) {
-          await recordSecurityEvent({
+          const anomalyEvent = await recordSecurityEvent({
             userId: params.userId,
             eventType: "login_anomaly",
             ipAddress: params.ipAddress ?? null,
@@ -187,14 +266,46 @@ export const applySecurityRules = createServerOnlyFn(
             },
           });
 
+          if (anomalyEvent) {
+            await notifyAdmins({
+              type: "security_login_anomaly",
+              title: "Login anomaly detected",
+              body: "Unusual login context detected for a user account.",
+              metadata: {
+                ...baseMetadata,
+                eventId: anomalyEvent.id,
+                eventType: anomalyEvent.eventType,
+                riskScore: anomalyEvent.riskScore,
+                riskFactors: anomalyEvent.riskFactors,
+                threshold: SECURITY_THRESHOLDS.newContext.riskScoreThreshold,
+              },
+            });
+          }
+
           if (riskScore >= SECURITY_THRESHOLDS.newContext.riskScoreThreshold) {
-            await recordSecurityEvent({
+            const flaggedEvent = await recordSecurityEvent({
               userId: params.userId,
               eventType: "account_flagged",
               riskScore,
               riskFactors,
               metadata: { reason: "login_anomaly" },
             });
+
+            if (flaggedEvent) {
+              await notifyAdmins({
+                type: "security_account_flagged",
+                title: "Account flagged for review",
+                body: "A user account was flagged after a high-risk login anomaly.",
+                metadata: {
+                  ...baseMetadata,
+                  eventId: flaggedEvent.id,
+                  eventType: flaggedEvent.eventType,
+                  riskScore: flaggedEvent.riskScore,
+                  riskFactors: flaggedEvent.riskFactors,
+                  reason: "login_anomaly",
+                },
+              });
+            }
           }
         }
       }

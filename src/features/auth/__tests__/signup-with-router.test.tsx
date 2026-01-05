@@ -37,8 +37,8 @@ describe("SignupForm with Router", () => {
     // Fill form with mismatched passwords
     await user.type(screen.getByLabelText("Name"), "Test User");
     await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
-    await user.type(screen.getByLabelText("Confirm Password"), "password456");
+    await user.type(screen.getByLabelText("Password"), "SecurePassword123!");
+    await user.type(screen.getByLabelText("Confirm Password"), "SecurePassword456!");
 
     await user.click(screen.getByRole("button", { name: "Sign up" }));
 
@@ -66,8 +66,8 @@ describe("SignupForm with Router", () => {
     // Fill form correctly
     await user.type(screen.getByLabelText("Name"), "New User");
     await user.type(screen.getByLabelText("Email"), "newuser@example.com");
-    await user.type(screen.getByLabelText("Password"), "securepassword123");
-    await user.type(screen.getByLabelText("Confirm Password"), "securepassword123");
+    await user.type(screen.getByLabelText("Password"), "SecurePassword123!");
+    await user.type(screen.getByLabelText("Confirm Password"), "SecurePassword123!");
 
     await user.click(screen.getByRole("button", { name: "Sign up" }));
 
@@ -75,7 +75,7 @@ describe("SignupForm with Router", () => {
       expect(auth.signUp.email).toHaveBeenCalledWith(
         expect.objectContaining({
           email: "newuser@example.com",
-          password: "securepassword123",
+          password: "SecurePassword123!",
           name: "New User",
           callbackURL: "/dashboard",
         }),

@@ -22,12 +22,12 @@ Austin Wallace Tech brings demonstrated experience delivering enterprise-scale i
 
 The most relevant demonstration of our capability is the Solstice platform itself: a working prototype built specifically for viaSport's Strength in Numbers requirements.
 
-| Metric           | Value                                       |
-| ---------------- | ------------------------------------------- |
-| Codebase         | 20,000+ lines of tested TypeScript          |
-| Requirements Met | All 25 system requirements                  |
-| Load Testing     | 20.1 million rows, sub-250ms response times |
-| Server Errors    | Zero under concurrent load                  |
+| Metric           | Value                                                               |
+| ---------------- | ------------------------------------------------------------------- |
+| Codebase         | 20,000+ lines of tested TypeScript                                  |
+| Requirements Met | Majority of system requirements implemented; remaining items scoped |
+| Load Testing     | 20.1 million rows, sub-250ms response times                         |
+| Server Errors    | Zero under concurrent load                                          |
 
 This is not a theoretical proposal. viaSport can evaluate a working system.
 
@@ -35,14 +35,14 @@ This is not a theoretical proposal. viaSport can evaluate a working system.
 
 ### Team Structure
 
-| Role                     | Team Member     | Responsibilities                                                       | Status    |
-| ------------------------ | --------------- | ---------------------------------------------------------------------- | --------- |
-| Project Lead / Architect | Austin Wallace  | Architecture, data engineering, project management, delivery oversight | Committed |
-| Senior Developer         | Will Siddal     | Frontend/backend development, feature implementation                   | Committed |
-| Security Expert          | TBD (confirmed) | Security review, penetration testing, compliance validation            | Confirmed |
-| UX Designer              | TBD (confirmed) | User research, interface design, accessibility audit                   | Confirmed |
+| Role                     | Team Member    | Responsibilities                                                       | Status      |
+| ------------------------ | -------------- | ---------------------------------------------------------------------- | ----------- |
+| Project Lead / Architect | Austin Wallace | Architecture, data engineering, project management, delivery oversight | Committed   |
+| Senior Developer         | Will Siddal    | Frontend/backend development, feature implementation                   | Committed   |
+| Security Expert          | TBD            | Security review, penetration testing, compliance validation            | In progress |
+| UX Designer              | TBD            | User research, interface design, accessibility audit                   | In progress |
 
-All team members are based in British Columbia.
+The core team is based in British Columbia; remaining roles are expected to be BC-based (TBD).
 
 ### Oversight Mechanisms
 
@@ -60,8 +60,8 @@ The architecture and deployment approach ensures continuity regardless of team c
 
 - **Infrastructure as Code**: All AWS resources defined in SST, reproducible from version control
 - **Comprehensive Documentation**: Architecture decisions, deployment procedures, and operational runbooks maintained in the repository
-- **Automated Testing**: 90%+ test coverage ensures changes can be validated by any developer
-- **Single-Tenant Production**: viaSport's instance is isolated; no dependencies on shared services
+- **Automated Testing**: CI validates core workflows and regressions on each change
+- **Operational Runbooks**: Environment setup, deployment, and recovery procedures documented for continuity
 
 In the event of team member departure, knowledge transfer is supported by the codebase itself. The principal-led structure ensures Austin Wallace remains the constant point of accountability.
 
@@ -106,7 +106,7 @@ This is not vendor experience serving the sport sector from the outside. Austin 
 
 **Results:**
 
-- All 25 system requirements addressed
+- Majority of system requirements addressed; remaining items scheduled in the implementation plan
 - Load tested with 20.1 million rows
 - Sub-250ms response times (p95) under concurrent load
 - Zero server errors
@@ -213,42 +213,30 @@ When AI features are implemented, the following principles will govern their dev
 
 | Standard        | Usage                          |
 | --------------- | ------------------------------ |
-| OAuth 2.0       | Authentication protocol        |
 | TOTP (RFC 6238) | Multi-factor authentication    |
-| OpenAPI         | API documentation format       |
 | CSV/Excel       | Data import and export formats |
-| JSON            | API data interchange           |
+| JSON            | Data interchange               |
 | TLS 1.2+        | Transport security             |
 | AES-256         | Encryption at rest             |
 
 ### APIs
 
-The platform exposes REST APIs for integration with external systems:
+The platform provides internal APIs and integration points. External APIs and webhooks can be exposed as needed and scoped collaboratively with viaSport during Planning.
 
-| API Category    | Capabilities                         |
-| --------------- | ------------------------------------ |
-| Authentication  | Login, logout, session management    |
-| Data Submission | Create, read, update submissions     |
-| Reporting       | Query data, export results           |
-| User Management | Invite users, manage roles           |
-| Webhooks        | Event notifications for integrations |
-
-API access is authenticated, rate-limited, and logged. Documentation follows OpenAPI specification.
-
-**Note:** External system integrations (such as connections to third-party databases or services) will be scoped collaboratively with viaSport during the Planning phase based on specific requirements.
+**Note:** Integration requirements (e.g., third-party databases or services) will be defined with viaSport before implementation.
 
 ### Open Source
 
 The platform is built on industry-standard open source technologies:
 
-| Layer          | Technologies                                                      |
-| -------------- | ----------------------------------------------------------------- |
-| Frontend       | React 19, TanStack Router, TanStack Query, Radix UI, Tailwind CSS |
-| Backend        | TanStack Start, Node.js, Drizzle ORM                              |
-| Database       | PostgreSQL                                                        |
-| Infrastructure | SST (infrastructure as code), AWS CDK                             |
-| Testing        | Vitest, Playwright, Testing Library                               |
-| Validation     | Zod                                                               |
+| Layer          | Technologies                                                 |
+| -------------- | ------------------------------------------------------------ |
+| Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
+| Backend        | TanStack Start, Node.js, Drizzle ORM                         |
+| Database       | PostgreSQL                                                   |
+| Infrastructure | SST (infrastructure as code)                                 |
+| Testing        | Vitest, Playwright, Testing Library                          |
+| Validation     | Zod                                                          |
 
 This open source foundation ensures:
 

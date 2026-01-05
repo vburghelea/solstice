@@ -18,7 +18,7 @@ Each user sees a personalized dashboard based on their role and organizational a
 
 - **Administrators:** Overdue submissions across organizations, pending access requests, system health indicators, analytics summaries.
 - **Reporters:** Current submission status, upcoming deadlines, changes requested, recent activity.
-- **Viewers:** Submitted reports, import progress, read-only access to organizational data.
+- **Data Stewards:** Validation queues, import progress, data quality exceptions, bulk operations.
 
 ### Navigation and Workflow
 
@@ -26,7 +26,6 @@ The platform uses dashboard-led navigation with quick access cards for common ta
 
 - **Command palette:** Keyboard-accessible search (Cmd/Ctrl+K) for instant navigation to any page, form, or record.
 - **Contextual links:** Related actions appear alongside relevant data, reducing clicks to complete tasks.
-- **Breadcrumb trails:** Clear indication of location within the application hierarchy.
 
 ### Responsive Design
 
@@ -41,7 +40,7 @@ The interface is built on Radix UI primitives, which provide WCAG-compliant acce
 - Sufficient color contrast ratios
 - Focus indicators for interactive elements
 
-Lighthouse accessibility audits confirm compliance. Formal WCAG audit available on request.
+Preliminary Lighthouse accessibility checks indicate strong compliance. A formal WCAG audit is available on request.
 
 ### UX Refinement Process
 
@@ -109,7 +108,7 @@ This technology combination delivers specific benefits for viaSport:
 
 ### Performance Evidence
 
-Lighthouse audit results (December 2025):
+Lighthouse audit results (latest prototype run; date TBD):
 
 | Metric                   | Score/Value | Target  | Status |
 | ------------------------ | ----------- | ------- | ------ |

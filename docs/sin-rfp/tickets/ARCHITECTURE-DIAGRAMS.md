@@ -51,15 +51,30 @@ Create technical architecture diagrams for the RFP response appendix. These shou
 
 `/docs/sin-rfp/response/08-appendices/diagrams/`
 
+## Deliverables
+
+- `docs/sin-rfp/response/08-appendices/diagrams/high-level-system-architecture.mmd`
+- `docs/sin-rfp/response/08-appendices/diagrams/high-level-system-architecture.svg`
+- `docs/sin-rfp/response/08-appendices/diagrams/high-level-system-architecture.png`
+- `docs/sin-rfp/response/08-appendices/diagrams/data-flow-diagram.mmd`
+- `docs/sin-rfp/response/08-appendices/diagrams/data-flow-diagram.svg`
+- `docs/sin-rfp/response/08-appendices/diagrams/data-flow-diagram.png`
+- `docs/sin-rfp/response/08-appendices/diagrams/security-architecture.mmd`
+- `docs/sin-rfp/response/08-appendices/diagrams/security-architecture.svg`
+- `docs/sin-rfp/response/08-appendices/diagrams/security-architecture.png`
+- `docs/sin-rfp/response/08-appendices/diagrams/multi-tenant-architecture.mmd`
+- `docs/sin-rfp/response/08-appendices/diagrams/multi-tenant-architecture.svg`
+- `docs/sin-rfp/response/08-appendices/diagrams/multi-tenant-architecture.png`
+
 ## Priority
 
 High - needed for RFP submission (Jan 9)
 
 ## Acceptance Criteria
 
-- [ ] High-level system architecture diagram
-- [ ] Data flow diagram
-- [ ] Security architecture diagram
-- [ ] Multi-tenant architecture diagram
-- [ ] All diagrams exported as PNG/SVG
+- [x] High-level system architecture diagram
+- [x] Data flow diagram
+- [x] Security architecture diagram
+- [x] Multi-tenant architecture diagram
+- [x] All diagrams exported as PNG/SVG
 - [ ] Diagrams reviewed for accuracy

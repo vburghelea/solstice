@@ -445,7 +445,7 @@ export const createEvent = createServerFn({ method: "POST" })
         .returning();
 
       const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-      invalidatePivotCache("events");
+      await invalidatePivotCache("events");
 
       return {
         success: true,
@@ -568,7 +568,7 @@ export const updateEvent = createServerFn({ method: "POST" })
         .returning();
 
       const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-      invalidatePivotCache("events");
+      await invalidatePivotCache("events");
 
       return {
         success: true,

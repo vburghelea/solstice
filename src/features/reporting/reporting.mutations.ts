@@ -274,7 +274,7 @@ export const createReportingTask = createServerFn({ method: "POST" })
     }
 
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("reporting_submissions");
+    await invalidatePivotCache("reporting_submissions");
 
     return created ?? null;
   });
@@ -541,7 +541,7 @@ export const updateReportingSubmission = createServerFn({ method: "POST" })
     });
 
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("reporting_submissions");
+    await invalidatePivotCache("reporting_submissions");
 
     return updated;
   });

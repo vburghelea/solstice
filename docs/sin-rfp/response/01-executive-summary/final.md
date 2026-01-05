@@ -2,13 +2,13 @@
 
 Austin Wallace Tech is pleased to respond to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project: B.C. Amateur Sport Information Management System Replacement. We believe that British Columbia's amateur sport sector deserves a modern, secure, and purpose-built information management platform that enables informed decision-making, reduces administrative burden, and sets a robust digital foundation for the province's next decade of sport development. That is why we have invested in building a working prototype specifically designed to meet viaSport's requirements.
 
-Replacing legacy systems that have served the sector for over 15 years presents both an opportunity and a risk. The opportunity is to create a foundational digital layer for amateur sport in B.C.: a shared data and information platform that transforms how participation, funding, equity, and impact are understood. The risk is that new system development often encounters delays, cost overruns, and gaps between design and delivery. We have addressed this risk directly by building a functional prototype that meets all 25 system requirements and has been load-tested at production scale with 20 million rows of data. This approach significantly de-risks viaSport's decision and demonstrates our commitment to delivering a proven solution, not a promise.
+Replacing legacy systems that have served the sector for over 15 years presents both an opportunity and a risk. The opportunity is to create a foundational digital layer for amateur sport in B.C.: a shared data and information platform that transforms how participation, funding, equity, and impact are understood. The risk is that new system development often encounters delays, cost overruns, and gaps between design and delivery. We have addressed this risk directly by building a functional prototype that already satisfies the majority of system requirements and has been load-tested at production scale with 20.1 million rows of data. This approach significantly de-risks viaSport's decision and demonstrates our commitment to delivering a proven solution, not a promise.
 
 The key highlights of our response are as follows:
 
-**De-Risked Delivery:** We are not proposing to build a system from scratch. A working prototype already exists, purpose-built for viaSport's Strength in Numbers requirements. This prototype has been load-tested with 20.1 million rows of historical data, achieving sub-250 millisecond response times (p95) with zero server errors. The platform meets all 25 system requirements as documented in the System Requirements Addendum. This level of pre-existing development significantly reduces delivery risk and accelerates the path to production.
+**De-Risked Delivery:** We are not proposing to build a system from scratch. A working prototype already exists, purpose-built for viaSport's Strength in Numbers requirements. This prototype has been load-tested with 20.1 million rows of historical data, achieving sub-250 millisecond response times (p95) with zero server errors. The prototype implements the majority of the System Requirements Addendum items today, with the remaining items scoped and scheduled for delivery. This level of pre-existing development significantly reduces delivery risk and accelerates the path to production.
 
-You can access a live prototype site at <url>, using username <viasport-staff@example.com> and password <testpassword123>.
+A live prototype environment is available upon request; access details are provided in Appendix A (placeholders until final deployment).
 
 **Domain Expertise:** Austin Wallace, Project Lead, brings a unique combination of enterprise data engineering experience and deep understanding of amateur sport governance. As Chair of the International Quidditch Association, he led data and technology strategy for 30+ national governing bodies worldwide. At the New Jersey Devils (NHL), he served as sole Data Developer, building an end-to-end data platform processing 10 million rows per game of NHL tracking data to support multi-million dollar player decisions. At Clio, he owns 10+ Databricks pipelines and unlocked over $1 million in value through responsible AI enablement. His B.Sc. from UBC in Analytical Sports Management, a custom degree combining business, statistics, and machine learning, was designed specifically for this intersection of sport and data.
 
@@ -22,7 +22,7 @@ Will Siddal, Senior Developer, brings 2+ years of full-stack development experie
 
 The Solstice platform delivers a comprehensive information management system designed specifically for viaSport's requirements:
 
-_Data Submission & Reporting Portal:_ A secure, responsive web portal with role-based dashboards for viaSport administrators, PSO reporters, and data stewards. The portal includes a customizable form builder, file upload capabilities, real-time submission tracking, and automated notifications. The interface is built on Radix UI primitives for WCAG accessibility compliance, achieving a Lighthouse performance score of 93/100.
+_Data Submission & Reporting Portal:_ A secure, responsive web portal with role-based dashboards for viaSport administrators, PSO reporters, and data stewards. The portal includes a customizable form builder, file upload capabilities, real-time submission tracking, and automated notifications. The interface is built on accessible Radix UI primitives and is tested for performance and usability (Lighthouse metrics available on request).
 
 _Native Analytics Platform:_ Rather than integrating third-party tools such as Metabase or Superset, we built analytics directly into the platform to ensure every query respects tenancy boundaries, every export is audited, and every field-level permission is enforced. Users can build ad-hoc pivot tables and charts, export to CSV, Excel, or JSON, and access self-service analytics without developer intervention.
 
@@ -48,12 +48,12 @@ This accelerated timeline is possible because of the extensive prototyping work 
 
 **Team:**
 
-| Role                         | Team Member     |
-| ---------------------------- | --------------- |
-| Project Lead / Data Engineer | Austin Wallace  |
-| Senior Developer             | Will Siddal     |
-| Security Expert              | TBD (confirmed) |
-| UX Designer                  | TBD (confirmed) |
+| Role                         | Team Member       |
+| ---------------------------- | ----------------- |
+| Project Lead / Data Engineer | Austin Wallace    |
+| Senior Developer             | Will Siddal       |
+| Security Expert              | TBD (in progress) |
+| UX Designer                  | TBD (in progress) |
 
 Austin Wallace, the architect and sole developer of the working prototype, will lead delivery directly. This principal-led approach ensures continuity from prototype through production, eliminates hand-off risk, and provides viaSport with direct access to the person who understands the system most deeply.
 

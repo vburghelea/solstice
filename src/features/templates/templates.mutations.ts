@@ -6,6 +6,7 @@ import {
   createTemplateUploadSchema,
   deleteTemplateSchema,
   getTemplateDownloadSchema,
+  getTemplatePreviewSchema,
   updateTemplateSchema,
 } from "./templates.schemas";
 
@@ -259,6 +260,61 @@ export const getTemplateDownloadUrl = createServerFn({ method: "POST" })
 
     return {
       downloadUrl,
+      fileName: template.fileName,
+      mimeType: template.mimeType,
+      sizeBytes: template.sizeBytes,
+    };
+  });
+
+export const getTemplatePreviewUrl = createServerFn({ method: "POST" })
+  .inputValidator(zod$(getTemplatePreviewSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_templates");
+    const userId = await requireSessionUserId();
+
+    const { getDb } = await import("~/db/server-helpers");
+    const { templates } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+    const { notFound } = await import("~/lib/server/errors");
+
+    const db = await getDb();
+    const [template] = await db
+      .select()
+      .from(templates)
+      .where(eq(templates.id, data.templateId))
+      .limit(1);
+
+    if (!template) {
+      throw notFound("Template not found");
+    }
+
+    if (template.organizationId) {
+      const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+      await requireOrganizationAccess({
+        userId,
+        organizationId: template.organizationId,
+      });
+    }
+
+    const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+    const { getArtifactsBucketName, getS3Client } =
+      await import("~/lib/storage/artifacts");
+
+    const bucket = await getArtifactsBucketName();
+    const client = await getS3Client();
+
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: template.storageKey,
+      ResponseContentDisposition: `inline; filename="${template.fileName}"`,
+      ResponseContentType: template.mimeType,
+    });
+
+    const previewUrl = await getSignedUrl(client, command, { expiresIn: 900 });
+
+    return {
+      previewUrl,
       fileName: template.fileName,
       mimeType: template.mimeType,
       sizeBytes: template.sizeBytes,

@@ -1,8 +1,10 @@
 # INFRA-002: SST Dev Mode Base URL Mismatch Causes Auth Redirect Loop
 
-**Status:** Open
+**Status:** ✅ Verified
 **Priority:** High
 **Discovered:** 2025-12-26
+**Last Updated:** 2026-01-05
+**Verified:** 2026-01-05
 **Environment:** `sst dev --stage sin-dev` (likely affects `qc-dev` too)
 
 ## Summary
@@ -12,6 +14,15 @@ server-side auth is configured with the CloudFront URL from the `BaseUrl` secret
 Better Auth uses this base URL for redirects and cookie security, which causes a
 307 redirect loop after login. The loop only appears in SST dev mode; the plain
 Vite dev server (`pnpm dev`) uses the correct localhost URL.
+
+## Status Update (2026-01-04)
+
+- **Fix implemented:** `sst.config.ts` now uses `$dev` to pick the local
+  `VITE_BASE_URL` (or `http://localhost:5173`) when running `sst dev`, while
+  deployed stages continue to use the `BaseUrl` secret.
+- `BASE_URL` and `VITE_BASE_URL` are both set from this resolved `baseUrl` so
+  Better Auth and the browser stay aligned in dev.
+- Needs verification in `sst dev` to confirm the redirect loop is gone.
 
 ## Expected Behavior (How It Should Work in Theory)
 
@@ -70,6 +81,10 @@ The issue is caused by **configuration precedence**, not Better Auth itself.
 **Net effect:** Server-side auth is configured for CloudFront, while the browser
 is on localhost. Redirects and cookie settings are out of sync, producing the
 307 loop.
+
+**Current state:** `sst.config.ts` now switches `baseUrl` based on `$dev`, so
+`sst dev` should use `VITE_BASE_URL` (localhost) instead of the CloudFront
+secret. This aligns the server and browser origins again.
 
 ## Why This Manifests as a 307 Loop
 
@@ -148,6 +163,8 @@ VITE_BASE_URL: baseUrl,
 // (optional) BASE_URL: baseUrl,
 ```
 
+**Status:** Implemented (2026-01-04)
+
 **Pros**
 
 - Single source of truth (SST config).
@@ -208,9 +225,9 @@ VITE_BASE_URL: baseUrl,
 
 ## Recommended Path
 
-- Implement **Option 1** in `sst.config.ts`.
-- Optionally add a small guard in `getBaseUrl()` (Option 2) as defense-in-depth
-  if you want belt-and-suspenders behavior.
+- ✅ Implemented **Option 1** in `sst.config.ts`.
+- Optional: add a small guard in `getBaseUrl()` (Option 2) if you want
+  belt-and-suspenders behavior.
 
 ## Validation Steps
 
@@ -225,12 +242,12 @@ VITE_BASE_URL: baseUrl,
    Base URL: http://localhost:5173
    ```
 4. Confirm dashboard loads and `getCurrentUser` returns a session.
+5. Optional: In the browser console, confirm `window.location.origin` matches
+   the base URL above.
 
 ## Open Questions / Follow-Ups
 
-- Confirm whether SST exposes a built-in `$dev` flag in config (not currently
-  used in this repo).
-- Confirm `SST_DEV` is present during `sst dev` for config evaluation.
+- ✅ `$dev` is available in SST config and is now used for `baseUrl`.
 - If a future Vite port change is expected, standardize via `.env` or a single
   `DEV_BASE_URL` value.
 
@@ -241,6 +258,29 @@ VITE_BASE_URL: baseUrl,
 - `src/lib/auth/server-helpers.ts` - Better Auth baseURL + cookie settings
 - `src/lib/env.client.ts` - client-side base URL (already correct)
 - `src/routes/__root.tsx` - logs the 307 loop in `Error loading user`
+
+## Verification Results (2026-01-05)
+
+**Test Environment:** `AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono`
+
+**Test Steps Performed:**
+
+1. Started SST dev mode with sin-dev stage
+2. Navigated to `http://localhost:5173/auth/login`
+3. Logged in with `viasport-staff@example.com` / `testpassword123`
+4. Completed MFA with TOTP code
+5. Verified redirect to `/dashboard/sin` (no loop)
+
+**Results:**
+
+- ✅ No 307 redirect loop observed
+- ✅ Dashboard loaded successfully
+- ✅ Server logs showed `Base URL: http://localhost:5173`
+- ✅ `getCurrentUser` returned valid session
+- ✅ Cookie set correctly for localhost origin
+
+**Conclusion:** Fix verified working. The `$dev` check in `sst.config.ts` correctly
+uses localhost base URL in dev mode while deployed stages use CloudFront.
 
 ## Testing Notes
 

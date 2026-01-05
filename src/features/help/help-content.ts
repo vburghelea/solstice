@@ -1,9 +1,17 @@
+import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+
+export type HelpAudience = {
+  roles?: OrganizationRole[];
+  requiresOrganization?: boolean;
+};
+
 export type HelpGuide = {
   id: string;
   title: string;
   category: string;
   summary: string;
   sections: Array<{ title: string; body: string }>;
+  audience?: HelpAudience;
 };
 
 export type HelpFaq = {
@@ -11,6 +19,7 @@ export type HelpFaq = {
   question: string;
   answer: string;
   category: string;
+  audience?: HelpAudience;
 };
 
 export const helpGuides: HelpGuide[] = [
@@ -39,6 +48,10 @@ export const helpGuides: HelpGuide[] = [
     title: "Preparing data imports",
     category: "Imports",
     summary: "Use templates, validate your files, and track import status.",
+    audience: {
+      roles: ["owner", "admin", "reporter"],
+      requiresOrganization: true,
+    },
     sections: [
       {
         title: "Download the latest template",
@@ -59,6 +72,10 @@ export const helpGuides: HelpGuide[] = [
     title: "Building analytics pivots",
     category: "Analytics",
     summary: "Drag fields into rows, columns, and measures to explore data.",
+    audience: {
+      roles: ["owner", "admin", "reporter"],
+      requiresOrganization: true,
+    },
     sections: [
       {
         title: "Choose a data source",
@@ -83,19 +100,28 @@ export const helpFaqs: HelpFaq[] = [
     question: "Where do I find the latest upload template?",
     answer:
       "Use the Templates hub and filter by Imports to download the most recent file.",
+    audience: {
+      roles: ["owner", "admin", "reporter"],
+      requiresOrganization: true,
+    },
   },
   {
     id: "reporting-deadlines",
     category: "Reporting",
     question: "How do I see my reporting deadlines?",
     answer: "Open the Reporting page to view due dates and the status of submissions.",
+    audience: {
+      roles: ["owner", "admin", "reporter", "viewer"],
+      requiresOrganization: true,
+    },
   },
   {
     id: "support-response",
     category: "Support",
     question: "How will I get a response to my support request?",
     answer:
-      "Support responses appear in your Support requests list and notify you by email if enabled.",
+      "Support responses appear in your Support requests list and trigger in-app " +
+      "and email notifications based on your preferences.",
   },
   {
     id: "data-quality",
@@ -103,5 +129,9 @@ export const helpFaqs: HelpFaq[] = [
     question: "What checks are monitored for data quality?",
     answer:
       "We track missing fields, validation errors, and low completeness scores in submissions.",
+    audience: {
+      roles: ["owner", "admin", "reporter"],
+      requiresOrganization: true,
+    },
   },
 ];

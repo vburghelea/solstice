@@ -204,9 +204,35 @@ export default $config({
       },
     });
 
+    const redisConfig = isProd
+      ? {
+          instance: "t4g.small",
+          numCacheClusters: 2,
+          multiAzEnabled: true,
+        }
+      : {
+          instance: "t4g.micro",
+          numCacheClusters: 1,
+          multiAzEnabled: false,
+        };
+
+    const redis = new sst.aws.Redis("Redis", {
+      vpc,
+      cluster: false,
+      instance: redisConfig.instance,
+      transform: {
+        cluster: (args) => ({
+          ...args,
+          numCacheClusters: redisConfig.numCacheClusters,
+          automaticFailoverEnabled: redisConfig.multiAzEnabled,
+          multiAzEnabled: redisConfig.multiAzEnabled,
+        }),
+      },
+    });
+
     // DSAR exports bucket with Object Lock for compliance retention
     // Object Lock provides WORM (Write Once Read Many) protection for DSAR exports
-    // and audit archives per ADR D0.13 (14-day DSAR retention)
+    // per ADR D0.13 (14-day DSAR retention).
     //
     // NOTE: Object Lock must be enabled at bucket creation time.
     const sinArtifacts = new sst.aws.Bucket("SinArtifacts", {
@@ -256,6 +282,28 @@ export default $config({
       ],
     });
 
+    const auditArchiveRetention = isProd || isPerf ? { years: 7 } : { days: 1 };
+
+    // Dedicated audit archive bucket with Object Lock (SEC-AGG-003, 7-year retention).
+    const sinAuditArchives = new sst.aws.Bucket("SinAuditArchives", {
+      versioning: true,
+      transform: {
+        bucket: {
+          objectLockEnabled: true,
+        },
+      },
+    });
+
+    new aws.s3.BucketObjectLockConfigurationV2("SinAuditArchivesLock", {
+      bucket: sinAuditArchives.name,
+      rule: {
+        defaultRetention: {
+          mode: "GOVERNANCE",
+          ...auditArchiveRetention,
+        },
+      },
+    });
+
     const notificationsDlq = new sst.aws.Queue("SinNotificationsDlq");
     const notificationsQueue = new sst.aws.Queue("SinNotificationsQueue", {
       visibilityTimeout: "2 minutes",
@@ -291,6 +339,10 @@ export default $config({
     const baseUrl = $dev ? devBaseUrl : secrets.baseUrl.value;
 
     const { tenantKey, viteTenantKey } = resolveTenantEnv(stageInfo);
+
+    const redisEnabled = true;
+    const redisRequired = isProd || isPerf;
+    const redisPrefix = `sin:${stage}`;
 
     const notificationEnv = {
       SIN_NOTIFICATIONS_QUEUE_URL: notificationsQueue.url,
@@ -341,7 +393,9 @@ export default $config({
       },
       link: [
         database,
+        redis,
         sinArtifacts,
+        sinAuditArchives,
         notificationsQueue,
         importBatchTask,
         ...Object.values(secrets),
@@ -356,6 +410,14 @@ export default $config({
         BASE_URL: baseUrl,
         VITE_BASE_URL: baseUrl,
         SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+        SIN_AUDIT_ARCHIVE_BUCKET: sinAuditArchives.name,
+        REDIS_HOST: redis.host,
+        REDIS_PORT: $interpolate`${redis.port}`,
+        REDIS_AUTH_TOKEN: redis.password,
+        REDIS_TLS: "true",
+        REDIS_PREFIX: redisPrefix,
+        REDIS_ENABLED: String(redisEnabled),
+        REDIS_REQUIRED: String(redisRequired),
         ...notificationEnv,
         // Map SST secrets to expected env var names
         BETTER_AUTH_SECRET: secrets.betterAuthSecret.value,
@@ -413,12 +475,13 @@ export default $config({
       schedule: "rate(1 day)",
       job: {
         handler: "src/cron/enforce-retention.handler",
-        link: [database, sinArtifacts, ...Object.values(secrets)],
+        link: [database, sinArtifacts, sinAuditArchives, ...Object.values(secrets)],
         environment: {
           ...runtimeEnv,
           TENANT_KEY: tenantKey,
           VITE_TENANT_KEY: viteTenantKey,
           SIN_ARTIFACTS_BUCKET: sinArtifacts.name,
+          SIN_AUDIT_ARCHIVE_BUCKET: sinAuditArchives.name,
         },
       },
     });
@@ -610,6 +673,128 @@ export default $config({
         Environment: stage,
         Application: "solstice",
         AlertType: "database",
+      },
+    });
+
+    const redisClusterId = redis.clusterId;
+
+    new aws.cloudwatch.MetricAlarm("RedisCpuAlarm", {
+      alarmName: `solstice-${stage}-redis-cpu`,
+      alarmDescription: "Redis CPU utilization is high",
+      namespace: "AWS/ElastiCache",
+      metricName: "CPUUtilization",
+      statistic: "Average",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 80,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        ReplicationGroupId: redisClusterId,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "redis",
+      },
+    });
+
+    new aws.cloudwatch.MetricAlarm("RedisFreeMemoryAlarm", {
+      alarmName: `solstice-${stage}-redis-free-memory`,
+      alarmDescription: "Redis free memory is low",
+      namespace: "AWS/ElastiCache",
+      metricName: "FreeableMemory",
+      statistic: "Minimum",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 200_000_000,
+      comparisonOperator: "LessThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        ReplicationGroupId: redisClusterId,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "redis",
+      },
+    });
+
+    new aws.cloudwatch.MetricAlarm("RedisEvictionsAlarm", {
+      alarmName: `solstice-${stage}-redis-evictions`,
+      alarmDescription: "Redis evictions detected",
+      namespace: "AWS/ElastiCache",
+      metricName: "Evictions",
+      statistic: "Sum",
+      period: 300,
+      evaluationPeriods: 1,
+      threshold: 1,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        ReplicationGroupId: redisClusterId,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "redis",
+      },
+    });
+
+    new aws.cloudwatch.MetricAlarm("RedisConnectionsAlarm", {
+      alarmName: `solstice-${stage}-redis-connections`,
+      alarmDescription: "Redis connections are high",
+      namespace: "AWS/ElastiCache",
+      metricName: "CurrConnections",
+      statistic: "Maximum",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 1000,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        ReplicationGroupId: redisClusterId,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "redis",
+      },
+    });
+
+    new aws.cloudwatch.MetricAlarm("RedisReplicationLagAlarm", {
+      alarmName: `solstice-${stage}-redis-replication-lag`,
+      alarmDescription: "Redis replication lag is high",
+      namespace: "AWS/ElastiCache",
+      metricName: "ReplicationLag",
+      statistic: "Maximum",
+      period: 300,
+      evaluationPeriods: 2,
+      threshold: 1,
+      comparisonOperator: "GreaterThanOrEqualToThreshold",
+      treatMissingData: "notBreaching",
+      actionsEnabled: isProd || isPerf,
+      alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+      okActions: alarmTopic ? [alarmTopic.arn] : [],
+      dimensions: {
+        ReplicationGroupId: redisClusterId,
+      },
+      tags: {
+        Environment: stage,
+        Application: "solstice",
+        AlertType: "redis",
       },
     });
 

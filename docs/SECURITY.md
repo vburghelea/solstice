@@ -42,13 +42,15 @@ Better Auth cookies are configured with enhanced security settings:
 
 ## Rate Limiting
 
-The application implements rate limiting for sensitive endpoints:
+The application implements both client-side (TanStack Pacer) and server-side
+rate limiting for sensitive endpoints. Server-side limits use Redis-backed
+sliding windows with fallback to in-memory limits when Redis is unavailable.
 
 ### Auth Endpoints
 
 - **Window**: 15 minutes
 - **Max Requests**: 5 per window
-- **Endpoints**: Login, registration, password reset
+- **Endpoints**: Login, registration, password reset, MFA verification
 
 ### API Endpoints
 
@@ -56,15 +58,32 @@ The application implements rate limiting for sensitive endpoints:
 - **Max Requests**: 100 per window
 - **Endpoints**: All API routes
 
-Usage example:
+### Export + Admin Endpoints
+
+- **Exports**: BI and audit exports (stricter window, lower max)
+- **Admin**: Role assignment, membership changes, delegated access
+
+Usage example (server-side):
 
 ```typescript
-import { rateLimit, getClientIp } from "~/lib/security";
+import { enforceRateLimit } from "~/lib/security";
 
-// In your API route
-const clientIp = getClientIp(request.headers);
-await rateLimit("auth", clientIp);
+await enforceRateLimit({
+  bucket: "auth",
+  route: "auth:sign-in",
+  userId,
+});
 ```
+
+### Redis Behavior
+
+- **Client**: Uses node-redis (`redis` package) with TLS and auth token support.
+- **Fail-open default**: If Redis is unavailable, rate limits fall back to in-memory
+  counters and caches return uncached data.
+- **Fail-closed option**: Set `REDIS_REQUIRED=true` (prod/perf defaults) to return 429s
+  when Redis is down; the app logs a `rate_limit_unavailable` security event.
+- **Key isolation**: `REDIS_PREFIX` scopes keys by stage to avoid cross-environment
+  collisions.
 
 ## Password Requirements
 
@@ -151,8 +170,7 @@ Security features that differ between environments:
 
 Consider implementing:
 
-1. **Redis-based Rate Limiting** - For distributed deployments
-2. **Web Application Firewall (WAF)** - Additional protection layer
-3. **Security Monitoring** - Log and alert on security events
-4. **2FA/MFA** - Two-factor authentication
-5. **API Key Management** - For service-to-service auth
+1. **Web Application Firewall (WAF)** - Additional protection layer
+2. **Security Monitoring** - Log and alert on security events
+3. **2FA/MFA** - Two-factor authentication
+4. **API Key Management** - For service-to-service auth

@@ -15,7 +15,7 @@ A working prototype is available for viaSport evaluation.
 | Club Reporter  | club-reporter@example.com  | testpassword123 | North Shore Club reporter                         |
 | Viewer         | member@example.com         | testpassword123 | View-only access                                  |
 
-**Note:** MFA-enabled accounts use TOTP authentication. Contact Austin Wallace for authenticator setup if needed.
+**Note:** MFA-enabled accounts use TOTP authentication. Credentials in this draft are placeholders; actual access details will be provided with the demo environment.
 
 ### Suggested Demo Walkthrough
 
@@ -59,18 +59,18 @@ A working prototype is available for viaSport evaluation.
 
 ### Technology Stack
 
-| Layer          | Technologies                                                      |
-| -------------- | ----------------------------------------------------------------- |
-| Frontend       | React 19, TanStack Router, TanStack Query, Radix UI, Tailwind CSS |
-| Backend        | TanStack Start, Node.js, Drizzle ORM                              |
-| Database       | PostgreSQL 16 on AWS RDS                                          |
-| Infrastructure | SST (infrastructure as code), AWS Lambda, CloudFront              |
-| Authentication | Better Auth with TOTP MFA                                         |
-| Monitoring     | AWS CloudWatch, CloudTrail                                        |
+| Layer          | Technologies                                                 |
+| -------------- | ------------------------------------------------------------ |
+| Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
+| Backend        | TanStack Start, Node.js, Drizzle ORM                         |
+| Database       | PostgreSQL on AWS RDS                                        |
+| Infrastructure | SST (infrastructure as code), AWS Lambda, CloudFront         |
+| Authentication | Better Auth with TOTP MFA                                    |
+| Monitoring     | AWS CloudWatch, CloudTrail                                   |
 
 ## Appendix C: Load Test Results
 
-Load testing conducted January 2026 in the sin-perf environment.
+Load testing conducted in the sin-perf environment (latest run; date TBD).
 
 ### Data Volume
 
@@ -92,7 +92,7 @@ Load testing conducted January 2026 in the sin-perf environment.
 | Concurrent Users    | 15    | N/A    | Pass   |
 | Server Errors (5xx) | 0     | 0      | Pass   |
 
-### Lighthouse Scores
+### Lighthouse Scores (latest prototype run; date TBD)
 
 | Metric                   | Value  | Target  | Status |
 | ------------------------ | ------ | ------- | ------ |
@@ -119,12 +119,12 @@ All data hosted exclusively in AWS ca-central-1 (Montreal, Canada). No data is s
 
 ### Authentication
 
-| Feature                     | Implementation                            |
-| --------------------------- | ----------------------------------------- |
-| Multi-Factor Authentication | TOTP with backup codes                    |
-| Password Requirements       | Minimum 8 characters, complexity enforced |
-| Session Management          | Secure cookies, configurable expiry       |
-| Account Lockout             | Automatic after failed attempt threshold  |
+| Feature                     | Implementation                                       |
+| --------------------------- | ---------------------------------------------------- |
+| Multi-Factor Authentication | TOTP with backup codes                               |
+| Password Requirements       | Configurable password policy (length and complexity) |
+| Session Management          | Secure cookies, configurable expiry                  |
+| Account Lockout             | Automatic after failed attempt threshold             |
 
 ### Authorization
 
@@ -194,11 +194,11 @@ Will Siddal brings 2+ years of full-stack development experience at Teck Resourc
 
 ### Security Expert (TBD)
 
-Position confirmed. Details to be provided in final submission.
+Position in progress. Details to be provided in final submission.
 
 ### UX Designer (TBD)
 
-Position confirmed. Details to be provided in final submission.
+Position in progress. Details to be provided in final submission.
 
 ## Appendix G: Glossary
 

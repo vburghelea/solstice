@@ -1,10 +1,12 @@
+import { createServerOnlyFn } from "@tanstack/react-start";
 import { sql } from "drizzle-orm";
-import { internalError } from "~/lib/server/errors";
 import { getDb } from "~/db/server-helpers";
+import { REDIS_TTLS, buildRedisKey, hashString } from "~/lib/redis/keys";
+import { internalError } from "~/lib/server/errors";
 import { DATASETS } from "../semantic";
 import { QUERY_GUARDRAILS } from "./query-guardrails";
 
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_TTL_MS = REDIS_TTLS.sqlWorkbenchGateSeconds * 1000;
 
 type GateCache = {
   ok: boolean;
@@ -14,6 +16,11 @@ type GateCache = {
 };
 
 let cachedGate: GateCache | null = null;
+
+const getRedisClient = createServerOnlyFn(async () => {
+  const { getRedis } = await import("~/lib/redis/client");
+  return getRedis({ required: false });
+});
 
 const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
@@ -36,6 +43,16 @@ const normalizeRows = <T>(result: unknown): T[] => {
   return [];
 };
 
+const buildGateCacheKey = (params: {
+  datasetIds: string[];
+  organizationId: string | null;
+  isGlobalAdmin: boolean;
+}) => {
+  const datasetKey = hashString(params.datasetIds.join("|"));
+  const orgKey = params.organizationId ?? "global";
+  return `bi:sql-gate:${datasetKey}:${orgKey}:${params.isGlobalAdmin ? "admin" : "user"}`;
+};
+
 export const assertSqlWorkbenchReady = async (params: {
   organizationId: string | null;
   isGlobalAdmin: boolean;
@@ -43,8 +60,24 @@ export const assertSqlWorkbenchReady = async (params: {
 }) => {
   const now = Date.now();
   const datasetIds = (params.datasetIds ?? Object.keys(DATASETS)).slice().sort();
-  const cacheKey = datasetIds.join("|");
-  if (
+  const cacheKey = buildGateCacheKey({
+    datasetIds,
+    organizationId: params.organizationId,
+    isGlobalAdmin: params.isGlobalAdmin,
+  });
+
+  const redis = await getRedisClient();
+  if (redis) {
+    const redisKey = await buildRedisKey(cacheKey);
+    const cached = await redis.get(redisKey);
+    if (cached) {
+      const entry = JSON.parse(cached) as GateCache;
+      if (entry.ok) return;
+      throw internalError(
+        entry.message ?? "SQL Workbench is not configured. Contact support.",
+      );
+    }
+  } else if (
     cachedGate &&
     cachedGate.key === cacheKey &&
     now - cachedGate.checkedAt < CACHE_TTL_MS
@@ -181,13 +214,30 @@ export const assertSqlWorkbenchReady = async (params: {
     }
   }
 
-  if (issues.length > 0) {
-    const message = `SQL Workbench is not configured (${issues.join("; ")}).`;
-    cachedGate = { ok: false, checkedAt: now, message, key: cacheKey };
-    throw internalError(message);
+  const entry: GateCache =
+    issues.length > 0
+      ? {
+          ok: false,
+          checkedAt: now,
+          message: `SQL Workbench is not configured (${issues.join("; ")}).`,
+          key: cacheKey,
+        }
+      : { ok: true, checkedAt: now, key: cacheKey };
+
+  if (redis) {
+    const redisKey = await buildRedisKey(cacheKey);
+    await redis.set(redisKey, JSON.stringify(entry), {
+      EX: REDIS_TTLS.sqlWorkbenchGateSeconds,
+    });
+  } else {
+    cachedGate = entry;
   }
 
-  cachedGate = { ok: true, checkedAt: now, key: cacheKey };
+  if (!entry.ok) {
+    throw internalError(
+      entry.message ?? "SQL Workbench is not configured. Contact support.",
+    );
+  }
 };
 
 export const resetSqlWorkbenchGateCache = () => {

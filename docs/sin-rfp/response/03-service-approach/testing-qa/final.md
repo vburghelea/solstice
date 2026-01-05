@@ -16,7 +16,7 @@ The platform uses a multi-layer testing strategy to catch issues at different le
 
 ### Automated Testing
 
-All tests run automatically on every commit through the CI/CD pipeline. Code cannot be merged without passing tests.
+Automated tests run on commits and pull requests through the CI/CD pipeline. Merges are gated by passing tests where applicable.
 
 **Test Coverage:**
 
@@ -29,7 +29,7 @@ All tests run automatically on every commit through the CI/CD pipeline. Code can
 
 Performance testing is conducted in the sin-perf environment with production-scale data.
 
-**Load Test Results (January 2026):**
+**Load Test Results (latest run; date TBD):**
 
 | Metric              | Value             | Target           | Status   |
 | ------------------- | ----------------- | ---------------- | -------- |
@@ -51,7 +51,7 @@ Performance testing is conducted in the sin-perf environment with production-sca
 
 The platform handles 20 million rows with sub-250ms response times and zero server errors under concurrent load.
 
-**Core Web Vitals (Lighthouse):**
+**Core Web Vitals (Lighthouse, latest prototype run; date TBD):**
 
 | Metric                   | Value  | Target  | Status |
 | ------------------------ | ------ | ------- | ------ |
@@ -86,7 +86,7 @@ Defects discovered during testing are classified by severity:
 | Medium   | Non-critical functionality affected    | Within sprint |
 | Low      | Cosmetic or minor UX issues            | Backlog       |
 
-Defects are tracked in a visible ticketing system accessible to viaSport.
+Defects will be tracked in a shared ticketing system accessible to viaSport.
 
 ## User Acceptance Testing Strategy
 

@@ -146,7 +146,7 @@ export const executeSqlWorkbenchQuery = async (params: {
   const maxRows = params.maxRows ?? QUERY_GUARDRAILS.maxRowsUi;
   const shouldLog = params.logQuery ?? true;
 
-  const release = acquireConcurrencySlot(context.userId, context.organizationId);
+  const release = await acquireConcurrencySlot(context.userId, context.organizationId);
   const startedAt = Date.now();
 
   try {
@@ -256,6 +256,6 @@ export const executeSqlWorkbenchQuery = async (params: {
       sql: rewritten.sql,
     };
   } finally {
-    release();
+    await release();
   }
 };

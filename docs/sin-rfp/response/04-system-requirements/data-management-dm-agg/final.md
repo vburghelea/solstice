@@ -2,14 +2,14 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                               | Status | Implementation                                                |
-| ---------- | ----------------------------------- | ------ | ------------------------------------------------------------- |
-| DM-AGG-001 | Data Collection & Submission        | Comply | Form builder, file uploads, submission tracking               |
-| DM-AGG-002 | Data Processing & Integration       | Comply | Format standardization, transformation logging, import/export |
-| DM-AGG-003 | Data Governance & Access Control    | Comply | RBAC with org-scoped access, database admin tools             |
-| DM-AGG-004 | Data Quality & Integrity            | Comply | Validation rules, automated quality monitoring                |
-| DM-AGG-005 | Data Storage & Retention            | Comply | AWS RDS with backups, S3 archival, configurable retention     |
-| DM-AGG-006 | Legacy Data Migration & Bulk Import | Comply | Import wizard with mapping, validation, rollback              |
+| Req ID     | Title                               | Status  | Implementation                                                                         |
+| ---------- | ----------------------------------- | ------- | -------------------------------------------------------------------------------------- |
+| DM-AGG-001 | Data Collection & Submission        | Comply  | Form builder, file uploads, submission tracking                                        |
+| DM-AGG-002 | Data Processing & Integration       | Partial | Standardization and import/export in place; external integrations scoped with viaSport |
+| DM-AGG-003 | Data Governance & Access Control    | Comply  | RBAC with org-scoped access, database admin tools                                      |
+| DM-AGG-004 | Data Quality & Integrity            | Comply  | Validation rules, automated quality monitoring                                         |
+| DM-AGG-005 | Data Storage & Retention            | Partial | Backups and retention in place; production immutability/archival configuration pending |
+| DM-AGG-006 | Legacy Data Migration & Bulk Import | Partial | Import wizard ready; batch worker deployment and extraction scoped with viaSport       |
 
 ## DM-AGG-001: Data Collection & Submission
 
@@ -33,13 +33,13 @@
 
 **Implementation:**
 
-| Capability             | Description                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| Format Standardization | Automatic normalization of dates, phone numbers, postal codes during import                          |
-| Transformation Logging | All data transformations recorded in audit log with before/after values                              |
-| Import Mechanisms      | CSV and Excel import with configurable field mapping, preview, and rollback                          |
-| Export Mechanisms      | CSV, Excel, and JSON export with field-level access control enforcement                              |
-| API Integration        | REST API available for future integrations; external platform connections to be scoped with viaSport |
+| Capability             | Description                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Format Standardization | Automatic normalization of dates, phone numbers, postal codes during import                                     |
+| Transformation Logging | All data transformations recorded in audit log with before/after values                                         |
+| Import Mechanisms      | CSV and Excel import with configurable field mapping, preview, and rollback                                     |
+| Export Mechanisms      | CSV, Excel, and JSON export with field-level access control enforcement                                         |
+| Integration Interfaces | Import/export endpoints and data exchange mechanisms; external platform connections to be defined with viaSport |
 
 **Note:** External API integrations (such as connections to third-party systems) will be defined collaboratively with viaSport during the Planning phase based on specific integration requirements.
 
@@ -49,13 +49,13 @@
 
 **Implementation:**
 
-| Capability                | Description                                                                                                       |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Role-Based Access Control | Predefined roles (owner, admin, reporter, viewer) with configurable permissions                                   |
-| Organization Scoping      | All data queries automatically scoped to user's organization; cross-org access requires explicit admin privileges |
-| Field-Level Permissions   | Sensitive fields can be restricted by role; PII visibility controlled at the field level                          |
-| Admin Database Access     | Authorized administrators can access database through secure, audited connections                                 |
-| Data Cataloging           | Searchable metadata for forms, submissions, and reports; full-text search across platform                         |
+| Capability                | Description                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role-Based Access Control | Predefined roles (owner, admin, reporter, viewer) with configurable permissions                                                                                |
+| Organization Scoping      | All data queries automatically scoped to user's organization; cross-org access requires explicit admin privileges                                              |
+| Field-Level Permissions   | Sensitive fields can be restricted by role; PII visibility controlled at the field level                                                                       |
+| Admin Data Access         | Authorized administrators can access data through secure, audited admin tooling; direct database access can be provided if required under a controlled process |
+| Data Cataloging           | Metadata cataloging and indexing for forms, submissions, and reports; search capabilities configured with viaSport                                             |
 
 **Evidence:** Role-based dashboards show different content by user role; access control tested via property-based tests.
 
@@ -89,7 +89,7 @@
 | Data Archiving     | Audit logs archived to S3 Glacier Deep Archive after 90 days; retained for 7 years      |
 | Retention Policies | Configurable retention periods by data type; automated purging per policy               |
 
-**Evidence:** Disaster recovery drill completed December 2025; restore verified within RTO target.
+**Evidence:** Most recent disaster recovery drill on file; restore verified within RTO target.
 
 ## DM-AGG-006: Legacy Data Migration & Bulk Import
 
@@ -106,6 +106,6 @@
 | Rollback          | All imported records tagged with job ID; entire import can be rolled back if issues discovered          |
 | Batch Processing  | Large imports processed via AWS ECS Fargate (2 vCPU, 4 GB RAM) with checkpointing for resumability      |
 
-**Note:** Migration methodology will be finalized collaboratively with viaSport based on BCAR/BCSI export capabilities. The import infrastructure is production-ready; extraction approach depends on legacy system access.
+**Note:** Migration methodology will be finalized collaboratively with viaSport based on BCAR/BCSI export capabilities. The import tooling is ready; production deployment of batch workers and the extraction approach depend on legacy system access.
 
 **Evidence:** Import wizard functional in prototype; tested with multi-million row datasets.

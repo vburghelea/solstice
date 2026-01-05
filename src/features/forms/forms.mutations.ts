@@ -500,7 +500,7 @@ export const submitForm = createServerFn({ method: "POST" })
       targetOrgId: submission.organizationId,
     });
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("form_submissions");
+    await invalidatePivotCache("form_submissions");
 
     if (isFinalSubmission && settings.notifyOnSubmit.length > 0) {
       const { enqueueNotification } = await import("~/lib/notifications/queue");
@@ -731,7 +731,7 @@ export const updateFormSubmission = createServerFn({ method: "POST" })
       targetOrgId: updated.organizationId,
     });
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("form_submissions");
+    await invalidatePivotCache("form_submissions");
 
     if (isFinalSubmission && !wasFinalSubmission && settings.notifyOnSubmit.length > 0) {
       const { enqueueNotification } = await import("~/lib/notifications/queue");
@@ -808,7 +808,7 @@ export const reviewFormSubmission = createServerFn({ method: "POST" })
     }
 
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("form_submissions");
+    await invalidatePivotCache("form_submissions");
 
     return updated ?? null;
   });
@@ -1045,7 +1045,7 @@ export const replaceSubmissionFile = createServerFn({ method: "POST" })
     });
 
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("form_submissions");
+    await invalidatePivotCache("form_submissions");
 
     return updated;
   });
@@ -1164,7 +1164,7 @@ export const deleteSubmissionFile = createServerFn({ method: "POST" })
     });
 
     const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-    invalidatePivotCache("form_submissions");
+    await invalidatePivotCache("form_submissions");
 
     return updated;
   });

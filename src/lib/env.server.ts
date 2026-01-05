@@ -22,6 +22,17 @@ import { z } from "zod";
 
 import { parseOAuthAllowedDomains } from "./env/oauth-domain";
 
+const normalizeBoolean = (value: unknown) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (["true", "1", "yes", "y", "on"].includes(normalized)) return true;
+  if (["false", "0", "no", "n", "off"].includes(normalized)) return false;
+  return undefined;
+};
+
+const booleanString = z.preprocess(normalizeBoolean, z.boolean().optional());
+
 export const env = createEnv({
   server: {
     // Database
@@ -68,6 +79,35 @@ export const env = createEnv({
     SENDGRID_FROM_EMAIL: z.email().optional(),
     SENDGRID_FROM_NAME: z.string().optional(),
 
+    // AI Providers
+    OPENAI_API_KEY: z.string().optional(),
+    OPENAI_ORG_ID: z.string().optional(),
+    OPENAI_BASE_URL: z.url().optional(),
+    ANTHROPIC_API_KEY: z.string().optional(),
+    ANTHROPIC_BASE_URL: z.url().optional(),
+    AI_TEXT_PROVIDER: z.enum(["openai", "anthropic"]).optional(),
+    AI_TEXT_MODEL: z.string().optional(),
+    AI_EMBED_PROVIDER: z.enum(["openai", "anthropic"]).optional(),
+    AI_EMBED_MODEL: z.string().optional(),
+    AI_MAX_RETRIES: z.coerce.number().int().min(0).optional(),
+    AI_TIMEOUT_MS: z.coerce.number().int().min(0).optional(),
+    AI_TEMPERATURE: z.coerce.number().min(0).max(2).optional(),
+    AI_TOP_P: z.coerce.number().min(0).max(1).optional(),
+    AI_MAX_TOKENS: z.coerce.number().int().min(1).optional(),
+    AI_MODEL_PRICING_JSON: z.string().optional(),
+    AI_QUOTA_REQUESTS_PER_MIN: z.coerce.number().int().min(1).optional(),
+    AI_QUOTA_REQUESTS_PER_DAY: z.coerce.number().int().min(1).optional(),
+    AI_QUOTA_TOKENS_PER_DAY: z.coerce.number().int().min(1).optional(),
+
+    // Redis
+    REDIS_HOST: z.string().optional(),
+    REDIS_PORT: z.coerce.number().int().positive().optional(),
+    REDIS_AUTH_TOKEN: z.string().optional(),
+    REDIS_TLS: booleanString,
+    REDIS_PREFIX: z.string().optional(),
+    REDIS_ENABLED: booleanString,
+    REDIS_REQUIRED: booleanString,
+
     // Other
     COOKIE_DOMAIN: z.string().optional(),
     NODE_ENV: z.enum(["development", "production", "test"]).prefault("development"),
@@ -79,6 +119,7 @@ export const env = createEnv({
     AWS_EXECUTION_ENV: z.string().optional(),
     SIN_ARTIFACTS_BUCKET: z.string().optional(),
     SIN_ARTIFACTS_KMS_KEY_ID: z.string().optional(),
+    SIN_AUDIT_ARCHIVE_BUCKET: z.string().optional(),
 
     // Base URL (set via SST secrets in production, VITE_BASE_URL in dev)
     VITE_BASE_URL: z.url().optional(),

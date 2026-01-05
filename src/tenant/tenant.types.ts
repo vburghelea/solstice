@@ -26,6 +26,7 @@ export const featureKeys = [
   "sin_imports",
   "sin_analytics",
   "sin_analytics_sql_workbench",
+  "sin_ai",
   "sin_templates",
   "sin_help_center",
   "sin_support",

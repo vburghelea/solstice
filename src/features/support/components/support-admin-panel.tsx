@@ -25,6 +25,30 @@ const statusOptions = [
   { value: "closed", label: "Closed" },
 ];
 
+const priorityOptions = [
+  { value: "low", label: "Low" },
+  { value: "normal", label: "Normal" },
+  { value: "high", label: "High" },
+  { value: "urgent", label: "Urgent" },
+];
+
+const formatDateTime = (value: string | Date) =>
+  new Date(value).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+const toDateTimeLocal = (value?: string | Date | null) => {
+  if (!value) return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const offset = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+};
+
 export function SupportAdminPanel() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -32,6 +56,8 @@ export function SupportAdminPanel() {
   const [activeResponseId, setActiveResponseId] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState("");
   const [nextStatus, setNextStatus] = useState("resolved");
+  const [nextPriority, setNextPriority] = useState("normal");
+  const [slaTargetAt, setSlaTargetAt] = useState("");
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["support", "admin", status, search],
@@ -55,6 +81,8 @@ export function SupportAdminPanel() {
               requestId: activeResponseId,
               status: nextStatus as "resolved" | "closed" | "in_progress" | "open",
               responseMessage: responseMessage.trim() || undefined,
+              priority: nextPriority as "low" | "normal" | "high" | "urgent",
+              slaTargetAt: slaTargetAt ? new Date(slaTargetAt).toISOString() : undefined,
             },
           })
         : Promise.resolve(null),
@@ -62,6 +90,7 @@ export function SupportAdminPanel() {
       toast.success("Response saved.");
       setResponseMessage("");
       setActiveResponseId(null);
+      setSlaTargetAt("");
       void queryClient.invalidateQueries({ queryKey: ["support", "admin"] });
     },
     onError: (error) => {
@@ -112,11 +141,19 @@ export function SupportAdminPanel() {
                       <p className="text-sm font-semibold">{request.subject}</p>
                       <p className="text-muted-foreground text-xs">
                         {request.category} • {request.organizationId ?? "General"}
+                        {request.slaTargetAt
+                          ? ` • SLA ${formatDateTime(request.slaTargetAt)}`
+                          : ""}
                       </p>
                     </div>
-                    <Badge variant="outline" className="capitalize">
-                      {request.status.replace(/_/g, " ")}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="capitalize">
+                        {request.status.replace(/_/g, " ")}
+                      </Badge>
+                      <Badge variant="secondary" className="capitalize">
+                        {request.priority}
+                      </Badge>
+                    </div>
                   </div>
                   <p className="text-muted-foreground text-sm">{request.message}</p>
 
@@ -134,6 +171,8 @@ export function SupportAdminPanel() {
                       setActiveResponseId(request.id);
                       setResponseMessage(request.responseMessage ?? "");
                       setNextStatus(request.status);
+                      setNextPriority(request.priority ?? "normal");
+                      setSlaTargetAt(toDateTimeLocal(request.slaTargetAt));
                     }}
                   >
                     Respond
@@ -163,13 +202,36 @@ export function SupportAdminPanel() {
                               ))}
                           </SelectContent>
                         </Select>
+                        <Select value={nextPriority} onValueChange={setNextPriority}>
+                          <SelectTrigger className="sm:w-48">
+                            <SelectValue placeholder="Set priority" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {priorityOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="datetime-local"
+                          value={slaTargetAt}
+                          onChange={(event) => setSlaTargetAt(event.target.value)}
+                          className="sm:w-56"
+                          placeholder="SLA target"
+                        />
                         <Button size="sm" onClick={() => respondMutation.mutate()}>
                           Save response
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => setActiveResponseId(null)}
+                          onClick={() => {
+                            setActiveResponseId(null);
+                            setResponseMessage("");
+                            setSlaTargetAt("");
+                          }}
                         >
                           Cancel
                         </Button>

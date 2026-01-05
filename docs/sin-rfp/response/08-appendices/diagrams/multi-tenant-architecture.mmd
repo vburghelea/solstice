@@ -1,0 +1,44 @@
+flowchart LR
+  Platform[Solstice Platform - single codebase]:::app --> Router[Tenant Router - TENANT_KEY]:::security
+
+  subgraph TenantVS["Tenant: viaSport - sin"]
+    direction TB
+    VSOrg[viaSport Governing Body]:::org --> PSO[PSO]:::org --> Club[Club]:::org
+    Roles[RBAC Roles - Owner/Admin/Reporter/Viewer]:::security
+    Roles --> VSOrg
+    Roles --> PSO
+    Roles --> Club
+    VSDB[(RDS - viaSport)]:::data
+    VSS3[(S3 - viaSport)]:::data
+  end
+
+  subgraph TenantQC["Tenant: QC - separate account"]
+    direction TB
+    QCOrg[QC Organization Hierarchy]:::org
+    QCDb[(RDS - QC)]:::data
+    QCS3[(S3 - QC)]:::data
+  end
+
+  Router --> VSOrg
+  Router --> QCOrg
+
+  subgraph Legend
+    L1[App / Platform]:::app
+    L2[Security Control]:::security
+    L3[Organization Node]:::org
+    L4[Data Store]:::data
+    L5[Tenant Boundary]:::tenant
+  end
+
+  classDef edge fill:#E3EEF8,stroke:#2E5F8A,color:#1C3D5A;
+  classDef app fill:#E6F4EA,stroke:#2E7D32,color:#1B5E20;
+  classDef data fill:#FFF3E0,stroke:#EF6C00,color:#4E342E;
+  classDef queue fill:#E0F2F1,stroke:#00796B,color:#004D40;
+  classDef security fill:#ECEFF1,stroke:#546E7A,color:#263238;
+  classDef user fill:#F5F5F5,stroke:#616161,color:#212121;
+  classDef audit fill:#FBE9E7,stroke:#D84315,color:#4E342E;
+  classDef org fill:#FFFDE7,stroke:#F9A825,color:#5D4037;
+  classDef tenant fill:#FFFFFF,stroke:#607D8B,stroke-dasharray:5 5,color:#263238;
+
+  style TenantVS fill:#F9FBFC,stroke:#607D8B,stroke-dasharray:5 5
+  style TenantQC fill:#F9FBFC,stroke:#607D8B,stroke-dasharray:5 5

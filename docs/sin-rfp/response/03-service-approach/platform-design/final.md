@@ -89,15 +89,15 @@ Deploy to sin-prod (manual, after UAT sign-off)
 
 ### Quality Gates
 
-Code cannot be deployed without passing:
+Deployments are gated by standard quality checks:
 
-| Gate          | Tool           | Purpose                        |
-| ------------- | -------------- | ------------------------------ |
-| Linting       | oxlint, ESLint | Code style and error detection |
-| Type checking | TypeScript     | Compile-time error detection   |
-| Formatting    | oxfmt          | Consistent code style          |
-| Unit tests    | Vitest         | Component and function testing |
-| E2E tests     | Playwright     | Full user flow testing         |
+| Gate          | Tooling                    | Purpose                        |
+| ------------- | -------------------------- | ------------------------------ |
+| Linting       | Project linting rules      | Code style and error detection |
+| Type checking | TypeScript                 | Compile-time error detection   |
+| Formatting    | Project formatter          | Consistent code style          |
+| Unit tests    | Automated unit tests       | Component and function testing |
+| E2E tests     | Automated end-to-end tests | Full user flow testing         |
 
 ### Deployment Process
 
@@ -121,7 +121,7 @@ This single command:
 If issues are discovered after deployment:
 
 - Previous Lambda versions remain available for instant rollback
-- Database migrations include down migrations for schema rollback
+- Database migrations are versioned with rollback plans as needed
 - SST maintains deployment history for reference
 
 ### Customization Capabilities

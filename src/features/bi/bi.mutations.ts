@@ -166,6 +166,12 @@ export const exportPivotResults = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_analytics");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "export",
+      route: "bi:pivot-export",
+      userId: user.id,
+    });
     const { badRequest, forbidden } = await import("~/lib/server/errors");
 
     if (!data.pivotQuery) {
@@ -413,6 +419,12 @@ export const exportSqlResults = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("sin_analytics_sql_workbench");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "export",
+      route: "bi:sql-export",
+      userId: user.id,
+    });
     const { badRequest, forbidden } = await import("~/lib/server/errors");
 
     const { getCurrentSession, requireRecentAuth } =

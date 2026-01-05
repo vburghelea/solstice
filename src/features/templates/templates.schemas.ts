@@ -50,9 +50,11 @@ export const deleteTemplateSchema = z.object({
   templateId: z.uuid(),
 });
 
-export const getTemplateDownloadSchema = z.object({
+export const templateIdSchema = z.object({
   templateId: z.uuid(),
 });
+export const getTemplateDownloadSchema = templateIdSchema;
+export const getTemplatePreviewSchema = templateIdSchema;
 
 export type CreateTemplateInput = z.infer<typeof createTemplateSchema>;
 export type UpdateTemplateInput = z.infer<typeof updateTemplateSchema>;

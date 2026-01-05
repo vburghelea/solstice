@@ -12,26 +12,7 @@ import {
 } from "~/components/ui/table";
 import { runDataQualityAudit } from "../data-quality.mutations";
 import { listDataQualityRuns } from "../data-quality.queries";
-
-type DataQualitySummary = {
-  totals?: {
-    totalSubmissions: number;
-    missingFields: number;
-    validationErrors: number;
-    lowCompleteness: number;
-    draftSubmissions: number;
-  };
-  byOrganization?: Array<{
-    organizationId: string;
-    organizationName: string | null;
-    totalSubmissions: number;
-    missingFields: number;
-    validationErrors: number;
-    lowCompleteness: number;
-    draftSubmissions: number;
-    latestSubmittedAt: string | null;
-  }>;
-};
+import type { DataQualitySummary } from "../data-quality.types";
 
 export function DataQualityDashboard() {
   const queryClient = useQueryClient();

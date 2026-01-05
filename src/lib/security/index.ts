@@ -6,6 +6,12 @@
 // Server-only exports - only import these in server code
 export { securityConfig } from "./config";
 export type { CookieConfig, SecurityConfig, SessionConfig } from "./config";
+export {
+  checkRateLimit,
+  enforceRateLimit,
+  type RateLimitBucket,
+  type RateLimitDecision,
+} from "./rate-limiter";
 
 // Shared exports - safe for both client and server
 export { PASSWORD_CONFIG } from "./password-config";

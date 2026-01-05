@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -19,20 +19,25 @@ const statusLabel = (status: string) => {
 export function TutorialPanel({
   title,
   tutorialIds,
+  autoLaunchTutorialId,
+  autoLaunchReady,
 }: {
   title?: string;
   tutorialIds?: TutorialId[];
+  autoLaunchTutorialId?: TutorialId;
+  autoLaunchReady?: boolean;
 }) {
   const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
   const [activeTourId, setActiveTourId] = useState<TutorialId | null>(null);
+  const autoLaunchAttempted = useRef(false);
 
   const filteredTutorials = useMemo(() => {
     if (!tutorialIds || tutorialIds.length === 0) return tutorials;
     return tutorials.filter((tutorial) => tutorialIds.includes(tutorial.id));
   }, [tutorialIds]);
 
-  const { data: progress = [] } = useQuery({
+  const { data: progress = [], isLoading: progressLoading } = useQuery({
     queryKey: ["tutorials", "progress", tutorialIds ?? "all"],
     queryFn: () =>
       listTutorialProgress({
@@ -54,7 +59,7 @@ export function TutorialPanel({
     },
   };
 
-  const startMutation = useMutation({
+  const { mutate: startMutate } = useMutation({
     mutationFn: (tutorialId: string) => startTutorial({ data: { tutorialId } }),
     ...mutationHandlers,
   });
@@ -69,6 +74,46 @@ export function TutorialPanel({
     ...mutationHandlers,
   });
 
+  const startTour = useCallback(
+    (tutorialId: TutorialId) => {
+      startMutate(tutorialId);
+      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect -- autoLaunchAttempted ref prevents loops
+      setActiveTourId(tutorialId);
+    },
+    [startMutate],
+  );
+
+  useEffect(() => {
+    if (progressLoading) return;
+    if (!autoLaunchTutorialId) return;
+    if (autoLaunchReady === false) return;
+    if (autoLaunchAttempted.current) return;
+
+    const autoLaunchTarget = filteredTutorials.find(
+      (tutorial) => tutorial.id === autoLaunchTutorialId,
+    );
+    if (!autoLaunchTarget) {
+      autoLaunchAttempted.current = true;
+      return;
+    }
+
+    const status = progressById.get(autoLaunchTarget.id)?.status ?? "not_started";
+    if (status !== "not_started") {
+      autoLaunchAttempted.current = true;
+      return;
+    }
+
+    autoLaunchAttempted.current = true;
+    startTour(autoLaunchTarget.id);
+  }, [
+    autoLaunchReady,
+    autoLaunchTutorialId,
+    filteredTutorials,
+    progressById,
+    progressLoading,
+    startTour,
+  ]);
+
   return (
     <Card>
       <CardHeader>
@@ -79,6 +124,7 @@ export function TutorialPanel({
           const progressItem = progressById.get(tutorial.id);
           const status = progressItem?.status ?? "not_started";
           const isOpen = openId === tutorial.id;
+          const isRestartable = status === "completed" || status === "dismissed";
 
           return (
             <div key={tutorial.id} className="space-y-3 rounded-md border p-4">
@@ -116,13 +162,7 @@ export function TutorialPanel({
                   {isOpen ? "Hide steps" : "View steps"}
                 </Button>
                 {status === "not_started" ? (
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      startMutation.mutate(tutorial.id);
-                      setActiveTourId(tutorial.id);
-                    }}
-                  >
+                  <Button size="sm" onClick={() => startTour(tutorial.id)}>
                     Start tour
                   </Button>
                 ) : null}
@@ -150,6 +190,15 @@ export function TutorialPanel({
                       Dismiss
                     </Button>
                   </>
+                ) : null}
+                {isRestartable ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => startTour(tutorial.id)}
+                  >
+                    Restart tour
+                  </Button>
                 ) : null}
               </div>
             </div>

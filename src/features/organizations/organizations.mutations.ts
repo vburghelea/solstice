@@ -127,6 +127,13 @@ export const createOrganization = createServerFn({ method: "POST" })
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
 
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org:create",
+        userId: sessionUser.id,
+      });
+
       try {
         const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
         await requireAdmin(sessionUser.id);
@@ -188,7 +195,13 @@ export const createOrganization = createServerFn({ method: "POST" })
           metadata: { slug: organization.slug },
         });
         const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-        invalidatePivotCache("organizations");
+        await invalidatePivotCache("organizations");
+        const { invalidateOrganizationAccessCache } =
+          await import("./organizations.access");
+        await invalidateOrganizationAccessCache({
+          userId: sessionUser.id,
+          organizationId: organization.id,
+        });
 
         return {
           success: true,
@@ -228,6 +241,13 @@ export const updateOrganization = createServerFn({ method: "POST" })
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org:update",
+        userId: sessionUser.id,
+      });
 
       const { PermissionService } = await import("~/features/roles/permission.service");
       const isGlobalAdmin = await PermissionService.isGlobalAdmin(sessionUser.id);
@@ -337,7 +357,7 @@ export const updateOrganization = createServerFn({ method: "POST" })
           changes,
         });
         const { invalidatePivotCache } = await import("~/features/bi/cache/pivot-cache");
-        invalidatePivotCache("organizations");
+        await invalidatePivotCache("organizations");
 
         return {
           success: true,
@@ -368,6 +388,13 @@ export const inviteOrganizationMember = createServerFn({ method: "POST" })
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org-member:invite",
+        userId: sessionUser.id,
+      });
 
       const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
         await import("~/lib/auth/guards/org-guard");
@@ -418,6 +445,12 @@ export const inviteOrganizationMember = createServerFn({ method: "POST" })
           targetOrgId: data.organizationId,
           metadata: { invitedUserId: targetUser.id, role: data.role },
         });
+        const { invalidateOrganizationAccessCache } =
+          await import("./organizations.access");
+        await invalidateOrganizationAccessCache({
+          userId: targetUser.id,
+          organizationId: data.organizationId,
+        });
 
         return {
           success: true,
@@ -453,6 +486,13 @@ export const approveOrganizationMember = createServerFn({ method: "POST" })
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org-member:approve",
+        userId: sessionUser.id,
+      });
 
       try {
         const { getDb } = await import("~/db/server-helpers");
@@ -507,6 +547,12 @@ export const approveOrganizationMember = createServerFn({ method: "POST" })
           targetOrgId: updated.organizationId,
           metadata: { approvedUserId: updated.userId },
         });
+        const { invalidateOrganizationAccessCache } =
+          await import("./organizations.access");
+        await invalidateOrganizationAccessCache({
+          userId: updated.userId,
+          organizationId: updated.organizationId,
+        });
 
         return {
           success: true,
@@ -542,6 +588,13 @@ export const updateOrganizationMemberRole = createServerFn({ method: "POST" })
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org-member:update-role",
+        userId: sessionUser.id,
+      });
 
       try {
         const { getDb } = await import("~/db/server-helpers");
@@ -592,6 +645,12 @@ export const updateOrganizationMemberRole = createServerFn({ method: "POST" })
           targetOrgId: updated.organizationId,
           changes: { role: { new: updated.role } },
         });
+        const { invalidateOrganizationAccessCache } =
+          await import("./organizations.access");
+        await invalidateOrganizationAccessCache({
+          userId: updated.userId,
+          organizationId: updated.organizationId,
+        });
 
         return {
           success: true,
@@ -627,6 +686,13 @@ export const removeOrganizationMember = createServerFn({ method: "POST" })
       if (!sessionUser?.id) {
         return errorResult("UNAUTHORIZED", "User not authenticated");
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "org-member:remove",
+        userId: sessionUser.id,
+      });
 
       try {
         const { getDb } = await import("~/db/server-helpers");
@@ -677,6 +743,12 @@ export const removeOrganizationMember = createServerFn({ method: "POST" })
           targetOrgId: updated.organizationId,
           metadata: { removedUserId: updated.userId },
         });
+        const { invalidateOrganizationAccessCache } =
+          await import("./organizations.access");
+        await invalidateOrganizationAccessCache({
+          userId: updated.userId,
+          organizationId: updated.organizationId,
+        });
 
         return {
           success: true,
@@ -711,6 +783,13 @@ export const createDelegatedAccess = createServerFn({ method: "POST" })
     if (!sessionUser?.id) {
       return errorResult("UNAUTHORIZED", "User not authenticated");
     }
+
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "admin",
+      route: "org-delegated-access:create",
+      userId: sessionUser.id,
+    });
 
     const { requireOrganizationMembership, ORG_ADMIN_ROLES } =
       await import("~/lib/auth/guards/org-guard");
@@ -759,6 +838,12 @@ export const createDelegatedAccess = createServerFn({ method: "POST" })
         targetOrgId: access.organizationId,
         metadata: { delegateUserId: access.delegateUserId, scope: access.scope },
       });
+      const { invalidateOrganizationAccessCache } =
+        await import("./organizations.access");
+      await invalidateOrganizationAccessCache({
+        userId: access.delegateUserId,
+        organizationId: access.organizationId,
+      });
 
       return {
         success: true,
@@ -790,6 +875,13 @@ export const revokeDelegatedAccess = createServerFn({ method: "POST" })
     if (!sessionUser?.id) {
       return errorResult("UNAUTHORIZED", "User not authenticated");
     }
+
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "admin",
+      route: "org-delegated-access:revoke",
+      userId: sessionUser.id,
+    });
 
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -843,6 +935,12 @@ export const revokeDelegatedAccess = createServerFn({ method: "POST" })
         targetId: updated.id,
         targetOrgId: updated.organizationId,
         metadata: { delegateUserId: updated.delegateUserId },
+      });
+      const { invalidateOrganizationAccessCache } =
+        await import("./organizations.access");
+      await invalidateOrganizationAccessCache({
+        userId: updated.delegateUserId,
+        organizationId: updated.organizationId,
       });
 
       return {

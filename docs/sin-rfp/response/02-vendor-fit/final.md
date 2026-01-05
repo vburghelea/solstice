@@ -11,7 +11,7 @@ Austin Wallace Tech is a British Columbia-based technology consulting firm incor
 | Incorporation | 2025                                        |
 | Headquarters  | Victoria, British Columbia                  |
 | Staff         | 1 principal + contracted specialists        |
-| Structure     | Sole proprietorship with contracted team    |
+| Structure     | Incorporated company with contracted team   |
 | Primary Focus | Sport sector information management systems |
 
 Austin Wallace Tech operates as a principal-led consultancy. This structure ensures that the person who architected and built the working prototype will lead delivery through to production. There are no hand-offs between sales, architecture, and delivery teams. viaSport will have direct access to the technical decision-maker throughout the engagement.
@@ -54,7 +54,7 @@ Will Siddal brings 2+ years of full-stack development experience at Teck Resourc
 
 ### Additional Team Members
 
-Security Expert and UX Designer positions have been filled and will be named in final submission. Both are British Columbia-based professionals with relevant enterprise experience.
+Security Expert and UX Designer positions are in progress and will be named in the final submission. We expect both roles to be filled with British Columbia-based professionals with relevant enterprise experience.
 
 ## Proposed Solution Statement
 
@@ -64,7 +64,7 @@ Austin Wallace Tech proposes the Solstice platform: a purpose-built information 
 
 **1. Working Prototype, Not a Proposal**
 
-A functional prototype already exists, meeting all 25 system requirements as documented in the System Requirements Addendum. This prototype has been load-tested with 20.1 million rows of data, achieving sub-250 millisecond response times with zero server errors. viaSport can evaluate a working system, not a proposal document.
+A functional prototype already exists, addressing the majority of the System Requirements Addendum items today. This prototype has been load-tested with 20.1 million rows of data, achieving sub-250 millisecond response times with zero server errors. viaSport can evaluate a working system, not a proposal document.
 
 **2. Principal-Led Delivery**
 
@@ -76,7 +76,7 @@ Austin Wallace's background combines enterprise data engineering (Devils, Clio, 
 
 **4. British Columbia Based**
 
-All team members are based in British Columbia. The company understands the local context, regulatory environment, and sport sector landscape.
+The core team is based in British Columbia; remaining roles are expected to be BC-based (TBD). This proximity supports local context, regulatory alignment, and sector familiarity.
 
 **5. Canadian Data Residency**
 

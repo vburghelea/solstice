@@ -45,6 +45,8 @@ export const startTutorial = createServerFn({ method: "POST" })
         set: {
           status: "started",
           startedAt: new Date(),
+          completedAt: null,
+          dismissedAt: null,
         },
       })
       .returning();
@@ -106,6 +108,7 @@ export const dismissTutorial = createServerFn({ method: "POST" })
         set: {
           status: "dismissed",
           dismissedAt: new Date(),
+          completedAt: null,
         },
       })
       .returning();

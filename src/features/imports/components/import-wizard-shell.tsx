@@ -173,10 +173,7 @@ export function ImportWizardShell() {
   });
 
   const definition = latestVersion?.definition as FormDefinition | undefined;
-  const supportedFields = useMemo(
-    () => (definition?.fields ?? []).filter((field) => field.type !== "file"),
-    [definition],
-  );
+  const supportedFields = useMemo(() => definition?.fields ?? [], [definition]);
   const fieldLookup = useMemo(
     () => (definition ? buildImportFieldLookup(definition) : null),
     [definition],
@@ -572,8 +569,9 @@ export function ImportWizardShell() {
                 </TableBody>
               </Table>
               {mappedFileFields.length > 0 ? (
-                <p className="text-destructive text-xs">
-                  File field imports are not supported yet. Remove mappings for:{" "}
+                <p className="text-muted-foreground text-xs">
+                  File fields expect JSON payloads with fileName, mimeType, sizeBytes, and
+                  storageKey or signedUrl. Mapped file fields:{" "}
                   {mappedFileFields.join(", ")}.
                 </p>
               ) : null}
@@ -654,8 +652,7 @@ export function ImportWizardShell() {
                     !importJobId ||
                     !selectedFormId ||
                     runImportMutation.isPending ||
-                    !hasReviewedPreview ||
-                    mappedFileFields.length > 0
+                    !hasReviewedPreview
                   }
                   onClick={() => runImportMutation.mutate()}
                 >
@@ -665,10 +662,7 @@ export function ImportWizardShell() {
                 <Button
                   type="button"
                   disabled={
-                    !importJobId ||
-                    runBatchMutation.isPending ||
-                    !hasReviewedPreview ||
-                    mappedFileFields.length > 0
+                    !importJobId || runBatchMutation.isPending || !hasReviewedPreview
                   }
                   onClick={() => runBatchMutation.mutate()}
                 >

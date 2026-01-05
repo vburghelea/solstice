@@ -3,7 +3,7 @@
 **Priority:** P2  
 **Effort:** 1-2 weeks  
 **Extends:** F-001 (Organization & Tenancy Model)  
-**Status:** Proposed
+**Status:** Implemented (2026-01-04)
 
 ---
 
@@ -126,34 +126,34 @@ CREATE INDEX idx_invite_links_org ON organization_invite_links(organization_id) 
 
 ### Component A: Improved Empty State
 
-- [ ] Update `src/routes/dashboard/select-org.tsx` with helpful empty state
-- [ ] Add explanation of invitation model
-- [ ] Add contact/support link
-- [ ] Add "Request to Join" CTA if join requests enabled
+- [x] Update `src/routes/dashboard/select-org.tsx` with helpful empty state
+- [x] Add explanation of invitation model
+- [x] Add contact/support link
+- [x] Add "Request to Join" CTA if join requests enabled
 
 ### Component B: Join Request Flow
 
-- [ ] Create `src/db/schema/organization-requests.schema.ts`
-- [ ] Create `src/features/organizations/join-requests/` module
-- [ ] Add `listDiscoverableOrganizations` query (filtered by `is_discoverable`)
-- [ ] Add `createJoinRequest` mutation with rate limiting
-- [ ] Add `resolveJoinRequest` mutation (admin only)
-- [ ] Create organization browse/search UI for users
-- [ ] Create pending requests panel for org admins
-- [ ] Add notification triggers for new requests and resolutions
-- [ ] Audit log all join request actions
+- [x] Create `src/db/schema/organization-requests.schema.ts`
+- [x] Create `src/features/organizations/join-requests/` module
+- [x] Add `listDiscoverableOrganizations` query (filtered by `is_discoverable`)
+- [x] Add `createJoinRequest` mutation with rate limiting
+- [x] Add `resolveJoinRequest` mutation (admin only)
+- [x] Create organization browse/search UI for users
+- [x] Create pending requests panel for org admins
+- [x] Add notification triggers for new requests and resolutions
+- [x] Audit log all join request actions
 
 ### Component C: Invitation Links
 
-- [ ] Create `src/features/organizations/invite-links/` module
-- [ ] Add `createInviteLink` mutation (org admin only)
-- [ ] Add `listInviteLinks` query (org admin only)
-- [ ] Add `revokeInviteLink` mutation
-- [ ] Add `useInviteLink` mutation (validates and creates membership)
-- [ ] Create `/join/:token` route for link redemption
-- [ ] Create admin UI for link management (create, copy, revoke)
-- [ ] Handle new user signup via invite link flow
-- [ ] Audit log link creation, usage, and revocation
+- [x] Create `src/features/organizations/invite-links/` module
+- [x] Add `createInviteLink` mutation (org admin only)
+- [x] Add `listInviteLinks` query (org admin only)
+- [x] Add `revokeInviteLink` mutation
+- [x] Add `useInviteLink` mutation (validates and creates membership)
+- [x] Create `/join/:token` route for link redemption
+- [x] Create admin UI for link management (create, copy, revoke)
+- [x] Handle new user signup via invite link flow
+- [x] Audit log link creation, usage, and revocation
 
 ---
 
@@ -161,30 +161,40 @@ CREATE INDEX idx_invite_links_org ON organization_invite_links(organization_id) 
 
 ### Empty State (A)
 
-- [ ] Users without orgs see helpful messaging, not just "No organizations available"
-- [ ] Clear explanation of how to get access
-- [ ] Contact/support information visible
+- [x] Users without orgs see helpful messaging, not just "No organizations available"
+- [x] Clear explanation of how to get access
+- [x] Contact/support information visible
 
 ### Join Requests (B)
 
-- [ ] Users can browse discoverable organizations
-- [ ] Users can submit join request with optional message
-- [ ] Org admins see pending requests in their dashboard
-- [ ] Admins can approve/deny with optional notes
-- [ ] Users notified of approval/denial
-- [ ] Rate limiting prevents request spam
-- [ ] All actions audit logged
+- [x] Users can browse discoverable organizations
+- [x] Users can submit join request with optional message
+- [x] Org admins see pending requests in their dashboard
+- [x] Admins can approve/deny with optional notes
+- [x] Users notified of approval/denial
+- [x] Rate limiting prevents request spam
+- [x] All actions audit logged
 
 ### Invite Links (C)
 
-- [ ] Org admins can create shareable invite links
-- [ ] Links can have expiration and usage limits
-- [ ] Links can specify role assignment
-- [ ] Links can auto-approve or require admin approval
-- [ ] New users via link are associated with org on signup
-- [ ] Existing users via link are added to org
-- [ ] Admins can view and revoke active links
-- [ ] All link actions audit logged
+- [x] Org admins can create shareable invite links
+- [x] Links can have expiration and usage limits
+- [x] Links can specify role assignment
+- [x] Links can auto-approve or require admin approval
+- [x] New users via link are associated with org on signup
+- [x] Existing users via link are added to org
+- [x] Admins can view and revoke active links
+- [x] All link actions audit logged
+
+---
+
+## Status Update (2026-01-04)
+
+- **Schema + migrations:** `src/db/schema/organization-requests.schema.ts`, `src/db/migrations/0000_secret_stingray.sql`
+- **Empty state + browse UI:** `src/routes/dashboard/select-org.tsx`, `src/routes/dashboard/organizations.tsx`, `src/features/organizations/join-requests/components/join-request-browser.tsx`
+- **Admin access + requests:** `src/routes/dashboard/sin/organization-access.tsx`, `src/features/organizations/join-requests/components/join-requests-admin-panel.tsx`
+- **Invite links + redemption:** `src/features/organizations/invite-links/`, `src/routes/join/$token.tsx`
+- **Invite signup/login redirect:** `src/routes/auth/signup.tsx`, `src/features/auth/components/signup.tsx`, `src/features/auth/components/login.tsx`
 
 ---
 
@@ -287,6 +297,7 @@ User proceeds to onboarding → dashboard
 
 ## Document History
 
-| Version | Date       | Changes                 |
-| ------- | ---------- | ----------------------- |
-| v1.0    | 2025-12-27 | Initial ticket creation |
+| Version | Date       | Changes                                 |
+| ------- | ---------- | --------------------------------------- |
+| v1.0    | 2025-12-27 | Initial ticket creation                 |
+| v1.1    | 2026-01-04 | Marked implemented; added code evidence |

@@ -28,7 +28,7 @@ This pricing reflects the value delivered to viaSport, not cost-plus billing. Th
 | PSO Rollout             | Cohort-based PSO onboarding, go-live support                      |
 | Production Deployment   | Production environment configuration, monitoring setup            |
 
-All 25 system requirements (DM-AGG, RP-AGG, SEC-AGG, TO-AGG, UI-AGG) are included.
+All RFP requirements (DM-AGG, RP-AGG, SEC-AGG, TO-AGG, UI-AGG) are included, including completion of the remaining gaps identified in this draft.
 
 ### Annual Operations ($200,000/year)
 
@@ -75,7 +75,7 @@ The change management process ensures no work begins without mutual agreement on
 
 ### Factors That Would NOT Trigger Price Adjustments
 
-- Normal data volume growth within PostgreSQL capacity (tested to 20M+ rows, scalable to 500M+)
+- Normal data volume growth within PostgreSQL capacity (tested to 20M+ rows, with headroom for projected growth)
 - Reasonable support request volume
 - Standard security updates and patches
 - Configuration changes within existing features
@@ -122,7 +122,7 @@ This would be delivered via subcontractor arrangement.
 The most significant value-add is the working prototype itself. Rather than proposing to build a system, Austin Wallace Tech has already built one:
 
 - 20,000+ lines of tested TypeScript
-- All 25 system requirements addressed
+- Majority of system requirements addressed; remaining items scheduled in the implementation plan
 - Load tested with 20.1 million rows
 - Available for viaSport evaluation before contract signing
 
@@ -130,7 +130,7 @@ This represents substantial pre-investment that de-risks the engagement for viaS
 
 ### Value-Add: Source Code Access
 
-Full source code access is provided to viaSport as part of the engagement. This ensures:
+Source code access can be provided under mutually agreed terms (e.g., escrow or direct access). This supports:
 
 - Transparency: viaSport can audit the code at any time
 - Continuity: If the engagement ends, viaSport retains access to the codebase

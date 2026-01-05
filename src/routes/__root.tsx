@@ -82,14 +82,76 @@ const serializeCookie = (
   return segments.join("; ");
 };
 
+type ServerTimingEntry = {
+  name: string;
+  start: number;
+  end?: number;
+};
+
+const createServerTiming = () => {
+  const entries: ServerTimingEntry[] = [];
+  const now =
+    typeof performance === "undefined" ? () => Date.now() : () => performance.now();
+
+  const start = (name: string) => {
+    const entry: ServerTimingEntry = { name, start: now() };
+    entries.push(entry);
+    return entry;
+  };
+
+  const end = (entry: ServerTimingEntry) => {
+    entry.end = now();
+  };
+
+  const wrap = async <T,>(name: string, task: () => Promise<T>) => {
+    const entry = start(name);
+    try {
+      return await task();
+    } finally {
+      end(entry);
+    }
+  };
+
+  const header = () =>
+    entries
+      .filter((entry) => typeof entry.end === "number")
+      .map((entry) => {
+        const duration = Math.max(0, (entry.end ?? entry.start) - entry.start);
+        return `${entry.name};dur=${duration.toFixed(1)}`;
+      })
+      .join(", ");
+
+  return { wrap, header };
+};
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthQueryResult;
   activeOrganizationId: string | null;
 }>()({
   beforeLoad: async ({ context, location }) => {
+    const isServer = typeof window === "undefined";
+    const serverTiming = isServer ? createServerTiming() : null;
+    let getRequest: (() => Request) | null = null;
+    let setResponseHeader: ((name: string, value: string) => void) | null = null;
+    let setResponseStatus: ((status: number) => void) | null = null;
+
+    const time = async <T,>(name: string, task: () => Promise<T>) =>
+      serverTiming ? serverTiming.wrap(name, task) : task();
+
+    const writeServerTiming = () => {
+      if (!serverTiming || !setResponseHeader) return;
+      const headerValue = serverTiming.header();
+      if (headerValue) {
+        setResponseHeader("Server-Timing", headerValue);
+      }
+    };
+
     try {
-      const isServer = typeof window === "undefined";
+      if (isServer) {
+        ({ getRequest, setResponseHeader, setResponseStatus } =
+          await import("@tanstack/react-start/server"));
+      }
 
       /**
        * IMPORTANT: Short-circuit /auth/* on the server.
@@ -98,15 +160,15 @@ export const Route = createRootRouteWithContext<{
        * SSR streaming has started, which can yield the empty octet-stream response.
        */
       if (isServer && location.pathname.startsWith("/auth")) {
-        const [{ getRequest }, { getSessionFromHeaders }] = await Promise.all([
-          import("@tanstack/react-start/server"),
-          import("~/lib/auth/session"),
-        ]);
-
-        const { headers } = getRequest();
-        const session = await getSessionFromHeaders(headers);
+        const { getSessionFromHeaders } = await import("~/lib/auth/session");
+        const request = getRequest?.();
+        const session = request?.headers
+          ? await time("auth.session", () => getSessionFromHeaders(request.headers))
+          : null;
 
         if (session?.user) {
+          setResponseStatus?.(302);
+          setResponseHeader?.("Location", "/dashboard");
           // Force a real HTTP redirect response before streaming begins
           throw redirect({ to: "/dashboard", statusCode: 302 });
         }
@@ -117,8 +179,8 @@ export const Route = createRootRouteWithContext<{
 
       const resolveActiveOrganizationId = async () => {
         if (typeof window === "undefined") {
-          const { getRequest } = await import("@tanstack/react-start/server");
-          const request = getRequest();
+          const request = getRequest?.();
+          if (!request) return null;
           const cookieHeader = request.headers.get("cookie");
           if (!cookieHeader) return null;
           const prefix = "active_org_id=";
@@ -132,7 +194,7 @@ export const Route = createRootRouteWithContext<{
       };
 
       const clearActiveOrganizationCookie = async () => {
-        const { setResponseHeader } = await import("@tanstack/react-start/server");
+        if (!setResponseHeader) return;
         const { securityConfig } = await import("~/lib/security/config");
         const cookie = serializeCookie("active_org_id", "", {
           ...securityConfig.cookies,
@@ -154,7 +216,7 @@ export const Route = createRootRouteWithContext<{
 
       if (isServer) {
         // Server: use the server function
-        const user = await getCurrentUser();
+        const user = await time("auth.user", () => getCurrentUser());
 
         // Check if user needs to complete onboarding (profile + policy acceptance)
         if (user && location.pathname.startsWith("/dashboard")) {
@@ -172,30 +234,34 @@ export const Route = createRootRouteWithContext<{
 
           const today = new Date().toISOString().slice(0, 10);
 
-          const [policy] = await db
-            .select({ id: policyDocuments.id })
-            .from(policyDocuments)
-            .where(
-              and(
-                eq(policyDocuments.type, "privacy_policy"),
-                isNotNull(policyDocuments.publishedAt),
-                lte(policyDocuments.effectiveDate, today),
-              ),
-            )
-            .orderBy(desc(policyDocuments.effectiveDate))
-            .limit(1);
-
-          if (policy?.id) {
-            const [acceptance] = await db
-              .select({ id: userPolicyAcceptances.id })
-              .from(userPolicyAcceptances)
+          const [policy] = await time("policy.latest", () =>
+            db
+              .select({ id: policyDocuments.id })
+              .from(policyDocuments)
               .where(
                 and(
-                  eq(userPolicyAcceptances.userId, user.id),
-                  eq(userPolicyAcceptances.policyId, policy.id),
+                  eq(policyDocuments.type, "privacy_policy"),
+                  isNotNull(policyDocuments.publishedAt),
+                  lte(policyDocuments.effectiveDate, today),
                 ),
               )
-              .limit(1);
+              .orderBy(desc(policyDocuments.effectiveDate))
+              .limit(1),
+          );
+
+          if (policy?.id) {
+            const [acceptance] = await time("policy.acceptance", () =>
+              db
+                .select({ id: userPolicyAcceptances.id })
+                .from(userPolicyAcceptances)
+                .where(
+                  and(
+                    eq(userPolicyAcceptances.userId, user.id),
+                    eq(userPolicyAcceptances.policyId, policy.id),
+                  ),
+                )
+                .limit(1),
+            );
 
             if (!acceptance) {
               throw redirect({ to: "/onboarding" });
@@ -214,10 +280,12 @@ export const Route = createRootRouteWithContext<{
           if (isUuid) {
             const { resolveOrganizationAccess } =
               await import("~/features/organizations/organizations.access");
-            const access = await resolveOrganizationAccess({
-              userId: user.id,
-              organizationId: candidateOrganizationId,
-            });
+            const access = await time("org.access", () =>
+              resolveOrganizationAccess({
+                userId: user.id,
+                organizationId: candidateOrganizationId,
+              }),
+            );
             activeOrganizationId = access?.organizationId ?? null;
           }
         }
@@ -272,6 +340,10 @@ export const Route = createRootRouteWithContext<{
       }
       console.error("Error loading user:", error);
       return { user: null, activeOrganizationId: null };
+    } finally {
+      if (isServer) {
+        writeServerTiming();
+      }
     }
   },
   head: () => ({

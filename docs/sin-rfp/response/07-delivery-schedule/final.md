@@ -16,15 +16,15 @@ Austin Wallace Tech proposes an 18-week implementation timeline from contract si
 
 ### Why This Timeline is Achievable
 
-Traditional information management system implementations of this scope typically require 24 to 36 weeks. Our accelerated timeline is possible because the working prototype already addresses all 25 system requirements:
+Traditional information management system implementations of this scope typically require 24 to 36 weeks. Our accelerated timeline is possible because the working prototype already addresses the majority of system requirements:
 
-| Traditional Phase         | Status   | Remaining Work                       |
-| ------------------------- | -------- | ------------------------------------ |
-| Architecture              | Complete | None                                 |
-| Authentication & Security | Complete | Production hardening                 |
-| Core Features             | Complete | UX refinements per viaSport feedback |
-| Analytics Platform        | Complete | None                                 |
-| Migration Tooling         | Complete | Extraction depends on legacy systems |
+| Traditional Phase         | Status        | Remaining Work                       |
+| ------------------------- | ------------- | ------------------------------------ |
+| Architecture              | Complete      | None                                 |
+| Authentication & Security | Complete      | Production hardening                 |
+| Core Features             | ~90% complete | UX refinements per viaSport feedback |
+| Analytics Platform        | Complete      | None                                 |
+| Migration Tooling         | Complete      | Extraction depends on legacy systems |
 
 Remaining work is refinement and migration, not greenfield development.
 
@@ -64,7 +64,7 @@ Remaining work is refinement and migration, not greenfield development.
 
 **PSO Rollout (Weeks 15-18)**
 
-- Cohort-based PSO onboarding (15 PSOs per week)
+- Cohort-based PSO onboarding (approx. 15 PSOs per week, TBD with viaSport)
 - Live training sessions with Q&A
 - Support ramp-up and monitoring
 - Legacy systems archived
@@ -100,14 +100,14 @@ viaSport will receive:
 
 ## Project Team and Roles
 
-| Role                     | Team Member     | Responsibilities                                                     |
-| ------------------------ | --------------- | -------------------------------------------------------------------- |
-| Project Lead / Architect | Austin Wallace  | Architecture, delivery oversight, viaSport liaison, data engineering |
-| Senior Developer         | Will Siddal     | Feature development, bug fixes, frontend implementation              |
-| Security Expert          | TBD (confirmed) | Security review, penetration testing, compliance validation          |
-| UX Designer              | TBD (confirmed) | User research, interface refinement, accessibility audit             |
+| Role                     | Team Member       | Responsibilities                                                     |
+| ------------------------ | ----------------- | -------------------------------------------------------------------- |
+| Project Lead / Architect | Austin Wallace    | Architecture, delivery oversight, viaSport liaison, data engineering |
+| Senior Developer         | Will Siddal       | Feature development, bug fixes, frontend implementation              |
+| Security Expert          | TBD (in progress) | Security review, penetration testing, compliance validation          |
+| UX Designer              | TBD (in progress) | User research, interface refinement, accessibility audit             |
 
-All team members are based in British Columbia.
+The core team is based in British Columbia; remaining roles are expected to be BC-based (TBD).
 
 ### viaSport Roles (Requested)
 

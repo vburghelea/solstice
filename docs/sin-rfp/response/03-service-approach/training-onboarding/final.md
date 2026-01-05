@@ -50,12 +50,14 @@ Training includes hands-on exercises in the sin-perf environment using realistic
 
 PSO training is delivered in cohorts to ensure adequate support:
 
-| Week | Cohort Size | Support Level                             |
-| ---- | ----------- | ----------------------------------------- |
-| 15   | 15 PSOs     | High-touch, live sessions                 |
-| 16   | 15 PSOs     | Live sessions with Q&A                    |
-| 17   | 15 PSOs     | Live sessions with Q&A                    |
-| 18   | 15 PSOs     | Live sessions, transition to self-service |
+| Week | Cohort Size           | Support Level                             |
+| ---- | --------------------- | ----------------------------------------- |
+| 15   | Approx. 15 PSOs (TBD) | High-touch, live sessions                 |
+| 16   | Approx. 15 PSOs (TBD) | Live sessions with Q&A                    |
+| 17   | Approx. 15 PSOs (TBD) | Live sessions with Q&A                    |
+| 18   | Approx. 15 PSOs (TBD) | Live sessions, transition to self-service |
+
+**Note:** Cohort sizing and scheduling will be confirmed with viaSport during Planning.
 
 Each PSO training session covers:
 
@@ -166,12 +168,14 @@ Ticket closed
 
 ### Response Commitments
 
-| Priority | First Response | Resolution Target |
-| -------- | -------------- | ----------------- |
-| Critical | 4 hours        | Same business day |
-| High     | 8 hours        | 2 business days   |
-| Standard | 24 hours       | 5 business days   |
-| Low      | 48 hours       | Best effort       |
+| Priority | First Response | Target Resolution (best effort) |
+| -------- | -------------- | ------------------------------- |
+| Critical | 4 hours        | Same business day               |
+| High     | 8 hours        | 2 business days                 |
+| Standard | 24 hours       | 5 business days                 |
+| Low      | 48 hours       | Best effort                     |
+
+**Note:** Resolution targets depend on issue complexity and may require additional time for root-cause analysis or third-party dependencies.
 
 ### Escalation Path
 

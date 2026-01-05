@@ -1,7 +1,9 @@
 export type RoleOperationErrorCode =
   | "VALIDATION_ERROR"
   | "UNAUTHORIZED"
+  | "FORBIDDEN"
   | "NOT_FOUND"
+  | "RATE_LIMITED"
   | "DATABASE_ERROR";
 
 export interface RoleOperationError {

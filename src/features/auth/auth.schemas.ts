@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { PASSWORD_CONFIG } from "~/lib/security/password-config";
+import { validatePassword } from "~/lib/security/utils/password-validator";
 
 /**
  * Login form validation schema
@@ -44,7 +46,10 @@ export const signupFormFieldSchemas = {
   password: z
     .string()
     .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
+    .min(
+      PASSWORD_CONFIG.minLength,
+      `Password must be at least ${PASSWORD_CONFIG.minLength} characters`,
+    ),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 };
 
@@ -77,13 +82,19 @@ export const signupFormFields = {
   password: ({ value }: { value: string }) => {
     try {
       signupFormFieldSchemas.password.parse(value);
-      return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
         return error.issues[0]?.message || "Invalid password";
       }
       return "Invalid password";
     }
+
+    const validation = validatePassword(value);
+    if (!validation.isValid) {
+      return validation.errors[0] ?? "Password does not meet requirements";
+    }
+
+    return undefined;
   },
   confirmPassword: ({ value }: { value: string }) => {
     try {

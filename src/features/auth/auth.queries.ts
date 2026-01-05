@@ -25,60 +25,78 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     const { eq } = await import("drizzle-orm");
     const { user, roles, userRoles } = await import("~/db/schema");
 
-    // Fetch user data and roles in parallel using the SAME db instance
-    // This avoids the extra db() acquisition that PermissionService.getUserRoles() would do
-    const [dbUserRows, roleRows] = await Promise.all([
-      db
-        .select({
-          profileComplete: user.profileComplete,
-          dateOfBirth: user.dateOfBirth,
-          emergencyContact: user.emergencyContact,
-          gender: user.gender,
-          pronouns: user.pronouns,
-          phone: user.phone,
-          privacySettings: user.privacySettings,
-          profileVersion: user.profileVersion,
-          profileUpdatedAt: user.profileUpdatedAt,
-          mfaRequired: user.mfaRequired,
-          mfaEnrolledAt: user.mfaEnrolledAt,
-          twoFactorEnabled: user.twoFactorEnabled,
-        })
-        .from(user)
-        .where(eq(user.id, session.user.id))
-        .limit(1),
-      db
-        .select({
-          id: userRoles.id,
-          userId: userRoles.userId,
-          roleId: userRoles.roleId,
-          teamId: userRoles.teamId,
-          eventId: userRoles.eventId,
-          assignedBy: userRoles.assignedBy,
-          assignedAt: userRoles.assignedAt,
-          expiresAt: userRoles.expiresAt,
-          notes: userRoles.notes,
-          role: {
-            id: roles.id,
-            name: roles.name,
-            description: roles.description,
-            permissions: roles.permissions,
-          },
-        })
-        .from(userRoles)
-        .innerJoin(roles, eq(userRoles.roleId, roles.id))
-        .where(eq(userRoles.userId, session.user.id)),
-    ]);
+    const rows = await db
+      .select({
+        profileComplete: user.profileComplete,
+        dateOfBirth: user.dateOfBirth,
+        emergencyContact: user.emergencyContact,
+        gender: user.gender,
+        pronouns: user.pronouns,
+        phone: user.phone,
+        privacySettings: user.privacySettings,
+        profileVersion: user.profileVersion,
+        profileUpdatedAt: user.profileUpdatedAt,
+        mfaRequired: user.mfaRequired,
+        mfaEnrolledAt: user.mfaEnrolledAt,
+        twoFactorEnabled: user.twoFactorEnabled,
+        roleAssignmentId: userRoles.id,
+        roleAssignmentUserId: userRoles.userId,
+        roleAssignmentRoleId: userRoles.roleId,
+        roleAssignmentTeamId: userRoles.teamId,
+        roleAssignmentEventId: userRoles.eventId,
+        roleAssignmentAssignedBy: userRoles.assignedBy,
+        roleAssignmentAssignedAt: userRoles.assignedAt,
+        roleAssignmentExpiresAt: userRoles.expiresAt,
+        roleAssignmentNotes: userRoles.notes,
+        roleId: roles.id,
+        roleName: roles.name,
+        roleDescription: roles.description,
+        rolePermissions: roles.permissions,
+      })
+      .from(user)
+      .leftJoin(userRoles, eq(user.id, userRoles.userId))
+      .leftJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(user.id, session.user.id));
 
-    const dbUser = dbUserRows[0];
-    if (!dbUser) {
+    const [firstRow] = rows;
+    if (!firstRow) {
       return null;
     }
 
     // Map the database user to our extended User type
     return {
       ...session.user,
-      ...dbUser,
-      roles: roleRows,
+      profileComplete: firstRow.profileComplete,
+      dateOfBirth: firstRow.dateOfBirth,
+      emergencyContact: firstRow.emergencyContact,
+      gender: firstRow.gender,
+      pronouns: firstRow.pronouns,
+      phone: firstRow.phone,
+      privacySettings: firstRow.privacySettings,
+      profileVersion: firstRow.profileVersion,
+      profileUpdatedAt: firstRow.profileUpdatedAt,
+      mfaRequired: firstRow.mfaRequired,
+      mfaEnrolledAt: firstRow.mfaEnrolledAt,
+      twoFactorEnabled: firstRow.twoFactorEnabled,
+      roles: rows
+        .filter((row) => Boolean(row.roleAssignmentId && row.roleId))
+        .map((row) => ({
+          id: row.roleAssignmentId!,
+          userId: row.roleAssignmentUserId!,
+          roleId: row.roleAssignmentRoleId!,
+          teamId: row.roleAssignmentTeamId,
+          eventId: row.roleAssignmentEventId,
+          assignedBy: row.roleAssignmentAssignedBy!,
+          assignedAt: row.roleAssignmentAssignedAt!,
+          expiresAt: row.roleAssignmentExpiresAt,
+          notes: row.roleAssignmentNotes,
+          role: {
+            id: row.roleId!,
+            name: row.roleName!,
+            description: row.roleDescription,
+            permissions: row.rolePermissions ?? {},
+          },
+        })),
     };
   },
 );

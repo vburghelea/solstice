@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { useOrgContext } from "~/features/organizations/org-context";
-import { getTemplateDownloadUrl } from "../templates.mutations";
+import { getTemplateDownloadUrl, getTemplatePreviewUrl } from "../templates.mutations";
 import { listTemplates } from "../templates.queries";
 import type { TemplateContext } from "../templates.schemas";
 
@@ -35,6 +35,11 @@ const formatBytes = (size: number) => {
   return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[index]}`;
 };
 
+const formatDate = (value: Date | string | null | undefined) => {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString();
+};
+
 export function TemplateHub({
   initialContext,
 }: {
@@ -45,6 +50,7 @@ export function TemplateHub({
   const [context, setContext] = useState<TemplateContext | "all">(
     initialContext ?? "all",
   );
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => new Set());
 
   const filters = useMemo(
     () => ({
@@ -61,6 +67,41 @@ export function TemplateHub({
     enabled: Boolean(activeOrganizationId),
   });
 
+  const groupedTemplates = useMemo(() => {
+    const groups = new Map<string, typeof templates>();
+
+    for (const template of templates) {
+      const key = `${template.organizationId ?? "global"}:${template.context}:${template.name}`;
+      const group = groups.get(key);
+      if (group) {
+        group.push(template);
+      } else {
+        groups.set(key, [template]);
+      }
+    }
+
+    const entries = Array.from(groups.entries()).map(([key, items]) => {
+      const sorted = [...items].sort((a, b) => {
+        const aDate = a.updatedAt ?? a.createdAt;
+        const bDate = b.updatedAt ?? b.createdAt;
+        return new Date(bDate).getTime() - new Date(aDate).getTime();
+      });
+      const [latest, ...history] = sorted;
+      return {
+        key,
+        latest,
+        history,
+        versionCount: sorted.length,
+      };
+    });
+
+    return entries.sort((a, b) => {
+      const aDate = a.latest.updatedAt ?? a.latest.createdAt;
+      const bDate = b.latest.updatedAt ?? b.latest.createdAt;
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
+    });
+  }, [templates]);
+
   const downloadMutation = useMutation({
     mutationFn: (templateId: string) => getTemplateDownloadUrl({ data: { templateId } }),
     onSuccess: (result) => {
@@ -74,6 +115,32 @@ export function TemplateHub({
       toast.error(error instanceof Error ? error.message : "Template download failed.");
     },
   });
+
+  const previewMutation = useMutation({
+    mutationFn: (templateId: string) => getTemplatePreviewUrl({ data: { templateId } }),
+    onSuccess: (result) => {
+      if (!result?.previewUrl) {
+        toast.error("Template preview failed.");
+        return;
+      }
+      window.open(result.previewUrl, "_blank", "noopener,noreferrer");
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Template preview failed.");
+    },
+  });
+
+  const toggleGroup = (key: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
 
   if (!activeOrganizationId) {
     return (
@@ -126,7 +193,7 @@ export function TemplateHub({
 
       {isLoading ? (
         <div className="text-muted-foreground">Loading templates…</div>
-      ) : templates.length === 0 ? (
+      ) : groupedTemplates.length === 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>No templates available.</CardTitle>
@@ -134,38 +201,109 @@ export function TemplateHub({
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {templates.map((template) => (
-            <Card key={template.id}>
-              <CardHeader className="space-y-2">
-                <CardTitle className="text-base">{template.name}</CardTitle>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="capitalize">
-                    {template.context}
-                  </Badge>
-                  {template.tags?.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="capitalize">
-                      {tag}
+          {groupedTemplates.map((group) => {
+            const { latest, history, versionCount } = group;
+            const isExpanded = expandedGroups.has(group.key);
+
+            return (
+              <Card key={group.key}>
+                <CardHeader className="space-y-2">
+                  <CardTitle className="text-base">{latest.name}</CardTitle>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="capitalize">
+                      {latest.context}
                     </Badge>
-                  ))}
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  {template.description || "No description provided."}
-                </p>
-              </CardHeader>
-              <CardContent className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-muted-foreground text-xs">
-                  {template.fileName} • {formatBytes(template.sizeBytes ?? 0)}
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => downloadMutation.mutate(template.id)}
-                >
-                  Download
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                    {latest.tags?.map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="capitalize">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {versionCount > 1 ? (
+                      <Badge variant="outline">{versionCount} versions</Badge>
+                    ) : null}
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    {latest.description || "No description provided."}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-muted-foreground text-xs">
+                    <span>
+                      {latest.fileName} • {formatBytes(latest.sizeBytes ?? 0)}
+                    </span>
+                    <span>
+                      Updated {formatDate(latest.updatedAt ?? latest.createdAt)}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => previewMutation.mutate(latest.id)}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadMutation.mutate(latest.id)}
+                    >
+                      Download
+                    </Button>
+                    {versionCount > 1 ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleGroup(group.key)}
+                      >
+                        {isExpanded
+                          ? "Hide versions"
+                          : `View ${versionCount - 1} older versions`}
+                      </Button>
+                    ) : null}
+                  </div>
+                  {versionCount > 1 && isExpanded ? (
+                    <div className="space-y-2 border-t pt-2">
+                      {history.map((version, index) => {
+                        const versionLabel = `Version ${versionCount - index - 1}`;
+                        return (
+                          <div
+                            key={version.id}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-2"
+                          >
+                            <div>
+                              <p className="text-xs font-medium">{versionLabel}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {version.fileName} • {formatBytes(version.sizeBytes ?? 0)}{" "}
+                                • Updated{" "}
+                                {formatDate(version.updatedAt ?? version.createdAt)}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => previewMutation.mutate(version.id)}
+                              >
+                                Preview
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => downloadMutation.mutate(version.id)}
+                              >
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

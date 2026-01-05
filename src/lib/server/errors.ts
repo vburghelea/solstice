@@ -7,6 +7,7 @@ export const ServerErrorSchema = z.object({
     "NOT_FOUND",
     "BAD_REQUEST",
     "VALIDATION",
+    "RATE_LIMITED",
     "INTERNAL",
   ]),
   message: z.string(),
@@ -43,6 +44,10 @@ export const badRequest = (message = "Bad request") =>
   createError("BAD_REQUEST", message);
 export const validationError = (message: string, details?: ServerError["details"]) =>
   createError("VALIDATION", message, details);
+export const rateLimited = (
+  message = "Too many requests",
+  details?: ServerError["details"],
+) => createError("RATE_LIMITED", message, details);
 export const internalError = (message = "Internal server error") =>
   createError("INTERNAL", message);
 

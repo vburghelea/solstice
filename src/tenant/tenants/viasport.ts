@@ -38,6 +38,7 @@ export const viasportTenant: TenantConfig = {
     sin_imports: true,
     sin_analytics: true,
     sin_analytics_sql_workbench: true,
+    sin_ai: true,
     sin_templates: true,
     sin_help_center: true,
     sin_support: true,

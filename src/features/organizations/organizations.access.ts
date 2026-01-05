@@ -1,8 +1,42 @@
+import { createServerOnlyFn } from "@tanstack/react-start";
 import { and, eq, gt, isNull, or } from "drizzle-orm";
 import { delegatedAccess, organizationMembers, organizations } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
+import { REDIS_TTLS, buildRedisKey } from "~/lib/redis/keys";
 import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
 import type { AccessibleOrganization } from "./organizations.types";
+
+const getRedisClient = createServerOnlyFn(async () => {
+  const { getRedis } = await import("~/lib/redis/client");
+  return getRedis({ required: false });
+});
+
+const buildOrgListKey = (userId: string) => `org-access:list:${userId}`;
+const buildOrgAccessKey = (userId: string, organizationId: string) =>
+  `org-access:resolve:${userId}:${organizationId}`;
+
+const getCachedJson = async <T>(key: string): Promise<T | null> => {
+  const redis = await getRedisClient();
+  if (!redis) return null;
+  const redisKey = await buildRedisKey(key);
+  const cached = await redis.get(redisKey);
+  if (!cached) return null;
+  return JSON.parse(cached) as T;
+};
+
+const setCachedJson = async (key: string, value: unknown, ttlSeconds: number) => {
+  const redis = await getRedisClient();
+  if (!redis) return;
+  const redisKey = await buildRedisKey(key);
+  await redis.set(redisKey, JSON.stringify(value), { EX: ttlSeconds });
+};
+
+const deleteCachedKeys = async (keys: string[]) => {
+  const redis = await getRedisClient();
+  if (!redis) return;
+  const redisKeys = await Promise.all(keys.map((key) => buildRedisKey(key)));
+  await redis.del(redisKeys);
+};
 
 export const rolePriority: Record<OrganizationRole, number> = {
   owner: 5,
@@ -96,6 +130,10 @@ export const resolveOrganizationRole = (params: {
 export const listAccessibleOrganizationsForUser = async (
   userId: string,
 ): Promise<AccessibleOrganization[]> => {
+  const cacheKey = buildOrgListKey(userId);
+  const cached = await getCachedJson<AccessibleOrganization[]>(cacheKey);
+  if (cached) return cached;
+
   const { PermissionService } = await import("~/features/roles/permission.service");
   const isAdmin = await PermissionService.isGlobalAdmin(userId);
 
@@ -114,10 +152,12 @@ export const listAccessibleOrganizationsForUser = async (
     .from(organizations);
 
   if (isAdmin) {
-    return orgRows.map((org) => ({
+    const result: AccessibleOrganization[] = orgRows.map((org) => ({
       ...org,
-      role: "admin",
+      role: "admin" as const,
     }));
+    await setCachedJson(cacheKey, result, REDIS_TTLS.orgListSeconds);
+    return result;
   }
 
   const memberships = await db
@@ -182,7 +222,7 @@ export const listAccessibleOrganizationsForUser = async (
       delegatedScopesByOrg,
     });
 
-  return orgRows
+  const result = orgRows
     .filter((org) => accessibleIds.has(org.id))
     .map(
       (org): AccessibleOrganization => ({
@@ -191,6 +231,9 @@ export const listAccessibleOrganizationsForUser = async (
         delegatedScopes: delegatedScopesByOrg.get(org.id) ?? [],
       }),
     );
+
+  await setCachedJson(cacheKey, result, REDIS_TTLS.orgListSeconds);
+  return result;
 };
 
 export const resolveOrganizationAccess = async (params: {
@@ -198,10 +241,18 @@ export const resolveOrganizationAccess = async (params: {
   organizationId: string;
 }) => {
   const { userId, organizationId } = params;
+  const cacheKey = buildOrgAccessKey(userId, organizationId);
+  const cached = await getCachedJson<{
+    value: { organizationId: string; role: string } | null;
+  }>(cacheKey);
+  if (cached) return cached.value;
+
   const { PermissionService } = await import("~/features/roles/permission.service");
   const isAdmin = await PermissionService.isGlobalAdmin(userId);
   if (isAdmin) {
-    return { organizationId, role: "admin" };
+    const result = { organizationId, role: "admin" };
+    await setCachedJson(cacheKey, { value: result }, REDIS_TTLS.orgAccessSeconds);
+    return result;
   }
 
   const db = await getDb();
@@ -262,8 +313,22 @@ export const resolveOrganizationAccess = async (params: {
     delegatedScopesByOrg,
   });
   if (!role) {
+    await setCachedJson(cacheKey, { value: null }, REDIS_TTLS.orgAccessSeconds);
     return null;
   }
 
-  return { organizationId, role };
+  const result = { organizationId, role };
+  await setCachedJson(cacheKey, { value: result }, REDIS_TTLS.orgAccessSeconds);
+  return result;
+};
+
+export const invalidateOrganizationAccessCache = async (params: {
+  userId: string;
+  organizationId?: string | null;
+}) => {
+  const keys = [buildOrgListKey(params.userId)];
+  if (params.organizationId) {
+    keys.push(buildOrgAccessKey(params.userId, params.organizationId));
+  }
+  await deleteCachedKeys(keys);
 };

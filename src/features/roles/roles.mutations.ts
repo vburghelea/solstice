@@ -58,6 +58,13 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
         };
       }
 
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "roles:assign",
+        userId: session.user.id,
+      });
+
       const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } =
         await import("~/lib/auth/utils/admin-check");
       await requireAdmin(session.user.id);
@@ -266,12 +273,34 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
         },
       });
 
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      await PermissionService.invalidateUserCache(targetUser.id);
+      const { invalidateOrganizationAccessCache } =
+        await import("~/features/organizations/organizations.access");
+      await invalidateOrganizationAccessCache({ userId: targetUser.id });
+
       return {
         success: true,
         data: created,
       };
     } catch (error) {
       console.error("Error assigning role:", error);
+
+      const { isTypedServerError } = await import("~/lib/server/errors");
+      if (isTypedServerError(error)) {
+        const { code, message } = error.error;
+        if (code === "UNAUTHORIZED" || code === "FORBIDDEN" || code === "RATE_LIMITED") {
+          return {
+            success: false,
+            errors: [
+              {
+                code,
+                message,
+              },
+            ],
+          };
+        }
+      }
 
       if (error instanceof Error && error.message.includes("Admin access required")) {
         return {
@@ -322,6 +351,13 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
           ],
         };
       }
+
+      const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+      await enforceRateLimit({
+        bucket: "admin",
+        route: "roles:remove",
+        userId: session.user.id,
+      });
 
       const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } =
         await import("~/lib/auth/utils/admin-check");
@@ -410,12 +446,34 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
         },
       });
 
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      await PermissionService.invalidateUserCache(existingAssignment.userId);
+      const { invalidateOrganizationAccessCache } =
+        await import("~/features/organizations/organizations.access");
+      await invalidateOrganizationAccessCache({ userId: existingAssignment.userId });
+
       return {
         success: true,
         data: existingAssignment,
       };
     } catch (error) {
       console.error("Error removing role assignment:", error);
+
+      const { isTypedServerError } = await import("~/lib/server/errors");
+      if (isTypedServerError(error)) {
+        const { code, message } = error.error;
+        if (code === "UNAUTHORIZED" || code === "FORBIDDEN" || code === "RATE_LIMITED") {
+          return {
+            success: false,
+            errors: [
+              {
+                code,
+                message,
+              },
+            ],
+          };
+        }
+      }
 
       if (error instanceof Error && error.message.includes("Admin access required")) {
         return {

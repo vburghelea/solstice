@@ -1,4 +1,5 @@
 export * from "./audit.schema";
+export * from "./ai.schema";
 export * from "./auth.schema";
 export * from "./bi.schema";
 export * from "./data-catalog.schema";

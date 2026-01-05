@@ -368,7 +368,7 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
       return `'${String(value).replace(/'/g, "''")}'`;
     };
 
-    const release = acquireConcurrencySlot(user.id, scopedOrganizationId);
+    const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
     try {
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
@@ -425,7 +425,7 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
 
       return { values };
     } finally {
-      release();
+      await release();
     }
   });
 
@@ -685,7 +685,7 @@ const runPivotQuery = async (params: {
     datasetId: dataset.id,
     query: data,
   });
-  const cached = getPivotCache(cacheKey);
+  const cached = await getPivotCache(cacheKey);
   if (cached) {
     const { logQuery } = await import("./governance");
     await logQuery({
@@ -693,6 +693,7 @@ const runPivotQuery = async (params: {
       queryType: "pivot",
       datasetId: dataset.id,
       pivotQuery: data,
+      parameters: { cacheStatus: "hit" },
       rowsReturned: cached.rowCount,
       executionTimeMs: 0,
     });
@@ -716,7 +717,7 @@ const runPivotQuery = async (params: {
     return `'${String(value).replace(/'/g, "''")}'`;
   };
 
-  const release = acquireConcurrencySlot(user.id, scopedOrganizationId);
+  const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
   try {
     const plan = buildPivotSqlPlan({
       dataset,
@@ -811,13 +812,13 @@ const runPivotQuery = async (params: {
       });
     }
   } finally {
-    release();
+    await release();
   }
 
   assertPivotCardinality(pivotResult.rows.length, pivotResult.columnKeys.length);
 
   const executionTimeMs = Date.now() - startedAt;
-  setPivotCache(cacheKey, {
+  await setPivotCache(cacheKey, {
     datasetId: dataset.id,
     pivot: pivotResult,
     rowCount: rowsReturned,
@@ -829,6 +830,7 @@ const runPivotQuery = async (params: {
     queryType: "pivot",
     datasetId: dataset.id,
     pivotQuery: data,
+    parameters: { cacheStatus: "miss" },
     rowsReturned,
     executionTimeMs,
   });

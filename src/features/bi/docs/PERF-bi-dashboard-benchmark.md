@@ -8,6 +8,7 @@ release. Capture results in the log table below and attach screenshots of key me
 - Environment: `sin-dev` (seeded data).
 - Account: `viasport-staff@example.com` (full analytics access).
 - Ensure SST dev tunnel is running and data is loaded.
+- Pivot cache uses Redis (shared 5-minute TTL). Cache hits are logged in BI query logs.
 - Disable browser extensions and close other heavy tabs.
 - Run each scenario twice: cold (first load) and warm (second load).
 

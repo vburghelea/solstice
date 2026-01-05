@@ -1,0 +1,53 @@
+flowchart LR
+  U[Users / Admins]:::user
+  WAF[AWS WAF optional]:::security
+  CF[CloudFront CDN]:::edge
+  APP[Lambda: TanStack Start App + API]:::app
+  RDS[(RDS PostgreSQL)]:::data
+  S3[(S3 Object Storage)]:::data
+  SQS[SQS Queue]:::queue
+  EB[EventBridge Scheduler]:::queue
+  SES[SES Email]:::queue
+  CW[CloudWatch Logs/Alarms]:::security
+  CT[CloudTrail]:::security
+  GD[GuardDuty]:::security
+
+  U --> WAF --> CF --> APP
+  APP --> RDS
+  APP --> S3
+  APP --> SQS
+  EB --> SQS
+  SQS --> SES
+  APP --> CW
+  APP --> CT
+  APP --> GD
+
+  subgraph Region["AWS ca-central-1 - data residency"]
+    direction LR
+    subgraph VPC["VPC - private subnets"]
+      APP
+      RDS
+    end
+    S3
+    SQS
+    EB
+    SES
+    CW
+    CT
+    GD
+  end
+
+  subgraph Legend
+    L1[Edge / CDN]:::edge
+    L2[App / Compute]:::app
+    L3[Data Stores]:::data
+    L4[Async / Events]:::queue
+    L5[Security / Monitoring]:::security
+  end
+
+  classDef edge fill:#E3EEF8,stroke:#2E5F8A,color:#1C3D5A;
+  classDef app fill:#E6F4EA,stroke:#2E7D32,color:#1B5E20;
+  classDef data fill:#FFF3E0,stroke:#EF6C00,color:#4E342E;
+  classDef queue fill:#E0F2F1,stroke:#00796B,color:#004D40;
+  classDef security fill:#ECEFF1,stroke:#546E7A,color:#263238;
+  classDef user fill:#F5F5F5,stroke:#616161,color:#212121;

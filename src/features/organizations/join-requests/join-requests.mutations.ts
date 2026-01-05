@@ -14,6 +14,12 @@ export const createJoinRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("org_join_requests");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "join_request",
+      route: "org-join-request:create",
+      userId: user.id,
+    });
 
     const { getDb } = await import("~/db/server-helpers");
     const { organizationJoinRequests, organizationMembers, organizations } =
@@ -148,6 +154,12 @@ export const resolveJoinRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("org_join_requests");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "admin",
+      route: "org-join-request:resolve",
+      userId: user.id,
+    });
 
     const { getDb } = await import("~/db/server-helpers");
     const { organizationJoinRequests, organizationMembers, organizations } =
@@ -248,16 +260,26 @@ export const resolveJoinRequest = createServerFn({ method: "POST" })
       const { createNotificationInternal } = await import("~/lib/notifications/create");
       const statusLabel = data.status === "approved" ? "approved" : "denied";
       const resolutionNote = data.resolutionNotes ? ` Note: ${data.resolutionNotes}` : "";
+      const message =
+        `Your request to join ${request.organizationName} was ` +
+        `${statusLabel}.${resolutionNote}`;
       await createNotificationInternal({
         userId: request.userId,
         organizationId: request.organizationId,
         type: "org_join_request_resolved",
         category: "system",
         title: `Join request ${statusLabel}`,
-        body: `Your request to join ${request.organizationName} was ${statusLabel}.${resolutionNote}`,
+        body: message,
         link: "/dashboard/select-org",
         actorUserId: user.id,
         metadata: { requestId: request.id, status: data.status },
+      });
+
+      const { invalidateOrganizationAccessCache } =
+        await import("../organizations.access");
+      await invalidateOrganizationAccessCache({
+        userId: request.userId,
+        organizationId: request.organizationId,
       });
     }
 

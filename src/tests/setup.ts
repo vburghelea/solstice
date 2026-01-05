@@ -46,6 +46,7 @@ vi.mock("~/lib/env.server", () => ({
   },
   getAuthSecret: () => "test-secret",
   getBaseUrl: () => "http://localhost:3000",
+  getSSTStage: () => "test",
   isProduction: () => false,
   isDevelopment: () => false,
   isTest: () => true,

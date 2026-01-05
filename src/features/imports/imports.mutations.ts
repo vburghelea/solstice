@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.utils";
+import { buildImportFieldLookup, parseImportRow } from "~/features/imports/imports.utils";
 import {
-  buildImportFieldLookup,
-  getMappedFileFields,
-  parseImportRow,
-} from "~/features/imports/imports.utils";
+  buildSubmissionFilesForImport,
+  normalizeImportFileFields,
+} from "~/lib/imports/file-field-utils";
 import { badRequest, forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
@@ -326,6 +326,7 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
       formVersions,
       importJobErrors,
       importJobs,
+      submissionFiles,
     } = await import("~/db/schema");
     const { desc, eq } = await import("drizzle-orm");
 
@@ -377,23 +378,11 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
 
     const definition = latestVersion.definition as FormDefinition;
     const fieldLookup = buildImportFieldLookup(definition);
+    const storageKeyPrefix = `forms/${data.formId}/`;
+    const { getArtifactsBucketName } = await import("~/lib/storage/artifacts");
+    const artifactsBucket = await getArtifactsBucketName();
 
     const mapping = data.mapping as Record<string, string>;
-    const mappedFileFields = getMappedFileFields(mapping, fieldLookup);
-    if (mappedFileFields.length > 0) {
-      await db
-        .update(importJobs)
-        .set({
-          status: "failed",
-          errorSummary: {
-            reason: "file_fields_not_supported",
-            fields: mappedFileFields,
-          },
-          completedAt: new Date(),
-        })
-        .where(eq(importJobs.id, job.id));
-      throw badRequest("File field imports are not supported yet.");
-    }
 
     if (!job.targetFormId) {
       await db
@@ -432,10 +421,19 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
 
     for (const [rowIndex, row] of rows.entries()) {
       const { payload, parseErrors } = parseImportRow(row, mapping, fieldLookup);
-      const sanitizedPayload = await sanitizePayload(definition, payload);
-      const validation = validateFormPayload(definition, sanitizedPayload);
+      const { payload: normalizedPayload, parseErrors: fileRefErrors } =
+        normalizeImportFileFields({
+          definition,
+          payload,
+          artifactsBucket,
+        });
+      const sanitizedPayload = await sanitizePayload(definition, normalizedPayload);
+      const validation = validateFormPayload(definition, sanitizedPayload, {
+        storageKeyPrefix,
+      });
+      const rowParseErrors = [...parseErrors, ...fileRefErrors];
 
-      const parseErrorFields = new Set(parseErrors.map((error) => error.fieldKey));
+      const parseErrorFields = new Set(rowParseErrors.map((error) => error.fieldKey));
       const validationErrors = validation.validationErrors.filter(
         (error) => !parseErrorFields.has(error.field),
       );
@@ -444,14 +442,14 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
       );
 
       if (
-        parseErrors.length > 0 ||
+        rowParseErrors.length > 0 ||
         validationErrors.length > 0 ||
         missingFields.length > 0
       ) {
         const rowNumber = rowIndex + 1;
         failedRows.add(rowNumber);
 
-        parseErrors.forEach((error) => {
+        rowParseErrors.forEach((error) => {
           errors.push({
             rowNumber,
             fieldKey: error.fieldKey,
@@ -466,7 +464,7 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
             fieldKey: error.field,
             errorType: "validation",
             errorMessage: error.message,
-            rawValue: String(payload[error.field] ?? ""),
+            rawValue: String(normalizedPayload[error.field] ?? ""),
           });
         });
         missingFields.forEach((fieldKey) => {
@@ -475,7 +473,7 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
             fieldKey,
             errorType: "required",
             errorMessage: "Missing required field",
-            rawValue: String(payload[fieldKey] ?? ""),
+            rawValue: String(normalizedPayload[fieldKey] ?? ""),
           });
         });
         continue;
@@ -507,6 +505,16 @@ export const runInteractiveImport = createServerFn({ method: "POST" })
           changedBy: actorUserId,
           changeReason: "import",
         });
+
+        const submissionFilesToInsert = buildSubmissionFilesForImport({
+          definition,
+          payload: sanitizedPayload,
+          submissionId: submission.id,
+          actorUserId,
+        });
+        if (submissionFilesToInsert.length > 0) {
+          await db.insert(submissionFiles).values(submissionFilesToInsert);
+        }
       }
     }
 

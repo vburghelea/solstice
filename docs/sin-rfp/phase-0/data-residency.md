@@ -64,6 +64,8 @@ parity, or isolated as directed by viaSport.
 
 - AWS services are pinned to ca-central-1 in SST configuration.
 - S3 buckets use SSE-KMS and block public access.
+- Audit archives are stored in a dedicated S3 bucket with Object Lock (governance
+  mode) and a 7-year default retention; legal holds apply at the object level.
 - RDS is deployed Multi-AZ within ca-central-1 and does not replicate
   cross-region.
 - CloudFront caches static assets only; authenticated responses are set to

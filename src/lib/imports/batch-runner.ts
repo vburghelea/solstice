@@ -1,11 +1,11 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.utils";
+import { buildImportFieldLookup, parseImportRow } from "~/features/imports/imports.utils";
 import {
-  buildImportFieldLookup,
-  getMappedFileFields,
-  parseImportRow,
-} from "~/features/imports/imports.utils";
+  buildSubmissionFilesForImport,
+  normalizeImportFileFields,
+} from "~/lib/imports/file-field-utils";
 
 export const runBatchImportJob = createServerOnlyFn(
   async (params: { jobId: string; actorUserId?: string | null }) => {
@@ -17,6 +17,7 @@ export const runBatchImportJob = createServerOnlyFn(
       formVersions,
       importJobs,
       importMappingTemplates,
+      submissionFiles,
     } = await import("~/db/schema");
     const { desc, eq } = await import("drizzle-orm");
 
@@ -75,22 +76,6 @@ export const runBatchImportJob = createServerOnlyFn(
     const definition = latestVersion.definition as FormDefinition;
     const fieldLookup = buildImportFieldLookup(definition);
 
-    const mappedFileFields = getMappedFileFields(mapping, fieldLookup);
-    if (mappedFileFields.length > 0) {
-      await db
-        .update(importJobs)
-        .set({
-          status: "failed",
-          errorSummary: {
-            reason: "file_fields_not_supported",
-            fields: mappedFileFields,
-          },
-          completedAt: new Date(),
-        })
-        .where(eq(importJobs.id, job.id));
-      throw forbidden("File field imports are not supported yet.");
-    }
-
     const { loadImportFile } = await import("~/lib/imports/file-utils");
     const { PutObjectCommand } = await import("@aws-sdk/client-s3");
     const { getArtifactsBucketName, getS3Client } =
@@ -120,6 +105,7 @@ export const runBatchImportJob = createServerOnlyFn(
 
     const bucket = await getArtifactsBucketName();
     const client = await getS3Client();
+    const storageKeyPrefix = `forms/${job.targetFormId}/`;
 
     const errors: Array<{
       rowNumber: number;
@@ -140,10 +126,19 @@ export const runBatchImportJob = createServerOnlyFn(
 
       for (const [index, row] of chunk.entries()) {
         const { payload, parseErrors } = parseImportRow(row, mapping, fieldLookup);
-        const sanitizedPayload = await sanitizePayload(definition, payload);
-        const validation = validateFormPayload(definition, sanitizedPayload);
+        const { payload: normalizedPayload, parseErrors: fileRefErrors } =
+          normalizeImportFileFields({
+            definition,
+            payload,
+            artifactsBucket: bucket,
+          });
+        const sanitizedPayload = await sanitizePayload(definition, normalizedPayload);
+        const validation = validateFormPayload(definition, sanitizedPayload, {
+          storageKeyPrefix,
+        });
+        const rowParseErrors = [...parseErrors, ...fileRefErrors];
 
-        const parseErrorFields = new Set(parseErrors.map((error) => error.fieldKey));
+        const parseErrorFields = new Set(rowParseErrors.map((error) => error.fieldKey));
         const validationErrors = validation.validationErrors.filter(
           (error) => !parseErrorFields.has(error.field),
         );
@@ -152,14 +147,14 @@ export const runBatchImportJob = createServerOnlyFn(
         );
 
         if (
-          parseErrors.length > 0 ||
+          rowParseErrors.length > 0 ||
           validationErrors.length > 0 ||
           missingFields.length > 0
         ) {
           const rowNumber = i + index + 1;
           failedRows.add(rowNumber);
 
-          parseErrors.forEach((error) => {
+          rowParseErrors.forEach((error) => {
             errors.push({
               rowNumber,
               fieldKey: error.fieldKey,
@@ -175,7 +170,7 @@ export const runBatchImportJob = createServerOnlyFn(
               fieldKey: error.field,
               errorType: "validation",
               errorMessage: error.message,
-              rawValue: String(payload[error.field] ?? ""),
+              rawValue: String(normalizedPayload[error.field] ?? ""),
             });
           });
           missingFields.forEach((fieldKey) => {
@@ -184,7 +179,7 @@ export const runBatchImportJob = createServerOnlyFn(
               fieldKey,
               errorType: "required",
               errorMessage: "Missing required field",
-              rawValue: String(payload[fieldKey] ?? ""),
+              rawValue: String(normalizedPayload[fieldKey] ?? ""),
             });
           });
           continue;
@@ -216,6 +211,16 @@ export const runBatchImportJob = createServerOnlyFn(
             changedBy: actorUserId,
             changeReason: "batch_import",
           });
+
+          const submissionFilesToInsert = buildSubmissionFilesForImport({
+            definition,
+            payload: sanitizedPayload,
+            submissionId: submission.id,
+            actorUserId,
+          });
+          if (submissionFilesToInsert.length > 0) {
+            await db.insert(submissionFiles).values(submissionFilesToInsert);
+          }
         }
       }
 

@@ -2,15 +2,15 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                            | Status | Implementation                                          |
-| ---------- | -------------------------------- | ------ | ------------------------------------------------------- |
-| UI-AGG-001 | User Access & Account Control    | Comply | Login, MFA, recovery, RBAC, admin management            |
-| UI-AGG-002 | Personalized Dashboard           | Comply | Role-aware dashboards with relevant data and actions    |
-| UI-AGG-003 | Responsive & Inclusive Design    | Comply | Radix primitives, WCAG compliance, Lighthouse 93/100    |
-| UI-AGG-004 | Task & Notification Management   | Comply | Automated notifications, email delivery, task reminders |
-| UI-AGG-005 | Content Navigation & Interaction | Comply | Command palette, search, filtering, categorization      |
-| UI-AGG-006 | User Support & Feedback          | Comply | In-app support requests with status tracking            |
-| UI-AGG-007 | Consistent Visual Language       | Comply | Design system with tenant branding configuration        |
+| Req ID     | Title                            | Status | Implementation                                                    |
+| ---------- | -------------------------------- | ------ | ----------------------------------------------------------------- |
+| UI-AGG-001 | User Access & Account Control    | Comply | Login, MFA, recovery, RBAC, admin management                      |
+| UI-AGG-002 | Personalized Dashboard           | Comply | Role-aware dashboards with relevant data and actions              |
+| UI-AGG-003 | Responsive & Inclusive Design    | Comply | Radix primitives, WCAG-aligned design, Lighthouse metrics on file |
+| UI-AGG-004 | Task & Notification Management   | Comply | Automated notifications, email delivery, task reminders           |
+| UI-AGG-005 | Content Navigation & Interaction | Comply | Command palette, search, filtering, categorization                |
+| UI-AGG-006 | User Support & Feedback          | Comply | In-app support requests with status tracking                      |
+| UI-AGG-007 | Consistent Visual Language       | Comply | Design system with tenant branding configuration                  |
 
 ## UI-AGG-001: User Access & Account Control
 
@@ -18,14 +18,14 @@
 
 **Implementation:**
 
-| Capability           | Description                                                                                         |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| Secure Login         | Email/password authentication with TOTP-based multi-factor authentication                           |
-| Logout               | Secure session termination; session cookies invalidated                                             |
-| Account Registration | Individual registration with email verification; organizational registration with approval workflow |
-| Account Recovery     | Secure password reset via time-limited email token                                                  |
-| Admin Management     | System administrators can create, modify, and deactivate user accounts                              |
-| Role Assignment      | Administrators can assign and modify user roles within their organization                           |
+| Capability           | Description                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Secure Login         | Email/password authentication with TOTP-based multi-factor authentication                                    |
+| Logout               | Secure session termination; session cookies invalidated                                                      |
+| Account Registration | Individual registration with email verification; organization onboarding via invitation or approval workflow |
+| Account Recovery     | Secure password reset via time-limited email token                                                           |
+| Admin Management     | System administrators can create, modify, and deactivate user accounts                                       |
+| Role Assignment      | Administrators can assign and modify user roles within their organization                                    |
 
 **Evidence:** Login flow tested in E2E tests; MFA and account management functional in prototype.
 
@@ -38,7 +38,7 @@
 | Capability         | Description                                                                            |
 | ------------------ | -------------------------------------------------------------------------------------- |
 | Role-Aware Content | Dashboard displays different widgets based on user role                                |
-| Admin Dashboard    | Overdue reporting, pending join requests, system health metrics                        |
+| Admin Dashboard    | Overdue reporting, pending join requests, system overview                              |
 | Reporter Dashboard | Changes requested, submitted reports, upcoming deadlines                               |
 | Viewer Dashboard   | Submitted reports, imports in progress, recent activity                                |
 | Reporting Progress | Visual indicators for submission status across reporting periods                       |
@@ -55,13 +55,13 @@
 | Capability            | Description                                                                  |
 | --------------------- | ---------------------------------------------------------------------------- |
 | Responsive Layout     | Mobile-first design; interface adapts to desktop, tablet, and mobile screens |
-| Radix UI Primitives   | Built on Radix UI, which provides WCAG-compliant components by default       |
+| Radix UI Primitives   | Built on Radix UI, which provides accessible components by default           |
 | Screen Reader Support | ARIA labels, semantic HTML, and keyboard navigation throughout               |
-| Color Contrast        | Color scheme meets WCAG AA contrast requirements                             |
+| Color Contrast        | Color scheme designed to meet WCAG AA contrast requirements                  |
 | Focus Management      | Visible focus indicators; logical tab order                                  |
 | Tailwind + shadcn/ui  | Consistent, accessible component library                                     |
 
-**Performance Metrics (Lighthouse):**
+**Performance Metrics (Lighthouse, latest prototype run; date TBD):**
 
 | Metric                   | Value  | Target  | Status |
 | ------------------------ | ------ | ------- | ------ |
@@ -73,7 +73,7 @@
 
 **Note:** Formal WCAG audit available on request; platform adheres to WCAG accessibility standards.
 
-**Evidence:** Lighthouse scores documented; accessibility tested with screen readers.
+**Evidence:** Lighthouse scores documented; accessibility checks performed during QA.
 
 ## UI-AGG-004: Task & Notification Management
 
@@ -84,13 +84,13 @@
 | Capability               | Description                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------------- |
 | Automated Notifications  | System-generated notifications for deadlines, status changes, and administrative actions |
-| Customizable Templates   | Notification templates configurable by administrators                                    |
+| Customizable Templates   | Notification templates configurable by administrators (scope defined with viaSport)      |
 | Email Delivery           | Notifications delivered via AWS SES to user's email address                              |
 | In-App Notifications     | Real-time notification feed; unread count displayed in navigation bar                    |
 | Task Reminders           | Configurable reminder schedules (7 days, 3 days, 1 day before deadline)                  |
-| Notification Preferences | Users can configure notification preferences for different event types                   |
+| Notification Preferences | Notification preferences configurable by role (scope defined with viaSport)              |
 
-**Evidence:** Email delivery verified December 31, 2025; in-app notifications functional in prototype.
+**Evidence:** Email delivery verified in dev; in-app notifications functional in prototype (date on file).
 
 ## UI-AGG-005: Content Navigation & Interaction
 
@@ -101,13 +101,13 @@
 | Capability      | Description                                                                            |
 | --------------- | -------------------------------------------------------------------------------------- |
 | Command Palette | Keyboard-accessible search (Cmd+K / Ctrl+K) for quick navigation to any page or action |
-| Global Search   | Full-text search across forms, submissions, reports, and help content                  |
-| Filtering       | Multi-criteria filtering on list views; filters persist across sessions                |
+| Search          | Search within lists and records; global search can be enabled as needed                |
+| Filtering       | Multi-criteria filtering on list views                                                 |
 | Categorization  | Content organized by type, organization, status, and date                              |
 | Pagination      | Large datasets paginated for performance; configurable page size                       |
 | Sorting         | Column-based sorting on all tabular data                                               |
 
-**Evidence:** Command palette and search functional in prototype; filtering tested on large datasets.
+**Evidence:** Command palette and list filtering functional in prototype; search capabilities available where enabled.
 
 ## UI-AGG-006: User Support & Feedback
 
@@ -119,7 +119,6 @@
 | -------------------- | ---------------------------------------------------------------------------- |
 | Support Request Form | In-app form for submitting questions, issues, feature requests, and feedback |
 | Category Selection   | Users categorize requests for efficient routing                              |
-| Attachment Support   | Users can attach screenshots or files to support requests                    |
 | Status Tracking      | Requests have status (submitted, in progress, resolved); users see updates   |
 | Admin Interface      | Administrators can view, respond to, and resolve support requests            |
 | Email Notifications  | Users notified via email when their request receives a response              |
@@ -138,7 +137,7 @@
 | Color Scheme       | Configurable color palette applied consistently across all modules  |
 | Typography         | Consistent font family, sizes, and weights throughout the interface |
 | Tenant Branding    | Configurable logo, primary colors, and organization name per tenant |
-| Icon Library       | Consistent iconography via Lucide icons                             |
+| Icon Library       | Consistent iconography across the interface                         |
 | Spacing and Layout | Standardized spacing scale and layout patterns across all screens   |
 
 **Note:** viaSport-specific branding (logo, colors) will be configured during the Planning phase.

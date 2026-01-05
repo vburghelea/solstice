@@ -330,6 +330,7 @@ export const generatePrivacyExport = createServerFn({ method: "POST" })
       delegatedAccess,
       formSubmissionVersions,
       formSubmissions,
+      legalHolds,
       notificationPreferences,
       notifications,
       organizationMembers,
@@ -347,7 +348,7 @@ export const generatePrivacyExport = createServerFn({ method: "POST" })
       verification,
       roles,
     } = await import("~/db/schema");
-    const { and, eq, inArray, or } = await import("drizzle-orm");
+    const { and, eq, inArray, isNull, or } = await import("drizzle-orm");
 
     const db = await getDb();
     const [request] = await db
@@ -578,6 +579,29 @@ export const generatePrivacyExport = createServerFn({ method: "POST" })
     );
 
     const resultUrl = `s3://${bucket}/${storageKey}`;
+
+    const activeHold = await db
+      .select({ id: legalHolds.id })
+      .from(legalHolds)
+      .where(
+        and(
+          isNull(legalHolds.releasedAt),
+          or(
+            and(eq(legalHolds.scopeType, "record"), eq(legalHolds.scopeId, request.id)),
+            and(eq(legalHolds.scopeType, "user"), eq(legalHolds.scopeId, request.userId)),
+          ),
+          or(
+            isNull(legalHolds.dataType),
+            inArray(legalHolds.dataType, ["dsar_exports", "privacy_exports"]),
+          ),
+        ),
+      )
+      .limit(1);
+
+    if (activeHold.length) {
+      const { applyLegalHold } = await import("~/lib/privacy/legal-hold");
+      await applyLegalHold({ objectKey: resultUrl });
+    }
 
     const [updated] = await db
       .update(privacyRequests)
@@ -1137,20 +1161,92 @@ export const createLegalHold = createServerFn({ method: "POST" })
     await requireRecentAuth(sessionUser.id, currentSession);
 
     const { getDb } = await import("~/db/server-helpers");
-    const { legalHolds } = await import("~/db/schema");
+    const { auditLogArchives, legalHolds, privacyRequests } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
     const db = await getDb();
+    const normalizedDataType = data.dataType?.trim().toLowerCase() ?? null;
+    const dsarDataTypes = new Set(["dsar_exports", "privacy_exports"]);
+    const auditArchiveDataTypes = new Set(["audit_log_archives", "audit_archives"]);
 
-    const [created] = await db
-      .insert(legalHolds)
-      .values({
-        scopeType: data.scopeType,
-        scopeId: data.scopeId,
-        dataType: data.dataType ?? null,
-        reason: data.reason,
-        appliedBy: sessionUser.id,
-        appliedAt: new Date(),
-      })
-      .returning();
+    const created = await db.transaction(async (tx) => {
+      const resolveTargets = async () => {
+        const targets: Array<{ objectKey: string; bucket?: string }> = [];
+        const appliesToDsar =
+          normalizedDataType === null || dsarDataTypes.has(normalizedDataType);
+        const appliesToAudit =
+          normalizedDataType === null || auditArchiveDataTypes.has(normalizedDataType);
+
+        if (appliesToDsar) {
+          if (data.scopeType === "record") {
+            const [request] = await tx
+              .select({ resultUrl: privacyRequests.resultUrl })
+              .from(privacyRequests)
+              .where(eq(privacyRequests.id, data.scopeId))
+              .limit(1);
+            if (request?.resultUrl) {
+              targets.push({ objectKey: request.resultUrl });
+            }
+          }
+
+          if (data.scopeType === "user") {
+            const requests = await tx
+              .select({ resultUrl: privacyRequests.resultUrl })
+              .from(privacyRequests)
+              .where(eq(privacyRequests.userId, data.scopeId));
+
+            for (const request of requests) {
+              if (request.resultUrl) {
+                targets.push({ objectKey: request.resultUrl });
+              }
+            }
+          }
+        }
+
+        if (appliesToAudit && data.scopeType === "record") {
+          const [archive] = await tx
+            .select({
+              bucket: auditLogArchives.bucket,
+              objectKey: auditLogArchives.objectKey,
+            })
+            .from(auditLogArchives)
+            .where(eq(auditLogArchives.id, data.scopeId))
+            .limit(1);
+
+          if (archive) {
+            targets.push({
+              objectKey: archive.objectKey,
+              bucket: archive.bucket,
+            });
+          }
+        }
+
+        return targets;
+      };
+
+      const [hold] = await tx
+        .insert(legalHolds)
+        .values({
+          scopeType: data.scopeType,
+          scopeId: data.scopeId,
+          dataType: normalizedDataType,
+          reason: data.reason,
+          appliedBy: sessionUser.id,
+          appliedAt: new Date(),
+        })
+        .returning();
+
+      if (!hold) return null;
+
+      const targets = await resolveTargets();
+      if (targets.length) {
+        const { applyLegalHold } = await import("~/lib/privacy/legal-hold");
+        for (const target of targets) {
+          await applyLegalHold(target);
+        }
+      }
+
+      return hold;
+    });
 
     if (created) {
       const { logAdminAction } = await import("~/lib/audit");
@@ -1187,8 +1283,8 @@ export const releaseLegalHold = createServerFn({ method: "POST" })
     await requireRecentAuth(sessionUser.id, currentSession);
 
     const { getDb } = await import("~/db/server-helpers");
-    const { legalHolds } = await import("~/db/schema");
-    const { eq } = await import("drizzle-orm");
+    const { auditLogArchives, legalHolds, privacyRequests } = await import("~/db/schema");
+    const { and, eq, isNull, not } = await import("drizzle-orm");
     const { badRequest } = await import("~/lib/server/errors");
 
     const db = await getDb();
@@ -1204,14 +1300,125 @@ export const releaseLegalHold = createServerFn({ method: "POST" })
       throw badRequest("Legal hold is already released.");
     }
 
-    const [updated] = await db
-      .update(legalHolds)
-      .set({
-        releasedBy: sessionUser.id,
-        releasedAt: new Date(),
-      })
-      .where(eq(legalHolds.id, data.holdId))
-      .returning();
+    const normalizedDataType = hold.dataType?.trim().toLowerCase() ?? null;
+    const dsarDataTypes = new Set(["dsar_exports", "privacy_exports"]);
+    const auditArchiveDataTypes = new Set(["audit_log_archives", "audit_archives"]);
+
+    const updated = await db.transaction(async (tx) => {
+      const activeHolds = await tx
+        .select()
+        .from(legalHolds)
+        .where(and(isNull(legalHolds.releasedAt), not(eq(legalHolds.id, hold.id))));
+
+      const normalizedHolds = activeHolds.map((activeHold) => ({
+        ...activeHold,
+        dataType: activeHold.dataType ? activeHold.dataType.trim().toLowerCase() : null,
+      }));
+
+      const hasDsarHold = (request: { id: string; userId: string }) =>
+        normalizedHolds.some((activeHold) => {
+          if (activeHold.dataType && !dsarDataTypes.has(activeHold.dataType)) {
+            return false;
+          }
+          if (activeHold.scopeType === "record" && activeHold.scopeId === request.id) {
+            return true;
+          }
+          return activeHold.scopeType === "user" && activeHold.scopeId === request.userId;
+        });
+
+      const hasAuditHold = (archiveId: string) =>
+        normalizedHolds.some((activeHold) => {
+          if (activeHold.dataType && !auditArchiveDataTypes.has(activeHold.dataType)) {
+            return false;
+          }
+          return activeHold.scopeType === "record" && activeHold.scopeId === archiveId;
+        });
+
+      const resolveReleaseTargets = async () => {
+        const targets: Array<{ objectKey: string; bucket?: string }> = [];
+        const appliesToDsar =
+          normalizedDataType === null || dsarDataTypes.has(normalizedDataType);
+        const appliesToAudit =
+          normalizedDataType === null || auditArchiveDataTypes.has(normalizedDataType);
+
+        if (appliesToDsar) {
+          if (hold.scopeType === "record") {
+            const [request] = await tx
+              .select({
+                id: privacyRequests.id,
+                userId: privacyRequests.userId,
+                resultUrl: privacyRequests.resultUrl,
+              })
+              .from(privacyRequests)
+              .where(eq(privacyRequests.id, hold.scopeId))
+              .limit(1);
+
+            if (request?.resultUrl && !hasDsarHold(request)) {
+              targets.push({ objectKey: request.resultUrl });
+            }
+          }
+
+          if (hold.scopeType === "user") {
+            const requests = await tx
+              .select({
+                id: privacyRequests.id,
+                userId: privacyRequests.userId,
+                resultUrl: privacyRequests.resultUrl,
+              })
+              .from(privacyRequests)
+              .where(eq(privacyRequests.userId, hold.scopeId));
+
+            for (const request of requests) {
+              if (request.resultUrl && !hasDsarHold(request)) {
+                targets.push({ objectKey: request.resultUrl });
+              }
+            }
+          }
+        }
+
+        if (appliesToAudit && hold.scopeType === "record") {
+          const [archive] = await tx
+            .select({
+              id: auditLogArchives.id,
+              bucket: auditLogArchives.bucket,
+              objectKey: auditLogArchives.objectKey,
+            })
+            .from(auditLogArchives)
+            .where(eq(auditLogArchives.id, hold.scopeId))
+            .limit(1);
+
+          if (archive && !hasAuditHold(archive.id)) {
+            targets.push({
+              objectKey: archive.objectKey,
+              bucket: archive.bucket,
+            });
+          }
+        }
+
+        return targets;
+      };
+
+      const targets = await resolveReleaseTargets();
+      const [updatedHold] = await tx
+        .update(legalHolds)
+        .set({
+          releasedBy: sessionUser.id,
+          releasedAt: new Date(),
+        })
+        .where(eq(legalHolds.id, data.holdId))
+        .returning();
+
+      if (!updatedHold) return null;
+
+      if (targets.length) {
+        const { releaseLegalHold } = await import("~/lib/privacy/legal-hold");
+        for (const target of targets) {
+          await releaseLegalHold(target);
+        }
+      }
+
+      return updatedHold;
+    });
 
     if (updated) {
       const { logAdminAction } = await import("~/lib/audit");

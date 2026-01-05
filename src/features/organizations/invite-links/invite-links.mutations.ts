@@ -14,6 +14,12 @@ export const createInviteLink = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("org_invite_links");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "admin",
+      route: "org-invite-link:create",
+      userId: user.id,
+    });
 
     if (!data.autoApprove && !isFeatureEnabled("org_join_requests")) {
       const { badRequest } = await import("~/lib/server/errors");
@@ -78,6 +84,12 @@ export const revokeInviteLink = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertFeatureEnabled("org_invite_links");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "admin",
+      route: "org-invite-link:revoke",
+      userId: user.id,
+    });
 
     const { getDb } = await import("~/db/server-helpers");
     const { organizationInviteLinks } = await import("~/db/schema");
@@ -136,6 +148,12 @@ export const redeemInviteLink = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<InviteRedemptionResult> => {
     await assertFeatureEnabled("org_invite_links");
     const user = requireUser(context);
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "invite_link",
+      route: "org-invite-link:redeem",
+      userId: user.id,
+    });
 
     const { getDb } = await import("~/db/server-helpers");
     const {
@@ -309,6 +327,11 @@ export const redeemInviteLink = createServerFn({ method: "POST" })
       targetOrgId: result.organizationId,
       metadata: { status: result.status },
     });
+    const { invalidateOrganizationAccessCache } = await import("../organizations.access");
+    await invalidateOrganizationAccessCache({
+      userId: user.id,
+      organizationId: result.organizationId,
+    });
 
     const joinRequestId = "joinRequestId" in result ? result.joinRequestId : undefined;
 
@@ -341,6 +364,8 @@ export const redeemInviteLink = createServerFn({ method: "POST" })
 
       if (adminRows.length > 0) {
         const { createNotificationInternal } = await import("~/lib/notifications/create");
+        const requestBody =
+          `${user.name ?? "A user"} requested access to ` + `${link.organizationName}.`;
         await Promise.all(
           adminRows.map((admin) =>
             createNotificationInternal({
@@ -349,7 +374,7 @@ export const redeemInviteLink = createServerFn({ method: "POST" })
               type: "org_join_request_created",
               category: "system",
               title: "New join request",
-              body: `${user.name ?? "A user"} requested access to ${link.organizationName}.`,
+              body: requestBody,
               link: "/dashboard/sin/organization-access",
               actorUserId: user.id,
               metadata: { inviteLinkId: link.id },

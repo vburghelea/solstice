@@ -86,6 +86,51 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
       before: [
         {
           matcher(context: { path: string }) {
+            return context.path === "/sign-up/email";
+          },
+          handler: createAuthMiddleware(async (ctx) => {
+            const password =
+              typeof ctx.body?.password === "string" ? ctx.body.password : "";
+            if (!password) {
+              throw new APIError("BAD_REQUEST", {
+                message: "Password is required",
+              });
+            }
+
+            const { validatePassword } =
+              await import("~/lib/security/utils/password-validator");
+            const validation = validatePassword(password);
+            if (!validation.isValid) {
+              throw new APIError("BAD_REQUEST", {
+                message: validation.errors[0] ?? "Password does not meet requirements",
+              });
+            }
+          }),
+        },
+        {
+          matcher(context: { path: string }) {
+            return context.path === "/sign-in/email";
+          },
+          handler: createAuthMiddleware(async (ctx) => {
+            const email =
+              typeof ctx.body?.email === "string" ? ctx.body.email.toLowerCase() : null;
+            if (!email) return;
+
+            const userResult = await ctx.context.internalAdapter.findUserByEmail(email);
+            const userId = userResult?.user?.id ?? null;
+            if (!userId) return;
+
+            const { isAccountLocked } = await import("~/lib/security/lockout");
+            const lock = await isAccountLocked(userId);
+            if (lock) {
+              throw new APIError("FORBIDDEN", {
+                message: "Account locked. Contact an administrator for access.",
+              });
+            }
+          }),
+        },
+        {
+          matcher(context: { path: string }) {
             return context.path === "/sign-out";
           },
           handler: createAuthMiddleware(async (ctx) => {

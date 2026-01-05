@@ -89,7 +89,7 @@ Production environment uses Multi-AZ deployment for automatic failover:
 
 ### Disaster Recovery Testing
 
-Disaster recovery drills are conducted quarterly. The most recent drill (December 2025) confirmed:
+Disaster recovery drills are scheduled quarterly. The most recent drill on file confirmed:
 
 - Point-in-time restore completed successfully
 - Application reconnection automated

@@ -2,12 +2,12 @@
 
 ## Compliance Summary
 
-| Req ID      | Title                           | Status | Implementation                                        |
-| ----------- | ------------------------------- | ------ | ----------------------------------------------------- |
-| SEC-AGG-001 | Authentication & Access Control | Comply | MFA, RBAC, step-up auth, org-scoped permissions       |
-| SEC-AGG-002 | Monitoring & Threat Detection   | Comply | Anomaly detection, automatic account lock, alerting   |
-| SEC-AGG-003 | Privacy & Regulatory Compliance | Comply | Canadian data residency, encryption, PIPEDA alignment |
-| SEC-AGG-004 | Audit Trail & Data Lineage      | Comply | Immutable audit log with tamper-evident hash chain    |
+| Req ID      | Title                           | Status  | Implementation                                                                 |
+| ----------- | ------------------------------- | ------- | ------------------------------------------------------------------------------ |
+| SEC-AGG-001 | Authentication & Access Control | Comply  | MFA, RBAC, step-up auth, org-scoped permissions                                |
+| SEC-AGG-002 | Monitoring & Threat Detection   | Comply  | Anomaly detection, automatic account lock, alerting                            |
+| SEC-AGG-003 | Privacy & Regulatory Compliance | Partial | Core controls in place; immutability and documentation finalized at deployment |
+| SEC-AGG-004 | Audit Trail & Data Lineage      | Comply  | Immutable audit log with tamper-evident hash chain                             |
 
 ## SEC-AGG-001: Authentication & Access Control
 
@@ -18,7 +18,7 @@
 | Capability                  | Description                                                                                |
 | --------------------------- | ------------------------------------------------------------------------------------------ |
 | Multi-Factor Authentication | TOTP-based MFA with authenticator app support; backup codes for recovery                   |
-| Password Requirements       | Minimum 8 characters; complexity requirements enforced                                     |
+| Password Requirements       | Configurable password policy (length and complexity)                                       |
 | Password Recovery           | Secure email-based reset flow with time-limited tokens                                     |
 | Role-Based Access           | Predefined roles (owner, admin, reporter, viewer) with granular permissions                |
 | Organization Scoping        | Users are affiliated with organizations; access automatically scoped to their organization |
@@ -33,13 +33,13 @@
 
 **Implementation:**
 
-| Capability              | Description                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------- |
-| Login Anomaly Detection | Failed login attempts tracked; patterns analyzed for brute force attempts                 |
-| Account Lockout         | Automatic temporary lock after configurable failed attempt threshold                      |
-| Behavioral Monitoring   | Unusual access patterns (time of day, location changes, rapid actions) flagged for review |
-| Security Alerts         | Administrators notified of security events via email and in-app notifications             |
-| AWS GuardDuty           | Infrastructure-level threat detection for network and API anomalies                       |
+| Capability              | Description                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------- |
+| Login Anomaly Detection | Failed login attempts tracked; patterns analyzed for brute force attempts               |
+| Account Lockout         | Automatic temporary lock after configurable failed attempt threshold                    |
+| Anomaly Detection       | Rules-based detection for unusual login behavior and activity spikes; alerts for review |
+| Security Alerts         | Administrators notified of security events via email and in-app notifications           |
+| AWS GuardDuty           | Infrastructure-level threat detection for network and API anomalies                     |
 
 **Evidence:** Anomaly detection implemented in `src/lib/security/detection.ts`; account lock triggers tested.
 
@@ -56,7 +56,7 @@
 | Encryption in Transit   | TLS 1.2+ for all client-server and inter-service communication                                   |
 | Access Controls         | Role-based and field-level access controls restrict PII visibility                               |
 | Data Minimization       | Configurable retention policies; automated purging of data past retention period                 |
-| Right to Access         | User data export functionality available for data subject requests                               |
+| Right to Access         | Data export workflows supported; data subject request process defined with viaSport              |
 | Secrets Management      | Application secrets stored in AWS Secrets Manager with rotation capability                       |
 
 **Sub-Processors:**
@@ -68,7 +68,9 @@
 
 AWS maintains a Data Processing Addendum (DPA) covering all services including SES for email delivery: https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf
 
-**Evidence:** Data residency documented; encryption verified via AWS console.
+**Note:** Production immutability controls (e.g., S3 Object Lock for audit archives) will be enabled during deployment, and the final compliance documentation package will be delivered with the production rollout.
+
+**Evidence:** Data residency documented; encryption configuration recorded in infrastructure documentation.
 
 ## SEC-AGG-004: Audit Trail & Data Lineage
 

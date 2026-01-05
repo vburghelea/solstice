@@ -109,6 +109,13 @@ export const exportAuditLogs = createServerFn({ method: "GET" })
   .inputValidator(zod$(listAuditLogsSchema))
   .handler(async ({ data }): Promise<string> => {
     await assertFeatureEnabled("sin_admin_audit");
+    const userId = await getSessionUserId();
+    const { enforceRateLimit } = await import("~/lib/security/rate-limiter");
+    await enforceRateLimit({
+      bucket: "export",
+      route: "audit:export",
+      userId,
+    });
     const logs = await listAuditLogs({ data });
     const { toCsv } = await import("~/shared/lib/csv");
     return toCsv(logs as Array<Record<string, unknown>>);

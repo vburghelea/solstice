@@ -63,6 +63,7 @@ repomix-*.txt
 # Confidential RFP documents
 docs/sin-rfp/example-rfp-real.*
 docs/sin-rfp/source/DO-NOT-COMMIT-CONFIDENTIAL-example-rfp-real.txt
+docs/sin-rfp/source/example-rfp-sample.md
 
 # Playwright MCP screenshots
 .playwright-mcp/

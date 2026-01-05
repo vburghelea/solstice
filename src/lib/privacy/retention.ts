@@ -92,10 +92,10 @@ export const applyRetentionPolicies = createServerOnlyFn(async () => {
 
     const { PutObjectCommand } = await import("@aws-sdk/client-s3");
     const { env } = await import("~/lib/env.server");
-    const { getArtifactsBucketName, getS3Client } =
+    const { getAuditArchiveBucketName, getS3Client } =
       await import("~/lib/storage/artifacts");
 
-    const bucket = await getArtifactsBucketName();
+    const bucket = await getAuditArchiveBucketName();
     const client = await getS3Client();
     const kmsKeyId = env.SIN_ARTIFACTS_KMS_KEY_ID;
 

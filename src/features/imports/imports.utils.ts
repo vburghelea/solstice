@@ -80,6 +80,113 @@ const toStringValue = (value: JsonValue) => {
   return String(value);
 };
 
+const parseFilePayloadRecord = (rawValue: JsonValue) => {
+  if (typeof rawValue === "object" && rawValue !== null && !Array.isArray(rawValue)) {
+    return { record: rawValue as JsonRecord, isArray: false };
+  }
+
+  if (Array.isArray(rawValue)) {
+    return { record: null, isArray: true };
+  }
+
+  if (typeof rawValue === "string") {
+    const trimmed = rawValue.trim();
+    if (!trimmed) return { record: null, isArray: false };
+    if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+      return { record: null, isArray: false };
+    }
+    try {
+      const parsed = JSON.parse(trimmed) as JsonValue;
+      if (Array.isArray(parsed)) {
+        return { record: null, isArray: true };
+      }
+      if (typeof parsed === "object" && parsed !== null) {
+        return { record: parsed as JsonRecord, isArray: false };
+      }
+      return { record: null, isArray: false };
+    } catch {
+      return { record: null, isArray: false };
+    }
+  }
+
+  return { record: null, isArray: false };
+};
+
+const parseFileImportValue = (rawValue: JsonValue) => {
+  const { record, isArray } = parseFilePayloadRecord(rawValue);
+  if (isArray) {
+    return {
+      payload: null,
+      error: {
+        errorType: "multi_file_not_supported",
+        message: "Multiple files are not supported. Provide a single file object.",
+        rawValue: toStringValue(rawValue),
+      },
+    };
+  }
+
+  if (!record) {
+    return {
+      payload: null,
+      error: {
+        errorType: "invalid_file_payload",
+        message:
+          "File fields require JSON with fileName, mimeType, sizeBytes, and storageKey or signedUrl.",
+        rawValue: toStringValue(rawValue),
+      },
+    };
+  }
+
+  const fileName =
+    typeof record["fileName"] === "string" ? record["fileName"].trim() : null;
+  const mimeType =
+    typeof record["mimeType"] === "string" ? record["mimeType"].trim() : null;
+  const sizeBytes = parseNumberValue(record["sizeBytes"] ?? record["size"]);
+  const storageKey =
+    typeof record["storageKey"] === "string" ? record["storageKey"].trim() : null;
+  const artifactKey =
+    typeof record["artifactKey"] === "string" ? record["artifactKey"].trim() : null;
+  const signedUrl =
+    typeof record["signedUrl"] === "string" ? record["signedUrl"].trim() : null;
+  const url = typeof record["url"] === "string" ? record["url"].trim() : null;
+  const checksum =
+    typeof record["checksum"] === "string" ? record["checksum"].trim() : null;
+
+  if (!fileName || !mimeType || sizeBytes === null) {
+    return {
+      payload: null,
+      error: {
+        errorType: "invalid_file_payload",
+        message: "File payload must include fileName, mimeType, and sizeBytes.",
+        rawValue: toStringValue(rawValue),
+      },
+    };
+  }
+
+  if (!storageKey && !artifactKey && !signedUrl && !url) {
+    return {
+      payload: null,
+      error: {
+        errorType: "missing_file_reference",
+        message: "File payload must include storageKey, artifactKey, or signedUrl.",
+        rawValue: toStringValue(rawValue),
+      },
+    };
+  }
+
+  const payload: JsonRecord = {
+    fileName,
+    mimeType,
+    sizeBytes,
+    ...(storageKey ? { storageKey } : {}),
+    ...(artifactKey ? { artifactKey } : {}),
+    ...(signedUrl || url ? { signedUrl: signedUrl ?? url } : {}),
+    ...(checksum ? { checksum } : {}),
+  };
+
+  return { payload, error: null };
+};
+
 export const buildImportFieldLookup = (definition: FormDefinition): ImportFieldLookup =>
   new Map(definition.fields.map((field) => [field.key, field]));
 
@@ -193,12 +300,14 @@ export const parseImportRow = (
     }
 
     if (field.type === "file") {
-      parseErrors.push({
-        fieldKey: field.key,
-        errorType: "unsupported_file",
-        message: "File uploads are not supported in imports",
-        rawValue: toStringValue(rawValue),
-      });
+      const { payload: filePayload, error } = parseFileImportValue(rawValue);
+      if (error) {
+        parseErrors.push({ fieldKey: field.key, ...error });
+        continue;
+      }
+      if (filePayload) {
+        payload[field.key] = filePayload;
+      }
       continue;
     }
 

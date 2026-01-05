@@ -23,7 +23,10 @@ import {
   createSupportRequestAttachment,
   createSupportRequestAttachmentUpload,
 } from "../support.mutations";
-import { listMySupportRequests } from "../support.queries";
+import {
+  getSupportRequestAttachmentDownloadUrl,
+  listMySupportRequests,
+} from "../support.queries";
 import {
   supportAttachmentAccept,
   supportAttachmentConfig,
@@ -73,6 +76,32 @@ export function SupportRequestsPanel() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const attachmentInputRef = useRef<HTMLInputElement | null>(null);
+  const [downloadingAttachmentId, setDownloadingAttachmentId] = useState<string | null>(
+    null,
+  );
+
+  const downloadMutation = useMutation({
+    mutationFn: (attachmentId: string) =>
+      getSupportRequestAttachmentDownloadUrl({ data: { attachmentId } }),
+    onMutate: (attachmentId) => {
+      setDownloadingAttachmentId(attachmentId);
+    },
+    onSuccess: (result) => {
+      if (result?.url) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      toast.error("Attachment is not available for download.");
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to download attachment.",
+      );
+    },
+    onSettled: () => {
+      setDownloadingAttachmentId(null);
+    },
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -410,6 +439,41 @@ export function SupportRequestsPanel() {
                   <div className="bg-muted/40 rounded-md p-3 text-sm">
                     <p className="font-medium">Response</p>
                     <p className="text-muted-foreground">{request.responseMessage}</p>
+                  </div>
+                ) : null}
+                {request.attachments?.length ? (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Attachments</p>
+                    <div className="space-y-2">
+                      {request.attachments.map((attachment) => {
+                        const isDownloading =
+                          downloadMutation.isPending &&
+                          downloadingAttachmentId === attachment.id;
+                        return (
+                          <div
+                            key={attachment.id}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/30 px-3 py-2 text-xs"
+                          >
+                            <div>
+                              <p className="font-semibold">{attachment.fileName}</p>
+                              <p className="text-muted-foreground">
+                                {attachment.mimeType} •{" "}
+                                {formatFileSize(attachment.sizeBytes)}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => downloadMutation.mutate(attachment.id)}
+                              disabled={isDownloading}
+                            >
+                              {isDownloading ? "Fetching..." : "Download"}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : null}
               </div>

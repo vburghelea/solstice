@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -50,38 +50,34 @@ export function TutorialPanel({
     [progress],
   );
 
-  const mutationHandlers = {
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["tutorials", "progress"] });
-    },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : "Tutorial update failed.");
-    },
+  const handleMutationSuccess = () => {
+    void queryClient.invalidateQueries({ queryKey: ["tutorials", "progress"] });
+  };
+
+  const handleMutationError = (error: unknown) => {
+    toast.error(error instanceof Error ? error.message : "Tutorial update failed.");
   };
 
   const { mutate: startMutate } = useMutation({
-    mutationFn: (tutorialId: string) => startTutorial({ data: { tutorialId } }),
-    ...mutationHandlers,
+    mutationFn: (tutorialId: TutorialId) => startTutorial({ data: { tutorialId } }),
+    onSuccess: (_data, tutorialId) => {
+      setActiveTourId(tutorialId);
+      handleMutationSuccess();
+    },
+    onError: handleMutationError,
   });
 
   const completeMutation = useMutation({
-    mutationFn: (tutorialId: string) => completeTutorial({ data: { tutorialId } }),
-    ...mutationHandlers,
+    mutationFn: (tutorialId: TutorialId) => completeTutorial({ data: { tutorialId } }),
+    onSuccess: handleMutationSuccess,
+    onError: handleMutationError,
   });
 
   const dismissMutation = useMutation({
-    mutationFn: (tutorialId: string) => dismissTutorial({ data: { tutorialId } }),
-    ...mutationHandlers,
+    mutationFn: (tutorialId: TutorialId) => dismissTutorial({ data: { tutorialId } }),
+    onSuccess: handleMutationSuccess,
+    onError: handleMutationError,
   });
-
-  const startTour = useCallback(
-    (tutorialId: TutorialId) => {
-      startMutate(tutorialId);
-      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect -- autoLaunchAttempted ref prevents loops
-      setActiveTourId(tutorialId);
-    },
-    [startMutate],
-  );
 
   useEffect(() => {
     if (progressLoading) return;
@@ -104,14 +100,14 @@ export function TutorialPanel({
     }
 
     autoLaunchAttempted.current = true;
-    startTour(autoLaunchTarget.id);
+    startMutate(autoLaunchTarget.id);
   }, [
     autoLaunchReady,
     autoLaunchTutorialId,
     filteredTutorials,
     progressById,
     progressLoading,
-    startTour,
+    startMutate,
   ]);
 
   return (
@@ -162,7 +158,7 @@ export function TutorialPanel({
                   {isOpen ? "Hide steps" : "View steps"}
                 </Button>
                 {status === "not_started" ? (
-                  <Button size="sm" onClick={() => startTour(tutorial.id)}>
+                  <Button size="sm" onClick={() => startMutate(tutorial.id)}>
                     Start tour
                   </Button>
                 ) : null}
@@ -195,7 +191,7 @@ export function TutorialPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => startTour(tutorial.id)}
+                    onClick={() => startMutate(tutorial.id)}
                   >
                     Restart tour
                   </Button>

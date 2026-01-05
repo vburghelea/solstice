@@ -15,7 +15,10 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { respondSupportRequest } from "../support.mutations";
-import { listSupportRequestsAdmin } from "../support.queries";
+import {
+  getSupportRequestAttachmentDownloadUrl,
+  listSupportRequestsAdmin,
+} from "../support.queries";
 
 const statusOptions = [
   { value: "all", label: "All statuses" },
@@ -41,6 +44,12 @@ const formatDateTime = (value: string | Date) =>
     minute: "2-digit",
   });
 
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} bytes`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 const toDateTimeLocal = (value?: string | Date | null) => {
   if (!value) return "";
   const date = value instanceof Date ? value : new Date(value);
@@ -58,6 +67,32 @@ export function SupportAdminPanel() {
   const [nextStatus, setNextStatus] = useState("resolved");
   const [nextPriority, setNextPriority] = useState("normal");
   const [slaTargetAt, setSlaTargetAt] = useState("");
+  const [downloadingAttachmentId, setDownloadingAttachmentId] = useState<string | null>(
+    null,
+  );
+
+  const downloadMutation = useMutation({
+    mutationFn: (attachmentId: string) =>
+      getSupportRequestAttachmentDownloadUrl({ data: { attachmentId } }),
+    onMutate: (attachmentId) => {
+      setDownloadingAttachmentId(attachmentId);
+    },
+    onSuccess: (result) => {
+      if (result?.url) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      toast.error("Attachment is not available for download.");
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to download attachment.",
+      );
+    },
+    onSettled: () => {
+      setDownloadingAttachmentId(null);
+    },
+  });
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["support", "admin", status, search],
@@ -156,6 +191,41 @@ export function SupportAdminPanel() {
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">{request.message}</p>
+                  {request.attachments?.length ? (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Attachments</p>
+                      <div className="space-y-2">
+                        {request.attachments.map((attachment) => {
+                          const isDownloading =
+                            downloadMutation.isPending &&
+                            downloadingAttachmentId === attachment.id;
+                          return (
+                            <div
+                              key={attachment.id}
+                              className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/30 px-3 py-2 text-xs"
+                            >
+                              <div>
+                                <p className="font-semibold">{attachment.fileName}</p>
+                                <p className="text-muted-foreground">
+                                  {attachment.mimeType} •{" "}
+                                  {formatFileSize(attachment.sizeBytes)}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => downloadMutation.mutate(attachment.id)}
+                                disabled={isDownloading}
+                              >
+                                {isDownloading ? "Fetching..." : "Download"}
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
 
                   {request.responseMessage ? (
                     <div className="bg-muted/40 rounded-md p-3 text-sm">

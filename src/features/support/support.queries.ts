@@ -6,6 +6,20 @@ import {
   getSupportRequestAttachmentDownloadSchema,
   listSupportRequestsSchema,
 } from "./support.schemas";
+import type { SupportRequest } from "~/db/schema";
+
+type SupportRequestAttachmentSummary = {
+  id: string;
+  requestId: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  createdAt: Date;
+};
+
+type SupportRequestWithAttachments = SupportRequest & {
+  attachments: SupportRequestAttachmentSummary[];
+};
 
 export const listMySupportRequests = createServerFn({ method: "GET" })
   .middleware(getAuthMiddleware())
@@ -35,7 +49,7 @@ export const listMySupportRequests = createServerFn({ method: "GET" })
       .orderBy(desc(supportRequests.createdAt));
 
     if (requests.length === 0) {
-      return requests;
+      return [] as SupportRequestWithAttachments[];
     }
 
     const attachmentRows = await db
@@ -56,10 +70,7 @@ export const listMySupportRequests = createServerFn({ method: "GET" })
       )
       .orderBy(asc(supportRequestAttachments.createdAt));
 
-    const attachmentsByRequest = new Map<
-      string,
-      Array<(typeof attachmentRows)[number]>
-    >();
+    const attachmentsByRequest = new Map<string, SupportRequestAttachmentSummary[]>();
     for (const attachment of attachmentRows) {
       const list = attachmentsByRequest.get(attachment.requestId) ?? [];
       list.push(attachment);
@@ -117,7 +128,7 @@ export const listSupportRequestsAdmin = createServerFn({ method: "GET" })
       .orderBy(desc(supportRequests.createdAt));
 
     if (requests.length === 0) {
-      return requests;
+      return [] as SupportRequestWithAttachments[];
     }
 
     const attachmentRows = await db
@@ -138,10 +149,7 @@ export const listSupportRequestsAdmin = createServerFn({ method: "GET" })
       )
       .orderBy(asc(supportRequestAttachments.createdAt));
 
-    const attachmentsByRequest = new Map<
-      string,
-      Array<(typeof attachmentRows)[number]>
-    >();
+    const attachmentsByRequest = new Map<string, SupportRequestAttachmentSummary[]>();
     for (const attachment of attachmentRows) {
       const list = attachmentsByRequest.get(attachment.requestId) ?? [];
       list.push(attachment);

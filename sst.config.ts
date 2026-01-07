@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./.sst/platform/config.d.ts" />
 
-type StageEnvClass = "dev" | "perf" | "prod";
+type StageEnvClass = "dev" | "perf" | "uat" | "prod";
 type StageTenantKey = "qc" | "viasport";
 
 type StageInfo = {
@@ -11,12 +11,14 @@ type StageInfo = {
   isCanonical: boolean;
 };
 
-const CANONICAL_STAGE_PATTERN = /^(qc|sin)-(dev|perf|prod)$/;
+const CANONICAL_STAGE_PATTERN = /^(qc|sin)-(dev|perf|uat|prod)$/;
 const CANONICAL_STAGE_LIST = [
   "qc-dev",
   "sin-dev",
   "qc-perf",
   "sin-perf",
+  "qc-uat",
+  "sin-uat",
   "qc-prod",
   "sin-prod",
 ] as const;
@@ -97,7 +99,8 @@ const resolveTenantEnv = (info: StageInfo) => {
  * SST Configuration for Solstice (Quadball Canada)
  *
  * Deploys TanStack Start app to AWS Lambda with CloudFront CDN.
- * All resources deployed to ca-central-1 for PIPEDA/Canadian data residency.
+ * Core data-plane resources deploy to ca-central-1 for PIPEDA/Canadian
+ * data residency. Global edge services (CloudFront/WAF) use us-east-1.
  *
  * Known issue workaround: Lambda Function URL permissions require $transform.
  * See: https://github.com/sst/sst/issues/6198
@@ -128,6 +131,10 @@ export default $config({
     const stage = stageInfo.stage;
     const isProd = stageInfo.stageEnv === "prod";
     const isPerf = stageInfo.stageEnv === "perf";
+    const isUat = stageInfo.stageEnv === "uat";
+    const cloudfrontProvider = new aws.Provider("CloudFrontProvider", {
+      region: "us-east-1",
+    });
 
     const dbVersion = "16.11";
     const dbConfig = isProd
@@ -335,6 +342,173 @@ export default $config({
       NODE_ENV: isProd || isPerf ? "production" : "development",
     };
 
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' https://js.squareup.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://connect.squareup.com https://pci-connect.squareup.com",
+      "frame-ancestors 'none'",
+      "base-uri 'none'",
+      "form-action 'self'",
+      "object-src 'none'",
+      "upgrade-insecure-requests",
+    ].join("; ");
+
+    const securityHeadersPolicy = new aws.cloudfront.ResponseHeadersPolicy(
+      "SecurityHeaders",
+      {
+        name: `solstice-${stage}-security-headers`,
+        securityHeadersConfig: {
+          strictTransportSecurity: {
+            accessControlMaxAgeSec: 31536000,
+            includeSubdomains: true,
+            override: true,
+            preload: isProd,
+          },
+          contentSecurityPolicy: {
+            contentSecurityPolicy,
+            override: true,
+          },
+          contentTypeOptions: {
+            override: true,
+          },
+          frameOptions: {
+            frameOption: "DENY",
+            override: true,
+          },
+          referrerPolicy: {
+            referrerPolicy: "strict-origin-when-cross-origin",
+            override: true,
+          },
+          xssProtection: {
+            protection: true,
+            modeBlock: true,
+            override: true,
+          },
+        },
+        customHeadersConfig: {
+          items: [
+            {
+              header: "Cross-Origin-Opener-Policy",
+              value: "same-origin",
+              override: true,
+            },
+            {
+              header: "Cross-Origin-Resource-Policy",
+              value: "same-origin",
+              override: true,
+            },
+            {
+              header: "Permissions-Policy",
+              value:
+                "accelerometer=(), camera=(), geolocation=(), gyroscope=(), " +
+                "magnetometer=(), microphone=(), payment=(), usb=()",
+              override: true,
+            },
+          ],
+        },
+      },
+    );
+
+    const wafName = `solstice-${stage}-waf`;
+    const wafManagedRuleOverrideAction = isProd ? { none: {} } : { count: {} };
+    const wafRateLimitAction = isProd ? { block: {} } : { count: {} };
+
+    const wafRateLimitRule = {
+      name: "RateLimitRule",
+      priority: 1,
+      action: wafRateLimitAction,
+      statement: {
+        rateBasedStatement: {
+          limit: 1000,
+          aggregateKeyType: "IP",
+        },
+      },
+      visibilityConfig: {
+        cloudwatchMetricsEnabled: true,
+        sampledRequestsEnabled: true,
+        metricName: "RateLimitRule",
+      },
+    };
+
+    const wafManagedRulesCommon = {
+      name: "AWS-AWSManagedRulesCommonRuleSet",
+      priority: 2,
+      overrideAction: wafManagedRuleOverrideAction,
+      statement: {
+        managedRuleGroupStatement: {
+          vendorName: "AWS",
+          name: "AWSManagedRulesCommonRuleSet",
+        },
+      },
+      visibilityConfig: {
+        cloudwatchMetricsEnabled: true,
+        metricName: "AWSManagedRulesCommonRuleSet",
+        sampledRequestsEnabled: true,
+      },
+    };
+
+    const wafManagedRulesKnownBad = {
+      name: "AWS-AWSManagedRulesKnownBadInputsRuleSet",
+      priority: 3,
+      overrideAction: wafManagedRuleOverrideAction,
+      statement: {
+        managedRuleGroupStatement: {
+          vendorName: "AWS",
+          name: "AWSManagedRulesKnownBadInputsRuleSet",
+        },
+      },
+      visibilityConfig: {
+        cloudwatchMetricsEnabled: true,
+        metricName: "AWSManagedRulesKnownBadInputsRuleSet",
+        sampledRequestsEnabled: true,
+      },
+    };
+
+    const wafManagedRulesSqli = {
+      name: "AWS-AWSManagedRulesSQLiRuleSet",
+      priority: 4,
+      overrideAction: wafManagedRuleOverrideAction,
+      statement: {
+        managedRuleGroupStatement: {
+          vendorName: "AWS",
+          name: "AWSManagedRulesSQLiRuleSet",
+        },
+      },
+      visibilityConfig: {
+        cloudwatchMetricsEnabled: true,
+        metricName: "AWSManagedRulesSQLiRuleSet",
+        sampledRequestsEnabled: true,
+      },
+    };
+
+    const wafAcl = new aws.wafv2.WebAcl(
+      "WafAcl",
+      {
+        name: wafName,
+        scope: "CLOUDFRONT",
+        defaultAction: { allow: {} },
+        visibilityConfig: {
+          cloudwatchMetricsEnabled: true,
+          metricName: wafName,
+          sampledRequestsEnabled: true,
+        },
+        rules: [
+          wafRateLimitRule,
+          wafManagedRulesCommon,
+          wafManagedRulesKnownBad,
+          wafManagedRulesSqli,
+        ],
+        tags: {
+          Environment: stage,
+          Application: "solstice",
+        },
+      },
+      { provider: cloudfrontProvider },
+    );
+
     const devBaseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
     const baseUrl = $dev ? devBaseUrl : secrets.baseUrl.value;
 
@@ -428,6 +602,15 @@ export default $config({
         SQUARE_ACCESS_TOKEN: secrets.squareAccessToken.value,
         SQUARE_LOCATION_ID: secrets.squareLocationId.value,
         SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
+      },
+      transform: {
+        cdn: (args) => {
+          args.defaultCacheBehavior = {
+            ...args.defaultCacheBehavior,
+            responseHeadersPolicyId: securityHeadersPolicy.id,
+          };
+          args.webAclId = wafAcl.arn;
+        },
       },
       // Performance tuning for perf/prod environments
       // See docs/tickets/PERF-001-performance-optimizations.md
@@ -523,16 +706,12 @@ export default $config({
     );
 
     // =========================================================================
-    // CloudWatch Alarms for Monitoring
+    // SNS Topic for Alarm Notifications
     // =========================================================================
+    // Create early so CloudTrail and other alarms can reference it
 
-    // Get the Lambda function name from the web deployment
-    // Note: SST creates the function with a generated name, we'll use pattern matching
-    const _webFunctionNamePattern = `solstice-${stage}-Web*`;
-
-    // SNS Topic for alarm notifications (create only for production)
     const alarmTopic =
-      isProd || isPerf
+      isProd || isPerf || isUat
         ? new aws.sns.Topic("AlarmNotifications", {
             name: `solstice-${stage}-alarms`,
             tags: {
@@ -541,6 +720,347 @@ export default $config({
             },
           })
         : undefined;
+
+    // =========================================================================
+    // CloudTrail for Infrastructure Audit Logging (SEC-AGG-002, SEC-AGG-004)
+    // =========================================================================
+    // Only enable for prod/perf/uat to control costs. Dev uses AWS default event history.
+
+    const cloudTrailLogGroup =
+      isProd || isPerf || isUat
+        ? new aws.cloudwatch.LogGroup("CloudTrailLogGroup", {
+            name: `/aws/cloudtrail/solstice-${stage}`,
+            retentionInDays: isProd ? 365 : 30,
+            tags: {
+              Environment: stage,
+              Application: "solstice",
+            },
+          })
+        : undefined;
+
+    // S3 bucket for CloudTrail logs with compliance retention
+    const cloudTrailBucket =
+      isProd || isPerf || isUat
+        ? new aws.s3.BucketV2("CloudTrailBucket", {
+            bucket: `solstice-${stage}-cloudtrail-logs`,
+            tags: {
+              Environment: stage,
+              Application: "solstice",
+              Purpose: "cloudtrail-audit-logs",
+            },
+          })
+        : undefined;
+
+    // Block public access to CloudTrail bucket
+    const _cloudTrailBucketPublicAccessBlock =
+      cloudTrailBucket &&
+      new aws.s3.BucketPublicAccessBlock("CloudTrailBucketPublicAccessBlock", {
+        bucket: cloudTrailBucket.id,
+        blockPublicAcls: true,
+        blockPublicPolicy: true,
+        ignorePublicAcls: true,
+        restrictPublicBuckets: true,
+      });
+
+    // Server-side encryption for CloudTrail bucket
+    const _cloudTrailBucketEncryption =
+      cloudTrailBucket &&
+      new aws.s3.BucketServerSideEncryptionConfigurationV2("CloudTrailBucketEncryption", {
+        bucket: cloudTrailBucket.id,
+        rules: [
+          {
+            applyServerSideEncryptionByDefault: {
+              sseAlgorithm: "AES256",
+            },
+          },
+        ],
+      });
+
+    // Lifecycle policy: transition to Glacier after 90 days, expire after 7 years (prod) or 1 year (perf/uat)
+    const _cloudTrailBucketLifecycle =
+      cloudTrailBucket &&
+      new aws.s3.BucketLifecycleConfigurationV2("CloudTrailBucketLifecycle", {
+        bucket: cloudTrailBucket.id,
+        rules: [
+          {
+            id: "ArchiveAndExpire",
+            status: "Enabled",
+            transitions: [
+              {
+                days: 90,
+                storageClass: "GLACIER",
+              },
+            ],
+            expiration: {
+              days: isProd ? 2555 : 365, // 7 years for prod, 1 year for perf/uat
+            },
+          },
+        ],
+      });
+
+    // Get AWS account ID for CloudTrail bucket policy
+    const awsAccountId = aws.getCallerIdentityOutput().accountId;
+
+    // CloudTrail bucket policy to allow CloudTrail to write logs
+    // Must use correct path format: s3://bucket/AWSLogs/account-id/*
+    const cloudTrailBucketPolicy =
+      cloudTrailBucket &&
+      new aws.s3.BucketPolicy("CloudTrailBucketPolicy", {
+        bucket: cloudTrailBucket.id,
+        policy: $util
+          .all([cloudTrailBucket.arn, awsAccountId])
+          .apply(([bucketArn, accountId]) =>
+            JSON.stringify({
+              Version: "2012-10-17",
+              Statement: [
+                {
+                  Sid: "AWSCloudTrailAclCheck",
+                  Effect: "Allow",
+                  Principal: { Service: "cloudtrail.amazonaws.com" },
+                  Action: "s3:GetBucketAcl",
+                  Resource: bucketArn,
+                  Condition: {
+                    StringEquals: {
+                      "aws:SourceArn": `arn:aws:cloudtrail:ca-central-1:${accountId}:trail/solstice-${stage}-audit-trail`,
+                    },
+                  },
+                },
+                {
+                  Sid: "AWSCloudTrailWrite",
+                  Effect: "Allow",
+                  Principal: { Service: "cloudtrail.amazonaws.com" },
+                  Action: "s3:PutObject",
+                  Resource: `${bucketArn}/AWSLogs/${accountId}/*`,
+                  Condition: {
+                    StringEquals: {
+                      "s3:x-amz-acl": "bucket-owner-full-control",
+                      "aws:SourceArn": `arn:aws:cloudtrail:ca-central-1:${accountId}:trail/solstice-${stage}-audit-trail`,
+                    },
+                  },
+                },
+              ],
+            }),
+          ),
+      });
+
+    // IAM role for CloudTrail to write to CloudWatch Logs
+    const cloudTrailRole =
+      cloudTrailLogGroup &&
+      new aws.iam.Role("CloudTrailRole", {
+        name: `solstice-${stage}-cloudtrail-role`,
+        assumeRolePolicy: JSON.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: { Service: "cloudtrail.amazonaws.com" },
+              Action: "sts:AssumeRole",
+            },
+          ],
+        }),
+        tags: {
+          Environment: stage,
+          Application: "solstice",
+        },
+      });
+
+    const _cloudTrailRolePolicy =
+      cloudTrailRole &&
+      cloudTrailLogGroup &&
+      new aws.iam.RolePolicy("CloudTrailRolePolicy", {
+        role: cloudTrailRole.id,
+        policy: cloudTrailLogGroup.arn.apply((logGroupArn) =>
+          JSON.stringify({
+            Version: "2012-10-17",
+            Statement: [
+              {
+                Effect: "Allow",
+                Action: ["logs:CreateLogStream", "logs:PutLogEvents"],
+                Resource: `${logGroupArn}:*`,
+              },
+            ],
+          }),
+        ),
+      });
+
+    // CloudTrail trail - management events only (write-only to reduce noise/cost)
+    const _cloudTrail =
+      cloudTrailBucket &&
+      cloudTrailBucketPolicy &&
+      cloudTrailLogGroup &&
+      cloudTrailRole &&
+      new aws.cloudtrail.Trail("CloudTrail", {
+        name: `solstice-${stage}-audit-trail`,
+        s3BucketName: cloudTrailBucket.id,
+        cloudWatchLogsGroupArn: $interpolate`${cloudTrailLogGroup.arn}:*`,
+        cloudWatchLogsRoleArn: cloudTrailRole.arn,
+        enableLogFileValidation: true,
+        includeGlobalServiceEvents: true,
+        isMultiRegionTrail: false, // Single region (ca-central-1) for cost control
+        eventSelectors: [
+          {
+            readWriteType: "WriteOnly", // Only write events to reduce noise/cost
+            includeManagementEvents: true,
+          },
+        ],
+        tags: {
+          Environment: stage,
+          Application: "solstice",
+        },
+      });
+
+    // =========================================================================
+    // CloudTrail Security Alarms (CIS Benchmark aligned)
+    // =========================================================================
+
+    // Metric filter and alarm helper for CloudTrail events
+    const createCloudTrailAlarm = (
+      name: string,
+      filterPattern: string,
+      description: string,
+      threshold = 1,
+    ) => {
+      if (!cloudTrailLogGroup || !alarmTopic) return;
+
+      const metricName = `CloudTrail${name}`;
+      const metricNamespace = "Solstice/CloudTrail";
+
+      new aws.cloudwatch.LogMetricFilter(`CloudTrail${name}Filter`, {
+        name: `solstice-${stage}-cloudtrail-${name.toLowerCase()}`,
+        logGroupName: cloudTrailLogGroup.name,
+        pattern: filterPattern,
+        metricTransformation: {
+          name: metricName,
+          namespace: metricNamespace,
+          value: "1",
+        },
+      });
+
+      new aws.cloudwatch.MetricAlarm(`CloudTrail${name}Alarm`, {
+        alarmName: `solstice-${stage}-cloudtrail-${name.toLowerCase()}`,
+        alarmDescription: description,
+        namespace: metricNamespace,
+        metricName: metricName,
+        statistic: "Sum",
+        period: 300, // 5 minutes
+        evaluationPeriods: 1,
+        threshold: threshold,
+        comparisonOperator: "GreaterThanOrEqualToThreshold",
+        treatMissingData: "notBreaching",
+        actionsEnabled: true,
+        alarmActions: [alarmTopic.arn],
+        okActions: [alarmTopic.arn],
+        tags: {
+          Environment: stage,
+          Application: "solstice",
+          AlertType: "security",
+        },
+      });
+    };
+
+    // CIS Benchmark 3.1: Root account usage
+    createCloudTrailAlarm(
+      "RootAccountUsage",
+      '{ $.userIdentity.type = "Root" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != "AwsServiceEvent" }',
+      "Root account was used - investigate immediately",
+    );
+
+    // CIS Benchmark 3.2: Unauthorized API calls
+    createCloudTrailAlarm(
+      "UnauthorizedApiCalls",
+      '{ ($.errorCode = "*UnauthorizedAccess*") || ($.errorCode = "AccessDenied*") }',
+      "Unauthorized API calls detected - potential security issue",
+      5, // Higher threshold to reduce noise
+    );
+
+    // CIS Benchmark 3.3: Console login without MFA
+    createCloudTrailAlarm(
+      "ConsoleLoginWithoutMfa",
+      '{ ($.eventName = "ConsoleLogin") && ($.additionalEventData.MFAUsed != "Yes") }',
+      "Console login without MFA detected",
+    );
+
+    // CIS Benchmark 3.4: IAM policy changes
+    createCloudTrailAlarm(
+      "IamPolicyChanges",
+      "{ ($.eventName=DeleteGroupPolicy) || ($.eventName=DeleteRolePolicy) || ($.eventName=DeleteUserPolicy) || ($.eventName=PutGroupPolicy) || ($.eventName=PutRolePolicy) || ($.eventName=PutUserPolicy) || ($.eventName=CreatePolicy) || ($.eventName=DeletePolicy) || ($.eventName=CreatePolicyVersion) || ($.eventName=DeletePolicyVersion) || ($.eventName=AttachRolePolicy) || ($.eventName=DetachRolePolicy) || ($.eventName=AttachUserPolicy) || ($.eventName=DetachUserPolicy) || ($.eventName=AttachGroupPolicy) || ($.eventName=DetachGroupPolicy) }",
+      "IAM policy was modified - verify this was authorized",
+    );
+
+    // CIS Benchmark 3.5: CloudTrail configuration changes
+    createCloudTrailAlarm(
+      "CloudTrailChanges",
+      "{ ($.eventName = CreateTrail) || ($.eventName = UpdateTrail) || ($.eventName = DeleteTrail) || ($.eventName = StartLogging) || ($.eventName = StopLogging) }",
+      "CloudTrail configuration was changed - potential tampering",
+    );
+
+    // CIS Benchmark 3.6: Console authentication failures
+    createCloudTrailAlarm(
+      "ConsoleAuthFailures",
+      '{ ($.eventName = ConsoleLogin) && ($.errorMessage = "Failed authentication") }',
+      "Console authentication failure detected",
+      3, // Threshold of 3 failures
+    );
+
+    // CIS Benchmark 3.10: Security group changes
+    createCloudTrailAlarm(
+      "SecurityGroupChanges",
+      "{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }",
+      "Security group was modified - verify this was authorized",
+    );
+
+    // CIS Benchmark 3.11: Network ACL changes
+    createCloudTrailAlarm(
+      "NetworkAclChanges",
+      "{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }",
+      "Network ACL was modified - verify this was authorized",
+    );
+
+    // CIS Benchmark 3.14: VPC changes
+    createCloudTrailAlarm(
+      "VpcChanges",
+      "{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }",
+      "VPC was modified - verify this was authorized",
+    );
+
+    // =========================================================================
+    // CloudWatch Alarms for Monitoring
+    // =========================================================================
+
+    new aws.cloudwatch.MetricAlarm(
+      "WafBlockedRequestsAlarm",
+      {
+        alarmName: `solstice-${stage}-waf-blocked-requests`,
+        alarmDescription: "WAF is blocking requests at CloudFront",
+        namespace: "AWS/WAFV2",
+        metricName: "BlockedRequests",
+        statistic: "Sum",
+        period: 300, // 5 minutes
+        evaluationPeriods: 1,
+        threshold: 100,
+        comparisonOperator: "GreaterThanOrEqualToThreshold",
+        treatMissingData: "notBreaching",
+        actionsEnabled: isProd || isPerf || isUat,
+        alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+        okActions: alarmTopic ? [alarmTopic.arn] : [],
+        dimensions: {
+          WebACL: wafName,
+          Rule: "ALL",
+          Region: "Global",
+          Scope: "CLOUDFRONT",
+        },
+        tags: {
+          Environment: stage,
+          Application: "solstice",
+          AlertType: "waf",
+        },
+      },
+      { provider: cloudfrontProvider },
+    );
+
+    // Get the Lambda function name from the web deployment
+    // Note: SST creates the function with a generated name, we'll use pattern matching
+    const _webFunctionNamePattern = `solstice-${stage}-Web*`;
 
     // Lambda Throttling Alarm - Critical for catching concurrency issues
     new aws.cloudwatch.MetricAlarm("LambdaThrottlingAlarm", {

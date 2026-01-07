@@ -101,6 +101,21 @@ export const recordSecurityEvent = createServerOnlyFn(
       metadata: params.metadata ?? {},
     });
 
+    // Emit CloudWatch metrics for high-severity security events only.
+    // Skip individual login_fail/mfa_fail to avoid noise (they roll up to account_flagged).
+    const HIGH_SEVERITY_EVENT_TYPES = new Set([
+      "account_locked",
+      "account_flagged",
+      "login_anomaly",
+    ]);
+    if (HIGH_SEVERITY_EVENT_TYPES.has(normalizedEventType)) {
+      const { recordSecurityEventMetric } = await import("~/lib/observability/metrics");
+      await recordSecurityEventMetric({
+        eventType: normalizedEventType,
+        ...(params.riskScore !== undefined && { riskScore: params.riskScore }),
+      });
+    }
+
     const authEventTypes = new Set([
       "LOGIN_SUCCESS",
       "LOGIN_FAIL",

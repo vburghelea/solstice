@@ -61,3 +61,29 @@ export const recordPivotCacheMetric = async (params: {
     dimensions: { CacheSource: params.source },
   });
 };
+
+/**
+ * Emits CloudWatch metrics for high-severity security events.
+ * Only significant events (account_locked, account_flagged, login_anomaly)
+ * should emit metrics to avoid noise from individual login failures.
+ */
+export const recordSecurityEventMetric = async (params: {
+  eventType: string;
+  riskScore?: number;
+}) => {
+  const severity =
+    params.riskScore !== undefined && params.riskScore >= 60
+      ? "high"
+      : params.riskScore !== undefined && params.riskScore >= 30
+        ? "medium"
+        : "low";
+
+  await emitMetric({
+    name: "SecurityEvent",
+    value: 1,
+    dimensions: {
+      EventType: params.eventType,
+      Severity: severity,
+    },
+  });
+};

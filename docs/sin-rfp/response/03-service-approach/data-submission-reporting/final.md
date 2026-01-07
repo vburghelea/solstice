@@ -26,7 +26,9 @@ The interface adapts to desktop, tablet, and mobile viewports. Core workflows re
 
 ### Accessibility
 
-The interface is built on Radix UI primitives and shadcn/ui components, which provide keyboard navigation and ARIA defaults. A formal WCAG audit is planned before submission. Latest accessibility scan evidence is in `docs/sin-rfp/review-plans/evidence/a11y-scan-20251231.json`.
+The interface is built on Radix UI primitives and shadcn/ui components, which
+provide keyboard navigation and ARIA defaults. A formal WCAG audit is planned
+before submission. Accessibility evidence is summarized in Section 1.3.
 
 ### UX Refinement Process
 
@@ -37,7 +39,7 @@ During Planning and Discovery we will:
 - Refine dashboard widgets to surface the most relevant information
 - Apply viaSport branding and terminology
 
-Detailed functional compliance for forms, submissions, and reporting lives in Section 04 (DM-AGG-001 and RP-AGG-003).
+Detailed functional compliance for forms, submissions, and reporting lives in **System Requirements Compliance Crosswalk** (DM-AGG-001 and RP-AGG-003).
 
 ## Technology Stack and Benefits
 
@@ -95,4 +97,4 @@ Lighthouse and load tests were run in the prototype environment. Final validatio
 | Total Blocking Time      | 88ms           | <300ms  | Pass   |
 | Cumulative Layout Shift  | 0              | <0.1    | Pass   |
 
-See Appendix C for performance evidence and planned final runs.
+See Section 1.3 for performance evidence and planned final runs.

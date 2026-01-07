@@ -101,4 +101,31 @@ Migration execution requires:
 3. Data dictionary and field mapping approval
 4. SME availability for validation and sign-off
 
-Import tooling is ready today. Extraction approach will be finalized during Discovery based on legacy system capabilities. See Section 04 DM-AGG-006 for detailed compliance mapping.
+Import tooling is ready today. Extraction approach will be finalized during Discovery based on legacy system capabilities. See **System Requirements Compliance Crosswalk** (DM-AGG-006) for detailed compliance mapping.
+
+## Cutover and Change Management
+
+A successful migration includes technical data movement and a managed transition for viaSport staff and PSOs.
+
+### Cutover Approach (Recommended)
+
+| Step                  | Description                                                 | Outcome                                              |
+| --------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| Pilot org migration   | Migrate one PSO end-to-end, validate workflow and reporting | Validated templates, mappings, and training approach |
+| Migration waves       | Migrate remaining orgs in planned cohorts                   | Manageable support load, reduced risk                |
+| Data freeze window    | Short read-only or limited update window on legacy systems  | Prevents last-minute divergence                      |
+| Final delta migration | Import changes since last full migration                    | Production data is current                           |
+| Go-live               | Solstice becomes system of record, support team on standby  | Controlled launch                                    |
+| Hypercare             | Elevated support and daily check-ins for a defined period   | Fast issue resolution, adoption support              |
+| Rollback plan         | Predefined rollback criteria and steps                      | Risk control if a blocking issue occurs              |
+
+### Sector Communication and Training
+
+- Publish a cutover calendar (freeze window, go-live date, support contacts).
+- Provide role-based quick-start guides and live training sessions.
+- Use a ticketing workflow and escalation path during hypercare.
+
+### Downtime and Continuity Expectations
+
+- Document expected downtime (if any) during final cutover.
+- If parallel run is required, define duration and responsibilities (who submits where, what is source of truth).

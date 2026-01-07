@@ -12,7 +12,9 @@ Austin Wallace Tech proposes a fixed-price engagement with milestone-based payme
 **Year 1 Total:** $800,000
 **Year 2 and beyond:** $200,000 per year
 
-This pricing reflects the value delivered to viaSport, not cost-plus billing. The working prototype reduces delivery risk because viaSport can evaluate a functioning system before contract award.
+This pricing reflects the value delivered to viaSport, not cost-plus billing.
+The existing prototype reduces delivery risk because viaSport can evaluate a
+functioning system before contract award (see Section 1.3).
 
 ## Cost Breakdown
 
@@ -32,14 +34,17 @@ All RFP requirements are included, including completion of partial items (DM-AGG
 
 ### Annual Operations ($200,000 per year)
 
-| Category                   | Scope                                             |
-| -------------------------- | ------------------------------------------------- |
-| Hosting and Infrastructure | AWS ca-central-1, database, storage, CDN, compute |
-| Security                   | Monitoring, patching, quarterly reviews           |
-| Maintenance                | Bug fixes, dependency updates, performance tuning |
-| Support                    | Business hours support, 24 hour response standard |
-| Minor Enhancements         | Small improvements within existing scope          |
-| Disaster Recovery          | Backups and quarterly DR drills                   |
+| Category                   | Scope                                                                                               |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Hosting and Infrastructure | AWS ca-central-1, database, storage, CDN, compute                                                   |
+| Security                   | Monitoring, patching, quarterly reviews                                                             |
+| Security Tooling           | Automated vulnerability scanning (SAST/SCA) and scheduled DAST execution, plus remediation workflow |
+| Maintenance                | Bug fixes, dependency updates, performance tuning                                                   |
+| Support                    | Business hours support, 24 hour response standard                                                   |
+| Minor Enhancements         | Small improvements within existing scope                                                            |
+| Disaster Recovery          | Backups and quarterly DR drills                                                                     |
+
+Security tooling and routine scanning effort are included in the annual operations fee. Independent penetration testing is included as a delivery milestone pre go-live (or can be priced as an annual add-on if viaSport prefers recurring third-party testing).
 
 ### Payment Schedule
 
@@ -95,7 +100,7 @@ Adds after-hours monitoring and response outside business hours.
 
 ### Value-Add: Working Prototype
 
-A functional prototype already exists:
+Prototype available for evaluation (see Section 1.3):
 
 - 20.1M rows tested with sub-250ms p95 latency
 - Majority of system requirements implemented

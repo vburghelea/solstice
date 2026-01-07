@@ -43,15 +43,16 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## Demo Access
 
-Demo credentials are listed in Appendix A to reduce reviewer friction.
+Demo credentials are listed in **Appendix A: Live Demo Access** to reduce reviewer friction.
 
-**Contact:** TBD
+**Contact:** austin@austinwallace.tech
 
-**Environment:** sin-perf (performance testing environment with production-like data)
+**Environment:** sin-uat (User Acceptance Testing environment with evaluator
+access and CloudTrail monitoring). Performance testing is run in sin-perf.
 
 **MFA:** The viaSport Staff account has MFA enabled to demonstrate the full authentication flow. Other demo accounts have MFA disabled for faster evaluation.
 
-**Data:** Synthetic only, with monitoring enabled.
+**Data:** Synthetic only, with environment monitoring enabled (CloudTrail with CIS Benchmark alarms).
 
 ## What to Ignore in the Prototype
 
@@ -71,26 +72,32 @@ Some elements are placeholders and will be replaced with viaSport-approved conte
 5. Version History, edit submission and view change history with attribution
 6. Analytics, build a pivot table and export to CSV
 7. Audit Logs, review recent actions and verify hash chain integrity
-8. Help Center, search for a topic and view contextual guidance
-9. Import Wizard, upload CSV, map fields, preview validation results
+8. Security Dashboard, review recent security events and account lockouts (SEC-AGG-002)
+9. Privacy and Retention, view retention policies and legal hold capabilities (SEC-AGG-003)
+10. Help Center, search for a topic and view contextual guidance
+11. Import Wizard, upload CSV, map fields, preview validation results
 
 ## Requirement Validation Crosswalk
 
-| To validate...             | Requirement | Demo path                                |
-| -------------------------- | ----------- | ---------------------------------------- |
-| Form building              | DM-AGG-001  | Dashboard -> Forms -> Create Form        |
-| File uploads               | DM-AGG-001  | Form Builder -> Add File Field -> Submit |
-| Import and rollback        | DM-AGG-006  | Dashboard -> Imports -> New Import       |
-| Submission tracking        | RP-AGG-003  | Dashboard -> Reporting                   |
-| Self-service analytics     | RP-AGG-005  | Analytics -> New Query -> Pivot          |
-| Export with access control | RP-AGG-005  | Pivot -> Export -> Verify scoping        |
-| MFA authentication         | SEC-AGG-001 | Login flow                               |
-| Role-based access          | SEC-AGG-001 | Compare admin vs reporter dashboards     |
-| Audit trail                | SEC-AGG-004 | Admin -> Audit Logs -> Filter            |
-| Hash chain verification    | SEC-AGG-004 | Audit Logs -> Verify Integrity           |
-| Guided walkthroughs        | TO-AGG-002  | Help -> Guided Walkthroughs              |
-| Help center search         | TO-AGG-003  | Help -> Search                           |
-| Support requests           | UI-AGG-006  | Help -> Support Request                  |
+| To validate...                  | Requirement | Demo path                                                             |
+| ------------------------------- | ----------- | --------------------------------------------------------------------- |
+| Form building                   | DM-AGG-001  | Dashboard -> Forms -> Create Form                                     |
+| File uploads                    | DM-AGG-001  | Form Builder -> Add File Field -> Submit                              |
+| Import and rollback             | DM-AGG-006  | Dashboard -> Imports -> New Import                                    |
+| Submission tracking             | RP-AGG-003  | Dashboard -> Reporting                                                |
+| Self-service analytics          | RP-AGG-005  | Analytics -> New Query -> Pivot                                       |
+| Export with access control      | RP-AGG-005  | Pivot -> Export -> Verify scoping                                     |
+| MFA authentication              | SEC-AGG-001 | Login flow                                                            |
+| Role-based access               | SEC-AGG-001 | Compare admin vs reporter dashboards                                  |
+| Monitoring and threat detection | SEC-AGG-002 | Admin -> Security -> Events / Account Locks                           |
+| Privacy and compliance controls | SEC-AGG-003 | Admin -> Privacy -> Retention Policies / Legal Holds, plus Appendix D |
+| Audit trail                     | SEC-AGG-004 | Admin -> Audit Logs -> Filter                                         |
+| Hash chain verification         | SEC-AGG-004 | Audit Logs -> Verify Integrity                                        |
+| Guided walkthroughs             | TO-AGG-002  | Help -> Guided Walkthroughs                                           |
+| Help center search              | TO-AGG-003  | Help -> Search                                                        |
+| Support requests                | UI-AGG-006  | Help -> Support Request                                               |
+
+Where evidence is platform-level (for example AWS compliance reports), we provide supporting artifacts through AWS Artifact and standard AWS compliance documentation upon request.
 
 ## Prototype Positioning
 

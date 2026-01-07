@@ -40,9 +40,7 @@
 Continue to refine validation rules during Discovery based on viaSport templates.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-001-forms-20251228-1953.png`
-- `src/features/forms/forms.utils.ts`
+Evidence is summarized in Section 1.3.
 
 ## RP-AGG-002: Reporting Information Management
 
@@ -75,12 +73,10 @@ Continue to refine validation rules during Discovery based on viaSport templates
 - Data dictionary and field definitions for contribution agreements and NCCP.
 
 **Approach:**
-Configure metadata fields during Discovery and validate in UAT. See Section 03 Training and Onboarding for change adoption.
+Configure metadata fields during Discovery and validate in UAT. See **System Requirements: Training and Onboarding (TO-AGG)** for change adoption.
 
 **Evidence:**
-
-- `src/features/reporting/reporting.schemas.ts`
-- `src/features/organizations/organizations.mutations.ts`
+Evidence is summarized in Section 1.3.
 
 ## RP-AGG-003: Reporting Flow and Support
 
@@ -112,9 +108,7 @@ Configure metadata fields during Discovery and validate in UAT. See Section 03 T
 Reminder cadence and reporting dashboards will be tuned with viaSport during Discovery.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/RP-AGG-003-reporting-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/NOTIFICATIONS-DELIVERY-sin-dev-20251231.md`
+Evidence is summarized in Section 1.3.
 
 ## RP-AGG-004: Reporting Configuration and Collection
 
@@ -146,9 +140,7 @@ Reminder cadence and reporting dashboards will be tuned with viaSport during Dis
 Continue to refine reporting form templates during Discovery.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/RP-AGG-004-reporting-admin-20251228-1953.png`
-- `src/routes/dashboard/sin/submissions/$submissionId.tsx`
+Evidence is summarized in Section 1.3.
 
 ## RP-AGG-005: Self-Service Analytics and Data Export
 
@@ -180,6 +172,4 @@ Continue to refine reporting form templates during Discovery.
 Continue to expand datasets and templates as viaSport priorities are defined.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/RP-AGG-005-analytics-access-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/RP-AGG-005-analytics-admin-20251228-1953.png`
+Evidence is summarized in Section 1.3.

@@ -33,12 +33,12 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 ## Security (SEC-AGG)
 
-| Req ID      | Title                             | Status | Built Today                                   | Remaining                             |
-| ----------- | --------------------------------- | ------ | --------------------------------------------- | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping       | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Redis rate limiting, pre-auth lockout, alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls     | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain               | None                                  |
+| Req ID      | Title                             | Status | Built Today                                                               | Remaining                             |
+| ----------- | --------------------------------- | ------ | ------------------------------------------------------------------------- | ------------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping                                   | None                                  |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Rate limiting, pre-auth lockout, CloudTrail CIS alarms, CloudWatch alerts | None                                  |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                          | Compliance package and pen test (TBD) |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain                                           | None                                  |
 
 ## Training and Onboarding (TO-AGG)
 

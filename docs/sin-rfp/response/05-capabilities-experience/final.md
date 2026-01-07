@@ -12,7 +12,7 @@ Austin Wallace Tech brings experience delivering information systems in sports a
 | New Jersey Devils, NHL (2022 to 2024) | Sole Data Developer | Built data platform processing 10 million rows per game. Developed 40+ dbt models.           |
 | Teck Resources (2020 to 2022)         | Data Developer      | Modernized legacy PostgreSQL processes with Terraform and Python.                            |
 
-### Will Siddal: Full-Stack Development
+### Will Siddall: Full-Stack Development
 
 | Organization                  | Role                 | Achievements                                                                                               |
 | ----------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -29,16 +29,24 @@ The most relevant evidence is the Solstice prototype itself, built for viaSport 
 | Server errors         | Zero under concurrent load                           |
 | Codebase size         | 97,000+ lines of TypeScript (app plus tests)         |
 
-## Partners and Subcontractors
+## Delivery and Advisory Team
 
-### Team Structure
+### Delivery Lead
 
-| Role                     | Team Member    | Responsibilities                                            | Status      |
-| ------------------------ | -------------- | ----------------------------------------------------------- | ----------- |
-| Project Lead / Architect | Austin Wallace | Architecture, data engineering, delivery oversight          | Committed   |
-| Senior Developer         | Will Siddal    | Frontend and backend development                            | Committed   |
-| Security Expert          | TBD            | Security review, penetration testing, compliance validation | In progress |
-| UX Designer              | TBD            | User research, interface refinement, accessibility audit    | In progress |
+| Role                              | Name           | Responsibilities                                                 | Status    |
+| --------------------------------- | -------------- | ---------------------------------------------------------------- | --------- |
+| Project Lead / Solution Architect | Austin Wallace | Architecture, data engineering, development, delivery governance | Committed |
+
+### Advisory Partners
+
+| Focus Area                  | Name            | Contribution                                  | Status    |
+| --------------------------- | --------------- | --------------------------------------------- | --------- |
+| Sport Sector Operations     | Soleil Heaney   | User perspective and workflow validation      | Committed |
+| Technical Architecture      | Will Siddall    | Architecture review and development support   | Committed |
+| UX and Accessibility        | Ruslan Hétu     | Design research and accessibility validation  | Committed |
+| Security and Risk           | Parul Kharub    | Security strategy and risk advisory           | Committed |
+| Security and Infrastructure | Michael Casinha | Infrastructure security review                | Committed |
+| Security and Compliance     | Tyler Piller    | Security operations and compliance validation | Committed |
 
 ### Oversight Mechanisms
 
@@ -72,7 +80,7 @@ Continuity is supported by:
 | -------------- | -------------- | ----------------------------------------- |
 | Austin Wallace | Teck Resources | Publicly traded resource sector           |
 | Austin Wallace | Clio           | Legal technology, public interest clients |
-| Will Siddal    | Teck Resources | Publicly traded resource sector           |
+| Will Siddall   | Teck Resources | Publicly traded resource sector           |
 
 ## Case Studies
 
@@ -80,7 +88,8 @@ Continuity is supported by:
 
 **Context:** viaSport requires replacement of BCAR and BCSI with a modern information system.
 
-**Approach:** Build a working prototype that meets the System Requirements Addendum and demonstrate performance at scale.
+**Approach:** Deliver a prototype that meets the System Requirements Addendum
+and demonstrate performance at scale.
 
 **Deliverables:**
 
@@ -117,25 +126,57 @@ Processed 10 million rows per game for NHL tracking data and supported multi-mil
 | Batch import worker     | On demand       | Process large imports with checkpointing    |
 | Health monitoring       | On demand       | Service health checks with alerts           |
 
-### AI Features (Roadmap)
+### AI Enablement Foundation (Built)
 
-AI features will be prioritized with viaSport during Planning:
+The platform includes a production-ready AI foundation layer that enables rapid delivery of AI features during the engagement. This infrastructure is fully implemented:
 
-| Feature                | Description                         | Benefit                 |
-| ---------------------- | ----------------------------------- | ----------------------- |
-| AI report narratives   | Generate summaries from submissions | Reduce manual reporting |
-| Natural language query | Ask questions in plain English      | Self-service analytics  |
-| Data quality AI        | Detect anomalies in submissions     | Improve integrity       |
-| Submission assistant   | Contextual form guidance            | Reduce errors           |
+| Component                    | Description                                                             |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| Provider registry            | Adapters for multiple LLM providers (Claude, OpenAI, Azure OpenAI)      |
+| Central AI service           | Unified interface with retries, timeouts, and error handling            |
+| Prompt template registry     | Versioned prompts with audit trail and rollback capability              |
+| Structured output validation | Zod schema validation ensuring AI responses match expected formats      |
+| Usage logging and costs      | Per-request tracking of tokens, latency, cost estimates by org and user |
+| Quota enforcement            | Rate limiting and budget controls per tenant and user                   |
+| Embedding support            | Vector generation for semantic search and document similarity           |
 
-AI is a roadmap item, not a day-one dependency.
+This foundation means AI features can be delivered in days rather than weeks, with consistent safety, observability, and cost controls from day one.
+
+### AI Feature Candidates
+
+The following AI features are included in the contract scope. During Planning, we will conduct UX research with viaSport staff and PSO representatives to determine which features deliver the highest value and should be prioritized for implementation.
+
+| Feature                  | Description                                                                                   | Target Users         | Value                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------- |
+| AI report narratives     | Generate natural language summaries from analytics dashboards for board reports and briefings | viaSport admins      | Reduce manual report writing by 60-80%  |
+| Natural language query   | Ask questions in plain English and receive structured answers from the data warehouse         | viaSport admins, PSO | Self-service analytics without SQL      |
+| AI dashboard builder     | Describe a visualization in words and generate chart configurations automatically             | viaSport admins      | Faster dashboard creation               |
+| Semantic document search | Search submissions and documents by meaning rather than exact keywords                        | All users            | Find relevant records faster            |
+| Data quality AI          | Detect anomalies and outliers in submissions with plain-language explanations                 | viaSport admins      | Catch errors before they affect reports |
+| Submission assistant     | Contextual guidance and suggestions while completing forms based on historical patterns       | PSO staff            | Reduce submission errors and rework     |
+
+### Prioritization Approach
+
+AI features will not be enabled without user research. Our approach:
+
+1. **Discovery interviews** with viaSport staff and PSO representatives to understand pain points
+2. **Value mapping** to identify which features address the highest-impact workflows
+3. **Prototype testing** of prioritized features with real users before production release
+4. **Iterative rollout** starting with the highest-value feature, gathering feedback before expanding
+
+The foundation work is complete. We will implement the AI features that drive real value for viaSport and PSOs based on what we learn during research.
 
 ## Responsible AI Approach
 
-- Transparent labeling of AI-generated content
-- Human review before publishing AI outputs
-- No model training on viaSport data without consent
-- Bias review and feedback mechanisms
+| Principle                | Implementation                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| Transparency             | All AI-generated content is clearly labeled; users see when AI assisted                   |
+| Human-in-the-loop        | AI outputs require human review before publishing or external sharing                     |
+| Privacy by design        | No PII in prompts; data aggregated or anonymized before AI processing                     |
+| No unauthorized training | viaSport data is never used for model training without explicit consent                   |
+| Bias mitigation          | Regular review of AI outputs for demographic or organizational bias                       |
+| Audit trail              | All AI requests logged with prompt version, user, timestamp, and response characteristics |
+| Data residency           | Canadian-region AI providers prioritized; fallback to providers with compliant policies   |
 
 ## Open Standards, APIs, and Open Source
 

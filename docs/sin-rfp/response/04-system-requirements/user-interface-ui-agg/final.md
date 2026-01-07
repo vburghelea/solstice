@@ -42,9 +42,7 @@
 Validate account flows during UAT and incorporate viaSport policy guidance.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-login-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-001-settings-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-002: Personalized Dashboard
 
@@ -76,8 +74,7 @@ Validate account flows during UAT and incorporate viaSport policy guidance.
 Refine dashboard widgets based on viaSport priorities.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-002-dashboard-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-003: Responsive and Inclusive Design
 
@@ -109,9 +106,7 @@ Refine dashboard widgets based on viaSport priorities.
 Run formal audit and remediate findings prior to submission.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-003-mobile-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/a11y-scan-20251231.json`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-004: Task and Notification Management
 
@@ -143,9 +138,7 @@ Run formal audit and remediate findings prior to submission.
 Tune reminder cadence with viaSport during Discovery.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-004-notifications-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/NOTIFICATIONS-DELIVERY-sin-dev-20251231.md`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-005: Content Navigation and Interaction
 
@@ -177,9 +170,7 @@ Tune reminder cadence with viaSport during Discovery.
 Expand search datasets as viaSport priorities are defined.
 
 **Evidence:**
-
-- `src/features/search/components/global-search-command-palette.tsx`
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-003-data-catalog-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-006: User Support and Feedback Mechanism
 
@@ -212,9 +203,7 @@ Expand search datasets as viaSport priorities are defined.
 Confirm SLA targets and escalation rules with viaSport.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-006-support-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/UI-AGG-006-support-admin-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## UI-AGG-007: Consistent Visual Language and Branding
 
@@ -250,5 +239,4 @@ Confirm SLA targets and escalation rules with viaSport.
 Apply viaSport branding during Discovery and validate in UAT.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/ADMIN-SIN-overview-20251228-1953.png`
+Evidence is summarized in Section 1.3.

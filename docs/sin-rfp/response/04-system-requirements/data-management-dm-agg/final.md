@@ -43,12 +43,10 @@
 - Final form templates and data dictionary.
 
 **Approach:**
-Template and field definitions will be finalized during Discovery. See Section 03 Data Submission and Reporting for UX approach.
+Template and field definitions will be finalized during Discovery. See **Service Approach: Data Submission and Reporting Web Portal** for UX approach.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-001-form-builder-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-001-forms-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## DM-AGG-002: Data Processing and Integration
 
@@ -82,12 +80,10 @@ Template and field definitions will be finalized during Discovery. See Section 0
 - Integration targets, API access, and data exchange requirements.
 
 **Approach:**
-Define integration scope during Discovery, then implement connectors and validation. See Section 03 Data Migration for methodology.
+Define integration scope during Discovery, then implement connectors and validation. See **Service Approach: Data Migration** for methodology.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/2025-12-29-import-preview-confirmation.png`
-- `src/features/imports/imports.mutations.ts`
+Evidence is summarized in Section 1.3.
 
 ## DM-AGG-003: Data Governance and Access Control
 
@@ -111,6 +107,12 @@ Define integration scope during Discovery, then implement connectors and validat
 - Data catalog and global search for forms, templates, and reports.
 - Admin access to data through audited BI and SQL workbench.
 
+### Data Catalog (What It Is)
+
+In Solstice, the Data Catalog is a searchable inventory of forms, fields, templates, reports, and saved analytics views, with permission-aware access. It helps users discover what data exists and where it is used. It is not a document management system. Uploaded files are stored in S3 and referenced from submissions and catalog entries through secure links and access controls.
+
+During discovery, we will confirm the proportion of structured submission data versus document-centric reporting and adjust catalog tagging and search priorities accordingly.
+
 **Remaining Scope:**
 
 - Catalog taxonomy and tagging refinement with viaSport (TBD).
@@ -120,12 +122,10 @@ Define integration scope during Discovery, then implement connectors and validat
 - Preferred catalog taxonomy and indexing priorities.
 
 **Approach:**
-Refine catalog categories during Discovery. See Section 03 Platform Design for governance approach.
+Refine catalog categories during Discovery. See **Service Approach: Platform Design and Customization** for governance approach.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-003-data-catalog-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-003-org-access-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## DM-AGG-004: Data Quality and Integrity
 
@@ -159,12 +159,10 @@ Refine catalog categories during Discovery. See Section 03 Platform Design for g
 - Data quality threshold preferences and escalation contacts.
 
 **Approach:**
-Configure thresholds during Discovery and validate in UAT. See Section 03 Testing and QA.
+Configure thresholds during Discovery and validate in UAT. See **Service Approach: Testing and Quality Assurance**.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-004-data-quality-20251228-1953.png`
-- `src/features/data-quality/data-quality.monitor.ts`
+Evidence is summarized in Section 1.3.
 
 ## DM-AGG-005: Data Storage and Retention
 
@@ -197,13 +195,10 @@ Configure thresholds during Discovery and validate in UAT. See Section 03 Testin
 - Confirm retention durations and DR schedule.
 
 **Approach:**
-Run final DR and retention validation in sin-perf or sin-prod. See Section 03 Data Warehousing.
+Run final DR and retention validation in sin-perf or sin-prod. See **Service Approach: Data Warehousing**.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DR-DRILL-sin-dev-20251230.md`
-- `docs/sin-rfp/review-plans/evidence/ENCRYPTION-STATUS-sin-dev-20251231.md`
-- `docs/sin-rfp/review-plans/evidence/RETENTION-JOB-sin-dev-20251230.md`
+Evidence is summarized in Sections 1.4 and 1.5.
 
 ## DM-AGG-006: Legacy Data Migration and Bulk Import
 
@@ -240,10 +235,7 @@ Run final DR and retention validation in sin-perf or sin-prod. See Section 03 Da
 - SME review for mapping templates.
 
 **Approach:**
-Finalize extraction approach during Discovery, then execute pilot and phased migration. See Section 03 Data Migration.
+Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-006-imports-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/DM-AGG-006-import-admin-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/2025-12-29-import-preview-confirmation.png`
+Evidence is summarized in Section 1.3.

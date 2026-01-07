@@ -4,99 +4,199 @@
 
 ### Austin Wallace Tech
 
-Austin Wallace Tech is a British Columbia based technology consulting firm incorporated in 2025 and headquartered in Victoria, BC. The company was founded to deliver information management solutions for the sport sector, with the Strength in Numbers platform as its primary engagement.
+Austin Wallace Tech is a British Columbia based technology consulting firm
+incorporated in 2025 and headquartered in Victoria, BC. The company was founded
+to deliver information management solutions for the sport sector, with the
+Strength in Numbers platform as its primary engagement.
 
-| Attribute     | Details                                     |
-| ------------- | ------------------------------------------- |
-| Incorporation | 2025                                        |
-| Headquarters  | Victoria, British Columbia                  |
-| Staff         | 1 principal plus contracted specialists     |
-| Structure     | Incorporated company with contracted team   |
-| Primary Focus | Sport sector information management systems |
+| Attribute      | Details                                                            |
+| -------------- | ------------------------------------------------------------------ |
+| Incorporation  | 2025                                                               |
+| Headquarters   | Victoria, British Columbia                                         |
+| Delivery Model | Austin Wallace Tech leads delivery, supported by advisory partners |
+| Team Coverage  | Security, UX and accessibility, data migration, delivery ops, QA   |
+| Primary Focus  | Sport sector information management systems                        |
 
-Austin Wallace Tech operates as a principal-led consultancy. The person who architected and built the working prototype will lead delivery through production. There are no hand-offs between sales, architecture, and delivery teams.
+Austin Wallace Tech leads delivery directly, supported by advisory partners
+who provide domain expertise, technical review, and validation. Work is
+managed through a shared backlog, sprint cadence, QA gates, and security
+sign-off. The solution architect leads delivery from discovery through rollout
+to avoid handoffs.
 
-## Principal: Austin Wallace, Project Lead and Data Engineer
+## Delivery Model
 
-Austin Wallace brings 9+ years of enterprise data engineering experience with executive leadership in amateur sport governance.
+### Core Delivery
 
-**Professional Experience**
+- **Austin Wallace**: Solution architecture, data engineering, development,
+  project management, and delivery governance.
 
-- **Clio (Aug 2024 to Present):** Data Engineer. Owns 10+ Databricks pipelines processing production workloads. Authored company-wide AI best practices guide.
-- **New Jersey Devils, NHL (May 2022 to Aug 2024):** Sole Data Developer. Built an end-to-end data platform processing 10 million rows per game of NHL tracking data. Developed 40+ dbt models supporting multi-million dollar player salary decisions.
-- **Teck Resources (Oct 2020 to May 2022):** Data Developer. Modernized legacy PostgreSQL stored procedures into testable Python pipelines using Terraform and Azure.
+### Advisory Partners
 
-**Sport Sector Leadership**
+| Focus Area                  | Advisor         | Contribution                                                 |
+| --------------------------- | --------------- | ------------------------------------------------------------ |
+| Sport Sector Operations     | Soleil Heaney   | User perspective and workflow validation from PSO experience |
+| Technical Architecture      | Will Siddall    | Architecture review and development support                  |
+| UX and Accessibility        | Ruslan Hétu     | Design research, interface review, accessibility validation  |
+| Security and Risk           | Parul Kharub    | Security strategy and risk advisory                          |
+| Security and Infrastructure | Michael Casinha | Infrastructure security and DevOps review                    |
+| Security and Compliance     | Tyler Piller    | Security operations and compliance validation                |
 
-- **Chair, Board of Directors, International Quidditch Association:** Led data and technology strategy for 30+ national governing bodies.
-- **CEO, Volunteer Media Organization:** Managed operations for a 70-person volunteer organization across 30 countries.
+## Relevant Delivery Portfolio
 
-**Education**
+### Austin Wallace Tech, Selected Relevant Delivery Work (examples)
 
-- **B.Sc., University of British Columbia:** Analytical Sports Management, a custom degree combining business, statistics, and machine learning.
+**Project: Legacy modernization (Teck Resources)**
 
-## Team Member: Will Siddal, Senior Developer
+- Scope: Replace brittle stored procedure workflows with testable pipelines.
+- Delivered: Python-based data workflows and infrastructure as code
+  deployments.
+- Responsibility: Data model changes, pipeline logic, Terraform, operational
+  handoff.
+- Outcome: Improved reliability and maintainability, reduced manual
+  intervention.
 
-Will Siddal brings 2+ years of full-stack development experience at Teck Resources, one of Canada's largest mining companies.
+**Project: High-volume sports data platform (New Jersey Devils)**
 
-**Professional Experience**
+- Scope: End-to-end platform for tracking data at game scale.
+- Delivered: Data pipelines and dbt models supporting decision workflows.
+- Responsibility: Architecture, pipeline implementation, modeling layer,
+  analytics consumers.
+- Outcome: Supported high-stakes decision making and large ingestion volumes.
 
-- **Teck Resources (2022 to 2024):** Full Stack Developer. Built reporting pipelines processing billions of rows annually. Developed internal tools using React and TypeScript. Managed AWS infrastructure using Terraform.
+**Project: Production data operations (Clio)**
 
-**Education**
+- Scope: Production pipelines and governance.
+- Delivered: Databricks pipelines and operational standards.
+- Responsibility: Pipeline ownership, quality controls, documentation, AI
+  usage guidance.
+- Outcome: Stable production workloads and standardized practices.
 
-- Simon Fraser University. Based in British Columbia.
+Austin Wallace is the delivery lead and solution architect for Solstice. He
+leads scope, architecture, and delivery governance for the platform and has 9+
+years of enterprise data engineering experience.
 
-## Additional Team Members
+## Advisory Partner Profiles
 
-Security Expert and UX Designer roles are in progress and will be named before submission. These positions will be filled with British Columbia based professionals with relevant enterprise experience.
+Advisory partners provide expertise and review. Short profiles are provided by
+each advisor.
 
-| Role            | Status |
-| --------------- | ------ |
-| Security Expert | TBD    |
-| UX Designer     | TBD    |
+### Soleil Heaney, Sport Sector Advisor
+
+[To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector
+experience and perspective they bring to the project]
+
+### Will Siddall, Technical Advisor
+
+[To be provided by Will Siddall - 2-3 sentences on relevant technical
+experience and their focus areas for this project]
+
+### Ruslan Hétu, UX and Accessibility Advisor
+
+[To be provided by Ruslan Hétu - 2-3 sentences on relevant design research
+experience and their focus areas for this project]
+
+### Parul Kharub, Security and Risk Advisor
+
+[To be provided by Parul Kharub - 2-3 sentences on relevant security
+experience and their focus areas for this project]
+
+### Michael Casinha, Security and Infrastructure Advisor
+
+[To be provided by Michael Casinha - 2-3 sentences on relevant infrastructure
+and security experience and their focus areas for this project]
+
+### Tyler Piller, Security and Compliance Advisor
+
+[To be provided by Tyler Piller - 2-3 sentences on relevant security
+operations experience and their focus areas for this project]
 
 ## Continuity of Services
 
 Continuity is supported by the architecture and delivery model:
 
-- **Infrastructure as Code:** All AWS resources are defined in SST and version controlled.
-- **Operational Runbooks:** Deployment and recovery procedures are documented and maintained.
-- **Automated Testing:** CI tests provide regression coverage for core workflows.
-- **Principal Accountability:** Austin Wallace remains the constant delivery lead through rollout.
+- **Infrastructure as Code:** All AWS resources are defined in SST and version
+  controlled.
+- **Operational Runbooks:** Deployment and recovery procedures are documented
+  and maintained.
+- **Automated Testing:** CI tests, including security vulnerability scanning,
+  provide regression coverage for core workflows.
+- **Delivery Governance:** Sprint cadence, backlog management, QA gates, and
+  release readiness checks.
+- **Principal Accountability:** Austin Wallace remains the constant delivery
+  lead through rollout.
 
-If a team member changes, the codebase, infrastructure definitions, and operational documentation enable efficient transition.
+If a team member changes, the codebase, infrastructure definitions, and
+operational documentation enable efficient transition.
 
 ## Proposed Solution Statement
 
-Austin Wallace Tech proposes the Solstice platform, a purpose-built information management system aligned to the Strength in Numbers requirements.
+Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable,
+and secure information management system aligned to the Strength in Numbers
+requirements.
 
 ### Key Differentiators
 
 **1. Working Prototype, Not a Proposal**
 
-A functional prototype already exists and is available for evaluation. It addresses the majority of System Requirements Addendum items today and has been load-tested at production scale with 20.1 million rows.
+A functional prototype already exists and is available for evaluation. It
+addresses the majority of System Requirements Addendum items today and has
+been load-tested at production scale with 20.1 million rows.
 
 **2. Principal-Led Delivery**
 
-The architect and primary developer of the prototype will lead delivery. This reduces knowledge transfer risk and provides direct accountability.
+The architect and primary developer of the prototype will lead delivery. This
+reduces knowledge transfer risk and provides direct accountability.
 
 **3. Domain Expertise in Sport Data**
 
-Austin Wallace combines enterprise data engineering experience with leadership in amateur sport governance. This team understands sport sector reporting and data governance from firsthand experience.
+The team combines enterprise data engineering with direct sport sector
+operations experience. Soleil Heaney brings perspective as a PSO executive,
+ensuring the platform reflects how sport organizations actually work.
+[Soleil to confirm wording]
 
 **4. British Columbia Based**
 
-The core team is based in British Columbia and remaining roles are expected to be BC based.
+The core team is based in British Columbia and remaining roles are expected to
+be BC based.
 
 **5. Canadian Data Residency**
 
-All data is hosted in AWS ca-central-1 (Canada). No data leaves Canadian jurisdiction.
+See Section 1.1, Data Residency and Privacy Summary.
+
+**6. Security and Privacy by Design**
+
+Security and privacy are built into delivery from discovery through operations.
+See Section 1.2, Security Model Summary.
+
+Our approach aligns with OWASP application security practices, including the
+OWASP Top 10 and OWASP ASVS as a verification framework.
+
+**Security by Design Approach**
+
+- **Security requirements up front:** Define security and privacy requirements
+  during discovery (access control, retention, audit, monitoring), then
+  validate them in the prototype and UAT.
+- **Threat modeling:** Run threat modeling for the core workflows
+  (authentication, imports, exports, delegated access) and track mitigations as
+  delivery items.
+- **Shift-left DevSecOps:** Automated code and dependency scanning in CI so
+  issues are found before deployment.
+- **Zero-trust access model:** MFA, RBAC, and organization scoping enforced
+  server-side for all data access.
+- **Data protection and Canadian hosting region:** See Section 1.1.
+- **Monitoring and anomaly response:** Detect suspicious authentication
+  patterns, alert administrators, and apply automated lockout controls.
+- **Immutable audit and integrity:** Tamper-evident audit logging and retention
+  controls to support forensic review and regulatory reporting.
 
 ### Benefits to viaSport
 
 - **Reduced Risk:** Evaluate a working system before committing.
-- **Accelerated Timeline:** 18 weeks to rollout because the platform exists today.
-- **Direct Accountability:** Principal-led delivery with no organizational layers.
-- **Sector Understanding:** Experience leading amateur sport organizations, not just building software.
-- **Sustainability:** Serverless architecture and infrastructure as code reduce operating overhead.
+- **Accelerated Timeline:** 18 weeks to rollout because the platform exists
+  today.
+- **Direct Accountability:** Principal-led delivery with no organizational
+  layers.
+- **Sector Understanding:** Experience leading amateur sport organizations, not
+  just building software.
+- **Sustainability:** Serverless architecture and infrastructure as code reduce
+  operating overhead.

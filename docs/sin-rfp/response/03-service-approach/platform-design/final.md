@@ -2,23 +2,24 @@
 
 ## Cloud Provider Services
 
-The platform is built on Amazon Web Services in the ca-central-1 (Montreal) region.
+The platform is built on Amazon Web Services in the ca-central-1 (Montreal)
+region. See Section 1.1 for data residency and privacy summary.
 
-| Service             | Purpose                                    |
-| ------------------- | ------------------------------------------ |
-| CloudFront          | CDN for static assets and edge caching     |
-| Lambda              | Serverless application compute             |
-| RDS PostgreSQL      | Managed relational database                |
-| ElastiCache Redis   | Rate limiting, caching, permissions        |
-| S3                  | Object storage for documents and imports   |
-| SQS                 | Message queues for notifications           |
-| ECS Fargate         | Batch import processing                    |
-| SES                 | Transactional email delivery               |
-| EventBridge         | Scheduled jobs for retention and reminders |
-| CloudWatch          | Metrics, logs, alarms                      |
-| CloudTrail          | API audit logging                          |
-| SSM Parameter Store | Credential storage                         |
-| KMS                 | Encryption key management                  |
+| Service           | Purpose                                    |
+| ----------------- | ------------------------------------------ |
+| CloudFront        | CDN for static assets and edge caching     |
+| Lambda            | Serverless application compute             |
+| RDS PostgreSQL    | Managed relational database                |
+| ElastiCache Redis | Rate limiting, caching, permissions        |
+| S3                | Object storage for documents and imports   |
+| SQS               | Message queues for notifications           |
+| ECS Fargate       | Batch import processing                    |
+| SES               | Transactional email delivery               |
+| EventBridge       | Scheduled jobs for retention and reminders |
+| CloudWatch        | Metrics, logs, alarms                      |
+| CloudTrail        | API audit logging                          |
+| Secrets Manager   | Credential storage (SST-managed)           |
+| KMS               | Encryption key management                  |
 
 ### Why AWS
 
@@ -51,13 +52,16 @@ Infrastructure is defined in TypeScript using SST. This provides:
 
 ### Environment Strategy
 
-| Environment | Purpose                 | Infrastructure Tier                         |
-| ----------- | ----------------------- | ------------------------------------------- |
-| sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                 |
-| sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ                |
-| sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups |
+| Environment | Purpose                 | Infrastructure Tier                                     |
+| ----------- | ----------------------- | ------------------------------------------------------- |
+| sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                             |
+| sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ, CloudTrail with alarms    |
+| sin-uat     | User Acceptance Testing | t4g.medium, 100 GB, single-AZ, CloudTrail with alarms   |
+| sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups, CloudTrail |
 
 Each environment is isolated with its own database, storage, and credentials.
+The sin-uat environment is available for viaSport evaluator access, while
+performance testing is executed in sin-perf.
 
 ### Development Workflow
 

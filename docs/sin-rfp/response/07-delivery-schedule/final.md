@@ -16,7 +16,9 @@ Austin Wallace Tech proposes an 18-week implementation timeline from contract si
 
 ### Why This Timeline is Achievable
 
-The prototype already covers the majority of system requirements, so remaining work focuses on discovery, migration, and production hardening.
+The core platform already covers the majority of system requirements (see
+Section 1.3), so remaining work focuses on discovery, migration, and production
+hardening.
 
 | Phase                       | Status           | Remaining Work                          |
 | --------------------------- | ---------------- | --------------------------------------- |
@@ -46,7 +48,7 @@ The prototype already covers the majority of system requirements, so remaining w
 
 **User Acceptance Testing (Weeks 9-12)**
 
-- UAT in sin-perf with production-like data
+- UAT in sin-uat with evaluator access
 - Test scenarios mapped to requirement IDs
 - Defect identification and resolution
 - Performance validation and security review (final runs TBD)
@@ -64,6 +66,8 @@ The prototype already covers the majority of system requirements, so remaining w
 - Live training sessions with Q and A
 - Support ramp-up and monitoring
 - Legacy systems archived
+
+See **Service Approach: Data Migration** for the detailed cutover plan, including data freeze window, hypercare period, and rollback criteria.
 
 ## Governance and Communications
 

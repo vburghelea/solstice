@@ -6,23 +6,24 @@
 
 The platform is hosted entirely on Amazon Web Services in a serverless architecture that reduces infrastructure overhead.
 
-| Component        | AWS Service         | Purpose                                    |
-| ---------------- | ------------------- | ------------------------------------------ |
-| Application Tier | Lambda              | Serverless compute, auto-scaling           |
-| Database         | RDS PostgreSQL      | Managed relational database                |
-| Caching          | ElastiCache Redis   | Rate limiting, BI caching, permissions     |
-| Object Storage   | S3                  | Documents, import files, audit archives    |
-| CDN              | CloudFront          | Edge caching, static asset delivery        |
-| Message Queue    | SQS                 | Asynchronous notification processing       |
-| Batch Processing | ECS Fargate         | Large file import processing               |
-| Email            | SES                 | Transactional email delivery               |
-| Scheduling       | EventBridge         | Scheduled jobs for retention and reminders |
-| Secrets          | SSM Parameter Store | Credential storage                         |
-| Encryption Keys  | KMS                 | Key management for encryption at rest      |
+| Component        | AWS Service       | Purpose                                    |
+| ---------------- | ----------------- | ------------------------------------------ |
+| Application Tier | Lambda            | Serverless compute, auto-scaling           |
+| Database         | RDS PostgreSQL    | Managed relational database                |
+| Caching          | ElastiCache Redis | Rate limiting, BI caching, permissions     |
+| Object Storage   | S3                | Documents, import files, audit archives    |
+| CDN              | CloudFront        | Edge caching, static asset delivery        |
+| Message Queue    | SQS               | Asynchronous notification processing       |
+| Batch Processing | ECS Fargate       | Large file import processing               |
+| Email            | SES               | Transactional email delivery               |
+| Scheduling       | EventBridge       | Scheduled jobs for retention and reminders |
+| Secrets          | Secrets Manager   | Credential storage (SST-managed)           |
+| Encryption Keys  | KMS               | Key management for encryption at rest      |
 
 ### Data Residency
 
-All data is hosted in AWS ca-central-1 (Canada). No data is stored or processed outside Canadian jurisdiction.
+Standard data residency assumptions are defined in Section 1.1. The table below
+lists the specific data stores and regions for this service approach.
 
 | Data Type            | Storage Location      | Region       |
 | -------------------- | --------------------- | ------------ |
@@ -30,6 +31,9 @@ All data is hosted in AWS ca-central-1 (Canada). No data is stored or processed 
 | Documents and files  | S3                    | ca-central-1 |
 | Audit archives       | S3 Deep Archive       | ca-central-1 |
 | Backups              | RDS automated backups | ca-central-1 |
+
+See Section 1.2 for the shared responsibility model and AWS Artifact
+references.
 
 ### Tenancy Model
 
@@ -78,7 +82,7 @@ No additional sub-processors are used.
 | Recovery Point Objective (RPO) | 1 hour (production) | Final production drill TBD             |
 | Recovery Time Objective (RTO)  | 4 hours             | sin-dev drill completed, final run TBD |
 
-Evidence for the latest DR drill is in `docs/sin-rfp/review-plans/evidence/DR-DRILL-sin-dev-20251230.md`.
+Evidence for the latest DR drill is summarized in Section 1.3.
 
 ### High Availability
 
@@ -90,7 +94,7 @@ Production uses Multi-AZ for automatic failover. Dev and perf use single-AZ for 
 
 **At Rest:** AES-256 via AWS KMS for database storage and S3 objects.
 
-Encryption evidence is documented in `docs/sin-rfp/review-plans/evidence/ENCRYPTION-STATUS-sin-dev-20251231.md`.
+Encryption evidence is summarized in Section 1.2.
 
 ### Audit Log Retention and Archival
 

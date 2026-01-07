@@ -43,9 +43,7 @@
 Collect templates during Discovery and load into the hub prior to UAT.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/TO-AGG-001-templates-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/TO-AGG-001-templates-admin-20251228-1953.png`
+Evidence is summarized in Section 1.3.
 
 ## TO-AGG-002: Guided Learning and Walkthroughs
 
@@ -78,9 +76,7 @@ Collect templates during Discovery and load into the hub prior to UAT.
 Refine tutorial copy and steps during Discovery and UAT.
 
 **Evidence:**
-
-- `src/features/tutorials/tutorials.config.ts`
-- `src/features/tutorials/components/tutorial-panel.tsx`
+Evidence is summarized in Section 1.3.
 
 ## TO-AGG-003: Reference Materials and Support
 
@@ -112,5 +108,4 @@ Refine tutorial copy and steps during Discovery and UAT.
 Review help content during Discovery and incorporate viaSport feedback.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/TO-AGG-003-help-center-20251228-1953.png`
+Evidence is summarized in Section 1.3.

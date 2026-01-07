@@ -1,13 +1,18 @@
 # System Requirements: Security (SEC-AGG)
 
+## Shared Responsibility Model
+
+See Section 1.2 for the shared responsibility summary and AWS Artifact
+references.
+
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                         | Remaining Scope                       |
-| ----------- | --------------------------------- | ------ | --------------------------------------------------- | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission              | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Redis rate limiting, pre-auth lockout, admin alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, residency, retention controls           | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                 | None                                  |
+| Req ID      | Title                             | Status | Built Today                                                               | Remaining Scope                       |
+| ----------- | --------------------------------- | ------ | ------------------------------------------------------------------------- | ------------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission                                    | None                                  |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Rate limiting, pre-auth lockout, CloudTrail CIS alarms, CloudWatch alerts | None                                  |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                          | Compliance package and pen test (TBD) |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                                       | None                                  |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -39,13 +44,10 @@
 - None. Fully implemented.
 
 **Approach:**
-Continue to validate flows during UAT. See Section 03 Testing and QA.
+Continue to validate flows during UAT. See **Service Approach: Testing and Quality Assurance**.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-login-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-mfa-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-001-roles-20251228-1953.png`
+Evidence is summarized in Section 1.2.
 
 ## SEC-AGG-002: Monitoring and Threat Detection
 
@@ -59,17 +61,24 @@ Continue to validate flows during UAT. See Section 03 Testing and QA.
 
 **How We Meet It:**
 
-- Security events are recorded with risk scores and thresholds.
+- Heuristic threat detection uses configurable thresholds to flag suspicious patterns.
+- CloudFront edge security provides DDoS protection, security headers, and
+  AWS WAF managed rules with rate limiting.
 - Failed logins trigger account flagging and lockouts.
-- Admins receive security alerts for anomalous behavior.
 - Rate limiting protects authentication and API endpoints.
+- CloudTrail with CIS Benchmark alarms detects infrastructure-level anomalies.
+- Admins receive security alerts for flagged activity.
 
 **Built Today:**
 
 - Pre-auth lockout gating blocks sign-in for locked users before authentication.
 - Rate limiting with Redis-backed sliding window algorithm (5 requests/15 min for auth, in-memory fallback).
 - Login failure thresholds: 5 failures in 15 minutes triggers 30-minute account lockout.
+- AWS WAF WebACL deployed on CloudFront with managed rules (CRS, SQLi, Known Bad
+  Inputs) and edge rate limiting.
 - Security event logging to `security_events` table with CloudWatch metrics.
+- CloudTrail audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes, VPC changes, unauthorized API calls).
+- CloudWatch alarms for anomalous request patterns and error rate spikes.
 - Admin notifications for login anomalies and account lockouts.
 
 **Remaining Scope:**
@@ -80,9 +89,7 @@ Continue to validate flows during UAT. See Section 03 Testing and QA.
 Security rules are tuned with viaSport and validated in UAT.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-002-security-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/SECURITY-LOCKOUT-sin-dev-20251231.md`
+Evidence is summarized in Section 1.2.
 
 ## SEC-AGG-003: Privacy and Regulatory Compliance
 
@@ -96,28 +103,28 @@ Security rules are tuned with viaSport and validated in UAT.
 
 **How We Meet It:**
 
-- Data is hosted in Canada with encryption in transit and at rest.
+- Data residency and privacy assumptions follow Section 1.1.
 - Role-based and field-level access controls protect PII.
 - Retention policies and legal holds support data minimization.
 
 **Built Today:**
 
-- Canadian data residency (ca-central-1).
+- Canadian hosting region (ca-central-1) for all primary data stores (see
+  Section 1.1).
 - AES-256 encryption via KMS for RDS and S3.
 - Retention enforcement and legal hold tooling.
+- CloudTrail API audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes).
 
 **Remaining Scope:**
 
 - Final compliance package and penetration test prior to submission (TBD).
 
 **Approach:**
-Provide compliance artifacts and independent test results in Appendix D prior to submission.
+Provide compliance artifacts and independent test results as noted in Section
+1.4 prior to submission.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-003-privacy-20251228-1953.png`
-- `docs/sin-rfp/review-plans/evidence/ENCRYPTION-STATUS-sin-dev-20251231.md`
-- `docs/sin-rfp/review-plans/evidence/2025-12-29-privacy-retention-legal-hold.png`
+Evidence is summarized in Section 1.2.
 
 ## SEC-AGG-004: Audit Trail and Data Lineage
 
@@ -146,9 +153,8 @@ Provide compliance artifacts and independent test results in Appendix D prior to
 - None. Fully implemented.
 
 **Approach:**
-Continue to validate audit integrity during UAT and provide evidence in Appendix D.
+Continue to validate audit integrity during UAT and provide evidence as noted
+in Section 1.2.
 
 **Evidence:**
-
-- `docs/sin-rfp/review-plans/evidence/SEC-AGG-004-audit-20251228-1953.png`
-- `src/lib/audit/__tests__/audit-hash-chain.pbt.test.ts`
+Evidence is summarized in Section 1.2.

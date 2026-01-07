@@ -12,6 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Quick Reference
 
 - **Playwright MCP**: Use for UI verification; see "Playwright MCP" section at end
+- **SST Console**: https://console.sst.dev/ausjndsfakjdnfakjdsfnak/solstice - View resources, deployments, logs
+- **New Environment Setup**: See `docs/runbooks/new-environment-setup.md` for standing up new stages
 - **Server Functions**: Always use `.inputValidator(schema.parse)` with Zod schemas
 - **Imports**: Avoid `@tanstack/react-start/server` in client code; use dynamic imports or `serverOnly()`
 - **Package**: Use `@tanstack/react-start` (not `@tanstack/start`)
@@ -198,6 +200,33 @@ AWS_PROFILE=techprod npx sst tunnel --stage qc-prod
 AWS_PROFILE=techprod npx sst tunnel --stage sin-prod
 ```
 
+**Troubleshooting SST Tunnel Issues:**
+
+```bash
+# Kill stale SST processes (connection refused on port 13558)
+pkill -f "sst" && sudo pkill -f "/opt/sst/tunnel"
+```
+
+**Common Gotchas (from sin-uat setup):**
+
+| Issue                    | Symptom                                           | Fix                                                      |
+| ------------------------ | ------------------------------------------------- | -------------------------------------------------------- |
+| **Stale bastion IP**     | "server closed connection unexpectedly"           | Run `sst deploy --stage <stage>` to update tunnel config |
+| **Multiple tunnels**     | Connection timeouts, wrong data                   | Kill ALL tunnels, run only ONE at a time                 |
+| **SST shell stage bug**  | Wrong DATABASE_URL returned                       | Pass env vars explicitly, don't trust `sst shell` output |
+| **Login downloads file** | Browser downloads instead of rendering login page | Clear browser cookies (session from different stage)     |
+
+**Diagnosing stale bastion IP:**
+
+```bash
+# Check what IP the tunnel is using (shown when tunnel starts)
+# Then verify that IP exists:
+AWS_PROFILE=techdev aws ec2 describe-instances --region ca-central-1 \
+  --filters "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].{Name:Tags[?Key==`Name`].Value|[0],PublicIP:PublicIpAddress}'
+# If tunnel IP doesn't match any instance, redeploy: sst deploy --stage <stage>
+```
+
 #### Accessing the Dev Database
 
 With the tunnel running, you can:
@@ -291,11 +320,26 @@ There are three seed/reset scripts with different purposes:
    - Resets SIN domain data while preserving fixed test users + audit logs
    - Uses stable IDs so it can be re-run without breaking log references
    - Use for `sin-dev` local testing (requires tunnel or SST dev running)
+   - **CRITICAL:** Must include `BETTER_AUTH_SECRET` for MFA to work (see warning below)
 
    ```bash
    # For sin-dev only (uses DATABASE_URL via SST shell or --force)
    npx tsx scripts/seed-sin-data.ts --force
    ```
+
+   **WARNING: MFA Seeding Requires BETTER_AUTH_SECRET**
+
+   When seeding a new environment, you MUST include `BETTER_AUTH_SECRET` or MFA will silently fail:
+
+   ```bash
+   # Get the secret first
+   AWS_PROFILE=techdev npx sst secret list --stage <stage> | grep BetterAuthSecret
+
+   # Then seed with both env vars
+   DATABASE_URL="postgresql://..." BETTER_AUTH_SECRET="<secret>" npx tsx scripts/seed-sin-data.ts --force
+   ```
+
+   Without `BETTER_AUTH_SECRET`, TOTP secrets are stored unencrypted and verification returns 200 with empty body (no navigation). See `docs/runbooks/new-environment-setup.md` for the full process.
 
 4. **`scripts/hard-reset-dev.ts`** - Hard reset for dev databases
    - **Truncates all tables including audit logs** (guarded)
@@ -692,3 +736,5 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 
 - **Project docs**: `docs/quadball-plan/*`
 - **Development backlog**: `docs/development-backlog.md`
+- **Runbooks**: `docs/runbooks/` - Operational guides for common tasks
+  - `new-environment-setup.md` - Standing up new stages (sin-uat, qc-perf, etc.)

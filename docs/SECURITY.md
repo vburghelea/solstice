@@ -6,7 +6,7 @@ This document outlines the security measures implemented in the Solstice applica
 
 The application implements multiple layers of security:
 
-1. **Security Headers** - Applied via Netlify Edge Functions
+1. **Security Headers** - Applied via CloudFront Response Headers Policy (SST/AWS)
 2. **Secure Cookie Configuration** - Enhanced Better Auth settings
 3. **Rate Limiting** - Protection against brute force attacks
 4. **Password Validation** - Strong password requirements
@@ -14,11 +14,15 @@ The application implements multiple layers of security:
 
 ## Security Headers
 
-Security headers are automatically applied to all responses via a Netlify Edge Function located at `netlify/edge-functions/security-headers.ts`.
+Security headers are applied at the CDN layer via a CloudFront Response Headers
+Policy configured in `sst.config.ts`. Local development responses (Vite on
+localhost) do not include these headers.
 
 ### Applied Headers:
 
-- **Content-Security-Policy**: Restricts resource loading with nonce-based script validation and `strict-dynamic`
+- **Content-Security-Policy**: Static policy applied at CloudFront. Currently allows
+  `unsafe-inline` for scripts/styles; follow-up work should tighten this with a
+  nonce-based policy.
 - **X-Frame-Options**: DENY - Prevents clickjacking attacks
 - **X-Content-Type-Options**: nosniff - Prevents MIME type sniffing
 - **Referrer-Policy**: strict-origin-when-cross-origin - Controls referrer information
@@ -113,19 +117,20 @@ const strength = getPasswordStrength(password);
 The CSP is configured to:
 
 - Allow self-hosted resources by default
-- Use nonces for inline scripts together with `'strict-dynamic'`
+- Allow inline scripts/styles temporarily (`unsafe-inline`) until nonce support lands
 - Explicitly block embedding via `frame-ancestors 'none'`
-- Allow only the external origins required for Square, Google OAuth, and analytics
+- Allow only the external origins required for Square
 - Prevent object/embed elements
-- Enforce HTTPS upgrades and optionally report violations via `report-uri`
+- Enforce HTTPS upgrades
+- CSP reporting is not yet enabled
 
-### Nonce Implementation
+### Nonce-Based CSP (Planned)
 
-The edge function automatically:
-
-1. Generates a unique nonce for each request
-2. Injects the nonce into all script tags
-3. Includes the nonce in the CSP header
+Nonce-based CSP is not implemented yet. The router already reads a nonce when
+it is present in the document, but the app does not currently generate or inject
+one. To move to a strict CSP, we will need per-request nonce generation and a
+server-side injection path (for example via Lambda@Edge or app-level HTML
+templating).
 
 ## Environment Variables
 
@@ -150,12 +155,13 @@ Security features that differ between environments:
 - Cookies use HTTP (not HTTPS-only)
 - Email verification not required
 - CSP may be more permissive
+- CloudFront security headers are not applied to localhost
 
 ### Production
 
 - Cookies are HTTPS-only
 - Email verification required
-- Strict CSP enforcement
+- CSP enforced at the CDN layer
 - HSTS header with preloading
 
 ## Testing Security
@@ -173,4 +179,5 @@ Consider implementing:
 1. **Web Application Firewall (WAF)** - Additional protection layer
 2. **Security Monitoring** - Log and alert on security events
 3. **2FA/MFA** - Two-factor authentication
-4. **API Key Management** - For service-to-service auth
+4. **CORP for Signed Downloads** - Apply CORP headers to signed S3 downloads
+5. **API Key Management** - For service-to-service auth

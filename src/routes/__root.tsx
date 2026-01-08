@@ -232,10 +232,14 @@ function RootDocument({
         <Suspense fallback={null}>
           <Toaster richColors closeButton />
         </Suspense>
-        <Suspense fallback={null}>
-          <ReactQueryDevtools buttonPosition="bottom-left" />
-          <TanStackRouterDevtools position="bottom-right" />
-        </Suspense>
+        {/* DevTools hydration fix: wrap in div with suppressHydrationWarning */}
+        {/* because these components add aria-hidden attributes that differ between SSR and client */}
+        <div suppressHydrationWarning>
+          <Suspense fallback={null}>
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <TanStackRouterDevtools position="bottom-right" />
+          </Suspense>
+        </div>
 
         <Scripts />
       </body>

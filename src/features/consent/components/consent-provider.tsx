@@ -21,40 +21,47 @@ export function ConsentProvider({
   user: AuthUser | null;
 }) {
   const options = useMemo<ConsentManagerOptions>(
-    () => ({
-      mode: "c15t",
-      backendURL: "/api/c15t",
-      consentCategories: consentCategoryIds,
-      translations: consentTranslations,
-      ignoreGeoLocation: import.meta.env.DEV,
-      callbacks: {
-        async onConsentSet({ preferences }) {
-          setConsentStateSnapshot(preferences);
+    () =>
+      ({
+        // Use offline mode in development to avoid backend initialization errors
+        // In production, use backend mode to sync consent across devices
+        mode: import.meta.env.DEV ? "offline" : "c15t",
+        ...(import.meta.env.DEV
+          ? {}
+          : {
+              backendURL: "/api/c15t",
+            }),
+        consentCategories: consentCategoryIds,
+        translations: consentTranslations,
+        ignoreGeoLocation: import.meta.env.DEV,
+        callbacks: {
+          async onConsentSet({ preferences }) {
+            setConsentStateSnapshot(preferences);
 
-          if (!isAnalyticsEnabled()) {
-            return;
-          }
-
-          try {
-            const posthog = await getPostHogInstance();
-            if (!posthog) {
+            if (!isAnalyticsEnabled()) {
               return;
             }
 
-            if (preferences.measurement) {
-              posthog.opt_in_capturing();
-            } else {
-              posthog.opt_out_capturing();
+            try {
+              const posthog = await getPostHogInstance();
+              if (!posthog) {
+                return;
+              }
+
+              if (preferences.measurement) {
+                posthog.opt_in_capturing();
+              } else {
+                posthog.opt_out_capturing();
+              }
+            } catch (error) {
+              console.error("Failed to sync PostHog consent:", error);
             }
-          } catch (error) {
-            console.error("Failed to sync PostHog consent:", error);
-          }
+          },
         },
-      },
-      react: {
-        colorScheme: "system",
-      },
-    }),
+        react: {
+          colorScheme: "system",
+        },
+      }) as ConsentManagerOptions,
     [],
   );
 

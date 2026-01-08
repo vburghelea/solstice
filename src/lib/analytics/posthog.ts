@@ -30,6 +30,13 @@ export function initializePostHogClient(): void {
     return;
   }
 
+  // Disable PostHog in development to avoid CORS errors from CDN
+  // PostHog's CDN doesn't send proper CORS headers for config.js in development
+  if (import.meta.env.DEV) {
+    console.info("PostHog is disabled in development to avoid CORS errors");
+    return;
+  }
+
   if (!env.VITE_POSTHOG_KEY) {
     console.warn(
       "PostHog not configured. Missing VITE_POSTHOG_KEY environment variable.",

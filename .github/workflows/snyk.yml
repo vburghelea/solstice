@@ -17,27 +17,41 @@ jobs:
     name: Dependency scan
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    if: ${{ secrets.SNYK_TOKEN != '' }}
 
     steps:
+      - name: Check for Snyk token
+        id: check-token
+        run: |
+          if [ -z "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "SNYK_TOKEN not set, skipping scan"
+            echo "has_token=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
+        if: steps.check-token.outputs.has_token == 'true'
         uses: actions/checkout@v4
 
       - name: Setup pnpm
+        if: steps.check-token.outputs.has_token == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
+        if: steps.check-token.outputs.has_token == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
 
       - name: Install dependencies
+        if: steps.check-token.outputs.has_token == 'true'
         run: pnpm install --frozen-lockfile
         env:
           BETTER_AUTH_SECRET: 0123456789abcdef0123456789abcdef
 
       - name: Run Snyk (all projects)
+        if: steps.check-token.outputs.has_token == 'true'
         uses: snyk/actions/node@v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

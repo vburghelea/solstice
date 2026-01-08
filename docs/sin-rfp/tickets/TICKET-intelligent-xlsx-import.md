@@ -613,9 +613,192 @@ CREATE INDEX idx_import_job_cell_edits_job ON import_job_cell_edits(job_id);
 
 ### In Progress / Open
 
-- Admin UI for managing `import_templates` (columns, defaults, versioning)
 - Referential checks beyond `organizationId` (needs form metadata contract)
-- Error category confidence tuning and additional pattern detectors
+
+---
+
+## Admin UX Enhancements (2026-01-08)
+
+This section documents the Import Admin UX Enhancement work completed to improve the
+admin experience, error confidence calculation, and overall polish.
+
+### Summary
+
+Enhanced the import admin experience with:
+1. Centralized pattern detection with 13 pattern types
+2. Dynamic confidence calculation replacing hardcoded values
+3. Tabbed admin layout with dedicated template and history management
+4. Visual progress stepper for import workflow
+5. Confidence badges with explanatory tooltips
+
+### New Files Created
+
+| File | Purpose |
+|------|---------|
+| `src/features/imports/pattern-detectors.ts` | Centralized pattern detection module with 13 patterns |
+| `src/features/imports/components/import-templates-panel.tsx` | Template CRUD UI with search, download, delete |
+| `src/features/imports/components/import-jobs-panel.tsx` | Job history with filtering, status badges, rollback |
+| `src/features/imports/__tests__/pattern-detectors.test.ts` | 54 unit tests for pattern detection |
+
+### Modified Files
+
+| File | Changes |
+|------|---------|
+| `src/features/imports/error-analyzer.ts` | Use centralized patterns, dynamic confidence, `confidenceReason` field |
+| `src/routes/dashboard/admin/sin/imports.tsx` | 3-tab layout (Import, Templates, History), URL query param persistence |
+| `src/features/imports/components/categorized-errors.tsx` | Confidence badges, tooltips explaining reasoning |
+| `src/features/imports/components/smart-import-wizard.tsx` | Progress stepper showing Upload→Map→Review→Import flow |
+
+### Pattern Detectors Module
+
+New centralized module (`pattern-detectors.ts`) with 13 pattern types:
+
+```typescript
+export const patterns = {
+  email: isEmail,           // RFC-compliant email check
+  isoDate: isIsoDate,       // YYYY-MM-DD
+  usDate: isUsDate,         // M/D/YYYY or MM/DD/YYYY
+  euDate: isEuDate,         // D.M.YYYY or DD.MM.YYYY
+  dateLike: isDateLike,     // Any common date format
+  number: isNumber,         // Integers/decimals with optional thousands separators
+  boolean: isBoolean,       // true/false/yes/no/y/n/1/0/on/off/enabled/disabled
+  phone: isPhone,           // Various formats, 7-15 digits
+  currency: isCurrency,     // $, €, £, ¥, ₹ with proper formatting
+  percentage: isPercentage, // 75% or 0.75 decimal form
+  url: isUrl,               // http/https links
+  postalCode: isPostalCode, // US (12345, 12345-6789) and Canada (A1A 1A1)
+  uuid: isUuid,             // Standard UUID format
+} as const;
+```
+
+**Helper functions:**
+- `analyzePatterns(values)` - Returns match ratios for all pattern types
+- `detectBestPattern(values, threshold)` - Finds highest matching pattern above threshold
+- `getHeaderHint(header)` - Extracts type hints from column headers (e.g., "Email" → email)
+- `calculateConfidence(params)` - Dynamic confidence based on multiple factors
+
+### Dynamic Confidence Calculation
+
+Replaced hardcoded confidence values (0.85, 0.9) with a dynamic calculation:
+
+```typescript
+export function calculateConfidence(params: {
+  patternMatchRatio: number;    // 0-1: % of values matching expected pattern
+  headerHintMatch: boolean;     // Column name contains type keyword
+  conflictingPatterns: number;  // How many other patterns also match well
+  sampleSize: number;           // Number of non-empty values tested
+}): number {
+  // Base confidence from pattern match ratio (60% weight)
+  let confidence = params.patternMatchRatio * 0.6;
+
+  // Bonus for header hint matching (up to +20%)
+  if (params.headerHintMatch) confidence += 0.2;
+
+  // Penalty for conflicting patterns (multiple patterns match well)
+  if (params.conflictingPatterns > 1) confidence -= 0.15;
+
+  // Sample size adjustment
+  if (params.sampleSize < 5) confidence -= 0.1;
+  else if (params.sampleSize >= 20) confidence += 0.05;
+
+  return Math.max(0, Math.min(1, confidence));
+}
+```
+
+**Rationale:**
+- Pattern match ratio is the primary signal (60% weight)
+- Header hints add confidence when column name matches expected type
+- Ambiguous patterns (multiple types match) reduce confidence
+- Small samples are less reliable; large samples boost confidence
+- Result always clamped to 0-1 range
+
+### Confidence Badges
+
+Added visual confidence indicators to autofix buttons:
+
+- **≥90% (green)**: High confidence with sparkle icon
+- **70-90% (secondary)**: Medium confidence, standard button
+- **<70% (outline)**: Low confidence, outline button only
+
+Each badge includes a tooltip explaining the reasoning:
+```
+"85% pattern match, column name matches type, large sample size"
+```
+
+### Progress Stepper
+
+Added visual progress indicator to the import wizard showing 4 phases:
+
+1. **Upload** - Select organization, form, and file
+2. **Map** - Map columns to form fields
+3. **Review** - Review errors and apply autofixes
+4. **Import** - Execute the import
+
+Step completion is calculated dynamically:
+- Upload complete: org + form + file parsed
+- Map complete: mappings defined + import job created
+- Review complete: analysis shows no blocking errors
+- Import complete: job status is "completed"
+
+### Tabbed Admin Layout
+
+Restructured `/dashboard/admin/sin/imports` with 3 tabs:
+
+**Tab 1: Import Wizard**
+- Original SmartImportWizard with progress stepper
+- Main workflow for running imports
+
+**Tab 2: Templates**
+- Card-based list with search/filter
+- Download templates (XLSX/CSV format selector)
+- Delete with confirmation dialog
+- Version warning badges when form schema has changed
+
+**Tab 3: Import History**
+- Table with columns: Status, Type, Rows, Created, Duration, Actions
+- Color-coded status badges with icons
+- Expandable error details (collapsible inline)
+- Rollback button (available within 24 hours of completion)
+- Filter by status dropdown
+
+Tab state persisted in URL: `?tab=wizard|templates|history`
+
+### Test Coverage
+
+Created comprehensive test suite with 54 tests covering:
+- All 13 pattern detectors (positive and negative cases)
+- Pattern analysis functions
+- Header hint detection
+- Confidence calculation with all factor combinations
+- Edge cases (empty arrays, whitespace, case sensitivity)
+
+All 61 import-related tests pass:
+```
+✓ src/features/imports/__tests__/pattern-detectors.test.ts (54 tests)
+✓ src/features/imports/__tests__/error-analyzer.test.ts (1 test)
+✓ src/features/imports/__tests__/imports.utils.test.ts (4 tests)
+✓ src/features/imports/__tests__/autofix-engine.test.ts (2 tests)
+```
+
+### Why These Changes
+
+1. **Pattern detectors module**: Centralizes pattern matching logic that was duplicated
+   across error-analyzer. New patterns (phone, currency, percentage, URL, postal code,
+   UUID) enable detection of more column type mismatches.
+
+2. **Dynamic confidence**: Hardcoded confidence (0.85, 0.9) didn't account for actual
+   data quality signals. Dynamic calculation uses pattern match ratio, header hints,
+   conflicting patterns, and sample size to produce more accurate confidence scores.
+
+3. **Tabbed layout**: Original single-page wizard buried template management and had
+   no dedicated job history view. Tabs provide clear separation of concerns and make
+   template management discoverable.
+
+4. **Progress stepper**: Users had no visual indication of where they were in the
+   multi-step import flow. Stepper provides orientation and shows completion status.
+
+5. **Confidence badges**: Users couldn't see why an autofix was suggested. Badges
+   with tooltips provide transparency into the system's reasoning.
 
 ---
 

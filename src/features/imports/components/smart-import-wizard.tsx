@@ -1,6 +1,8 @@
 import { useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { Check, FileUp, GitCompare, Play, Search } from "lucide-react";
+import { cn } from "~/shared/lib/utils";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedFileUpload } from "~/components/form-fields/ValidatedFileUpload";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
@@ -94,6 +96,88 @@ const autoMapHeaders = (
 };
 
 const buildCellKey = (rowIndex: number, header: string) => `${rowIndex}:${header}`;
+
+/**
+ * Visual progress indicator showing import workflow steps.
+ */
+const WIZARD_STEPS = [
+  { id: "upload", label: "Upload", icon: FileUp },
+  { id: "map", label: "Map", icon: GitCompare },
+  { id: "review", label: "Review", icon: Search },
+  { id: "import", label: "Import", icon: Play },
+] as const;
+
+type WizardStepId = (typeof WIZARD_STEPS)[number]["id"];
+
+function ProgressStepper({
+  currentStep,
+  completedSteps,
+}: {
+  currentStep: WizardStepId;
+  completedSteps: Set<WizardStepId>;
+}) {
+  const currentIndex = WIZARD_STEPS.findIndex((s) => s.id === currentStep);
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between">
+        {WIZARD_STEPS.map((step, index) => {
+          const isCompleted = completedSteps.has(step.id);
+          const isCurrent = step.id === currentStep;
+          const isPast = index < currentIndex;
+          const Icon = step.icon;
+
+          return (
+            <div key={step.id} className="flex flex-1 items-center">
+              <div className="flex flex-col items-center">
+                <div
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors",
+                    isCompleted
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : isCurrent
+                        ? "border-primary bg-background text-primary"
+                        : isPast
+                          ? "border-muted-foreground/50 bg-muted text-muted-foreground"
+                          : "border-muted bg-background text-muted-foreground",
+                  )}
+                >
+                  {isCompleted ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    <Icon className="h-5 w-5" />
+                  )}
+                </div>
+                <span
+                  className={cn(
+                    "mt-2 text-xs font-medium",
+                    isCurrent
+                      ? "text-primary"
+                      : isCompleted || isPast
+                        ? "text-foreground"
+                        : "text-muted-foreground",
+                  )}
+                >
+                  {step.label}
+                </span>
+              </div>
+              {index < WIZARD_STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "mx-2 h-0.5 flex-1 transition-colors",
+                    index < currentIndex || completedSteps.has(WIZARD_STEPS[index + 1].id)
+                      ? "bg-primary"
+                      : "bg-muted",
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const generateCorrectedFile = async (
   rows: JsonRecord[],
@@ -561,8 +645,58 @@ export function SmartImportWizard() {
 
   const previewRows = rows.slice(0, 10);
 
+  // Calculate current step and completed steps for progress stepper
+  const { currentStep, completedSteps } = useMemo(() => {
+    const completed = new Set<WizardStepId>();
+
+    // Upload is complete when we have a file parsed
+    const uploadComplete =
+      Boolean(selectedOrganizationId) &&
+      Boolean(selectedFormId) &&
+      Boolean(sourceFileKey) &&
+      headers.length > 0;
+
+    // Map is complete when we have mappings defined
+    const mappingComplete =
+      uploadComplete &&
+      Object.values(mapping).filter(Boolean).length > 0 &&
+      Boolean(importJobId);
+
+    // Review is complete when analysis shows no errors or user has proceeded
+    const reviewComplete = mappingComplete && analysis && analysis.canProceed;
+
+    // Import is complete when job status is completed
+    const importComplete =
+      importJobs.find((j) => j.id === importJobId)?.status === "completed";
+
+    if (uploadComplete) completed.add("upload");
+    if (mappingComplete) completed.add("map");
+    if (reviewComplete) completed.add("review");
+    if (importComplete) completed.add("import");
+
+    // Determine current step
+    let current: WizardStepId = "upload";
+    if (uploadComplete && !mappingComplete) current = "map";
+    else if (mappingComplete && !reviewComplete) current = "review";
+    else if (reviewComplete && !importComplete) current = "import";
+    else if (importComplete) current = "import";
+
+    return { currentStep: current, completedSteps: completed };
+  }, [
+    selectedOrganizationId,
+    selectedFormId,
+    sourceFileKey,
+    headers.length,
+    mapping,
+    importJobId,
+    analysis,
+    importJobs,
+  ]);
+
   return (
     <div className="space-y-6">
+      <ProgressStepper currentStep={currentStep} completedSteps={completedSteps} />
+
       <Card>
         <CardHeader>
           <CardTitle>Import setup</CardTitle>

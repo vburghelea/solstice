@@ -1,5 +1,13 @@
+import { Info, Sparkles, Wand2 } from "lucide-react";
 import type { AnalysisResult, CategorizedError } from "~/features/imports/error-analyzer";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 interface CategorizedErrorsProps {
   analysis: AnalysisResult;
@@ -14,6 +22,48 @@ const categoryLabels: Record<CategorizedError["category"], string> = {
   completeness: "Completeness Issues",
   referential: "Referential Issues",
 };
+
+/**
+ * Display confidence level with color-coded badge and optional tooltip.
+ */
+function ConfidenceBadge({
+  confidence,
+  reason,
+}: {
+  confidence: number;
+  reason?: string;
+}) {
+  const percent = Math.round(confidence * 100);
+
+  // Color based on confidence level
+  const variant: "default" | "secondary" | "outline" =
+    confidence >= 0.9 ? "default" : confidence >= 0.7 ? "secondary" : "outline";
+
+  const badgeContent = (
+    <Badge variant={variant} className="gap-1 text-xs">
+      {confidence >= 0.9 && <Sparkles className="h-3 w-3" />}
+      {percent}%
+    </Badge>
+  );
+
+  if (!reason) {
+    return badgeContent;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="cursor-help">{badgeContent}</span>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs">
+        <div className="flex items-start gap-2">
+          <Info className="mt-0.5 h-3 w-3 shrink-0" />
+          <p className="text-xs">{reason}</p>
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
 export function CategorizedErrors(props: CategorizedErrorsProps) {
   const visibleErrors = props.analysis.errors.filter(
@@ -50,14 +100,40 @@ export function CategorizedErrors(props: CategorizedErrorsProps) {
                     <p className="text-xs text-muted-foreground">{error.details}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {error.autofix && error.autofix.confidence >= 0.8 ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => props.onAutofix(error)}
-                      >
-                        Autofix
-                      </Button>
+                    {error.autofix ? (
+                      <TooltipProvider>
+                        <div className="flex items-center gap-1">
+                          <ConfidenceBadge
+                            confidence={error.autofix.confidence}
+                            {...(error.autofix.confidenceReason && {
+                              reason: error.autofix.confidenceReason,
+                            })}
+                          />
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant={
+                                  error.autofix.confidence >= 0.8 ? "default" : "outline"
+                                }
+                                className="gap-1"
+                                onClick={() => props.onAutofix(error)}
+                              >
+                                <Wand2 className="h-3 w-3" />
+                                Autofix
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p className="font-medium">{error.autofix.preview}</p>
+                              {error.autofix.confidenceReason && (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                  {error.autofix.confidenceReason}
+                                </p>
+                              )}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
                     ) : null}
                     <Button
                       size="sm"

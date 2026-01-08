@@ -7,6 +7,25 @@ import {
   type ImportParseError,
   parseImportRow,
 } from "~/features/imports/imports.utils";
+import {
+  analyzePatterns,
+  calculateConfidence,
+  getHeaderHint,
+  isBoolean,
+  isCurrency,
+  isDateLike,
+  isEmail,
+  isEuDate,
+  isIsoDate,
+  isNumber,
+  isPercentage,
+  isPhone,
+  isPostalCode,
+  isUrl,
+  isUsDate,
+  isUuid,
+  type PatternType,
+} from "~/features/imports/pattern-detectors";
 import type { JsonRecord } from "~/shared/lib/json";
 
 export type ErrorCategory =
@@ -35,6 +54,7 @@ export interface CategorizedError {
   autofix?: {
     type: AutofixType;
     confidence: number;
+    confidenceReason?: string;
     preview: string;
     params: Record<string, unknown>;
   };
@@ -64,13 +84,18 @@ type RowIssue = {
 const toKey = (fieldKey: string | null, errorType: string) =>
   `${fieldKey ?? "row"}:${errorType}`;
 
-const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-const isIsoDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
-const isUsDate = (value: string) => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value);
-const isNumberLike = (value: string) =>
-  /^-?\d{1,3}(,\d{3})*(\.\d+)?$/.test(value.trim()) || /^-?\d+(\.\d+)?$/.test(value);
-const isBooleanLike = (value: string) =>
-  ["true", "false", "yes", "no", "y", "n", "1", "0"].includes(value.toLowerCase());
+/**
+ * Map form field types to their expected pattern types.
+ */
+const FIELD_TYPE_TO_PATTERN: Record<string, PatternType[]> = {
+  email: ["email"],
+  date: ["isoDate", "usDate", "euDate", "dateLike"],
+  number: ["number", "currency", "percentage"],
+  checkbox: ["boolean"],
+  text: ["phone", "url", "postalCode", "uuid"],
+  url: ["url"],
+  tel: ["phone"],
+};
 
 const detectDateFormatMismatch = (
   rows: JsonRecord[],
@@ -88,9 +113,24 @@ const detectDateFormatMismatch = (
       .map((value) => value.trim())
       .filter(Boolean);
     if (values.length === 0) return;
+
+    const patternRatios = analyzePatterns(values);
+    const usDateRatio = patternRatios.usDate;
+    const euDateRatio = patternRatios.euDate;
+    const isoDateRatio = patternRatios.isoDate;
+    const headerHint = getHeaderHint(header);
     const usDateCount = values.filter(isUsDate).length;
-    const isoDateCount = values.filter(isIsoDate).length;
-    if (usDateCount > 0 && isoDateCount === 0) {
+    const euDateCount = values.filter(isEuDate).length;
+
+    // Check for US date format (MM/DD/YYYY)
+    if (usDateRatio > 0.5 && isoDateRatio < 0.2) {
+      const confidence = calculateConfidence({
+        patternMatchRatio: usDateRatio,
+        headerHintMatch: headerHint === "dateLike",
+        conflictingPatterns: euDateRatio > 0.3 ? 1 : 0,
+        sampleSize: values.length,
+      });
+
       errors.push({
         id: createId(),
         category: "data_quality",
@@ -103,7 +143,12 @@ const detectDateFormatMismatch = (
         sampleValues: values.slice(0, 3),
         autofix: {
           type: "convert_date_format",
-          confidence: 0.9,
+          confidence,
+          confidenceReason: buildConfidenceReason({
+            patternMatchRatio: usDateRatio,
+            headerHintMatch: headerHint === "dateLike",
+            sampleSize: values.length,
+          }),
           preview: `Convert ${usDateCount} values from MM/DD/YYYY to YYYY-MM-DD`,
           params: {
             column: header,
@@ -113,8 +158,134 @@ const detectDateFormatMismatch = (
         },
       });
     }
+
+    // Check for EU date format (DD.MM.YYYY)
+    if (euDateRatio > 0.5 && isoDateRatio < 0.2) {
+      const confidence = calculateConfidence({
+        patternMatchRatio: euDateRatio,
+        headerHintMatch: headerHint === "dateLike",
+        conflictingPatterns: usDateRatio > 0.3 ? 1 : 0,
+        sampleSize: values.length,
+      });
+
+      errors.push({
+        id: createId(),
+        category: "data_quality",
+        severity: "error",
+        code: "DATE_FORMAT_MISMATCH",
+        summary: `Date format mismatch in "${field.label}"`,
+        details: `Expected YYYY-MM-DD. Detected DD.MM.YYYY in ${euDateCount} rows.`,
+        affectedRows: [],
+        affectedColumns: [header],
+        sampleValues: values.slice(0, 3),
+        autofix: {
+          type: "convert_date_format",
+          confidence,
+          confidenceReason: buildConfidenceReason({
+            patternMatchRatio: euDateRatio,
+            headerHintMatch: headerHint === "dateLike",
+            sampleSize: values.length,
+          }),
+          preview: `Convert ${euDateCount} values from DD.MM.YYYY to YYYY-MM-DD`,
+          params: {
+            column: header,
+            fromFormat: "dd.MM.yyyy",
+            toFormat: "yyyy-MM-dd",
+          },
+        },
+      });
+    }
   });
   return errors;
+};
+
+/**
+ * Build a human-readable explanation for confidence score.
+ */
+const buildConfidenceReason = (params: {
+  patternMatchRatio: number;
+  headerHintMatch: boolean;
+  sampleSize: number;
+}): string => {
+  const parts: string[] = [];
+  const matchPercent = Math.round(params.patternMatchRatio * 100);
+  parts.push(`${matchPercent}% pattern match`);
+  if (params.headerHintMatch) {
+    parts.push("column name matches type");
+  }
+  if (params.sampleSize < 5) {
+    parts.push("small sample size");
+  } else if (params.sampleSize >= 20) {
+    parts.push("large sample size");
+  }
+  return parts.join(", ");
+};
+
+/**
+ * Collect column statistics using centralized pattern analysis.
+ */
+interface ColumnStats {
+  header: string;
+  fieldKey: string;
+  values: string[];
+  patternRatios: Record<PatternType, number>;
+  headerHint: PatternType | null;
+}
+
+const collectColumnStats = (
+  rows: JsonRecord[],
+  mapping: Record<string, string>,
+): ColumnStats[] => {
+  return Object.entries(mapping)
+    .filter(([, fieldKey]) => Boolean(fieldKey))
+    .map(([header, fieldKey]) => {
+      const values = rows
+        .map((row) => row[header])
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+      return {
+        header,
+        fieldKey: fieldKey ?? "",
+        values,
+        patternRatios: analyzePatterns(values),
+        headerHint: getHeaderHint(header),
+      };
+    });
+};
+
+/**
+ * Get the primary pattern types expected for a field type.
+ */
+const getExpectedPatterns = (fieldType: string): PatternType[] => {
+  return FIELD_TYPE_TO_PATTERN[fieldType] ?? [];
+};
+
+/**
+ * Check if column values match expected pattern for field type.
+ */
+const matchesExpectedPattern = (
+  stats: ColumnStats,
+  expectedPatterns: PatternType[],
+  threshold = 0.5,
+): boolean => {
+  return expectedPatterns.some((pattern) => stats.patternRatios[pattern] >= threshold);
+};
+
+/**
+ * Find the best matching pattern for a column.
+ */
+const findBestPattern = (
+  stats: ColumnStats,
+): { pattern: PatternType; ratio: number } | null => {
+  let best: { pattern: PatternType; ratio: number } | null = null;
+  for (const [pattern, ratio] of Object.entries(stats.patternRatios)) {
+    if (ratio >= 0.5 && (!best || ratio > best.ratio)) {
+      best = { pattern: pattern as PatternType, ratio };
+    }
+  }
+  return best;
 };
 
 const detectMappingMismatch = (
@@ -123,86 +294,91 @@ const detectMappingMismatch = (
   fieldLookup: ImportFieldLookup,
 ): CategorizedError[] => {
   const errors: CategorizedError[] = [];
-  const columnStats = Object.entries(mapping)
-    .filter(([, fieldKey]) => Boolean(fieldKey))
-    .map(([header, fieldKey]) => {
-      const values = rows
-        .map((row) => row[header])
-        .filter((value): value is string => typeof value === "string")
-        .map((value) => value.trim())
-        .filter(Boolean);
-      const total = values.length || 1;
-      return {
-        header,
-        fieldKey: fieldKey ?? "",
-        matches: {
-          email: values.filter(isEmail).length / total,
-          date: values.filter(isIsoDate).length / total,
-          usDate: values.filter(isUsDate).length / total,
-          number: values.filter(isNumberLike).length / total,
-          boolean: values.filter(isBooleanLike).length / total,
-        },
-      };
-    });
+  const columnStats = collectColumnStats(rows, mapping);
+
+  // Track which mismatches we've already reported to avoid duplicates
+  const reportedSwaps = new Set<string>();
 
   columnStats.forEach((stat) => {
     const field = fieldLookup.get(stat.fieldKey);
     if (!field) return;
-    if (field.type === "email" && stat.matches.email < 0.2) {
-      const candidate = columnStats.find(
-        (other) => other.fieldKey !== stat.fieldKey && other.matches.email > 0.8,
+
+    const expectedPatterns = getExpectedPatterns(field.type);
+    if (expectedPatterns.length === 0) return;
+
+    // Check if current column matches expected pattern
+    const matchesExpected = matchesExpectedPattern(stat, expectedPatterns, 0.2);
+    if (matchesExpected) return;
+
+    // Find the best pattern detected in this column
+    const bestPattern = findBestPattern(stat);
+    if (!bestPattern) return;
+
+    // Look for another column that has expected pattern but doesn't match its own field
+    const candidate = columnStats.find((other) => {
+      if (other.fieldKey === stat.fieldKey) return false;
+
+      // Check if other column has expected pattern for this field
+      const hasExpectedPattern = matchesExpectedPattern(other, expectedPatterns, 0.7);
+      if (!hasExpectedPattern) return false;
+
+      // Check if other column doesn't match its own expected type
+      const otherField = fieldLookup.get(other.fieldKey);
+      if (!otherField) return false;
+      const otherExpected = getExpectedPatterns(otherField.type);
+      const otherMatchesOwn = matchesExpectedPattern(other, otherExpected, 0.5);
+
+      return !otherMatchesOwn;
+    });
+
+    if (candidate) {
+      // Avoid duplicate swaps
+      const swapKey = [stat.header, candidate.header].sort().join(":");
+      if (reportedSwaps.has(swapKey)) return;
+      reportedSwaps.add(swapKey);
+
+      // Calculate confidence dynamically
+      const candidateRatio = expectedPatterns.reduce(
+        (max, p) => Math.max(max, candidate.patternRatios[p]),
+        0,
       );
-      if (candidate) {
-        errors.push({
-          id: createId(),
-          category: "structural",
-          severity: "error",
-          code: "MAPPING_MISMATCH",
-          summary: `Column "${stat.header}" does not look like emails`,
-          details: `Values in "${candidate.header}" look like emails. Swap mappings?`,
-          affectedRows: [],
-          affectedColumns: [stat.header, candidate.header],
-          sampleValues: [],
-          autofix: {
-            type: "map_column",
-            confidence: 0.85,
-            preview: `Swap mapping between "${stat.header}" and "${candidate.header}"`,
-            params: {
-              from: stat.header,
-              to: candidate.header,
-            },
+      const conflictingPatterns = Object.values(stat.patternRatios).filter(
+        (r) => r > 0.5,
+      ).length;
+
+      const confidence = calculateConfidence({
+        patternMatchRatio: candidateRatio,
+        headerHintMatch: candidate.headerHint !== null,
+        conflictingPatterns,
+        sampleSize: candidate.values.length,
+      });
+
+      const patternName = expectedPatterns[0] ?? field.type;
+      errors.push({
+        id: createId(),
+        category: "structural",
+        severity: "error",
+        code: "MAPPING_MISMATCH",
+        summary: `Column "${stat.header}" does not look like ${patternName}`,
+        details: `Values in "${candidate.header}" look like ${patternName}. Swap mappings?`,
+        affectedRows: [],
+        affectedColumns: [stat.header, candidate.header],
+        sampleValues: candidate.values.slice(0, 3),
+        autofix: {
+          type: "map_column",
+          confidence,
+          confidenceReason: buildConfidenceReason({
+            patternMatchRatio: candidateRatio,
+            headerHintMatch: candidate.headerHint !== null,
+            sampleSize: candidate.values.length,
+          }),
+          preview: `Swap mapping between "${stat.header}" and "${candidate.header}"`,
+          params: {
+            from: stat.header,
+            to: candidate.header,
           },
-        });
-      }
-    }
-    if (field.type === "date" && stat.matches.date < 0.2 && stat.matches.usDate < 0.2) {
-      const candidate = columnStats.find(
-        (other) =>
-          other.fieldKey !== stat.fieldKey &&
-          (other.matches.date > 0.8 || other.matches.usDate > 0.8),
-      );
-      if (candidate) {
-        errors.push({
-          id: createId(),
-          category: "structural",
-          severity: "error",
-          code: "MAPPING_MISMATCH",
-          summary: `Column "${stat.header}" does not look like dates`,
-          details: `Values in "${candidate.header}" look like dates. Swap mappings?`,
-          affectedRows: [],
-          affectedColumns: [stat.header, candidate.header],
-          sampleValues: [],
-          autofix: {
-            type: "map_column",
-            confidence: 0.85,
-            preview: `Swap mapping between "${stat.header}" and "${candidate.header}"`,
-            params: {
-              from: stat.header,
-              to: candidate.header,
-            },
-          },
-        });
-      }
+        },
+      });
     }
   });
 

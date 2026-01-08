@@ -1,5 +1,5 @@
 [build]
-  publish = "dist"
+  publish = ".output/public"
   command = "pnpm build"
 
 [functions]
@@ -37,9 +37,3 @@
     Access-Control-Allow-Origin = "https://roundup.games"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization"
-
-# Redirects for SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

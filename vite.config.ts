@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
@@ -47,6 +48,11 @@ export default defineConfig(({ mode }) => {
           routeFileIgnorePrefix: "__tests__",
           // verboseFileRoutes: false,
         },
+      }),
+
+      // Nitro v2 plugin for Netlify deployment
+      nitroV2Plugin({
+        // target: "netlify",
       }),
 
       // React plugin explicitly provided (required for TanStack Start RC v1.132+)

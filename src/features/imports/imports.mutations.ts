@@ -17,6 +17,7 @@ import {
   deleteImportTemplateSchema,
   deleteMappingTemplateSchema,
   downloadFormTemplateSchema,
+  downloadImportTemplateSchema,
   rollbackImportJobSchema,
   runBatchImportSchema,
   runInteractiveImportSchema,
@@ -554,6 +555,106 @@ export const downloadFormTemplate = createServerFn({ method: "POST" })
     );
 
     const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const downloadCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: storageKey,
+      ResponseContentDisposition: `attachment; filename="${fileName}"`,
+    });
+    const downloadUrl = await getSignedUrl(client, downloadCommand, {
+      expiresIn: 900,
+    });
+
+    return { downloadUrl, fileName };
+  });
+
+export const downloadImportTemplate = createServerFn({ method: "POST" })
+  .inputValidator(zod$(downloadImportTemplateSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { importTemplates, forms, formVersions } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [template] = await db
+      .select()
+      .from(importTemplates)
+      .where(eq(importTemplates.id, data.templateId))
+      .limit(1);
+
+    if (!template) {
+      throw notFound("Import template not found");
+    }
+
+    if (template.organizationId) {
+      await requireOrgAccess(actorUserId, template.organizationId);
+    } else {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(actorUserId);
+      if (!isAdmin) {
+        throw forbidden("Global admin access required");
+      }
+    }
+
+    const [form] = await db
+      .select({ name: forms.name })
+      .from(forms)
+      .where(eq(forms.id, template.formId))
+      .limit(1);
+
+    if (!form) {
+      throw notFound("Form not found");
+    }
+
+    const [version] = await db
+      .select()
+      .from(formVersions)
+      .where(eq(formVersions.id, template.formVersionId))
+      .limit(1);
+
+    if (!version) {
+      throw notFound("Form version not found");
+    }
+
+    const { createId } = await import("@paralleldrive/cuid2");
+    const { PutObjectCommand, GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+    const { getArtifactsBucketName, getS3Client } =
+      await import("~/lib/storage/artifacts");
+    const { generateTemplateBuffer, getTemplateFileName } =
+      await import("~/features/imports/template-generator");
+
+    const buffer = await generateTemplateBuffer({
+      definition: version.definition as FormDefinition,
+      format: data.format,
+      columns: template.columns as Record<string, unknown>,
+      defaults: template.defaults as Record<string, unknown>,
+      options: {
+        includeDescriptions: true,
+        includeExamples: true,
+        includeDataValidation: data.format === "xlsx",
+        includeMetadataMarkers: true,
+      },
+    });
+
+    const fileName = getTemplateFileName(form.name, data.format);
+    const storageKey = `imports/templates/${template.id}/${createId()}-${fileName}`;
+    const bucket = await getArtifactsBucketName();
+    const client = await getS3Client();
+
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: storageKey,
+        Body: buffer,
+        ContentType:
+          data.format === "csv"
+            ? "text/csv"
+            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+    );
+
     const downloadCommand = new GetObjectCommand({
       Bucket: bucket,
       Key: storageKey,

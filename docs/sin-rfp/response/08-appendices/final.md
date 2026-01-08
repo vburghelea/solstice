@@ -21,7 +21,7 @@ To protect evaluator accounts and align with security best practices, credential
 
 **To request access:**
 
-1. Contact austin@austinwallace.tech with evaluator names and email addresses
+1. Contact austinwallacetech@gmail.com with evaluator names and email addresses
 2. Receive the Evaluator Access Pack via secure email
 3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
 4. MFA demonstration available on the viaSport Staff account
@@ -208,7 +208,9 @@ sector projects, healthcare, and startups.
 
 ### Will Siddall, Technical Advisor
 
-[To be provided by Will Siddall]
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX).
+
+He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments. Industries he's supported in the past include mining, VFX, hydrography and ocean exploration, oil and gas, civil engineering and cadastral/bathymetric surveys.
 
 ### Parul Kharub, Security and Risk Advisor
 
@@ -219,7 +221,7 @@ security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha]
+A 30+ year veteran of the dotcom internet era bringing generational lessons of best practices to an agile era of cloud development. Having worked with American Finance, Aviation and Canadian quantum computing startups. All relying on consistent, secure, repeatable development practices learned over years of successful achievements and hard lessons learned.
 
 ### Tyler Piller, Security and Compliance Advisor
 
@@ -249,7 +251,7 @@ align technical risk with enterprise business objectives.
 
 Austin Wallace
 Project Lead, Austin Wallace Tech
-Email: austin@austinwallace.tech
+Email: austinwallacetech@gmail.com
 Location: Victoria, British Columbia
 
 Austin Wallace Tech welcomes the opportunity to present the prototype and discuss how Solstice can serve viaSport's Strength in Numbers initiative.

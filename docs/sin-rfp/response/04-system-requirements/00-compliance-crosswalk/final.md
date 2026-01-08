@@ -19,7 +19,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement             |
 | DM-AGG-004 | Data Quality and Integrity            | Built   | Validation, alerting with thresholds            | Threshold tuning with viaSport          |
 | DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD) |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file imports, ECS batch worker   | Legacy extraction and mapping           |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with autofix, dynamic templates    | Legacy extraction (awaiting BCAR/BCSI)  |
 
 ## Reporting (RP-AGG)
 
@@ -64,11 +64,11 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 | Category                | Total  | Built  | Partial |
 | ----------------------- | ------ | ------ | ------- |
-| Data Management         | 6      | 4      | 2       |
+| Data Management         | 6      | 5      | 1       |
 | Reporting               | 5      | 4      | 1       |
 | Security                | 4      | 4      | 0       |
 | Training and Onboarding | 3      | 3      | 0       |
 | User Interface          | 7      | 7      | 0       |
-| **Total**               | **25** | **22** | **3**   |
+| **Total**               | **25** | **23** | **2**   |
 
-Three requirements are partial due to integration and metadata dependencies that require viaSport input.
+Two requirements are partial due to integration and metadata dependencies that require viaSport input.

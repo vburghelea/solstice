@@ -46,12 +46,13 @@ The platform uses a multi-tenant architecture with strict organization scoping:
 
 ### Regulatory Alignment
 
-| Requirement         | Implementation                                                      |
-| ------------------- | ------------------------------------------------------------------- |
-| PIPEDA alignment    | Canadian data residency, encryption, access controls, audit logging |
-| Data minimization   | Configurable retention policies and legal holds                     |
-| Right to access     | Data export workflows with audit trail                              |
-| Breach notification | Audit logging and anomaly detection                                 |
+| Requirement         | Implementation                                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| PIPEDA alignment    | Canadian data residency, TLS 1.2+ encryption in transit, encryption at rest, access controls, audit logging |
+| Transport security  | All APIs served over HTTPS (TLS 1.2+); no unencrypted endpoints                                             |
+| Data minimization   | Configurable retention policies and legal holds                                                             |
+| Right to access     | Data export workflows with audit trail                                                                      |
+| Breach notification | Audit logging and anomaly detection                                                                         |
 
 AWS maintains a Data Processing Addendum that covers all services used by the platform, including SES for email delivery: https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf
 

@@ -611,6 +611,26 @@ CREATE INDEX idx_import_job_cell_edits_job ON import_job_cell_edits(job_id);
   - `src/features/imports/__tests__/autofix-engine.test.ts`
   - `src/features/imports/__tests__/error-analyzer.test.ts`
 
+### Follow-up Fixes (2026-01-08)
+
+- Block import execution when there are pending edits; prompt users to save edits
+  before importing:
+  - `src/features/imports/components/smart-import-wizard.tsx`
+- Removed `meta` header exclusion from auto-mapping:
+  - `src/features/imports/components/smart-import-wizard.tsx`
+- CSV metadata row skipping now applies to CSV only (prevents Excel false positives):
+  - `src/features/imports/imports.utils.ts`
+- Added `phone` mapping support for analyzer pattern matching:
+  - `src/features/imports/error-analyzer.ts`
+- Fixed currency detector to treat `CAD` as a token (not a char set):
+  - `src/features/imports/pattern-detectors.ts`
+- Template downloads now respect admin-managed template columns/defaults via
+  `downloadImportTemplate`, and version warnings compare to the latest form version:
+  - `src/features/imports/imports.mutations.ts`
+  - `src/features/imports/imports.schemas.ts`
+  - `src/features/imports/template-generator.ts`
+  - `src/features/imports/components/import-templates-panel.tsx`
+
 ### In Progress / Open
 
 - Referential checks beyond `organizationId` (needs form metadata contract)
@@ -625,6 +645,7 @@ admin experience, error confidence calculation, and overall polish.
 ### Summary
 
 Enhanced the import admin experience with:
+
 1. Centralized pattern detection with 13 pattern types
 2. Dynamic confidence calculation replacing hardcoded values
 3. Tabbed admin layout with dedicated template and history management
@@ -633,21 +654,21 @@ Enhanced the import admin experience with:
 
 ### New Files Created
 
-| File | Purpose |
-|------|---------|
-| `src/features/imports/pattern-detectors.ts` | Centralized pattern detection module with 13 patterns |
-| `src/features/imports/components/import-templates-panel.tsx` | Template CRUD UI with search, download, delete |
-| `src/features/imports/components/import-jobs-panel.tsx` | Job history with filtering, status badges, rollback |
-| `src/features/imports/__tests__/pattern-detectors.test.ts` | 54 unit tests for pattern detection |
+| File                                                         | Purpose                                               |
+| ------------------------------------------------------------ | ----------------------------------------------------- |
+| `src/features/imports/pattern-detectors.ts`                  | Centralized pattern detection module with 13 patterns |
+| `src/features/imports/components/import-templates-panel.tsx` | Template CRUD UI with search, download, delete        |
+| `src/features/imports/components/import-jobs-panel.tsx`      | Job history with filtering, status badges, rollback   |
+| `src/features/imports/__tests__/pattern-detectors.test.ts`   | 54 unit tests for pattern detection                   |
 
 ### Modified Files
 
-| File | Changes |
-|------|---------|
-| `src/features/imports/error-analyzer.ts` | Use centralized patterns, dynamic confidence, `confidenceReason` field |
-| `src/routes/dashboard/admin/sin/imports.tsx` | 3-tab layout (Import, Templates, History), URL query param persistence |
-| `src/features/imports/components/categorized-errors.tsx` | Confidence badges, tooltips explaining reasoning |
-| `src/features/imports/components/smart-import-wizard.tsx` | Progress stepper showing Upload→Map→Review→Import flow |
+| File                                                      | Changes                                                                |
+| --------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `src/features/imports/error-analyzer.ts`                  | Use centralized patterns, dynamic confidence, `confidenceReason` field |
+| `src/routes/dashboard/admin/sin/imports.tsx`              | 3-tab layout (Import, Templates, History), URL query param persistence |
+| `src/features/imports/components/categorized-errors.tsx`  | Confidence badges, tooltips explaining reasoning                       |
+| `src/features/imports/components/smart-import-wizard.tsx` | Progress stepper showing Upload→Map→Review→Import flow                 |
 
 ### Pattern Detectors Module
 
@@ -672,6 +693,7 @@ export const patterns = {
 ```
 
 **Helper functions:**
+
 - `analyzePatterns(values)` - Returns match ratios for all pattern types
 - `detectBestPattern(values, threshold)` - Finds highest matching pattern above threshold
 - `getHeaderHint(header)` - Extracts type hints from column headers (e.g., "Email" → email)
@@ -706,6 +728,7 @@ export function calculateConfidence(params: {
 ```
 
 **Rationale:**
+
 - Pattern match ratio is the primary signal (60% weight)
 - Header hints add confidence when column name matches expected type
 - Ambiguous patterns (multiple types match) reduce confidence
@@ -721,6 +744,7 @@ Added visual confidence indicators to autofix buttons:
 - **<70% (outline)**: Low confidence, outline button only
 
 Each badge includes a tooltip explaining the reasoning:
+
 ```
 "85% pattern match, column name matches type, large sample size"
 ```
@@ -735,6 +759,7 @@ Added visual progress indicator to the import wizard showing 4 phases:
 4. **Import** - Execute the import
 
 Step completion is calculated dynamically:
+
 - Upload complete: org + form + file parsed
 - Map complete: mappings defined + import job created
 - Review complete: analysis shows no blocking errors
@@ -745,16 +770,19 @@ Step completion is calculated dynamically:
 Restructured `/dashboard/admin/sin/imports` with 3 tabs:
 
 **Tab 1: Import Wizard**
+
 - Original SmartImportWizard with progress stepper
 - Main workflow for running imports
 
 **Tab 2: Templates**
+
 - Card-based list with search/filter
 - Download templates (XLSX/CSV format selector)
 - Delete with confirmation dialog
 - Version warning badges when form schema has changed
 
 **Tab 3: Import History**
+
 - Table with columns: Status, Type, Rows, Created, Duration, Actions
 - Color-coded status badges with icons
 - Expandable error details (collapsible inline)
@@ -766,6 +794,7 @@ Tab state persisted in URL: `?tab=wizard|templates|history`
 ### Test Coverage
 
 Created comprehensive test suite with 54 tests covering:
+
 - All 13 pattern detectors (positive and negative cases)
 - Pattern analysis functions
 - Header hint detection
@@ -773,6 +802,7 @@ Created comprehensive test suite with 54 tests covering:
 - Edge cases (empty arrays, whitespace, case sensitivity)
 
 All 61 import-related tests pass:
+
 ```
 ✓ src/features/imports/__tests__/pattern-detectors.test.ts (54 tests)
 ✓ src/features/imports/__tests__/error-analyzer.test.ts (1 test)

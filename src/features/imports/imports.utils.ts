@@ -69,7 +69,7 @@ export const parseImportFile = async (file: File) => {
   }
   if (lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls")) {
     const rows = await parseExcelFile(file);
-    return { type: "excel" as const, rows: stripTemplateMetadataRows(rows) };
+    return { type: "excel" as const, rows };
   }
   throw new Error("Unsupported file type. Please upload CSV or Excel.");
 };

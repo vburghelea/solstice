@@ -191,6 +191,38 @@ purely a doc change or requires code/infra work.
   (pipeline status).
 - Code/Infra: Build the pipelines and mapping once schema access is granted.
 
+### DM-AGG-006 Upgrade — INTELLIGENT IMPORT NOW BUILT
+
+The intelligent XLSX/CSV import feature (ticket: `docs/sin-rfp/tickets/TICKET-intelligent-xlsx-import.md`)
+is now substantially complete and should be reflected in the proposal.
+
+**Current proposal text** (`04-system-requirements/data-management-dm-agg/final.md:12`):
+| DM-AGG-006 | Partial | Import wizard, file imports, ECS batch worker | Legacy extraction scope |
+
+**Recommended update:**
+| DM-AGG-006 | **Built** | Smart import wizard with error categorization, autofix, dynamic templates | Legacy extraction (awaiting BCAR/BCSI) |
+
+**New capabilities to highlight in DM-AGG-006 detail section:**
+
+1. **Intelligent Error Categorization**: Errors grouped by root cause (structural, data quality, completeness, referential) instead of row-by-row
+2. **Pattern Detection**: 13 pattern detectors (email, date formats, phone, currency, postal codes, UUID, etc.) automatically identify column type mismatches
+3. **Autofix with Confidence Scoring**: One-click fixes for column swaps, date format conversion, boolean normalization; dynamic confidence based on pattern match ratio, header hints, and sample size
+4. **In-App Correction**: Inline cell editing with real-time validation, eliminating re-upload for minor fixes
+5. **Dynamic Templates**: Generate XLSX/CSV templates from any form definition with field descriptions, example values, and Excel data validation dropdowns
+6. **Virtualized Preview**: TanStack Virtual for 10k+ row previews without performance degradation
+7. **Admin Template Management**: Template CRUD, version tracking, import history with rollback
+
+**Files to update:**
+
+- `04-system-requirements/data-management-dm-agg/final.md:12` (status table)
+- `04-system-requirements/data-management-dm-agg/final.md:203` (DM-AGG-006 detail)
+- `04-system-requirements/00-compliance-crosswalk/final.md:22` (crosswalk table)
+- `full-proposal-response-combined.md:1464`, `:1531`, `:1722`
+
+**Demo path update:**
+Current: "Dashboard -> Imports -> New Import"
+Proposed: "Dashboard -> Admin -> Imports (Smart wizard with autofix demo)"
+
 ### Training and Cohort Planning — POST-CONTRACT
 
 - Cohort sizing and scheduling TBD: `full-proposal-response-combined.md:1179`

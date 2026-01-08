@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { AlertTriangle, Download, FileText, Plus, Search, Trash2 } from "lucide-react";
+import { AlertTriangle, Download, FileText, Search, Trash2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -34,9 +34,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { getLatestFormVersion } from "~/features/forms/forms.queries";
 import { listImportTemplates } from "../imports.queries";
-import { deleteImportTemplate } from "../imports.mutations";
-import { downloadFormTemplate } from "../imports.mutations";
+import { deleteImportTemplate, downloadImportTemplate } from "../imports.mutations";
 
 interface ImportTemplatesPanelProps {
   organizationId?: string;
@@ -66,23 +66,14 @@ export function ImportTemplatesPanel({ organizationId }: ImportTemplatesPanelPro
 
   const downloadTemplateMutation = useMutation({
     mutationFn: async ({
-      formId,
+      templateId,
       format,
     }: {
-      formId: string;
+      templateId: string;
       format: "xlsx" | "csv";
     }) => {
-      const result = await downloadFormTemplate({
-        data: {
-          formId,
-          format,
-          options: {
-            includeDescriptions: true,
-            includeExamples: format === "xlsx",
-            includeDataValidation: format === "xlsx",
-            organizationId,
-          },
-        },
+      const result = await downloadImportTemplate({
+        data: { templateId, format },
       });
       return result;
     },
@@ -111,9 +102,22 @@ export function ImportTemplatesPanel({ organizationId }: ImportTemplatesPanelPro
     }
   };
 
-  const handleDownload = (formId: string) => {
-    downloadTemplateMutation.mutate({ formId, format: downloadFormat });
+  const handleDownload = (templateId: string) => {
+    downloadTemplateMutation.mutate({ templateId, format: downloadFormat });
   };
+
+  const formIds = Array.from(new Set(templates.map((template) => template.formId)));
+  const latestVersionQueries = useQueries({
+    queries: formIds.map((formId) => ({
+      queryKey: ["forms", "latest", formId],
+      queryFn: () => getLatestFormVersion({ data: { formId } }),
+      enabled: Boolean(formId),
+    })),
+  });
+
+  const latestVersionMap = new Map(
+    formIds.map((formId, index) => [formId, latestVersionQueries[index]?.data?.id]),
+  );
 
   if (templatesQuery.isLoading) {
     return (
@@ -172,14 +176,15 @@ export function ImportTemplatesPanel({ organizationId }: ImportTemplatesPanelPro
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredTemplates.map((template) => {
             // Parse columns to show field count
-            const columns =
-              typeof template.columns === "object" && template.columns !== null
-                ? Object.keys(template.columns)
-                : [];
-            const fieldCount = columns.length;
+            const fieldCount = Array.isArray(template.columns)
+              ? template.columns.length
+              : typeof template.columns === "object" && template.columns !== null
+                ? Object.keys(template.columns).length
+                : 0;
 
-            // Check if version might be outdated (simplified check)
-            const hasVersionWarning = template.formVersionId !== template.formId;
+            const latestVersionId = latestVersionMap.get(template.formId);
+            const hasVersionWarning =
+              Boolean(latestVersionId) && template.formVersionId !== latestVersionId;
 
             return (
               <Card key={template.id} className="relative">
@@ -227,7 +232,7 @@ export function ImportTemplatesPanel({ organizationId }: ImportTemplatesPanelPro
                       variant="outline"
                       size="sm"
                       className="flex-1 gap-1"
-                      onClick={() => handleDownload(template.formId)}
+                      onClick={() => handleDownload(template.id)}
                       disabled={downloadTemplateMutation.isPending}
                     >
                       <Download className="h-3.5 w-3.5" />

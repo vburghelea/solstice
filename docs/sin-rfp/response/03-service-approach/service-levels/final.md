@@ -40,7 +40,7 @@ Availability is measured as the percentage of time the production application is
 | Sev 1 - Critical | 4 hours        | Same business day | Immediate escalation to delivery lead |
 | Sev 2 - High     | 8 hours        | 2 business days   | Escalation if no progress in 24 hours |
 | Sev 3 - Medium   | 24 hours       | 5 business days   | Standard workflow                     |
-| Sev 4 - Low      | 48 hours       | Best effort       | Standard workflow                     |
+| Sev 4 - Low      | 48 hours       | 10 Business Days  | Standard workflow                     |
 
 **Business hours:** Monday to Friday, 9:00 AM to 5:00 PM Pacific Time, excluding BC statutory holidays.
 
@@ -97,7 +97,7 @@ Production environment uses Multi-AZ deployment for automatic failover. Database
 | Security patching (critical) | Within 48 hours of vulnerability disclosure                   |
 | Dependency updates           | Monthly review; immediate for security-related updates        |
 | Security reviews             | Quarterly review of access controls, configurations, and logs |
-| Penetration testing          | Available as optional add-on (see Optional Add-Ons)           |
+| Penetration testing          | Available as optional add-on (see Commercial Model)           |
 
 ## Release Management
 
@@ -147,15 +147,6 @@ If desired by viaSport, service credits can be included in the contract for avai
 | Below 95.0%          | 25% of monthly subscription |
 
 Credits are applied to the following quarter's invoice upon viaSport request with documented evidence of downtime.
-
-## Optional Add-Ons
-
-| Add-On                          | Description                                                                | Estimated Cost             |
-| ------------------------------- | -------------------------------------------------------------------------- | -------------------------- |
-| Third-party penetration testing | Independent security assessment by qualified third-party firm              | $10,000-$20,000/assessment |
-| Extended support (24/7)         | After-hours monitoring and response, reduced Sev 1 response time (2 hours) | $30,000-$50,000/year       |
-
-See **Commercial Model and Pricing** for full add-on details.
 
 ---
 

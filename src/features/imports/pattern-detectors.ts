@@ -55,10 +55,10 @@ export const isPhone = (value: string): boolean => {
 // Currency: $, €, £, ¥ with proper formatting
 export const isCurrency = (value: string): boolean => {
   const cleaned = value.trim();
-  // Match: $1,234.56, €123.45, 1234.56$, etc.
+  // Match: $1,234.56, €123.45, CAD 123.45, 1234.56 CAD, etc.
   return (
-    /^[$€£¥₹CAD]?\s*-?\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(cleaned) ||
-    /^-?\d{1,3}(,\d{3})*(\.\d{1,2})?\s*[$€£¥₹]?$/.test(cleaned)
+    /^(?:[$€£¥₹]|CAD)?\s*-?\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(cleaned) ||
+    /^-?\d{1,3}(,\d{3})*(\.\d{1,2})?\s*(?:[$€£¥₹]|CAD)?$/.test(cleaned)
   );
 };
 

@@ -42,9 +42,9 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## Demo Access
 
-Demo credentials are listed in **Appendix A: Live Demo Access** to reduce reviewer friction.
+Demo credentials are listed in **Appendix A: Prototype Evaluation Access** to reduce reviewer friction.
 
-**Contact:** austin@austinwallace.tech
+**Contact:** austinwallacetech@gmail.com
 
 **Environment:** sin-uat (User Acceptance Testing environment with evaluator
 access and CloudTrail monitoring). Performance testing is run in sin-perf.

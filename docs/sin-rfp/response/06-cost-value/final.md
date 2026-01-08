@@ -1,52 +1,57 @@
-# Cost and Value of Services
+# Commercial Model and Pricing
 
-## Pricing Model Overview
+## Procurement Structure
 
-Austin Wallace Tech proposes a fixed-price engagement with milestone-based payments.
+Austin Wallace Tech proposes Solstice as a **3-year base term subscription** with two optional 1-year extensions at viaSport's discretion (3+1+1). This structure avoids a separate annual RFP for operations and provides predictable multi-year budgeting.
 
-| Component         | Amount   | Period   |
-| ----------------- | -------- | -------- |
-| Implementation    | $600,000 | One-time |
-| Annual Operations | $200,000 | Per year |
+## Pricing Summary
 
-**Year 1 Total:** $800,000
-**Year 2 and beyond:** $200,000 per year
+| Component                                        | Price           | Notes                                                                                                  |
+| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------ |
+| Implementation / Standup (one-time)              | $600,000        | Discovery, configuration, migration, UAT support, training, rollout, go-live/hypercare                 |
+| Platform Subscription + Managed Service (annual) | $200,000 / year | Hosting, monitoring, patching, support, reliability management, product updates, 200 enhancement hours |
 
-This pricing reflects the value delivered to viaSport, not cost-plus billing.
-The existing prototype reduces delivery risk because viaSport can evaluate a
-functioning system before contract award (see Section 1.3).
+## Total Cost View
 
-## Cost Breakdown
+| Term                                   | Total      |
+| -------------------------------------- | ---------- |
+| 3-year base term                       | $1,200,000 |
+| 5-year total (if extensions exercised) | $1,600,000 |
 
-### Implementation ($600,000)
+## What is Included
 
-| Phase                   | Activities                                                  |
-| ----------------------- | ----------------------------------------------------------- |
-| Planning and Discovery  | Requirements validation, UX interviews, migration discovery |
-| Development             | viaSport configuration, branding, remaining feature work    |
-| Data Migration          | Legacy extraction, mapping, validation, import              |
-| User Acceptance Testing | UAT environment, test support, defect resolution            |
-| Training                | viaSport admin training, train-the-trainer                  |
-| PSO Rollout             | Cohort onboarding and go-live support                       |
-| Production Deployment   | Monitoring setup and operational handoff                    |
+### Implementation / Standup
 
-All RFP requirements are included, including completion of partial items (DM-AGG-002, DM-AGG-006, RP-AGG-002).
+- Discovery and requirements confirmation against the prototype
+- viaSport-specific configuration (forms, templates, metadata, branding)
+- Legacy data extraction approach, pilot migration, full migration, and reconciliation
+- UAT support and defect remediation
+- Training delivery (viaSport admin, train-the-trainer, PSO rollout enablement)
+- Go-live support and defined hypercare period
 
-### Annual Operations ($200,000 per year)
+### Platform Subscription + Managed Service
 
-| Category                   | Scope                                                                                               |
-| -------------------------- | --------------------------------------------------------------------------------------------------- |
-| Hosting and Infrastructure | AWS ca-central-1, database, storage, CDN, compute                                                   |
-| Security                   | Monitoring, patching, quarterly reviews                                                             |
-| Security Tooling           | Automated vulnerability scanning (SAST/SCA) and scheduled DAST execution, plus remediation workflow |
-| Maintenance                | Bug fixes, dependency updates, performance tuning                                                   |
-| Support                    | Business hours support, 24 hour response standard                                                   |
-| Minor Enhancements         | Small improvements within existing scope                                                            |
-| Disaster Recovery          | Backups and quarterly DR drills                                                                     |
+- Canadian-hosted production infrastructure and routine operations
+- Monitoring, alerting, and incident response coordination
+- Security patching and dependency updates
+- Routine backups and quarterly DR validation drills (results reported to viaSport)
+- Support channels (in-app and email) with severity-based response targets
+- Ongoing product updates and non-custom feature improvements
+- **200 hours per year** for enhancements, minor feature requests, and configuration changes
 
-Security tooling and routine scanning effort are included in the annual operations fee.
+## Enhancements and Change Requests
 
-### Payment Schedule
+viaSport will have evolving needs. The subscription includes **200 hours per year** for enhancements, minor feature requests, and configuration changes beyond routine operations.
+
+Additional work beyond the included hours is available at **$175/hour** with prior approval. A change control process ensures transparency:
+
+1. Change request submitted
+2. Impact assessment (scope, timeline, hours)
+3. Proposal with options
+4. Mutual agreement documented
+5. Work proceeds after sign-off
+
+## Payment Schedule
 
 | Milestone        | Percentage | Amount   | Trigger                          |
 | ---------------- | ---------- | -------- | -------------------------------- |
@@ -54,35 +59,50 @@ Security tooling and routine scanning effort are included in the annual operatio
 | UAT Sign-Off     | 25%        | $150,000 | User acceptance testing complete |
 | Go-Live          | 50%        | $300,000 | Production deployment            |
 
-Annual operations are billed quarterly in advance ($50,000 per quarter).
+Annual subscriptions are billed quarterly in advance ($50,000 per quarter).
 
-## Factors Affecting Timeline and Price
-
-### Scope Changes
-
-Changes beyond the RFP scope trigger a change order:
-
-| Change Type                  | Process                               |
-| ---------------------------- | ------------------------------------- |
-| New features not in RFP      | Scope assessment and proposal         |
-| Additional integrations      | Integration specification and pricing |
-| Major infrastructure changes | Architecture review and options       |
-
-### Change Management Process
-
-1. Change request submitted
-2. Impact assessment (scope, timeline, cost)
-3. Proposal with options
-4. Mutual agreement documented
-5. Work proceeds after sign-off
-
-### Factors That Do Not Trigger Price Adjustments
+## Factors That Do Not Trigger Price Adjustments
 
 - Normal data volume growth within PostgreSQL capacity
 - Standard security updates and patches
 - Configuration changes within existing features
+- Work within the included 200 enhancement hours
+
+## Renewal and Price Protection
+
+Renewal years can be priced:
+
+- At the same annual rate ($200,000), or
+- With a mutually agreed inflation cap (e.g., CPI-capped adjustments)
+
+Renewal terms will be discussed no later than 90 days before the end of each contract year.
+
+## Optional Risk Reduction: Exit and Continuity
+
+To reduce vendor risk, viaSport may select from the following continuity options:
+
+| Option                              | Description                                                                                                              | Included                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------- |
+| Data portability + runbooks         | Full data export (CSV, JSON, database dump) plus operational runbooks                                                    | Baseline (included)         |
+| Source code escrow                  | Source code deposited with escrow agent, released upon defined trigger conditions (insolvency, failure to support, etc.) | Optional                    |
+| Perpetual license to customizations | At end of contract, viaSport receives perpetual license to viaSport-specific configuration and customizations            | Optional                    |
+| Transition support                  | Support for transition to a replacement system if viaSport chooses not to renew                                          | Available at standard rates |
+
+Details on escrow and perpetual license options are provided in the Exit and Portability Appendix.
 
 ## Optional Add-Ons
+
+### Third-Party Penetration Testing
+
+**Estimated:** $10,000 to $20,000 per assessment
+
+Independent penetration testing by a qualified third-party security firm. Can be scheduled pre-go-live or annually. Austin Wallace Tech coordinates with the testing firm and remediates findings.
+
+### Extended Support Coverage (24/7)
+
+**Estimated:** $30,000 to $50,000 per year additional
+
+Adds after-hours monitoring and response outside business hours, with Sev 1 response time reduced to 2 hours.
 
 ### Operations Portal (Events and Team Management)
 
@@ -90,26 +110,13 @@ Changes beyond the RFP scope trigger a change order:
 
 The Solstice platform includes an operations portal used by Quadball Canada. This could be extended to viaSport and PSOs to unify reporting and operations.
 
-### Extended Support Coverage (24/7)
+## Pricing Philosophy
 
-**Estimated:** $30,000 to $50,000 per year additional
+Pricing is based on the value delivered, not on hourly billing. The existing prototype represents Austin Wallace Tech's investment in building a platform for the sport sector. viaSport benefits from:
 
-Adds after-hours monitoring and response outside business hours.
+- A working system available for evaluation before contract award
+- Reduced delivery risk (23 of 25 requirements already built)
+- Principal-led delivery with no organizational layers
+- A managed service model with clear service levels and included enhancement capacity
 
-## In-Kind and Value-Add Contributions
-
-### Value-Add: Working Prototype
-
-Prototype available for evaluation (see Section 1.3):
-
-- 20.1M rows tested with sub-250ms p95 latency
-- Majority of system requirements implemented
-- Available for evaluator review before contract award
-
-### Value-Add: Source Code Access
-
-Source code access can be provided under mutually agreed terms to support transparency and continuity.
-
-### Pricing Philosophy
-
-Pricing is based on the value delivered, not on hourly billing. The prototype and principal-led delivery model reduce overhead and accelerate implementation compared to traditional project structures.
+The prototype and principal-led delivery model reduce overhead and accelerate implementation compared to traditional project structures or enterprise platform integrations.

@@ -2,19 +2,30 @@
 
 Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project. We built a working prototype that aligns to the System Requirements Addendum and demonstrates delivery feasibility before contract award.
 
+## What viaSport is Buying
+
+Solstice is proposed as a **term subscription with managed service**, structured to reduce ongoing procurement overhead and operational risk:
+
+- **3-year base term**, with two optional 1-year extensions at viaSport's discretion
+- **Implementation/Standup** to complete viaSport configuration, migration, UAT, and rollout
+- **Platform Subscription + Managed Service** covering hosting, monitoring, security patching, support, ongoing product updates, and 200 hours/year of enhancement capacity
+
+This "batteries included" model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+
 ## Response Overview
 
-| Section                                                        | Summary                                                                           |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.        |
-| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.             |
-| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training. |
-| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                   |
-| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                       |
-| **Cost and Value of Services**                                 | Implementation and operations pricing with key assumptions.                       |
-| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.       |
-| **Prototype Evaluation Guide**                                 | Live demo access and a 15-minute validation path tied to requirement IDs.         |
-| **Appendices**                                                 | Performance, security, and supporting evidence.                                   |
+| Section                                                        | Summary                                                                                   |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.                |
+| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.                     |
+| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training.         |
+| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                           |
+| **Service Levels, Support, and Reliability**                   | SLAs, monitoring, incident response, and operational commitments.                         |
+| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                               |
+| **Commercial Model and Pricing**                               | Term subscription pricing (3+1+1), standup fee, included services, and options.           |
+| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.               |
+| **Prototype Evaluation Guide**                                 | Prototype access and a 15-minute validation path tied to requirement IDs.                 |
+| **Appendices**                                                 | Performance, security, service levels, exit/portability options, and supporting evidence. |
 
 ## Standard Assumptions and Security Posture
 
@@ -33,8 +44,15 @@ The security model follows the AWS shared responsibility approach: AWS secures
 the underlying cloud infrastructure, and we implement and operate the
 application controls, configuration, and monitoring required for viaSport's use
 case. The platform implements MFA, role-based access control, organization
-scoping, encryption in transit and at rest, and an immutable audit log with
-tamper-evident hashing. Security evidence is summarized in **Appendix D:
+scoping, and an immutable audit log with tamper-evident hashing.
+
+**Encryption layers:**
+
+- **At rest:** AES-256 via AWS KMS for RDS, S3, and backups
+- **In transit:** TLS 1.2+ for all API endpoints and database connections
+- **Processing controls:** PostgreSQL column-level encryption for highly sensitive fields (e.g., TOTP secrets)
+
+Security evidence is summarized in **Appendix D:
 Security Architecture Summary**. AWS compliance reports (SOC, ISO) are available
 via AWS Artifact upon request.
 
@@ -44,37 +62,44 @@ A working prototype is available for evaluation in the sin-uat environment. No
 viaSport confidential data was used. Performance testing is run in sin-perf
 using synthetic data designed to match the scale characteristics described in
 the RFP. Performance and accessibility evidence is summarized in **Appendix C:
-Performance Evidence**. Demo credentials are listed in **Appendix A: Live Demo
-Access**, and a 15-minute validation path is provided in the **Prototype
+Performance Evidence**. Demo access is provided via a secure Evaluator Access Pack
+(see **Appendix A**), and a 15-minute validation path is provided in the **Prototype
 Evaluation Guide**.
 
 ## At a Glance
 
-| Dimension    | Status                                                                                                                     |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Prototype    | Working system available for evaluation (See Section 1.3)                                                                  |
-| Requirements | 22 of 25 built today; 3 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**)                 |
-| Data Used    | See Section 1.3                                                                                                            |
-| Performance  | 20.1M rows, sub-250ms p95 latency, final validation run TBD                                                                |
-| Security     | See Section 1.2                                                                                                            |
-| Timeline     | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan, Timeline, and Delivery Schedule**) |
-| Investment   | $600K implementation + $200K/year operations (See **Cost and Value of Services**)                                          |
+| Dimension        | Status                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| Prototype        | Working system available for evaluation (See Section 1.3)                                                  |
+| Requirements     | 23 of 25 built today; 2 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**) |
+| Data Used        | See Section 1.3                                                                                            |
+| Performance      | 20.1M rows, sub-250ms p95 latency                                                                          |
+| Security         | See Section 1.2                                                                                            |
+| Timeline         | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan**)                  |
+| Commercial Model | 3-year base term + two optional 1-year extensions (3+1+1)                                                  |
+| Total Cost       | 3-year: **$1.2M** / 5-year: **$1.6M** (standup + subscription)                                             |
 
 ## Key Highlights
 
 **De-risked Delivery**
 A working prototype is available for evaluation. This reduces delivery risk and
 allows evaluators to validate requirements directly. Access details are in
-**Appendix A: Live Demo Access**. The **Prototype Evaluation Guide** provides a
+**Appendix A: Prototype Evaluation Access**. The **Prototype Evaluation Guide** provides a
 15-minute validation path tied to requirement IDs. See Section 1.3 for the
 standard prototype and data provenance summary.
 
 **Requirements Coverage**
-The prototype covers the majority of the System Requirements Addendum today. Three requirements remain partial and are explicitly scoped with viaSport dependencies and delivery approach. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
+The prototype covers the majority of the System Requirements Addendum today. Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery approach. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
 
 **Security and Residency**
 See Section 1.1 for data residency and privacy, and Section 1.2 for the
 security model summary and evidence references.
+
+**Managed Service Model**
+viaSport is purchasing an outcome: a reliable platform with clear service levels,
+operational ownership, and included enhancement capacity. The subscription includes
+monitoring, support, security patching, DR drills, and 200 hours/year for ongoing
+improvements. See **Commercial Model and Pricing** for details.
 
 **Delivery Timeline**
 The proposed 30-week timeline targets Fall 2026 launch with comprehensive UX research and community engagement. The timeline enables proper user research with viaSport staff and PSO representatives, UAT with accessibility validation, and phased rollout. The core platform is already built, so the additional time focuses on getting the user experience right rather than building new features.
@@ -102,8 +127,9 @@ needs during research and rollout. Details on each team member are in
 | Solution Overview                   | **Solution Overview**                                                                                                | Non-technical workflow summary              |
 | Service Approach and Responsiveness | **Service Approach: Data Submission and Reporting Web Portal** through **Service Approach: Training and Onboarding** | Methodology for each scope item             |
 | System Requirements Addendum        | **System Requirements Compliance Crosswalk** and detailed requirement sections                                       | Requirement-by-requirement compliance       |
+| Service Levels and Reliability      | **Service Levels, Support, and Reliability** (new section)                                                           | SLAs, monitoring, ops commitments           |
 | Capabilities and Experience         | **Capabilities and Experience**                                                                                      | Case studies, automation/AI approach        |
-| Cost and Value                      | **Cost and Value of Services**                                                                                       | Pricing, breakdown, change management       |
+| Cost and Value                      | **Commercial Model and Pricing**                                                                                     | Term pricing, TCO, change management        |
 | Timeline and Delivery Schedule      | **Project Plan, Timeline, and Delivery Schedule**                                                                    | Milestones, risks, dependencies             |
 | Prototype Validation                | **Prototype Evaluation Guide** and **Appendices**                                                                    | Demo access, performance/security summaries |
 
@@ -155,9 +181,9 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## Demo Access
 
-Demo credentials are listed in **Appendix A: Live Demo Access** to reduce reviewer friction.
+Demo credentials are listed in **Appendix A: Prototype Evaluation Access** to reduce reviewer friction.
 
-**Contact:** austin@austinwallace.tech
+**Contact:** austinwallacetech@gmail.com
 
 **Environment:** sin-uat (User Acceptance Testing environment with evaluator
 access and CloudTrail monitoring). Performance testing is run in sin-perf.
@@ -219,190 +245,152 @@ We built this prototype to prove feasibility and reduce delivery risk. Discovery
 
 # Vendor Fit to viaSport's Needs
 
-## Company Information
+## Company Overview
 
-### Austin Wallace Tech
+Austin Wallace Tech is a British Columbia incorporated technology firm (Victoria, BC) delivering Solstice as a managed platform for sport sector reporting and information management.
 
-Austin Wallace Tech is a British Columbia based technology consulting firm
-incorporated in 2025 and headquartered in Victoria, BC. The company was founded
-to deliver information management solutions for the sport sector, with the
-Strength in Numbers platform as its primary engagement.
+We operate as a principal-led product team with contracted specialists for security, UX/accessibility, and independent testing. This model provides:
 
-| Attribute      | Details                                                            |
-| -------------- | ------------------------------------------------------------------ |
-| Incorporation  | 2025                                                               |
-| Headquarters   | Victoria, British Columbia                                         |
-| Delivery Model | Austin Wallace Tech leads delivery, supported by advisory partners |
-| Team Coverage  | Security, UX and accessibility, data migration, delivery ops, QA   |
-| Primary Focus  | Sport sector information management systems                        |
+- A single accountable delivery lead (no sales-to-delivery handoff)
+- A stable core engineering team
+- Elastic specialist capacity for compliance, security testing, and UX validation
 
-Austin Wallace Tech leads delivery directly, supported by advisory partners
-who provide domain expertise, technical review, and validation. Work is
-managed through a shared backlog, sprint cadence, QA gates, and security
-sign-off. The solution architect leads delivery from discovery through rollout
-to avoid handoffs.
+| Attribute          | Details                                      |
+| ------------------ | -------------------------------------------- |
+| Headquarters       | Victoria, British Columbia                   |
+| Operating model    | Product team + managed service               |
+| Delivery structure | Core delivery pod + specialist partners      |
+| Hosting region     | AWS Canada (Central) for primary data stores |
+| Primary focus      | Sport sector information management systems  |
 
-## Delivery Model
+## Operating Model
 
-### Core Delivery
+### Delivery Pod
 
-- **Austin Wallace**: Solution architecture, data engineering, development,
-  project management, and delivery governance.
+Solstice is delivered through a product team operating model: a consistent delivery pod for implementation and the same team responsible for ongoing operations. This avoids handoffs between "project build" and "ops," and provides clear accountability through rollout and into steady state.
 
-### Execution Capacity and Engagement Model
+| Function                 | Responsibilities                                                          | Primary                                     |
+| ------------------------ | ------------------------------------------------------------------------- | ------------------------------------------- |
+| Program & Delivery Lead  | Delivery plan, governance, risk management, stakeholder management        | Austin Wallace                              |
+| UX & Accessibility Lead  | UX research, design, accessibility validation, usability testing          | Ruslan Hétu                                 |
+| System Navigator         | Connects team to PSO community needs during research and rollout          | Soleil Heaney                               |
+| Technical Advisor        | Architecture review, development support, performance engineering         | Will Siddall                                |
+| Security & Risk Advisors | Security architecture, control mapping, pen test coordination, compliance | Parul Kharub, Michael Casinha, Tyler Piller |
 
-| Role                               | Engagement                       | Phase Coverage                  |
-| ---------------------------------- | -------------------------------- | ------------------------------- |
-| Austin Wallace (Delivery Lead)     | Full-time, accountable           | All phases                      |
-| Ruslan Hétu (UX/A11y Lead)         | Full-time UX research and design | All phases                      |
-| Soleil Heaney (System Navigator)   | Ongoing community liaison        | Research, UAT, rollout          |
-| Will Siddall (Engineering Support) | Part-time during development     | Weeks 11-22                     |
-| Security Advisors                  | Scheduled reviews at checkpoints | Design freeze, pre-UAT, go-live |
+### Engagement Model
 
-Advisory partners participate in scheduled reviews and provide expertise at
-defined checkpoints rather than full-time allocation.
+| Role                             | Engagement                       | Phase Coverage                  |
+| -------------------------------- | -------------------------------- | ------------------------------- |
+| Austin Wallace (Delivery Lead)   | Full-time, accountable           | All phases                      |
+| Ruslan Hétu (UX/A11y Lead)       | Full-time UX research and design | All phases                      |
+| Soleil Heaney (System Navigator) | Ongoing community liaison        | Research, UAT, rollout          |
+| Will Siddall (Technical Advisor) | Part-time during development     | Weeks 11-22                     |
+| Security Advisors                | Scheduled reviews at checkpoints | Design freeze, pre-UAT, go-live |
 
-### Advisory Partners
+## Service Management and Coverage
 
-| Focus Area                  | Advisor         | Contribution                                            |
-| --------------------------- | --------------- | ------------------------------------------------------- |
-| UX and Accessibility        | Ruslan Hétu     | UX research lead, design, accessibility validation      |
-| Sport Sector / Navigator    | Soleil Heaney   | System navigator connecting team to PSO community needs |
-| Technical Architecture      | Will Siddall    | Architecture review and development support             |
-| Security and Risk           | Parul Kharub    | Security strategy and risk advisory                     |
-| Security and Infrastructure | Michael Casinha | Infrastructure security and DevOps review               |
-| Security and Compliance     | Tyler Piller    | Security operations and compliance validation           |
+viaSport is purchasing an outcome: a platform that performs reliably during reporting cycles, with clear operational ownership.
+
+| Area                  | Approach                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Support model         | In-app support requests + email support with severity-based response targets (see Service Levels section) |
+| Monitoring & alerting | 24/7 automated monitoring via AWS CloudWatch with alerting to the service team                            |
+| Release management    | Scheduled maintenance windows, versioned releases, and change log reporting to viaSport                   |
+| Security operations   | Regular patching cadence, expedited response for critical vulnerabilities, quarterly security reviews     |
+| Continuity            | Infrastructure as Code, documented runbooks, tested restore procedures, quarterly DR validation           |
+| Escalation            | Clear escalation path for Severity 1 incidents, including immediate triage and customer communications    |
+
+## What Makes This a Low-Risk Procurement Choice
+
+viaSport is not purchasing a one-time "web project." viaSport is purchasing an outcome: a reliable platform that supports ongoing reporting cycles with predictable support, monitoring, and updates.
+
+Solstice is positioned like an enterprise platform engagement:
+
+- viaSport receives a **subscription + managed service** with defined service levels
+- viaSport retains **control of its configuration and content** (forms, templates, reporting definitions)
+- viaSport retains **full access to its data** with export/portability options at any time
+- Continuity and exit risk can be mitigated through **escrow and transition options** (see Exit & Portability Appendix)
+
+### Risk Mitigation Summary
+
+| Risk              | Mitigation                                                                |
+| ----------------- | ------------------------------------------------------------------------- |
+| Vendor dependency | Source code escrow, data portability, documented runbooks                 |
+| Key person risk   | Infrastructure as Code, operational documentation, delivery pod structure |
+| Technology risk   | Working prototype validated at scale (20.1M rows, sub-250ms p95)          |
+| Delivery risk     | 23 of 25 requirements already built; principal-led with no handoffs       |
+| Operational risk  | Defined SLAs, 24/7 monitoring, quarterly DR drills                        |
 
 ## Relevant Delivery Portfolio
 
-### Austin Wallace Tech, Selected Relevant Delivery Work (examples)
+### Austin Wallace Tech, Selected Relevant Delivery Work
 
 **Project: Legacy modernization (Teck Resources)**
 
-- Scope: Replace brittle stored procedure workflows with testable pipelines.
-- Delivered: Python-based data workflows and infrastructure as code
-  deployments.
-- Responsibility: Data model changes, pipeline logic, Terraform, operational
-  handoff.
-- Outcome: Improved reliability and maintainability, reduced manual
-  intervention.
+- **Problem:** Replace brittle stored procedure workflows with testable, maintainable pipelines
+- **Delivered:** Python-based data workflows and infrastructure as code deployments
+- **Ownership:** Data model changes, pipeline logic, Terraform, operational handoff
+- **Outcome:** Improved reliability and maintainability, reduced manual intervention
+- **Relevance to viaSport:** Mirrors migration from legacy systems to modern, maintainable architecture
 
 **Project: High-volume sports data platform (New Jersey Devils)**
 
-- Scope: End-to-end platform for tracking data at game scale.
-- Delivered: Data pipelines and dbt models supporting decision workflows.
-- Responsibility: Architecture, pipeline implementation, modeling layer,
-  analytics consumers.
-- Outcome: Supported high-stakes decision making and large ingestion volumes.
+- **Problem:** Process tracking data at game scale for decision support
+- **Delivered:** End-to-end data pipelines and dbt models supporting decision workflows
+- **Ownership:** Architecture, pipeline implementation, modeling layer, analytics consumers
+- **Outcome:** Supported high-stakes decision making and large ingestion volumes (10M+ rows per game)
+- **Relevance to viaSport:** Demonstrates ability to deliver reliable analytics at scale in sport sector
 
 **Project: Production data operations (Clio)**
 
-- Scope: Production pipelines and governance.
-- Delivered: Databricks pipelines and operational standards.
-- Responsibility: Pipeline ownership, quality controls, documentation, AI
-  usage guidance.
-- Outcome: Stable production workloads and standardized practices.
-
-Austin Wallace is the delivery lead and solution architect for Solstice. He
-leads scope, architecture, and delivery governance for the platform and has 9+
-years of enterprise data engineering experience.
+- **Problem:** Establish stable production pipelines with governance and quality controls
+- **Delivered:** Databricks pipelines and operational standards
+- **Ownership:** Pipeline ownership, quality controls, documentation, operational support
+- **Outcome:** Stable production workloads and standardized practices
+- **Relevance to viaSport:** Demonstrates operational maturity and production reliability
 
 ## Advisory Partner Profiles
 
-Advisory partners provide expertise and review. Short profiles are provided by
-each advisor.
-
-### Soleil Heaney, System Navigator
-
-[To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector
-experience and their role connecting the team to PSO community needs]
-
-### Will Siddall, Technical Advisor
-
-[To be provided by Will Siddall - 2-3 sentences on relevant technical
-experience and their focus areas for this project]
+Advisory partners provide expertise and review at defined checkpoints.
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-He brings 6 years of mixed-methods research and design for projects across the
-public sector, healthcare, and startup environments.
+[To be provided by Ruslan Hétu - 2-3 sentences on relevant UX research and accessibility experience]
 
-UX Leadership (Founding Designer at Parafoil): Co-led AI product development
-from ideation to Alpha launch, conducting research with 50+ users and
-collaborating cross-functionally to translate complex requirements to human
-digital experiences.
+### Soleil Heaney, System Navigator
 
-Multistakeholder system transformation (Designer at Coeuraj): Delivered
-multistakeholder research projects through workshops, interviews, and designed
-artifacts working with over 200+ participants. Applied methods such as systems
-thinking, foresight, and human-centered design for strategic outputs for
-clients.
+[To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector experience and role connecting team to PSO community needs]
+
+### Will Siddall, Technical Advisor
+
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX). He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments.
 
 ### Parul Kharub, Security and Risk Advisor
 
-Secure Transformation Leadership (Teck Resources Limited): Directed security
-architecture and governance for a $1B digital transformation, ensuring secure
-product development, legacy-to-cloud migration and overall robust security
-controls.
-
-Canadian Regulatory Expertise (CBSA): Managed large-scale cloud transformations
-in the Canadian public sector, aligning over 350 security controls with PIPEDA
-and ISO 27001 standards.
-
-Big 4 Consulting North America (Deloitte): A strategic partner in building a
-global Application Security practice across 43 countries - spearheaded the
-development of a DevSecOps practice that embedded "Shift Left" security from
-requirements to production into the CI/CD pipeline.
+Strategic cybersecurity and risk advisor with 16 years of experience in Fortune 100 companies globally. Led security architecture and governance for a $1B digital transformation at Teck Resources. Managed large-scale cloud transformations at CBSA, aligning 350+ security controls with PIPEDA and ISO 27001. Built Deloitte's global Application Security practice across 43 countries with DevSecOps and "Shift Left" security practices.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha - 2-3 sentences on relevant infrastructure
-and security experience and their focus areas for this project]
+A seasoned 30 year veteran in the technology space, developing early DevOps practices in the dotcom era of the internet. Working with American banking companies like Bank of America, airline industry with Boeing and cutting edge quantum computing at 1Qbit. The one consistent thread with all the large and small enterprises is applying best practices in DevOps, encompassing agile, secure and consistent deployment practices into securely built and cloud environments in a consistent method.
 
 ### Tyler Piller, Security and Compliance Advisor
 
-A cybersecurity veteran with over 10 years of experience specializing in both
-operational defense and strategic risk management. Track record includes
-leading response for major security incidents, conducting complex digital
-forensic investigations, and executing multi-year security assessments for
-critical platforms. He currently directs the Information Security Risk
-Management program, providing strategic advisory to align technical risk with
-enterprise business objectives.
-
-## Continuity of Services
-
-Continuity is supported by the architecture and delivery model:
-
-- **Infrastructure as Code:** All AWS resources are defined in SST and version
-  controlled.
-- **Operational Runbooks:** Deployment and recovery procedures are documented
-  and maintained.
-- **Automated Testing:** CI tests, including security vulnerability scanning,
-  provide regression coverage for core workflows.
-- **Delivery Governance:** Sprint cadence, backlog management, QA gates, and
-  release readiness checks.
-- **Principal Accountability:** Austin Wallace remains the constant delivery
-  lead through rollout.
-
-If a team member changes, the codebase, infrastructure definitions, and
-operational documentation enable efficient transition.
+[To be provided by Tyler Piller - 2-3 sentences on relevant security operations experience]
 
 ## Data Ownership and Portability
 
-| Aspect             | Commitment                                               |
-| ------------------ | -------------------------------------------------------- |
-| Data Ownership     | viaSport retains full ownership of all data              |
-| Export Formats     | CSV, Excel, and JSON exports available at any time       |
-| Data Extraction    | Full database export available on contract termination   |
-| Documentation      | Operational runbooks and schema documentation provided   |
-| Source Access      | Source code access available under mutually agreed terms |
-| Transition Support | Support available for transition to a replacement system |
+| Aspect             | Commitment                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| Data Ownership     | viaSport retains full ownership of all data                                           |
+| Export Formats     | CSV, Excel, and JSON exports available at any time                                    |
+| Data Extraction    | Full database export available on request or contract termination                     |
+| Documentation      | Operational runbooks and schema documentation provided                                |
+| Source Access      | Source code escrow available; perpetual license to customizations available as option |
+| Transition Support | Support available for transition to a replacement system                              |
 
 ## Proposed Solution Statement
 
-Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable,
-and secure information management system aligned to the Strength in Numbers
-requirements.
+Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable, and secure information management system aligned to the Strength in Numbers requirements.
 
 ### Key Differentiators
 
@@ -422,7 +410,6 @@ reduces knowledge transfer risk and provides direct accountability.
 The team combines enterprise data engineering with direct sport sector
 operations experience. Soleil Heaney brings perspective as a PSO executive,
 ensuring the platform reflects how sport organizations actually work.
-[Soleil to confirm wording]
 
 **4. British Columbia Based**
 
@@ -462,16 +449,12 @@ OWASP Top 10 and OWASP ASVS as a verification framework.
 ### Benefits to viaSport
 
 - **Reduced Risk:** Evaluate a working system before committing.
-- **Accelerated Timeline:** 30 weeks to rollout, with time focused on UX
-  research and community engagement rather than building core features.
-- **Direct Accountability:** Principal-led delivery with no organizational
-  layers.
-- **Sector Understanding:** Experience leading amateur sport organizations, not
-  just building software.
-- **Secure and Safe:** Embedding security and privacy by design from day one of
-  development.
-- **Sustainability:** Serverless architecture and infrastructure as code reduce
-  operating overhead.
+- **Predictable Costs:** Term subscription with included enhancement hours.
+- **Direct Accountability:** Principal-led delivery with no organizational layers.
+- **Sector Understanding:** Experience leading amateur sport organizations, not just building software.
+- **Secure and Safe:** Embedding security and privacy by design from day one.
+- **Sustainability:** Serverless architecture and infrastructure as code reduce operating overhead.
+- **Exit Options:** Data portability, escrow, and transition support available.
 
 ---
 
@@ -670,12 +653,13 @@ The platform uses a multi-tenant architecture with strict organization scoping:
 
 ### Regulatory Alignment
 
-| Requirement         | Implementation                                                      |
-| ------------------- | ------------------------------------------------------------------- |
-| PIPEDA alignment    | Canadian data residency, encryption, access controls, audit logging |
-| Data minimization   | Configurable retention policies and legal holds                     |
-| Right to access     | Data export workflows with audit trail                              |
-| Breach notification | Audit logging and anomaly detection                                 |
+| Requirement         | Implementation                                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| PIPEDA alignment    | Canadian data residency, TLS 1.2+ encryption in transit, encryption at rest, access controls, audit logging |
+| Transport security  | All APIs served over HTTPS (TLS 1.2+); no unencrypted endpoints                                             |
+| Data minimization   | Configurable retention policies and legal holds                                                             |
+| Right to access     | Data export workflows with audit trail                                                                      |
+| Breach notification | Audit logging and anomaly detection                                                                         |
 
 AWS maintains a Data Processing Addendum that covers all services used by the platform, including SES for email delivery: https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf
 
@@ -1317,7 +1301,7 @@ Availability is measured as the percentage of time the production application is
 | Sev 1 - Critical | 4 hours        | Same business day | Immediate escalation to delivery lead |
 | Sev 2 - High     | 8 hours        | 2 business days   | Escalation if no progress in 24 hours |
 | Sev 3 - Medium   | 24 hours       | 5 business days   | Standard workflow                     |
-| Sev 4 - Low      | 48 hours       | Best effort       | Standard workflow                     |
+| Sev 4 - Low      | 48 hours       | 10 Business Days  | Standard workflow                     |
 
 **Business hours:** Monday to Friday, 9:00 AM to 5:00 PM Pacific Time, excluding BC statutory holidays.
 
@@ -1374,7 +1358,7 @@ Production environment uses Multi-AZ deployment for automatic failover. Database
 | Security patching (critical) | Within 48 hours of vulnerability disclosure                   |
 | Dependency updates           | Monthly review; immediate for security-related updates        |
 | Security reviews             | Quarterly review of access controls, configurations, and logs |
-| Penetration testing          | Available as optional add-on (see Optional Add-Ons)           |
+| Penetration testing          | Available as optional add-on (see Commercial Model)           |
 
 ## Release Management
 
@@ -1425,15 +1409,6 @@ If desired by viaSport, service credits can be included in the contract for avai
 
 Credits are applied to the following quarter's invoice upon viaSport request with documented evidence of downtime.
 
-## Optional Add-Ons
-
-| Add-On                          | Description                                                                | Estimated Cost             |
-| ------------------------------- | -------------------------------------------------------------------------- | -------------------------- |
-| Third-party penetration testing | Independent security assessment by qualified third-party firm              | $10,000-$20,000/assessment |
-| Extended support (24/7)         | After-hours monitoring and response, reduced Sev 1 response time (2 hours) | $30,000-$50,000/year       |
-
-See **Commercial Model and Pricing** for full add-on details.
-
 ---
 
 _Full service level terms can be incorporated into a formal SLA schedule as part of the contract._
@@ -1461,7 +1436,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement             |
 | DM-AGG-004 | Data Quality and Integrity            | Built   | Validation, alerting with thresholds            | Threshold tuning with viaSport          |
 | DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD) |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file imports, ECS batch worker   | Legacy extraction and mapping           |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with autofix, dynamic templates    | Legacy extraction (awaiting BCAR/BCSI)  |
 
 ## Reporting (RP-AGG)
 
@@ -1506,14 +1481,14 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 | Category                | Total  | Built  | Partial |
 | ----------------------- | ------ | ------ | ------- |
-| Data Management         | 6      | 4      | 2       |
+| Data Management         | 6      | 5      | 1       |
 | Reporting               | 5      | 4      | 1       |
 | Security                | 4      | 4      | 0       |
 | Training and Onboarding | 3      | 3      | 0       |
 | User Interface          | 7      | 7      | 0       |
-| **Total**               | **25** | **22** | **3**   |
+| **Total**               | **25** | **23** | **2**   |
 
-Three requirements are partial due to integration and metadata dependencies that require viaSport input.
+Two requirements are partial due to integration and metadata dependencies that require viaSport input.
 
 ---
 
@@ -1521,14 +1496,14 @@ Three requirements are partial due to integration and metadata dependencies that
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                         | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | --------------------------------------------------- | ---------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking     | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging        | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                     | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds  | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement           | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file field imports, ECS batch worker | Legacy extraction scope and mapping      |
+| Req ID     | Title                                 | Status  | Built Today                                                        | Remaining Scope                          |
+| ---------- | ------------------------------------- | ------- | ------------------------------------------------------------------ | ---------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging                       | External integrations and mapping rules  |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement              |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds                 | Threshold tuning with viaSport           |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement                          | Final DR and retention validation (TBD)  |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with error categorization, autofix, dynamic templates | Legacy extraction (awaiting BCAR/BCSI)   |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -1731,22 +1706,26 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 
 **How We Meet It:**
 
-- Import wizard supports CSV and Excel uploads with mapping templates.
-- Validation preview highlights errors before commit.
+- Smart import wizard supports CSV and Excel uploads with intelligent error handling.
+- Pattern detection identifies column type mismatches and suggests fixes.
+- One-click autofix for common issues with confidence scoring.
 - Import jobs are auditable and reversible within the rollback window.
 
 **Built Today:**
 
-- Import wizard with upload, mapping, preview, and commit flow.
-- File field import pipeline supporting JSON file payloads with validation (fileName, mimeType, sizeBytes, storageKey).
-- Mapping template library and reusable mappings.
-- Rollback support using import job ID and 7-day rollback window.
-- Batch processing lane with ECS Fargate worker (verified deployed in sin-dev).
+- **Intelligent Error Categorization:** Errors grouped by root cause (structural, data quality, completeness, referential) instead of row-by-row display
+- **Pattern Detection:** 13 pattern detectors (email, date formats, phone, currency, postal codes, UUID, etc.) automatically identify column type mismatches
+- **Autofix with Confidence Scoring:** One-click fixes for column swaps, date format conversion, boolean normalization; dynamic confidence based on pattern match ratio, header hints, and sample size
+- **In-App Correction:** Inline cell editing with real-time validation, eliminating re-upload for minor fixes
+- **Dynamic Templates:** Generate XLSX/CSV templates from any form definition with field descriptions, example values, and Excel data validation dropdowns
+- **Virtualized Preview:** TanStack Virtual for 10k+ row previews without performance degradation
+- **Admin Template Management:** Template CRUD, version tracking, import history with rollback
+- **Batch Processing:** ECS Fargate worker for large file processing (verified deployed in sin-dev)
 
 **Remaining Scope:**
 
 - Legacy extraction and BCAR or BCSI mapping rules.
-- Additional migration pipelines for organization and user records (TBD).
+- Additional migration pipelines for organization and user records (pending viaSport legacy access).
 
 **viaSport Dependencies:**
 
@@ -1755,6 +1734,8 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 
 **Approach:**
 Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
+
+**Demo Path:** Dashboard → Admin → Imports (Smart wizard with autofix demo)
 
 **Evidence:**
 Evidence is summarized in Section 1.3.
@@ -2656,55 +2637,60 @@ The application code is proprietary to Austin Wallace Tech, with source access a
 
 ---
 
-# Cost and Value of Services
+# Commercial Model and Pricing
 
-## Pricing Model Overview
+## Procurement Structure
 
-Austin Wallace Tech proposes a fixed-price engagement with milestone-based payments.
+Austin Wallace Tech proposes Solstice as a **3-year base term subscription** with two optional 1-year extensions at viaSport's discretion (3+1+1). This structure avoids a separate annual RFP for operations and provides predictable multi-year budgeting.
 
-| Component         | Amount   | Period   |
-| ----------------- | -------- | -------- |
-| Implementation    | $600,000 | One-time |
-| Annual Operations | $200,000 | Per year |
+## Pricing Summary
 
-**Year 1 Total:** $800,000
-**Year 2 and beyond:** $200,000 per year
+| Component                                        | Price           | Notes                                                                                                  |
+| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------ |
+| Implementation / Standup (one-time)              | $600,000        | Discovery, configuration, migration, UAT support, training, rollout, go-live/hypercare                 |
+| Platform Subscription + Managed Service (annual) | $200,000 / year | Hosting, monitoring, patching, support, reliability management, product updates, 200 enhancement hours |
 
-This pricing reflects the value delivered to viaSport, not cost-plus billing.
-The existing prototype reduces delivery risk because viaSport can evaluate a
-functioning system before contract award (see Section 1.3).
+## Total Cost View
 
-## Cost Breakdown
+| Term                                   | Total      |
+| -------------------------------------- | ---------- |
+| 3-year base term                       | $1,200,000 |
+| 5-year total (if extensions exercised) | $1,600,000 |
 
-### Implementation ($600,000)
+## What is Included
 
-| Phase                   | Activities                                                  |
-| ----------------------- | ----------------------------------------------------------- |
-| Planning and Discovery  | Requirements validation, UX interviews, migration discovery |
-| Development             | viaSport configuration, branding, remaining feature work    |
-| Data Migration          | Legacy extraction, mapping, validation, import              |
-| User Acceptance Testing | UAT environment, test support, defect resolution            |
-| Training                | viaSport admin training, train-the-trainer                  |
-| PSO Rollout             | Cohort onboarding and go-live support                       |
-| Production Deployment   | Monitoring setup and operational handoff                    |
+### Implementation / Standup
 
-All RFP requirements are included, including completion of partial items (DM-AGG-002, DM-AGG-006, RP-AGG-002).
+- Discovery and requirements confirmation against the prototype
+- viaSport-specific configuration (forms, templates, metadata, branding)
+- Legacy data extraction approach, pilot migration, full migration, and reconciliation
+- UAT support and defect remediation
+- Training delivery (viaSport admin, train-the-trainer, PSO rollout enablement)
+- Go-live support and defined hypercare period
 
-### Annual Operations ($200,000 per year)
+### Platform Subscription + Managed Service
 
-| Category                   | Scope                                                                                               |
-| -------------------------- | --------------------------------------------------------------------------------------------------- |
-| Hosting and Infrastructure | AWS ca-central-1, database, storage, CDN, compute                                                   |
-| Security                   | Monitoring, patching, quarterly reviews                                                             |
-| Security Tooling           | Automated vulnerability scanning (SAST/SCA) and scheduled DAST execution, plus remediation workflow |
-| Maintenance                | Bug fixes, dependency updates, performance tuning                                                   |
-| Support                    | Business hours support, 24 hour response standard                                                   |
-| Minor Enhancements         | Small improvements within existing scope                                                            |
-| Disaster Recovery          | Backups and quarterly DR drills                                                                     |
+- Canadian-hosted production infrastructure and routine operations
+- Monitoring, alerting, and incident response coordination
+- Security patching and dependency updates
+- Routine backups and quarterly DR validation drills (results reported to viaSport)
+- Support channels (in-app and email) with severity-based response targets
+- Ongoing product updates and non-custom feature improvements
+- **200 hours per year** for enhancements, minor feature requests, and configuration changes
 
-Security tooling and routine scanning effort are included in the annual operations fee.
+## Enhancements and Change Requests
 
-### Payment Schedule
+viaSport will have evolving needs. The subscription includes **200 hours per year** for enhancements, minor feature requests, and configuration changes beyond routine operations.
+
+Additional work beyond the included hours is available at **$175/hour** with prior approval. A change control process ensures transparency:
+
+1. Change request submitted
+2. Impact assessment (scope, timeline, hours)
+3. Proposal with options
+4. Mutual agreement documented
+5. Work proceeds after sign-off
+
+## Payment Schedule
 
 | Milestone        | Percentage | Amount   | Trigger                          |
 | ---------------- | ---------- | -------- | -------------------------------- |
@@ -2712,35 +2698,50 @@ Security tooling and routine scanning effort are included in the annual operatio
 | UAT Sign-Off     | 25%        | $150,000 | User acceptance testing complete |
 | Go-Live          | 50%        | $300,000 | Production deployment            |
 
-Annual operations are billed quarterly in advance ($50,000 per quarter).
+Annual subscriptions are billed quarterly in advance ($50,000 per quarter).
 
-## Factors Affecting Timeline and Price
-
-### Scope Changes
-
-Changes beyond the RFP scope trigger a change order:
-
-| Change Type                  | Process                               |
-| ---------------------------- | ------------------------------------- |
-| New features not in RFP      | Scope assessment and proposal         |
-| Additional integrations      | Integration specification and pricing |
-| Major infrastructure changes | Architecture review and options       |
-
-### Change Management Process
-
-1. Change request submitted
-2. Impact assessment (scope, timeline, cost)
-3. Proposal with options
-4. Mutual agreement documented
-5. Work proceeds after sign-off
-
-### Factors That Do Not Trigger Price Adjustments
+## Factors That Do Not Trigger Price Adjustments
 
 - Normal data volume growth within PostgreSQL capacity
 - Standard security updates and patches
 - Configuration changes within existing features
+- Work within the included 200 enhancement hours
+
+## Renewal and Price Protection
+
+Renewal years can be priced:
+
+- At the same annual rate ($200,000), or
+- With a mutually agreed inflation cap (e.g., CPI-capped adjustments)
+
+Renewal terms will be discussed no later than 90 days before the end of each contract year.
+
+## Optional Risk Reduction: Exit and Continuity
+
+To reduce vendor risk, viaSport may select from the following continuity options:
+
+| Option                              | Description                                                                                                              | Included                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------- |
+| Data portability + runbooks         | Full data export (CSV, JSON, database dump) plus operational runbooks                                                    | Baseline (included)         |
+| Source code escrow                  | Source code deposited with escrow agent, released upon defined trigger conditions (insolvency, failure to support, etc.) | Optional                    |
+| Perpetual license to customizations | At end of contract, viaSport receives perpetual license to viaSport-specific configuration and customizations            | Optional                    |
+| Transition support                  | Support for transition to a replacement system if viaSport chooses not to renew                                          | Available at standard rates |
+
+Details on escrow and perpetual license options are provided in the Exit and Portability Appendix.
 
 ## Optional Add-Ons
+
+### Third-Party Penetration Testing
+
+**Estimated:** $10,000 to $20,000 per assessment
+
+Independent penetration testing by a qualified third-party security firm. Can be scheduled pre-go-live or annually. Austin Wallace Tech coordinates with the testing firm and remediates findings.
+
+### Extended Support Coverage (24/7)
+
+**Estimated:** $30,000 to $50,000 per year additional
+
+Adds after-hours monitoring and response outside business hours, with Sev 1 response time reduced to 2 hours.
 
 ### Operations Portal (Events and Team Management)
 
@@ -2748,29 +2749,16 @@ Changes beyond the RFP scope trigger a change order:
 
 The Solstice platform includes an operations portal used by Quadball Canada. This could be extended to viaSport and PSOs to unify reporting and operations.
 
-### Extended Support Coverage (24/7)
+## Pricing Philosophy
 
-**Estimated:** $30,000 to $50,000 per year additional
+Pricing is based on the value delivered, not on hourly billing. The existing prototype represents Austin Wallace Tech's investment in building a platform for the sport sector. viaSport benefits from:
 
-Adds after-hours monitoring and response outside business hours.
+- A working system available for evaluation before contract award
+- Reduced delivery risk (23 of 25 requirements already built)
+- Principal-led delivery with no organizational layers
+- A managed service model with clear service levels and included enhancement capacity
 
-## In-Kind and Value-Add Contributions
-
-### Value-Add: Working Prototype
-
-Prototype available for evaluation (see Section 1.3):
-
-- 20.1M rows tested with sub-250ms p95 latency
-- Majority of system requirements implemented
-- Available for evaluator review before contract award
-
-### Value-Add: Source Code Access
-
-Source code access can be provided under mutually agreed terms to support transparency and continuity.
-
-### Pricing Philosophy
-
-Pricing is based on the value delivered, not on hourly billing. The prototype and principal-led delivery model reduce overhead and accelerate implementation compared to traditional project structures.
+The prototype and principal-led delivery model reduce overhead and accelerate implementation compared to traditional project structures or enterprise platform integrations.
 
 ---
 
@@ -2996,7 +2984,7 @@ To protect evaluator accounts and align with security best practices, credential
 
 **To request access:**
 
-1. Contact austin@austinwallace.tech with evaluator names and email addresses
+1. Contact austinwallacetech@gmail.com with evaluator names and email addresses
 2. Receive the Evaluator Access Pack via secure email
 3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
 4. MFA demonstration available on the viaSport Staff account
@@ -3183,7 +3171,9 @@ sector projects, healthcare, and startups.
 
 ### Will Siddall, Technical Advisor
 
-[To be provided by Will Siddall]
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX).
+
+He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments. Industries he's supported in the past include mining, VFX, hydrography and ocean exploration, oil and gas, civil engineering and cadastral/bathymetric surveys.
 
 ### Parul Kharub, Security and Risk Advisor
 
@@ -3194,7 +3184,7 @@ security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha]
+A 30+ year veteran of the dotcom internet era bringing generational lessons of best practices to an agile era of cloud development. Having worked with American Finance, Aviation and Canadian quantum computing startups. All relying on consistent, secure, repeatable development practices learned over years of successful achievements and hard lessons learned.
 
 ### Tyler Piller, Security and Compliance Advisor
 
@@ -3224,7 +3214,7 @@ align technical risk with enterprise business objectives.
 
 Austin Wallace
 Project Lead, Austin Wallace Tech
-Email: austin@austinwallace.tech
+Email: austinwallacetech@gmail.com
 Location: Victoria, British Columbia
 
 Austin Wallace Tech welcomes the opportunity to present the prototype and discuss how Solstice can serve viaSport's Strength in Numbers initiative.

@@ -217,11 +217,17 @@ export default $config({
           numCacheClusters: 2,
           multiAzEnabled: true,
         }
-      : {
-          instance: "t4g.micro",
-          numCacheClusters: 1,
-          multiAzEnabled: false,
-        };
+      : isPerf
+        ? {
+            instance: "t4g.small",
+            numCacheClusters: 2,
+            multiAzEnabled: false,
+          }
+        : {
+            instance: "t4g.micro",
+            numCacheClusters: 1,
+            multiAzEnabled: false,
+          };
 
     const redis = new sst.aws.Redis("Redis", {
       vpc,

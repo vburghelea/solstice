@@ -137,3 +137,9 @@ export const downloadFormTemplateSchema = z.object({
     .optional(),
 });
 export type DownloadFormTemplateInput = z.infer<typeof downloadFormTemplateSchema>;
+
+export const downloadImportTemplateSchema = z.object({
+  templateId: z.uuid(),
+  format: templateFormatSchema,
+});
+export type DownloadImportTemplateInput = z.infer<typeof downloadImportTemplateSchema>;

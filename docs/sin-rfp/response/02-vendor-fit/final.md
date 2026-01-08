@@ -1,189 +1,151 @@
 # Vendor Fit to viaSport's Needs
 
-## Company Information
+## Company Overview
 
-### Austin Wallace Tech
+Austin Wallace Tech is a British Columbia incorporated technology firm (Victoria, BC) delivering Solstice as a managed platform for sport sector reporting and information management.
 
-Austin Wallace Tech is a British Columbia based technology consulting firm
-incorporated in 2025 and headquartered in Victoria, BC. The company was founded
-to deliver information management solutions for the sport sector, with the
-Strength in Numbers platform as its primary engagement.
+We operate as a principal-led product team with contracted specialists for security, UX/accessibility, and independent testing. This model provides:
 
-| Attribute      | Details                                                            |
-| -------------- | ------------------------------------------------------------------ |
-| Incorporation  | 2025                                                               |
-| Headquarters   | Victoria, British Columbia                                         |
-| Delivery Model | Austin Wallace Tech leads delivery, supported by advisory partners |
-| Team Coverage  | Security, UX and accessibility, data migration, delivery ops, QA   |
-| Primary Focus  | Sport sector information management systems                        |
+- A single accountable delivery lead (no sales-to-delivery handoff)
+- A stable core engineering team
+- Elastic specialist capacity for compliance, security testing, and UX validation
 
-Austin Wallace Tech leads delivery directly, supported by advisory partners
-who provide domain expertise, technical review, and validation. Work is
-managed through a shared backlog, sprint cadence, QA gates, and security
-sign-off. The solution architect leads delivery from discovery through rollout
-to avoid handoffs.
+| Attribute          | Details                                      |
+| ------------------ | -------------------------------------------- |
+| Headquarters       | Victoria, British Columbia                   |
+| Operating model    | Product team + managed service               |
+| Delivery structure | Core delivery pod + specialist partners      |
+| Hosting region     | AWS Canada (Central) for primary data stores |
+| Primary focus      | Sport sector information management systems  |
 
-## Delivery Model
+## Operating Model
 
-### Core Delivery
+### Delivery Pod
 
-- **Austin Wallace**: Solution architecture, data engineering, development,
-  project management, and delivery governance.
+Solstice is delivered through a product team operating model: a consistent delivery pod for implementation and the same team responsible for ongoing operations. This avoids handoffs between "project build" and "ops," and provides clear accountability through rollout and into steady state.
 
-### Execution Capacity and Engagement Model
+| Function                 | Responsibilities                                                          | Primary                                     |
+| ------------------------ | ------------------------------------------------------------------------- | ------------------------------------------- |
+| Program & Delivery Lead  | Delivery plan, governance, risk management, stakeholder management        | Austin Wallace                              |
+| UX & Accessibility Lead  | UX research, design, accessibility validation, usability testing          | Ruslan Hétu                                 |
+| System Navigator         | Connects team to PSO community needs during research and rollout          | Soleil Heaney                               |
+| Technical Advisor        | Architecture review, development support, performance engineering         | Will Siddall                                |
+| Security & Risk Advisors | Security architecture, control mapping, pen test coordination, compliance | Parul Kharub, Michael Casinha, Tyler Piller |
 
-| Role                               | Engagement                       | Phase Coverage                  |
-| ---------------------------------- | -------------------------------- | ------------------------------- |
-| Austin Wallace (Delivery Lead)     | Full-time, accountable           | All phases                      |
-| Ruslan Hétu (UX/A11y Lead)         | Full-time UX research and design | All phases                      |
-| Soleil Heaney (System Navigator)   | Ongoing community liaison        | Research, UAT, rollout          |
-| Will Siddall (Engineering Support) | Part-time during development     | Weeks 11-22                     |
-| Security Advisors                  | Scheduled reviews at checkpoints | Design freeze, pre-UAT, go-live |
+### Engagement Model
 
-Advisory partners participate in scheduled reviews and provide expertise at
-defined checkpoints rather than full-time allocation.
+| Role                             | Engagement                       | Phase Coverage                  |
+| -------------------------------- | -------------------------------- | ------------------------------- |
+| Austin Wallace (Delivery Lead)   | Full-time, accountable           | All phases                      |
+| Ruslan Hétu (UX/A11y Lead)       | Full-time UX research and design | All phases                      |
+| Soleil Heaney (System Navigator) | Ongoing community liaison        | Research, UAT, rollout          |
+| Will Siddall (Technical Advisor) | Part-time during development     | Weeks 11-22                     |
+| Security Advisors                | Scheduled reviews at checkpoints | Design freeze, pre-UAT, go-live |
 
-### Advisory Partners
+## Service Management and Coverage
 
-| Focus Area                  | Advisor         | Contribution                                            |
-| --------------------------- | --------------- | ------------------------------------------------------- |
-| UX and Accessibility        | Ruslan Hétu     | UX research lead, design, accessibility validation      |
-| Sport Sector / Navigator    | Soleil Heaney   | System navigator connecting team to PSO community needs |
-| Technical Architecture      | Will Siddall    | Architecture review and development support             |
-| Security and Risk           | Parul Kharub    | Security strategy and risk advisory                     |
-| Security and Infrastructure | Michael Casinha | Infrastructure security and DevOps review               |
-| Security and Compliance     | Tyler Piller    | Security operations and compliance validation           |
+viaSport is purchasing an outcome: a platform that performs reliably during reporting cycles, with clear operational ownership.
+
+| Area                  | Approach                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Support model         | In-app support requests + email support with severity-based response targets (see Service Levels section) |
+| Monitoring & alerting | 24/7 automated monitoring via AWS CloudWatch with alerting to the service team                            |
+| Release management    | Scheduled maintenance windows, versioned releases, and change log reporting to viaSport                   |
+| Security operations   | Regular patching cadence, expedited response for critical vulnerabilities, quarterly security reviews     |
+| Continuity            | Infrastructure as Code, documented runbooks, tested restore procedures, quarterly DR validation           |
+| Escalation            | Clear escalation path for Severity 1 incidents, including immediate triage and customer communications    |
+
+## What Makes This a Low-Risk Procurement Choice
+
+viaSport is not purchasing a one-time "web project." viaSport is purchasing an outcome: a reliable platform that supports ongoing reporting cycles with predictable support, monitoring, and updates.
+
+Solstice is positioned like an enterprise platform engagement:
+
+- viaSport receives a **subscription + managed service** with defined service levels
+- viaSport retains **control of its configuration and content** (forms, templates, reporting definitions)
+- viaSport retains **full access to its data** with export/portability options at any time
+- Continuity and exit risk can be mitigated through **escrow and transition options** (see Exit & Portability Appendix)
+
+### Risk Mitigation Summary
+
+| Risk              | Mitigation                                                                |
+| ----------------- | ------------------------------------------------------------------------- |
+| Vendor dependency | Source code escrow, data portability, documented runbooks                 |
+| Key person risk   | Infrastructure as Code, operational documentation, delivery pod structure |
+| Technology risk   | Working prototype validated at scale (20.1M rows, sub-250ms p95)          |
+| Delivery risk     | 23 of 25 requirements already built; principal-led with no handoffs       |
+| Operational risk  | Defined SLAs, 24/7 monitoring, quarterly DR drills                        |
 
 ## Relevant Delivery Portfolio
 
-### Austin Wallace Tech, Selected Relevant Delivery Work (examples)
+### Austin Wallace Tech, Selected Relevant Delivery Work
 
 **Project: Legacy modernization (Teck Resources)**
 
-- Scope: Replace brittle stored procedure workflows with testable pipelines.
-- Delivered: Python-based data workflows and infrastructure as code
-  deployments.
-- Responsibility: Data model changes, pipeline logic, Terraform, operational
-  handoff.
-- Outcome: Improved reliability and maintainability, reduced manual
-  intervention.
+- **Problem:** Replace brittle stored procedure workflows with testable, maintainable pipelines
+- **Delivered:** Python-based data workflows and infrastructure as code deployments
+- **Ownership:** Data model changes, pipeline logic, Terraform, operational handoff
+- **Outcome:** Improved reliability and maintainability, reduced manual intervention
+- **Relevance to viaSport:** Mirrors migration from legacy systems to modern, maintainable architecture
 
 **Project: High-volume sports data platform (New Jersey Devils)**
 
-- Scope: End-to-end platform for tracking data at game scale.
-- Delivered: Data pipelines and dbt models supporting decision workflows.
-- Responsibility: Architecture, pipeline implementation, modeling layer,
-  analytics consumers.
-- Outcome: Supported high-stakes decision making and large ingestion volumes.
+- **Problem:** Process tracking data at game scale for decision support
+- **Delivered:** End-to-end data pipelines and dbt models supporting decision workflows
+- **Ownership:** Architecture, pipeline implementation, modeling layer, analytics consumers
+- **Outcome:** Supported high-stakes decision making and large ingestion volumes (10M+ rows per game)
+- **Relevance to viaSport:** Demonstrates ability to deliver reliable analytics at scale in sport sector
 
 **Project: Production data operations (Clio)**
 
-- Scope: Production pipelines and governance.
-- Delivered: Databricks pipelines and operational standards.
-- Responsibility: Pipeline ownership, quality controls, documentation, AI
-  usage guidance.
-- Outcome: Stable production workloads and standardized practices.
-
-Austin Wallace is the delivery lead and solution architect for Solstice. He
-leads scope, architecture, and delivery governance for the platform and has 9+
-years of enterprise data engineering experience.
+- **Problem:** Establish stable production pipelines with governance and quality controls
+- **Delivered:** Databricks pipelines and operational standards
+- **Ownership:** Pipeline ownership, quality controls, documentation, operational support
+- **Outcome:** Stable production workloads and standardized practices
+- **Relevance to viaSport:** Demonstrates operational maturity and production reliability
 
 ## Advisory Partner Profiles
 
-Advisory partners provide expertise and review. Short profiles are provided by
-each advisor.
-
-### Soleil Heaney, System Navigator
-
-[To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector
-experience and their role connecting the team to PSO community needs]
-
-### Will Siddall, Technical Advisor
-
-[To be provided by Will Siddall - 2-3 sentences on relevant technical
-experience and their focus areas for this project]
+Advisory partners provide expertise and review at defined checkpoints.
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-He brings 6 years of mixed-methods research and design for projects across the
-public sector, healthcare, and startup environments.
+[To be provided by Ruslan Hétu - 2-3 sentences on relevant UX research and accessibility experience]
 
-UX Leadership (Founding Designer at Parafoil): Co-led AI product development
-from ideation to Alpha launch, conducting research with 50+ users and
-collaborating cross-functionally to translate complex requirements to human
-digital experiences.
+### Soleil Heaney, System Navigator
 
-Multistakeholder system transformation (Designer at Coeuraj): Delivered
-multistakeholder research projects through workshops, interviews, and designed
-artifacts working with over 200+ participants. Applied methods such as systems
-thinking, foresight, and human-centered design for strategic outputs for
-clients.
+[To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector experience and role connecting team to PSO community needs]
+
+### Will Siddall, Technical Advisor
+
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX). He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments.
 
 ### Parul Kharub, Security and Risk Advisor
 
-Secure Transformation Leadership (Teck Resources Limited): Directed security
-architecture and governance for a $1B digital transformation, ensuring secure
-product development, legacy-to-cloud migration and overall robust security
-controls.
-
-Canadian Regulatory Expertise (CBSA): Managed large-scale cloud transformations
-in the Canadian public sector, aligning over 350 security controls with PIPEDA
-and ISO 27001 standards.
-
-Big 4 Consulting North America (Deloitte): A strategic partner in building a
-global Application Security practice across 43 countries - spearheaded the
-development of a DevSecOps practice that embedded "Shift Left" security from
-requirements to production into the CI/CD pipeline.
+Strategic cybersecurity and risk advisor with 16 years of experience in Fortune 100 companies globally. Led security architecture and governance for a $1B digital transformation at Teck Resources. Managed large-scale cloud transformations at CBSA, aligning 350+ security controls with PIPEDA and ISO 27001. Built Deloitte's global Application Security practice across 43 countries with DevSecOps and "Shift Left" security practices.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha - 2-3 sentences on relevant infrastructure
-and security experience and their focus areas for this project]
+A seasoned 30 year veteran in the technology space, developing early DevOps practices in the dotcom era of the internet. Working with American banking companies like Bank of America, airline industry with Boeing and cutting edge quantum computing at 1Qbit. The one consistent thread with all the large and small enterprises is applying best practices in DevOps, encompassing agile, secure and consistent deployment practices into securely built and cloud environments in a consistent method.
 
 ### Tyler Piller, Security and Compliance Advisor
 
-A cybersecurity veteran with over 10 years of experience specializing in both
-operational defense and strategic risk management. Track record includes
-leading response for major security incidents, conducting complex digital
-forensic investigations, and executing multi-year security assessments for
-critical platforms. He currently directs the Information Security Risk
-Management program, providing strategic advisory to align technical risk with
-enterprise business objectives.
-
-## Continuity of Services
-
-Continuity is supported by the architecture and delivery model:
-
-- **Infrastructure as Code:** All AWS resources are defined in SST and version
-  controlled.
-- **Operational Runbooks:** Deployment and recovery procedures are documented
-  and maintained.
-- **Automated Testing:** CI tests, including security vulnerability scanning,
-  provide regression coverage for core workflows.
-- **Delivery Governance:** Sprint cadence, backlog management, QA gates, and
-  release readiness checks.
-- **Principal Accountability:** Austin Wallace remains the constant delivery
-  lead through rollout.
-
-If a team member changes, the codebase, infrastructure definitions, and
-operational documentation enable efficient transition.
+[To be provided by Tyler Piller - 2-3 sentences on relevant security operations experience]
 
 ## Data Ownership and Portability
 
-| Aspect             | Commitment                                               |
-| ------------------ | -------------------------------------------------------- |
-| Data Ownership     | viaSport retains full ownership of all data              |
-| Export Formats     | CSV, Excel, and JSON exports available at any time       |
-| Data Extraction    | Full database export available on contract termination   |
-| Documentation      | Operational runbooks and schema documentation provided   |
-| Source Access      | Source code access available under mutually agreed terms |
-| Transition Support | Support available for transition to a replacement system |
+| Aspect             | Commitment                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| Data Ownership     | viaSport retains full ownership of all data                                           |
+| Export Formats     | CSV, Excel, and JSON exports available at any time                                    |
+| Data Extraction    | Full database export available on request or contract termination                     |
+| Documentation      | Operational runbooks and schema documentation provided                                |
+| Source Access      | Source code escrow available; perpetual license to customizations available as option |
+| Transition Support | Support available for transition to a replacement system                              |
 
 ## Proposed Solution Statement
 
-Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable,
-and secure information management system aligned to the Strength in Numbers
-requirements.
+Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable, and secure information management system aligned to the Strength in Numbers requirements.
 
 ### Key Differentiators
 
@@ -203,7 +165,6 @@ reduces knowledge transfer risk and provides direct accountability.
 The team combines enterprise data engineering with direct sport sector
 operations experience. Soleil Heaney brings perspective as a PSO executive,
 ensuring the platform reflects how sport organizations actually work.
-[Soleil to confirm wording]
 
 **4. British Columbia Based**
 
@@ -243,13 +204,9 @@ OWASP Top 10 and OWASP ASVS as a verification framework.
 ### Benefits to viaSport
 
 - **Reduced Risk:** Evaluate a working system before committing.
-- **Accelerated Timeline:** 30 weeks to rollout, with time focused on UX
-  research and community engagement rather than building core features.
-- **Direct Accountability:** Principal-led delivery with no organizational
-  layers.
-- **Sector Understanding:** Experience leading amateur sport organizations, not
-  just building software.
-- **Secure and Safe:** Embedding security and privacy by design from day one of
-  development.
-- **Sustainability:** Serverless architecture and infrastructure as code reduce
-  operating overhead.
+- **Predictable Costs:** Term subscription with included enhancement hours.
+- **Direct Accountability:** Principal-led delivery with no organizational layers.
+- **Sector Understanding:** Experience leading amateur sport organizations, not just building software.
+- **Secure and Safe:** Embedding security and privacy by design from day one.
+- **Sustainability:** Serverless architecture and infrastructure as code reduce operating overhead.
+- **Exit Options:** Data portability, escrow, and transition support available.

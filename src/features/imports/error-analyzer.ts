@@ -92,6 +92,7 @@ const FIELD_TYPE_TO_PATTERN: Record<string, PatternType[]> = {
   date: ["isoDate", "usDate", "euDate", "dateLike"],
   number: ["number", "currency", "percentage"],
   checkbox: ["boolean"],
+  phone: ["phone"],
   text: ["phone", "url", "postalCode", "uuid"],
   url: ["url"],
   tel: ["phone"],

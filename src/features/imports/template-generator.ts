@@ -82,20 +82,49 @@ const buildExampleValue = (field: FormDefinition["fields"][number]) => {
   return "Example";
 };
 
+const buildColumns = (definition: FormDefinition, columns?: Record<string, unknown>) => {
+  if (!columns || typeof columns !== "object") {
+    return definition.fields.map((field) => ({ field, header: field.label }));
+  }
+
+  if (Array.isArray(columns)) {
+    const fieldKeys = columns.filter(
+      (entry): entry is string => typeof entry === "string",
+    );
+    return fieldKeys
+      .map((key) => definition.fields.find((field) => field.key === key))
+      .filter((field): field is FormDefinition["fields"][number] => field !== undefined)
+      .map((field) => ({ field, header: field.label }));
+  }
+
+  return Object.entries(columns)
+    .map(([header, fieldKey]) => {
+      if (typeof fieldKey !== "string") return null;
+      const field = definition.fields.find((item) => item.key === fieldKey);
+      if (!field) return null;
+      return { field, header };
+    })
+    .filter(Boolean) as Array<{
+    field: FormDefinition["fields"][number];
+    header: string;
+  }>;
+};
+
 const buildRows = (
-  definition: FormDefinition,
+  columnDefs: Array<{ field: FormDefinition["fields"][number]; header: string }>,
   options: Required<
     Pick<
       TemplateOptions,
       "includeDescriptions" | "includeExamples" | "includeMetadataMarkers"
     >
   >,
+  defaults?: Record<string, unknown>,
 ) => {
-  const headers = definition.fields.map((field) => field.label);
+  const headers = columnDefs.map((col) => col.header);
   const rows: string[][] = [headers];
 
   if (options.includeDescriptions) {
-    const descriptionRow = definition.fields.map(buildDescriptionText);
+    const descriptionRow = columnDefs.map((col) => buildDescriptionText(col.field));
     if (options.includeMetadataMarkers && descriptionRow.length > 0) {
       const marker = `${IMPORT_TEMPLATE_SKIP_MARKERS[0]} | ${IMPORT_TEMPLATE_MARKER_TOKEN}`;
       const detail = descriptionRow[0] ? ` | ${descriptionRow[0]}` : "";
@@ -105,7 +134,19 @@ const buildRows = (
   }
 
   if (options.includeExamples) {
-    const exampleRow = definition.fields.map(buildExampleValue);
+    const exampleRow = columnDefs.map((col) => {
+      if (defaults && typeof defaults === "object") {
+        const defaultByKey = defaults[col.field.key];
+        if (defaultByKey !== undefined && defaultByKey !== null) {
+          return String(defaultByKey);
+        }
+        const defaultByHeader = defaults[col.header];
+        if (defaultByHeader !== undefined && defaultByHeader !== null) {
+          return String(defaultByHeader);
+        }
+      }
+      return buildExampleValue(col.field);
+    });
     if (options.includeMetadataMarkers && exampleRow.length > 0) {
       const marker = IMPORT_TEMPLATE_SKIP_MARKERS[2];
       const detail = exampleRow[0] ? ` | ${exampleRow[0]}` : "";
@@ -130,13 +171,14 @@ const columnToLetter = (columnIndex: number) => {
 
 const addDataValidation = (
   sheet: Record<string, unknown>,
-  definition: FormDefinition,
+  columnDefs: Array<{ field: FormDefinition["fields"][number]; header: string }>,
   dataStartRow: number,
 ) => {
   const validations: Array<Record<string, unknown>> = [];
   const maxRow = 1048576;
 
-  definition.fields.forEach((field, index) => {
+  columnDefs.forEach((col, index) => {
+    const field = col.field;
     if (field.type !== "select" && field.type !== "multiselect") return;
     const options = field.options ?? [];
     if (options.length === 0) return;
@@ -161,10 +203,13 @@ export const generateTemplateBuffer = async (params: {
   definition: FormDefinition;
   format: "xlsx" | "csv";
   options?: TemplateOptions | undefined;
+  columns?: Record<string, unknown>;
+  defaults?: Record<string, unknown>;
 }) => {
   const { utils, write } = await import("xlsx");
   const normalizedOptions = { ...DEFAULT_OPTIONS, ...params.options };
-  const rows = buildRows(params.definition, normalizedOptions);
+  const columnDefs = buildColumns(params.definition, params.columns);
+  const rows = buildRows(columnDefs, normalizedOptions, params.defaults);
 
   const sheet = utils.aoa_to_sheet(rows);
   if (params.format === "xlsx" && normalizedOptions.includeDataValidation) {
@@ -172,7 +217,7 @@ export const generateTemplateBuffer = async (params: {
       2 +
       (normalizedOptions.includeDescriptions ? 1 : 0) +
       (normalizedOptions.includeExamples ? 1 : 0);
-    addDataValidation(sheet as Record<string, unknown>, params.definition, dataStartRow);
+    addDataValidation(sheet as Record<string, unknown>, columnDefs, dataStartRow);
   }
 
   if (params.format === "csv") {

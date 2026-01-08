@@ -2,14 +2,14 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                         | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | --------------------------------------------------- | ---------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking     | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging        | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                     | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds  | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement           | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file field imports, ECS batch worker | Legacy extraction scope and mapping      |
+| Req ID     | Title                                 | Status  | Built Today                                                        | Remaining Scope                          |
+| ---------- | ------------------------------------- | ------- | ------------------------------------------------------------------ | ---------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging                       | External integrations and mapping rules  |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement              |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds                 | Threshold tuning with viaSport           |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement                          | Final DR and retention validation (TBD)  |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with error categorization, autofix, dynamic templates | Legacy extraction (awaiting BCAR/BCSI)   |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -212,22 +212,26 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 
 **How We Meet It:**
 
-- Import wizard supports CSV and Excel uploads with mapping templates.
-- Validation preview highlights errors before commit.
+- Smart import wizard supports CSV and Excel uploads with intelligent error handling.
+- Pattern detection identifies column type mismatches and suggests fixes.
+- One-click autofix for common issues with confidence scoring.
 - Import jobs are auditable and reversible within the rollback window.
 
 **Built Today:**
 
-- Import wizard with upload, mapping, preview, and commit flow.
-- File field import pipeline supporting JSON file payloads with validation (fileName, mimeType, sizeBytes, storageKey).
-- Mapping template library and reusable mappings.
-- Rollback support using import job ID and 7-day rollback window.
-- Batch processing lane with ECS Fargate worker (verified deployed in sin-dev).
+- **Intelligent Error Categorization:** Errors grouped by root cause (structural, data quality, completeness, referential) instead of row-by-row display
+- **Pattern Detection:** 13 pattern detectors (email, date formats, phone, currency, postal codes, UUID, etc.) automatically identify column type mismatches
+- **Autofix with Confidence Scoring:** One-click fixes for column swaps, date format conversion, boolean normalization; dynamic confidence based on pattern match ratio, header hints, and sample size
+- **In-App Correction:** Inline cell editing with real-time validation, eliminating re-upload for minor fixes
+- **Dynamic Templates:** Generate XLSX/CSV templates from any form definition with field descriptions, example values, and Excel data validation dropdowns
+- **Virtualized Preview:** TanStack Virtual for 10k+ row previews without performance degradation
+- **Admin Template Management:** Template CRUD, version tracking, import history with rollback
+- **Batch Processing:** ECS Fargate worker for large file processing (verified deployed in sin-dev)
 
 **Remaining Scope:**
 
 - Legacy extraction and BCAR or BCSI mapping rules.
-- Additional migration pipelines for organization and user records (TBD).
+- Additional migration pipelines for organization and user records (pending viaSport legacy access).
 
 **viaSport Dependencies:**
 
@@ -236,6 +240,8 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 
 **Approach:**
 Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
+
+**Demo Path:** Dashboard → Admin → Imports (Smart wizard with autofix demo)
 
 **Evidence:**
 Evidence is summarized in Section 1.3.

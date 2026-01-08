@@ -79,7 +79,6 @@ const autoMapHeaders = (
   }));
 
   return headers.reduce<Record<string, string>>((acc, header) => {
-    if (normalizeKey(header) === "meta") return acc;
     const normalizedHeader = normalizeKey(header);
     const match = normalizedFields.find(
       (field) =>
@@ -1010,7 +1009,8 @@ export function SmartImportWizard() {
                     !importJobId ||
                     !selectedFormId ||
                     runImportMutation.isPending ||
-                    !hasReviewedPreview
+                    !hasReviewedPreview ||
+                    hasPendingEdits
                   }
                   onClick={() => runImportMutation.mutate()}
                 >
@@ -1020,13 +1020,21 @@ export function SmartImportWizard() {
                 <Button
                   type="button"
                   disabled={
-                    !importJobId || runBatchMutation.isPending || !hasReviewedPreview
+                    !importJobId ||
+                    runBatchMutation.isPending ||
+                    !hasReviewedPreview ||
+                    hasPendingEdits
                   }
                   onClick={() => runBatchMutation.mutate()}
                 >
                   {runBatchMutation.isPending ? "Importing..." : "Run batch import"}
                 </Button>
               )}
+              {hasPendingEdits ? (
+                <p className="text-xs text-muted-foreground">
+                  Save pending edits before importing.
+                </p>
+              ) : null}
             </>
           )}
         </CardContent>

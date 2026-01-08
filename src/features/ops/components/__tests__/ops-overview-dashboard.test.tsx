@@ -27,7 +27,6 @@ vi.mock("@tanstack/react-query", async () => {
     ...actual,
     useQuery: queryMocks.useQuery,
     useMutation: queryMocks.useMutation,
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
     useQueryClient: () => queryMocks.queryClient,
   };
 });
@@ -65,11 +64,9 @@ vi.mock("sonner", () => ({
 
 // Mock the translation hook to return keys instead of translated text
 vi.mock("~/hooks/useTypedTranslation", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useOpsTranslation: () => ({
     t: (key: string) => key, // Return the key itself - tests shouldn't depend on translation content
   }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useCommonTranslation: () => ({
     t: (key: string) => key, // Return the key itself
   }),

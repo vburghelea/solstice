@@ -20,7 +20,6 @@ import { setupReactQueryMocks } from "~/tests/mocks/react-query"; // Added impor
 
 // Make debounce immediate for tests to avoid timers
 vi.mock("~/shared/hooks/useDebounce", () => ({
-  /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
   useDebounce: <T,>(value: T) => value,
 }));
 

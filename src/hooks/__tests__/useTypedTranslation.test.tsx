@@ -45,7 +45,6 @@ vi.mock("~/lib/i18n/i18n", () => ({
 }));
 
 vi.mock("~/hooks/useLanguageDetection", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useLanguageDetection: () => ({
     currentLanguage: "en",
     userPreferences: {

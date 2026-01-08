@@ -11,7 +11,7 @@ export type TranslationFunction = (
 ) => string;
 
 const passwordRequirements = z
-  .string({ required_error: tCommon("validation.password_required") })
+  .string()
   .min(PASSWORD_CONFIG.minLength, tCommon("validation.password_too_short"))
   .superRefine((value, ctx) => {
     if (PASSWORD_CONFIG.requireUppercase && !/[A-Z]/.test(value)) {
@@ -44,9 +44,7 @@ const passwordRequirements = z
   });
 
 export const changePasswordInputSchema = z.object({
-  currentPassword: z
-    .string({ required_error: tCommon("validation.current_password_required") })
-    .min(1, tCommon("validation.current_password_required")),
+  currentPassword: z.string().min(1, tCommon("validation.current_password_required")),
   newPassword: passwordRequirements,
   revokeOtherSessions: z.boolean().optional(),
 });
@@ -72,13 +70,11 @@ export const defaultNotificationPreferences: z.infer<
 };
 
 export const revokeSessionInputSchema = z.object({
-  token: z.string({ required_error: "Session token is required" }).min(1),
+  token: z.string().min(1, "Session token is required"),
 });
 
 export const unlinkAccountInputSchema = z.object({
-  providerId: z
-    .string({ required_error: tCommon("validation.provider_required") })
-    .min(1, tCommon("validation.provider_required")),
+  providerId: z.string().min(1, tCommon("validation.provider_required")),
   accountId: z.string().optional(),
 });
 
@@ -86,7 +82,7 @@ export const unlinkAccountInputSchema = z.object({
  * Base password requirements schema (kept with hardcoded messages for server-side compatibility)
  */
 const basePasswordRequirements = z
-  .string({ required_error: "Password is required" })
+  .string()
   .min(
     PASSWORD_CONFIG.minLength,
     `Password must be at least ${PASSWORD_CONFIG.minLength} characters long`,
@@ -125,9 +121,7 @@ const basePasswordRequirements = z
  * Base change password input schema (kept with hardcoded messages for server-side compatibility)
  */
 export const baseChangePasswordInputSchema = z.object({
-  currentPassword: z
-    .string({ required_error: tCommon("validation.current_password_required") })
-    .min(1, tCommon("validation.current_password_required")),
+  currentPassword: z.string().min(1, tCommon("validation.current_password_required")),
   newPassword: basePasswordRequirements,
   revokeOtherSessions: z.boolean().optional(),
 });
@@ -142,7 +136,7 @@ export const createChangePasswordFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("Current password is required")) {
           return t("common.validation.current_password_required");
         }
@@ -193,11 +187,9 @@ export const createChangePasswordFields = (t: TranslationFunction) => ({
  */
 export const createChangePasswordSchema = (t: TranslationFunction) =>
   z.object({
-    currentPassword: z
-      .string({ required_error: t("common.validation.current_password_required") })
-      .min(1, t("common.validation.current_password_required")),
+    currentPassword: z.string().min(1, t("common.validation.current_password_required")),
     newPassword: z
-      .string({ required_error: t("common.validation.password_required") })
+      .string()
       .min(PASSWORD_CONFIG.minLength, t("common.validation.password_too_short"))
       .superRefine((value, ctx) => {
         if (PASSWORD_CONFIG.requireUppercase && !/[A-Z]/.test(value)) {

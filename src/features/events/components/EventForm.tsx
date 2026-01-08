@@ -132,7 +132,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
               baseCreateEventSchema.shape.name.parse(value);
               return undefined;
             } catch (e) {
-              return (e as z.ZodError).errors?.[0]?.message;
+              return (e as z.ZodError).issues?.[0]?.message;
             }
           },
         }}
@@ -170,7 +170,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 baseCreateEventSchema.shape.slug.parse(value);
                 return undefined;
               } catch (e) {
-                return (e as z.ZodError).errors?.[0]?.message;
+                return (e as z.ZodError).issues?.[0]?.message;
               }
             },
           }}

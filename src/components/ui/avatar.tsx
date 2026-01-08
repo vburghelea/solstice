@@ -88,6 +88,12 @@ export function Avatar(props: AvatarComponentProps) {
   const ariaLabel = alt || name || email || "User avatar";
   const fallbackSource = fallback ?? name ?? email ?? "?";
   const fallbackInitial = fallbackSource.trim().charAt(0).toUpperCase() || "?";
+
+  // Determine if the image source is external (not from the same origin)
+  const isExternalImage =
+    resolvedSrc &&
+    (resolvedSrc.startsWith("http://") || resolvedSrc.startsWith("https://"));
+
   const root = (
     <AvatarPrimitive.Root
       ref={forwardedRef}
@@ -99,7 +105,12 @@ export function Avatar(props: AvatarComponentProps) {
       {...rootProps}
     >
       {resolvedSrc ? (
-        <AvatarImage src={resolvedSrc} alt={ariaLabel} className={imageClassName} />
+        <AvatarImage
+          src={resolvedSrc}
+          alt={ariaLabel}
+          className={imageClassName}
+          crossOrigin={isExternalImage ? "anonymous" : undefined}
+        />
       ) : null}
       <AvatarFallback className={fallbackClassName}>{fallbackInitial}</AvatarFallback>
     </AvatarPrimitive.Root>

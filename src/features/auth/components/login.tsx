@@ -109,7 +109,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   } catch (error) {
                     if (error instanceof z.ZodError) {
                       return (
-                        error.errors?.[0]?.message || commonT("validation.invalid_email")
+                        error.issues?.[0]?.message || commonT("validation.invalid_email")
                       );
                     }
                     return commonT("validation.invalid_email");
@@ -138,7 +138,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   } catch (error) {
                     if (error instanceof z.ZodError) {
                       return (
-                        error.errors?.[0]?.message ||
+                        error.issues?.[0]?.message ||
                         commonT("validation.password_required")
                       );
                     }

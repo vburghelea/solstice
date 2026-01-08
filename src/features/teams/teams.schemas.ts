@@ -58,7 +58,7 @@ export const createTeamSchema = z.object({
     .optional(),
   foundedYear: z.string().length(4).optional(),
   website: z.string().url().optional(),
-  socialLinks: z.record(z.string()).optional(),
+  socialLinks: z.record(z.string(), z.string()).optional(),
 });
 export type CreateTeamInput = z.infer<typeof createTeamSchema>;
 

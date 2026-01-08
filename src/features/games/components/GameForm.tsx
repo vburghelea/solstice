@@ -141,11 +141,11 @@ export function GameForm({
   const trimmedCampaignSystemName = gameSystemName?.trim() ?? "";
   const shouldPrefetchCampaignSystem = Boolean(
     isCampaignGame &&
-      defaults.gameSystemId &&
-      trimmedCampaignSystemName.length >= 3 &&
-      (initialExpectedDuration == null ||
-        initialMinPlayers == null ||
-        initialMaxPlayers == null),
+    defaults.gameSystemId &&
+    trimmedCampaignSystemName.length >= 3 &&
+    (initialExpectedDuration == null ||
+      initialMinPlayers == null ||
+      initialMaxPlayers == null),
   );
 
   const fallbackCampaignGameSystem = React.useMemo(() => {
@@ -555,7 +555,7 @@ export function GameForm({
                   createGameInputSchema.shape.price.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -659,7 +659,7 @@ export function GameForm({
                   createGameInputSchema.shape.visibility.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -727,7 +727,7 @@ export function GameForm({
                   minimumRequirementsSchema.shape.minPlayers.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -775,7 +775,7 @@ export function GameForm({
                   minimumRequirementsSchema.shape.maxPlayers.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -832,7 +832,7 @@ export function GameForm({
                 locationSchema.shape.address.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -882,7 +882,7 @@ export function GameForm({
                 locationSchema.shape.lat.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -909,7 +909,7 @@ export function GameForm({
                 locationSchema.shape.lng.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -942,7 +942,7 @@ export function GameForm({
                 safetyRulesSchema.shape["no-alcohol"].parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -970,7 +970,7 @@ export function GameForm({
                 safetyRulesSchema.shape["safe-word"].parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -996,7 +996,7 @@ export function GameForm({
                 safetyRulesSchema.shape.openCommunication.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -1026,7 +1026,7 @@ export function GameForm({
                   safetyRulesSchema.shape.xCardSystem.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -1072,7 +1072,7 @@ export function GameForm({
                   safetyRulesSchema.shape.xCardDetails.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -1103,7 +1103,7 @@ export function GameForm({
                 safetyRulesSchema.shape.playerBoundariesConsent.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}

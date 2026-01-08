@@ -146,7 +146,10 @@ describe("LanguageSwitcher", () => {
     render(<LanguageSwitcher variant="compact" />, { wrapper });
 
     expect(screen.getByText("English")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "🇬🇧 English" })).toBeInTheDocument();
+    // Check that the button contains both flag and text
+    const button = screen.getByRole("button");
+    expect(button).toHaveTextContent("🇬🇧");
+    expect(button).toHaveTextContent("English");
   });
 
   it("should render flags variant", () => {

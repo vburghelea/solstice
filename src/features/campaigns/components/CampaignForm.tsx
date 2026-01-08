@@ -163,7 +163,7 @@ export function CampaignForm({
                 schema.shape.name.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -212,7 +212,7 @@ export function CampaignForm({
                 createCampaignInputSchema.shape.description.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -259,7 +259,7 @@ export function CampaignForm({
                 createCampaignInputSchema.shape.gameSystemId.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -335,7 +335,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.recurrence.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -389,7 +389,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.timeOfDay.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -440,7 +440,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.sessionDuration.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -495,7 +495,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.pricePerSession.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -554,7 +554,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.language.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -606,7 +606,7 @@ export function CampaignForm({
                   createCampaignInputSchema.shape.visibility.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -674,7 +674,7 @@ export function CampaignForm({
                 locationSchema.shape.address.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -720,7 +720,7 @@ export function CampaignForm({
                 locationSchema.shape.lat.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -747,7 +747,7 @@ export function CampaignForm({
                 locationSchema.shape.lng.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -782,7 +782,7 @@ export function CampaignForm({
                   minimumRequirementsSchema.shape.minPlayers.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -830,7 +830,7 @@ export function CampaignForm({
                   minimumRequirementsSchema.shape.maxPlayers.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -884,7 +884,7 @@ export function CampaignForm({
                 safetyRulesSchema.shape["no-alcohol"].parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -912,7 +912,7 @@ export function CampaignForm({
                 safetyRulesSchema.shape["safe-word"].parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -940,7 +940,7 @@ export function CampaignForm({
                 safetyRulesSchema.shape.openCommunication.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}
@@ -970,7 +970,7 @@ export function CampaignForm({
                   safetyRulesSchema.shape.xCardSystem.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -1018,7 +1018,7 @@ export function CampaignForm({
                   safetyRulesSchema.shape.xCardDetails.parse(value);
                   return undefined;
                 } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
+                  return (error as z.ZodError).issues[0]?.message;
                 }
               },
             }}
@@ -1049,7 +1049,7 @@ export function CampaignForm({
                 safetyRulesSchema.shape.playerBoundariesConsent.parse(value);
                 return undefined;
               } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+                return (error as z.ZodError).issues[0]?.message;
               }
             },
           }}

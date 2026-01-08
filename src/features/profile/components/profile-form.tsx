@@ -81,7 +81,7 @@ export function ProfileForm() {
       onChange: ({ value }) => {
         const result = profileInputSchema.safeParse(value);
         if (!result.success) {
-          return result.error.errors.map((err) => ({
+          return result.error.issues.map((err) => ({
             message: err.message,
             path: err.path.join("."),
           }));

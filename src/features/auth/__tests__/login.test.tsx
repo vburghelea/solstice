@@ -33,13 +33,9 @@ vi.mock("~/lib/auth-client", () => ({
 
 // Mock TanStack Router
 vi.mock("@tanstack/react-router", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useNavigate: () => mockNavigate,
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouteContext: () => ({ redirectUrl: "/player" }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouterState: () => ({ location: { pathname: "/auth/login" } }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
     to,
@@ -75,7 +71,6 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>();
   return {
     ...actual,
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
     useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
   };
 });

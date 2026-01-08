@@ -235,7 +235,7 @@ export const createGameFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("positive")) {
           return t("common.validation.positive_number");
         }
@@ -253,7 +253,7 @@ export const createGameFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("Game session name is required")) {
           return t("common.validation.game_name_required");
         }
@@ -279,7 +279,7 @@ export const createGameFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("Description is required")) {
           return t("common.validation.description_required");
         }
@@ -308,7 +308,7 @@ export const createGameFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("Language is required")) {
           return t("common.validation.language_required");
         }
@@ -335,7 +335,7 @@ export const createSearchGamesFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("at least 3 characters")) {
           return t("common.validation.search_term_too_short", { count: 3 });
         }
@@ -417,7 +417,7 @@ export const createSearchUsersForInvitationFields = (t: TranslationFunction) => 
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("at least 4 characters")) {
           return t("common.validation.search_term_too_short", { count: 4 });
         }

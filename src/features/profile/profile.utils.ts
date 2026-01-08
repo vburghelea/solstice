@@ -23,7 +23,7 @@ export function validateProfileNameValue(rawName: string): ProfileNameValidation
     return { success: true, value: parsed.data };
   }
 
-  const message = parsed.error.errors[0]?.message ?? "Invalid profile name";
+  const message = parsed.error.issues[0]?.message ?? "Invalid profile name";
   return { success: false, error: message };
 }
 

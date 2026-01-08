@@ -308,7 +308,7 @@ describe("Events Schemas", () => {
         const result = createEventSchema.safeParse(invalidInput);
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error.errors[0].message).toContain("lowercase with hyphens only");
+          expect(result.error.issues[0].message).toContain("lowercase with hyphens only");
         }
       });
 

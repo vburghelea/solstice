@@ -3,7 +3,7 @@ import { z } from "zod";
 export const ServerErrorSchema = z.object({
   code: z.enum(["UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "VALIDATION", "INTERNAL"]),
   message: z.string(),
-  details: z.record(z.unknown()).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type ServerError = z.infer<typeof ServerErrorSchema>;

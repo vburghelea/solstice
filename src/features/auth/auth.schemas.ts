@@ -24,7 +24,7 @@ export const createLoginFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Email is required")) {
           return t("common.validation.email_required");
@@ -43,7 +43,7 @@ export const createLoginFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Password is required")) {
           return t("common.validation.password_required");
@@ -92,7 +92,7 @@ export const createSignupFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Name is required")) {
           return t("common.validation.name_required");
@@ -111,7 +111,7 @@ export const createSignupFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Email is required")) {
           return t("common.validation.email_required");
@@ -130,7 +130,7 @@ export const createSignupFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Password is required")) {
           return t("common.validation.password_required");
@@ -149,7 +149,7 @@ export const createSignupFormFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Please confirm your password")) {
           return t("common.validation.confirm_password_required");
@@ -172,7 +172,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid name";
+        return error.issues?.[0]?.message || "Invalid name";
       }
       return "Invalid name";
     }
@@ -183,7 +183,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid email";
+        return error.issues?.[0]?.message || "Invalid email";
       }
       return "Invalid email";
     }
@@ -194,7 +194,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid password";
+        return error.issues?.[0]?.message || "Invalid password";
       }
       return "Invalid password";
     }
@@ -205,7 +205,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Please confirm your password";
+        return error.issues?.[0]?.message || "Please confirm your password";
       }
       return "Please confirm your password";
     }
@@ -272,7 +272,7 @@ export const createPasswordResetRequestFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Email is required")) {
           return t("common.validation.email_required");
@@ -307,7 +307,7 @@ export const createResetPasswordFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Reset token is required")) {
           return t("common.validation.reset_token_required");
@@ -323,7 +323,7 @@ export const createResetPasswordFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Password is required")) {
           return t("common.validation.password_required");
@@ -342,7 +342,7 @@ export const createResetPasswordFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         // Map specific error messages to translation keys
         if (errorMessage?.includes("Please confirm your password")) {
           return t("common.validation.confirm_password_required");

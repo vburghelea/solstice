@@ -18,7 +18,6 @@ import { Route as CreateCampaignRoute } from "../create";
 const CreateCampaignPage = CreateCampaignRoute.options.component!;
 // Make debounce immediate for tests to avoid timers
 vi.mock("~/shared/hooks/useDebounce", () => ({
-  /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
   useDebounce: <T,>(value: T) => value,
 }));
 
@@ -32,7 +31,6 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
   return {
     ...actual,
-    /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
     useNavigate: () => navigateMock,
   };
 });
@@ -58,9 +56,8 @@ describe("CreateCampaignPage", () => {
   });
 
   const renderCreateCampaignPage = async () => {
-    const { createRouter, createMemoryHistory, RouterProvider } = await import(
-      "@tanstack/react-router"
-    );
+    const { createRouter, createMemoryHistory, RouterProvider } =
+      await import("@tanstack/react-router");
     const routeTree = createTestRouteTree({
       routes: [
         {

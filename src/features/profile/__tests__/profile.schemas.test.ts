@@ -88,7 +88,7 @@ describe("Profile Schemas", () => {
       const result = profileInputSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
       expect(result.error?.issues[0].message).toContain(
-        "Expected number, received string",
+        "expected number, received string",
       );
     });
 
@@ -210,36 +210,36 @@ describe("Profile Schemas", () => {
         const result = profileInputSchema.safeParse(validInput);
         expect(result.success).toBe(true);
       });
+    });
+  });
 
-      describe("Complete Profile Validation", () => {
-        it("validates complete profile with all required fields", () => {
-          const validInput = {
-            gender: "Male",
-            pronouns: "he/him",
-            phone: "+4915123456789",
-            privacySettings: {
-              showEmail: true,
-              showPhone: false,
-              showLocation: false,
-              showLanguages: false,
-              showGamePreferences: false,
-              allowTeamInvitations: true,
-              allowFollows: true,
-            },
-            overallExperienceLevel: "intermediate",
-            identityTags: ["LGBTQ+", "Artist"],
-            preferredGameThemes: ["Fantasy", "Scifi"],
-            languages: ["en", "es"],
-            city: "München",
-            country: "Germany",
-            isGM: true,
-            gmStyle: "Narrative",
-          };
+  describe("Complete Profile Validation", () => {
+    it("validates complete profile with all required fields", () => {
+      const validInput = {
+        gender: "Male",
+        pronouns: "he/him",
+        phone: "+4915123456789",
+        privacySettings: {
+          showEmail: true,
+          showPhone: false,
+          showLocation: false,
+          showLanguages: false,
+          showGamePreferences: false,
+          allowTeamInvitations: true,
+          allowFollows: true,
+        },
+        overallExperienceLevel: "intermediate",
+        identityTags: ["LGBTQ+", "Artist"],
+        preferredGameThemes: ["Fantasy", "Scifi"],
+        languages: ["en", "es"],
+        city: "München",
+        country: "Germany",
+        isGM: true,
+        gmStyle: "Narrative",
+      };
 
-          const result = profileInputSchema.safeParse(validInput);
-          expect(result.success).toBe(true);
-        });
-      });
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
     });
   });
 

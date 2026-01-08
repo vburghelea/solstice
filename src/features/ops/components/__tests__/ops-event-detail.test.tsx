@@ -36,7 +36,6 @@ import commonTranslations from "~/lib/i18n/locales/en/common.json";
 import opsTranslations from "~/lib/i18n/locales/en/ops.json";
 
 vi.mock("~/hooks/useTypedTranslation", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useOpsTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       // Helper function to get nested value from object using dot notation
@@ -79,7 +78,6 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
     },
     currentLanguage: "en",
   }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useCommonTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       const getNestedValue = (obj: Record<string, unknown>, path: string): string => {

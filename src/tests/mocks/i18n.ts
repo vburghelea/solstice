@@ -209,7 +209,6 @@ vi.mock("~/lib/i18n/i18n", () => ({
 }));
 
 // Mock namespace-specific translation hooks
-/* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
 vi.mock("~/hooks/useTypedTranslation", () => ({
   useTypedTranslation: mockUseTranslation,
   useNamespaceTranslation: (namespace: string) => mockUseTranslation(namespace),
@@ -236,7 +235,6 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
   useRolesTranslation: () => mockUseTranslation("roles"),
   useSocialTranslation: () => mockUseTranslation("social"),
 }));
-/* eslint-enable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
 
 // Export mock for use in tests
 export { mockI18n };

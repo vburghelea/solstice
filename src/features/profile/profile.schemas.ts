@@ -119,7 +119,7 @@ export const createProfileNameFields = (t: TranslationFunction) => ({
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors?.[0]?.message;
+        const errorMessage = error.issues?.[0]?.message;
         if (errorMessage?.includes("at least 3 characters")) {
           return t("common.validation.profile_name_too_short");
         }

@@ -14,7 +14,6 @@ import * as gamesQueries from "~/features/games/games.queries";
 
 // Make debounce immediate for predictable tests
 vi.mock("~/shared/hooks/useDebounce", () => ({
-  /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
   useDebounce: <T,>(value: T) => value,
 }));
 

@@ -39,7 +39,6 @@ vi.mock("~/features/social", () => ({
 }));
 
 vi.mock("~/lib/pacer", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRateLimitedServerFn: (fn: unknown) => fn,
   useRateLimitedSearch: vi.fn(),
 }));

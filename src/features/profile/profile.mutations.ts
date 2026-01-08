@@ -535,7 +535,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       if (!validation.success) {
         return {
           success: false,
-          errors: validation.error.errors.map((err: z.ZodIssue) => ({
+          errors: validation.error.issues.map((err: z.ZodIssue) => ({
             code: "VALIDATION_ERROR" as const,
             field: err.path.join("."),
             message: err.message,

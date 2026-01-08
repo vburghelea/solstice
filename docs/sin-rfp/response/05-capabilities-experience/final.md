@@ -2,21 +2,7 @@
 
 ## Demonstrated Success Delivering Similar Systems
 
-Austin Wallace Tech brings experience delivering information systems in sports and data-intensive environments.
-
-### Austin Wallace: Enterprise Data Engineering
-
-| Organization                          | Role                | Achievements                                                                                 |
-| ------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------- |
-| Clio (2024 to Present)                | Data Engineer       | Owns Databricks pipelines processing production workloads. Authored AI best practices guide. |
-| New Jersey Devils, NHL (2022 to 2024) | Sole Data Developer | Built data platform processing 10 million rows per game. Developed 40+ dbt models.           |
-| Teck Resources (2020 to 2022)         | Data Developer      | Modernized legacy PostgreSQL processes with Terraform and Python.                            |
-
-### Will Siddall: Full-Stack Development
-
-| Organization                  | Role                 | Achievements                                                                                               |
-| ----------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Teck Resources (2022 to 2024) | Full Stack Developer | Built reporting pipelines processing billions of rows. Developed internal tools with React and TypeScript. |
+Austin Wallace Tech brings experience delivering information systems in sports and data-intensive environments. For project-based delivery examples, see **Relevant Delivery Portfolio** in Vendor Fit to viaSport's Needs.
 
 ### The Solstice Prototype as Proof
 
@@ -41,9 +27,9 @@ The most relevant evidence is the Solstice prototype itself, built for viaSport 
 
 | Focus Area                  | Name            | Contribution                                  | Status    |
 | --------------------------- | --------------- | --------------------------------------------- | --------- |
-| Sport Sector Operations     | Soleil Heaney   | User perspective and workflow validation      | Committed |
+| UX and Accessibility        | Ruslan Hétu     | UX research lead, design, accessibility       | Committed |
+| Sport Sector / Navigator    | Soleil Heaney   | System navigator connecting team to PSO needs | Committed |
 | Technical Architecture      | Will Siddall    | Architecture review and development support   | Committed |
-| UX and Accessibility        | Ruslan Hétu     | Design research and accessibility validation  | Committed |
 | Security and Risk           | Parul Kharub    | Security strategy and risk advisory           | Committed |
 | Security and Infrastructure | Michael Casinha | Infrastructure security review                | Committed |
 | Security and Compliance     | Tyler Piller    | Security operations and compliance validation | Committed |
@@ -76,11 +62,12 @@ Continuity is supported by:
 
 ### Public and Enterprise Experience
 
-| Team Member    | Organization   | Sector                                    |
-| -------------- | -------------- | ----------------------------------------- |
-| Austin Wallace | Teck Resources | Publicly traded resource sector           |
-| Austin Wallace | Clio           | Legal technology, public interest clients |
-| Will Siddall   | Teck Resources | Publicly traded resource sector           |
+| Team Member    | Organization                           | Sector                                    |
+| -------------- | -------------------------------------- | ----------------------------------------- |
+| Austin Wallace | Teck Resources                         | Publicly traded resource sector           |
+| Austin Wallace | Clio                                   | Legal technology, public interest clients |
+| Parul Kharub   | Canadian Border Services Agency (CBSA) | Federal Law Enforcement Agency            |
+| Will Siddall   | Teck Resources                         | Publicly traded resource sector           |
 
 ## Case Studies
 
@@ -132,15 +119,15 @@ The platform includes a production-ready AI foundation layer that enables rapid 
 
 | Component                    | Description                                                             |
 | ---------------------------- | ----------------------------------------------------------------------- |
-| Provider registry            | Adapters for multiple LLM providers (Claude, OpenAI, Azure OpenAI)      |
+| AWS Bedrock integration      | Claude, Amazon Nova, and Cohere models via Bedrock in ca-central-1      |
 | Central AI service           | Unified interface with retries, timeouts, and error handling            |
 | Prompt template registry     | Versioned prompts with audit trail and rollback capability              |
 | Structured output validation | Zod schema validation ensuring AI responses match expected formats      |
 | Usage logging and costs      | Per-request tracking of tokens, latency, cost estimates by org and user |
 | Quota enforcement            | Rate limiting and budget controls per tenant and user                   |
-| Embedding support            | Vector generation for semantic search and document similarity           |
+| Embedding support            | Cohere and Amazon Titan embeddings for semantic search                  |
 
-This foundation means AI features can be delivered in days rather than weeks, with consistent safety, observability, and cost controls from day one.
+AI features use AWS Bedrock with models hosted exclusively in ca-central-1. No AI provider outside Canada will be used without explicit written authorization from viaSport.
 
 ### AI Feature Candidates
 
@@ -176,7 +163,7 @@ The foundation work is complete. We will implement the AI features that drive re
 | No unauthorized training | viaSport data is never used for model training without explicit consent                   |
 | Bias mitigation          | Regular review of AI outputs for demographic or organizational bias                       |
 | Audit trail              | All AI requests logged with prompt version, user, timestamp, and response characteristics |
-| Data residency           | Canadian-region AI providers prioritized; fallback to providers with compliant policies   |
+| Data residency           | AWS Bedrock in ca-central-1 only; no non-Canadian AI providers without written consent    |
 
 ## Open Standards, APIs, and Open Source
 

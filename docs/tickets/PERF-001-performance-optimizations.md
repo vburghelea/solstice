@@ -1,9 +1,9 @@
 # PERF-001: Performance Optimizations from Load Testing
 
 **Created**: 2025-12-31
-**Updated**: 2026-01-01
+**Updated**: 2026-01-07
 **Priority**: High
-**Status**: In Progress
+**Status**: In Progress (5/7 tasks done)
 **Labels**: performance, infrastructure, production-readiness
 
 ## Implementation Status
@@ -14,8 +14,8 @@
 | Provisioned concurrency + memory | ✅ Done    | -   |
 | QueryClient retry/backoff        | ✅ Done    | -   |
 | Vite manualChunks                | ✅ Done    | -   |
+| Verify CloudFront compression    | ✅ Done    | -   |
 | Test streaming toggle            | ⏳ Pending | -   |
-| Verify CloudFront compression    | ⏳ Pending | -   |
 | Fix Playwright nav test          | ⏳ Pending | -   |
 
 ---
@@ -262,31 +262,22 @@ awsLambda: {
 
 ---
 
-### 7. [MEDIUM] Verify CloudFront Compression
+### 7. [MEDIUM] Verify CloudFront Compression ✅ VERIFIED
 
 **Problem**: Lighthouse flagged "Enable text compression" warning.
 
 **Solution**: Verify compression is enabled after deploy.
 
-**Verification Command**:
+**Verification (2026-01-07 on sin-dev)**:
 
 ```bash
-curl -I -H "Accept-Encoding: br" https://<cloudfront-url>/auth/login
+$ curl -I -H "Accept-Encoding: br, gzip" https://d21gh6khf5uj9x.cloudfront.net/auth/login
+
+content-encoding: br
+content-type: text/html; charset=utf-8
 ```
 
-**Expected**: Response should include `content-encoding: br` or `content-encoding: gzip`.
-
-If missing, add to CDN config in `sst.config.ts`:
-
-```typescript
-transform: {
-  distribution: {
-    defaultCacheBehavior: {
-      compress: true,
-    },
-  },
-}
-```
+**Result**: ✅ Brotli compression (`br`) is enabled and working. No further action needed.
 
 ---
 
@@ -296,7 +287,7 @@ transform: {
 - [ ] FCP is <1800ms
 - [ ] TTFB remains <500ms
 - [ ] No user-visible errors from Lambda cold starts
-- [ ] Response compression is verified working
+- [x] Response compression is verified working (Brotli confirmed 2026-01-07)
 
 ## Testing Plan
 

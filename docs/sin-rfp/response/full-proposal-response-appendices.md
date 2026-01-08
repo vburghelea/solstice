@@ -152,11 +152,11 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 
 ### Audit Trail
 
-| Feature      | Implementation                                     |
-| ------------ | -------------------------------------------------- |
-| Scope        | All user actions, data changes, auth events        |
-| Immutability | Append-only audit log with hash chain              |
-| Retention    | Retention policies and legal holds (durations TBD) |
+| Feature      | Implementation                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| Scope        | All user actions, data changes, auth events                                                           |
+| Immutability | Hash chain verification: each entry hashes the previous, rendering the trail mathematically immutable |
+| Retention    | Retention policies and legal holds (durations TBD)                                                    |
 
 ### Compliance
 
@@ -183,17 +183,17 @@ leads platform architecture, data migration strategy, and delivery governance.
 He has 9+ years of enterprise data engineering experience and sport governance
 leadership.
 
-### Soleil Heaney, Sport Sector Advisor
+### Ruslan Hétu, UX and Accessibility Lead
+
+[To be provided by Ruslan Hétu]
+
+### Soleil Heaney, System Navigator
 
 [To be provided by Soleil Heaney]
 
 ### Will Siddall, Technical Advisor
 
 [To be provided by Will Siddall]
-
-### Ruslan Hétu, UX and Accessibility Advisor
-
-[To be provided by Ruslan Hétu]
 
 ### Parul Kharub, Security and Risk Advisor
 

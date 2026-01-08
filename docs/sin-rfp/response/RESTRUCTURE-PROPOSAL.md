@@ -462,7 +462,7 @@ Add "At-a-Glance" panel near the top:
 | **Data Used** | Synthetic only — no viaSport data |
 | **Performance** | 20.1M rows, sub-250ms p95 latency, zero errors |
 | **Security** | MFA, RBAC, audit chain, S3 Object Lock, Canadian data residency |
-| **Timeline** | 18 weeks from contract to full rollout |
+| **Timeline** | 30 weeks from contract to full rollout |
 | **Investment** | $600K implementation + $200K/year operations |
 ```
 

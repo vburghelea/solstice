@@ -2,19 +2,30 @@
 
 Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project. We built a working prototype that aligns to the System Requirements Addendum and demonstrates delivery feasibility before contract award.
 
+## What viaSport is Buying
+
+Solstice is proposed as a **term subscription with managed service**, structured to reduce ongoing procurement overhead and operational risk:
+
+- **3-year base term**, with two optional 1-year extensions at viaSport's discretion
+- **Implementation/Standup** to complete viaSport configuration, migration, UAT, and rollout
+- **Platform Subscription + Managed Service** covering hosting, monitoring, security patching, support, ongoing product updates, and 200 hours/year of enhancement capacity
+
+This "batteries included" model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+
 ## Response Overview
 
-| Section                                                        | Summary                                                                           |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.        |
-| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.             |
-| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training. |
-| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                   |
-| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                       |
-| **Cost and Value of Services**                                 | Implementation and operations pricing with key assumptions.                       |
-| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.       |
-| **Prototype Evaluation Guide**                                 | Live demo access and a 15-minute validation path tied to requirement IDs.         |
-| **Appendices**                                                 | Performance, security, and supporting evidence.                                   |
+| Section                                                        | Summary                                                                                   |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.                |
+| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.                     |
+| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training.         |
+| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                           |
+| **Service Levels, Support, and Reliability**                   | SLAs, monitoring, incident response, and operational commitments.                         |
+| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                               |
+| **Commercial Model and Pricing**                               | Term subscription pricing (3+1+1), standup fee, included services, and options.           |
+| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.               |
+| **Prototype Evaluation Guide**                                 | Live demo access and a 15-minute validation path tied to requirement IDs.                 |
+| **Appendices**                                                 | Performance, security, service levels, exit/portability options, and supporting evidence. |
 
 ## Standard Assumptions and Security Posture
 
@@ -44,28 +55,29 @@ A working prototype is available for evaluation in the sin-uat environment. No
 viaSport confidential data was used. Performance testing is run in sin-perf
 using synthetic data designed to match the scale characteristics described in
 the RFP. Performance and accessibility evidence is summarized in **Appendix C:
-Performance Evidence**. Demo credentials are listed in **Appendix A: Live Demo
-Access**, and a 15-minute validation path is provided in the **Prototype
+Performance Evidence**. Demo access is provided via a secure Evaluator Access Pack
+(see **Appendix A**), and a 15-minute validation path is provided in the **Prototype
 Evaluation Guide**.
 
 ## At a Glance
 
-| Dimension    | Status                                                                                                                     |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Prototype    | Working system available for evaluation (See Section 1.3)                                                                  |
-| Requirements | 22 of 25 built today; 3 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**)                 |
-| Data Used    | See Section 1.3                                                                                                            |
-| Performance  | 20.1M rows, sub-250ms p95 latency, final validation run TBD                                                                |
-| Security     | See Section 1.2                                                                                                            |
-| Timeline     | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan, Timeline, and Delivery Schedule**) |
-| Investment   | $600K implementation + $200K/year operations (See **Cost and Value of Services**)                                          |
+| Dimension        | Status                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| Prototype        | Working system available for evaluation (See Section 1.3)                                                  |
+| Requirements     | 22 of 25 built today; 3 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**) |
+| Data Used        | See Section 1.3                                                                                            |
+| Performance      | 20.1M rows, sub-250ms p95 latency                                                                          |
+| Security         | See Section 1.2                                                                                            |
+| Timeline         | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan**)                  |
+| Commercial Model | 3-year base term + two optional 1-year extensions (3+1+1)                                                  |
+| Total Cost       | 3-year: **$1.2M** / 5-year: **$1.6M** (standup + subscription)                                             |
 
 ## Key Highlights
 
 **De-risked Delivery**
 A working prototype is available for evaluation. This reduces delivery risk and
 allows evaluators to validate requirements directly. Access details are in
-**Appendix A: Live Demo Access**. The **Prototype Evaluation Guide** provides a
+**Appendix A: Prototype Evaluation Access**. The **Prototype Evaluation Guide** provides a
 15-minute validation path tied to requirement IDs. See Section 1.3 for the
 standard prototype and data provenance summary.
 
@@ -75,6 +87,12 @@ The prototype covers the majority of the System Requirements Addendum today. Thr
 **Security and Residency**
 See Section 1.1 for data residency and privacy, and Section 1.2 for the
 security model summary and evidence references.
+
+**Managed Service Model**
+viaSport is purchasing an outcome: a reliable platform with clear service levels,
+operational ownership, and included enhancement capacity. The subscription includes
+monitoring, support, security patching, DR drills, and 200 hours/year for ongoing
+improvements. See **Commercial Model and Pricing** for details.
 
 **Delivery Timeline**
 The proposed 30-week timeline targets Fall 2026 launch with comprehensive UX research and community engagement. The timeline enables proper user research with viaSport staff and PSO representatives, UAT with accessibility validation, and phased rollout. The core platform is already built, so the additional time focuses on getting the user experience right rather than building new features.
@@ -102,8 +120,9 @@ needs during research and rollout. Details on each team member are in
 | Solution Overview                   | **Solution Overview**                                                                                                | Non-technical workflow summary              |
 | Service Approach and Responsiveness | **Service Approach: Data Submission and Reporting Web Portal** through **Service Approach: Training and Onboarding** | Methodology for each scope item             |
 | System Requirements Addendum        | **System Requirements Compliance Crosswalk** and detailed requirement sections                                       | Requirement-by-requirement compliance       |
+| Service Levels and Reliability      | **Service Levels, Support, and Reliability** (new section)                                                           | SLAs, monitoring, ops commitments           |
 | Capabilities and Experience         | **Capabilities and Experience**                                                                                      | Case studies, automation/AI approach        |
-| Cost and Value                      | **Cost and Value of Services**                                                                                       | Pricing, breakdown, change management       |
+| Cost and Value                      | **Commercial Model and Pricing**                                                                                     | Term pricing, TCO, change management        |
 | Timeline and Delivery Schedule      | **Project Plan, Timeline, and Delivery Schedule**                                                                    | Milestones, risks, dependencies             |
 | Prototype Validation                | **Prototype Evaluation Guide** and **Appendices**                                                                    | Demo access, performance/security summaries |
 

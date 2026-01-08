@@ -1,9 +1,10 @@
 # TICKET: Apply CORP Headers to Signed S3 Downloads
 
-**Status**: Open
+**Status**: Open (Issue Confirmed)
 **Priority**: P1 (High)
 **Component**: Infrastructure / Security
 **Date**: 2026-01-06
+**Updated**: 2026-01-07
 **Author**: Codex (AI Assistant)
 
 ---
@@ -14,6 +15,43 @@ Cross-Origin-Resource-Policy (CORP) headers are now applied at the CloudFront
 distribution for the TanStack Start app, but signed S3 downloads bypass
 CloudFront and do not receive CORP headers. ASVS 5 control 3.5.8 remains
 partially unmet for authenticated file downloads.
+
+---
+
+## Verification Results (2026-01-07)
+
+**Test Environment:** sin-dev
+
+### Issue Confirmed ❌
+
+S3 presigned URLs bypass CloudFront and serve files directly from S3:
+
+**Artifacts bucket:** `solstice-sin-dev-sinartifactsbucket-smhmnosc.s3.ca-central-1.amazonaws.com`
+
+```bash
+# S3 direct response headers (no CORP):
+$ curl -I "https://solstice-sin-dev-sinartifactsbucket-smhmnosc.s3.ca-central-1.amazonaws.com/..."
+
+Content-Type: application/octet-stream
+x-amz-server-side-encryption: AES256
+# NO cross-origin-resource-policy header
+```
+
+**CloudFront response headers (has CORP):**
+
+```bash
+$ curl -I https://d21gh6khf5uj9x.cloudfront.net/
+
+cross-origin-resource-policy: same-origin
+cross-origin-opener-policy: same-origin
+cross-origin-embedder-policy: require-corp
+```
+
+### Impact
+
+- File downloads (forms, templates, exports) lack CORP protection
+- ASVS 5 control 3.5.8 partially unmet
+- Low actual security risk (presigned URLs are time-limited and authenticated)
 
 ---
 

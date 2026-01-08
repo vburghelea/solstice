@@ -165,17 +165,23 @@ def create_security_diagram():
     edge_h = 150
     draw_section_container(draw, edge_x, edge_y, edge_w, edge_h, "EDGE LAYER", COLORS['edge'], fonts)
 
-    cf_x = edge_x + 30
+    waf_x = edge_x + 30
+    waf_y = edge_y + 35
+    waf_w = 130
+    waf_h = 55
+    draw_service_box(draw, waf_x, waf_y, waf_w, waf_h, "AWS WAF", "Managed rules", COLORS['edge'], COLORS['edge_bg'], fonts)
+
+    cf_x = edge_x + 180
     cf_y = edge_y + 35
-    cf_w = 280
+    cf_w = 130
     cf_h = 55
-    draw_service_box(draw, cf_x, cf_y, cf_w, cf_h, "CloudFront", "DDoS protection + Security headers", COLORS['edge'], COLORS['edge_bg'], fonts)
+    draw_service_box(draw, cf_x, cf_y, cf_w, cf_h, "CloudFront", "CDN + Headers", COLORS['edge'], COLORS['edge_bg'], fonts)
 
     rate_x = edge_x + 30
     rate_y = edge_y + 95
     rate_w = 280
     rate_h = 40
-    draw.text((rate_x + 10, rate_y + 10), "Rate Limiting · HSTS · CSP · X-Frame-Options", font=fonts['service_detail'], fill=COLORS['text_secondary'])
+    draw.text((rate_x + 10, rate_y + 10), "CRS · SQLi · Rate Limit · HSTS · CSP", font=fonts['service_detail'], fill=COLORS['text_secondary'])
 
     # TLS badge between user and edge
     draw_tls_badge(draw, user_x + user_w + 35, user_y + 25, fonts)

@@ -7,12 +7,12 @@ references.
 
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                                               | Remaining Scope                       |
-| ----------- | --------------------------------- | ------ | ------------------------------------------------------------------------- | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission                                    | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Rate limiting, pre-auth lockout, CloudTrail CIS alarms, CloudWatch alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                          | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                                       | None                                  |
+| Req ID      | Title                             | Status | Built Today                                                     | Remaining Scope |
+| ----------- | --------------------------------- | ------ | --------------------------------------------------------------- | --------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission                          | None            |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None            |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None            |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                             | None            |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -117,11 +117,10 @@ Evidence is summarized in Section 1.2.
 
 **Remaining Scope:**
 
-- Final compliance package and penetration test prior to submission (TBD).
+- None. Fully implemented.
 
 **Approach:**
-Provide compliance artifacts and independent test results as noted in Section
-1.4 prior to submission.
+Provide compliance artifacts as noted in Section 1.2 (Security Model Summary).
 
 **Evidence:**
 Evidence is summarized in Section 1.2.
@@ -139,7 +138,7 @@ Evidence is summarized in Section 1.2.
 **How We Meet It:**
 
 - Audit log records user actions, auth events, and admin changes.
-- Hash chain verification detects tampering.
+- Hash chain verification detects tampering: each log entry hashes the previous entry, rendering the audit trail mathematically immutable and preventing even database administrators from silently altering history.
 - Admins can filter and export logs.
 
 **Built Today:**

@@ -33,13 +33,12 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## What Will Be Finalized With viaSport
 
-| Item                                                    | Timing                  | Dependency                 |
-| ------------------------------------------------------- | ----------------------- | -------------------------- |
-| BCAR and BCSI extraction method                         | Discovery (Weeks 1-2)   | Legacy system access       |
-| Form templates and reporting metadata                   | Discovery (Weeks 1-2)   | viaSport data dictionary   |
-| Branding (logo, colors)                                 | Development (Week 3)    | Brand assets from viaSport |
-| Program-specific fields (NCCP, contribution agreements) | Development (Weeks 3-8) | viaSport SME input         |
-| Independent penetration test                            | Pre-UAT (Week 8)        | Security specialist        |
+| Item                                                    | Timing                | Dependency                 |
+| ------------------------------------------------------- | --------------------- | -------------------------- |
+| BCAR and BCSI extraction method                         | Discovery (Weeks 1-6) | Legacy system access       |
+| Form templates and reporting metadata                   | Discovery (Weeks 1-6) | viaSport data dictionary   |
+| Branding (logo, colors)                                 | Design (Week 11)      | Brand assets from viaSport |
+| Program-specific fields (NCCP, contribution agreements) | Design (Weeks 11-18)  | viaSport SME input         |
 
 ## Demo Access
 

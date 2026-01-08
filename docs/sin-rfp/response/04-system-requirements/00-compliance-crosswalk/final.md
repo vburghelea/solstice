@@ -33,12 +33,12 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 ## Security (SEC-AGG)
 
-| Req ID      | Title                             | Status | Built Today                                                               | Remaining                             |
-| ----------- | --------------------------------- | ------ | ------------------------------------------------------------------------- | ------------------------------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping                                   | None                                  |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | Rate limiting, pre-auth lockout, CloudTrail CIS alarms, CloudWatch alerts | None                                  |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                          | Compliance package and pen test (TBD) |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain                                           | None                                  |
+| Req ID      | Title                             | Status | Built Today                                                     | Remaining |
+| ----------- | --------------------------------- | ------ | --------------------------------------------------------------- | --------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping                         | None      |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None      |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None      |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log, hash chain                                 | None      |
 
 ## Training and Onboarding (TO-AGG)
 
@@ -54,7 +54,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------ |
 | UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                     |
 | UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                     |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI, accessibility scans        | Formal audit (TBD)       |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI, accessibility scans        | None                     |
 | UI-AGG-004 | Task and Notification Management        | Built  | Notifications and reminders               | None                     |
 | UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                     |
 | UI-AGG-006 | User Support and Feedback               | Built  | Support with priority, SLA, notifications | None                     |

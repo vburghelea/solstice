@@ -198,7 +198,7 @@ Evidence is summarized in Section 1.3.
 Run final DR and retention validation in sin-perf or sin-prod. See **Service Approach: Data Warehousing**.
 
 **Evidence:**
-Evidence is summarized in Sections 1.4 and 1.5.
+Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Security Architecture Summary).
 
 ## DM-AGG-006: Legacy Data Migration and Bulk Import
 

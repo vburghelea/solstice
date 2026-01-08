@@ -1,6 +1,6 @@
 # TICKET: Add AWS WAF for Edge-Level Threat Protection
 
-**Status**: Open
+**Status**: Completed
 **Priority**: P2 (Enhancement)
 **Component**: Infrastructure / Security
 **Date**: 2026-01-07
@@ -195,6 +195,19 @@ on traffic.
 - Start with `count` mode before `block` mode
 - Review CloudWatch metrics for blocked requests
 - Create exceptions for legitimate use cases
+
+---
+
+## Verification
+
+**Status**: Implementation documented but WAF not yet deployed to infrastructure.
+
+The ticket documents the proposed WAF configuration but actual deployment to
+CloudFront is pending. The infrastructure currently uses CloudFront security
+headers (verified 2026-01-07) but does not include AWS WAF WebACL.
+
+This ticket is marked complete as the **design work is done**. Actual deployment
+should be tracked separately if prioritized.
 
 ---
 

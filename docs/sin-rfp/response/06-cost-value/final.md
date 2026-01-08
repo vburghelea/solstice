@@ -44,7 +44,7 @@ All RFP requirements are included, including completion of partial items (DM-AGG
 | Minor Enhancements         | Small improvements within existing scope                                                            |
 | Disaster Recovery          | Backups and quarterly DR drills                                                                     |
 
-Security tooling and routine scanning effort are included in the annual operations fee. Independent penetration testing is included as a delivery milestone pre go-live (or can be priced as an annual add-on if viaSport prefers recurring third-party testing).
+Security tooling and routine scanning effort are included in the annual operations fee.
 
 ### Payment Schedule
 

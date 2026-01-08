@@ -27,8 +27,8 @@ The interface adapts to desktop, tablet, and mobile viewports. Core workflows re
 ### Accessibility
 
 The interface is built on Radix UI primitives and shadcn/ui components, which
-provide keyboard navigation and ARIA defaults. A formal WCAG audit is planned
-before submission. Accessibility evidence is summarized in Section 1.3.
+provide keyboard navigation and ARIA defaults. Accessibility evidence is
+summarized in Section 1.3.
 
 ### UX Refinement Process
 

@@ -8,13 +8,13 @@ Migration follows a phased approach that reduces risk and validates data at each
 
 ### Migration Phases
 
-| Phase                      | Duration  | Activities                                                          | Exit Criteria              |
-| -------------------------- | --------- | ------------------------------------------------------------------- | -------------------------- |
-| Discovery                  | Weeks 1-2 | Obtain sample exports, document legacy schemas, assess data quality | Schema mapping approved    |
-| Mapping and Transformation | Weeks 2-3 | Build mapping templates, define validation rules, test with samples | Templates validated        |
-| Pilot Migration            | Weeks 3-4 | Migrate subset (one PSO), validate accuracy, refine mappings        | Pilot data verified        |
-| Full Migration             | Weeks 4-6 | Migrate organizations, users, submissions, documents                | Reconciliation checks pass |
-| Validation and Cutover     | Weeks 6-7 | Full reconciliation, UAT on migrated data                           | Sign-off received          |
+| Phase                      | Duration    | Activities                                                          | Exit Criteria              |
+| -------------------------- | ----------- | ------------------------------------------------------------------- | -------------------------- |
+| Discovery                  | Weeks 1-6   | Obtain sample exports, document legacy schemas, assess data quality | Schema mapping approved    |
+| Mapping and Transformation | Weeks 7-10  | Build mapping templates, define validation rules, test with samples | Templates validated        |
+| Pilot Migration            | Weeks 11-14 | Migrate subset (one PSO), validate accuracy, refine mappings        | Pilot data verified        |
+| Full Migration             | Weeks 15-18 | Migrate organizations, users, submissions, documents                | Reconciliation checks pass |
+| Validation and Cutover     | Weeks 19-22 | Full reconciliation, UAT on migrated data                           | Sign-off received          |
 
 ### Migration Sequence
 

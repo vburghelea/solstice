@@ -1,0 +1,111 @@
+name: ZAP Baseline
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.ts"
+      - ".github/workflows/zap-baseline.yml"
+      - ".zap/**"
+  schedule:
+    - cron: "41 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  zap-baseline:
+    name: DAST (baseline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: solstice_zap
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      APP_PORT: "4173"
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_zap
+      VITE_BASE_URL: http://127.0.0.1:4173
+      BETTER_AUTH_SECRET: 0123456789abcdef0123456789abcdef
+      NODE_ENV: development
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm db push --force
+
+      - name: Start app (background)
+        run: |
+          pnpm dev -- --host 127.0.0.1 --port "$APP_PORT" &
+          echo $! > .app.pid
+
+      - name: Wait for app
+        run: |
+          for i in {1..60}; do
+            if curl -fsS "$VITE_BASE_URL" >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App did not become ready in time"
+          exit 1
+
+      - name: Run ZAP baseline scan (passive)
+        run: |
+          mkdir -p zap-reports
+          docker run --rm --network host -v "$PWD:/zap/wrk" -w /zap/wrk -t zaproxy/zap-stable \
+            zap-baseline.py \
+            -t "$VITE_BASE_URL" \
+            -c .zap/zap-baseline.conf \
+            -I \
+            -m 2 \
+            -T 10 \
+            -r zap-reports/zap-report.html \
+            -w zap-reports/zap-report.md \
+            -J zap-reports/zap-report.json
+
+      - name: Stop app
+        if: always()
+        run: |
+          if [[ -f .app.pid ]]; then
+            kill "$(cat .app.pid)" || true
+          fi
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-reports
+          path: zap-reports/
+          retention-days: 14

@@ -418,7 +418,7 @@ A working prototype is available for viaSport evaluation in a dedicated UAT envi
 | Data Used    | Synthetic only, no confidential viaSport data                                                                     |
 | Performance  | 20.1M rows, sub-250ms p95 latency, final validation run TBD                                                       |
 | Security     | MFA, RBAC, audit chain, monitoring and lockout controls, Canadian hosting region                                  |
-| Timeline     | 18 weeks from contract to full rollout (See **Project Plan, Timeline, and Delivery Schedule**)                    |
+| Timeline     | 30 weeks from contract to full rollout (See **Project Plan, Timeline, and Delivery Schedule**)                    |
 | Investment   | $600K implementation + $200K/year operations (See **Cost and Value of Services**)                                 |
 ```
 

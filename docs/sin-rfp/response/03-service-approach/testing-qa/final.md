@@ -4,19 +4,21 @@
 
 ### Testing Layers
 
-| Layer                  | Tooling (examples)                                       | Purpose                                  | Frequency                                      |
-| ---------------------- | -------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------- |
-| Unit and Integration   | Vitest + Testing Library                                 | Component and function testing           | Every commit                                   |
-| End-to-End             | Playwright                                               | Full user flow testing                   | Every commit                                   |
-| Property-Based         | fast-check                                               | Access control and audit integrity       | Every commit                                   |
-| Performance            | Lighthouse, k6                                           | Load testing and Core Web Vitals         | Pre-release and before major reporting periods |
-| Security (Automated)   | SAST + SCA (for example CodeQL/Semgrep, Dependabot/Snyk) | Find code and dependency vulnerabilities | Every commit                                   |
-| Security (Dynamic)     | DAST (for example OWASP ZAP)                             | Detect runtime web vulnerabilities       | Scheduled and pre-release                      |
-| Security (Independent) | Third-party penetration test                             | Independent validation                   | Pre go-live (and annually if selected)         |
+| Layer                | Tooling (examples)                                       | Purpose                                  | Frequency                                      |
+| -------------------- | -------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------- |
+| Unit and Integration | Vitest + Testing Library                                 | Component and function testing           | Every commit                                   |
+| End-to-End           | Playwright                                               | Full user flow testing                   | Every commit                                   |
+| Property-Based       | fast-check                                               | Access control and audit integrity       | Every commit                                   |
+| Performance          | Lighthouse, k6                                           | Load testing and Core Web Vitals         | Pre-release and before major reporting periods |
+| Security (Automated) | SAST + SCA (for example CodeQL/Semgrep, Dependabot/Snyk) | Find code and dependency vulnerabilities | Every commit                                   |
+| Security (Dynamic)   | DAST (for example OWASP ZAP)                             | Detect runtime web vulnerabilities       | Scheduled and pre-release                      |
 
 ### Automated Testing
 
-Automated tests run in CI and gate merges where applicable. Coverage focuses on core workflows: login, data submission, reporting, analytics, and access control. Security vulnerability scanning runs on every commit to identify issues early.
+Automated tests run in CI and gate merges where applicable. Coverage focuses on
+core workflows: login, data submission, reporting, analytics, and access
+control. There is also automated security testing, please see below for further
+details.
 
 ### Performance Testing
 
@@ -38,6 +40,9 @@ Lighthouse results from the prototype are recorded as noted in Section 1.3.
 Final Lighthouse runs will be completed before submission (TBD).
 
 ### Security Testing
+
+Security vulnerability scanning runs on every commit to identify issues early
+followed by scheduled and pre-release scans to identify run-time issues.
 
 Security testing covers authentication, authorization, and audit integrity, plus application vulnerability testing.
 

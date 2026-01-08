@@ -23,8 +23,9 @@ Training is tailored to distinct user groups with different responsibilities.
 
 | Phase                   | Timing      | Participants       | Content                                    |
 | ----------------------- | ----------- | ------------------ | ------------------------------------------ |
-| viaSport Admin Training | Weeks 13-14 | viaSport staff     | Full platform capabilities and admin tools |
-| PSO Rollout Training    | Weeks 15-18 | PSO administrators | Core workflows and reporting               |
+| viaSport Admin Training | Weeks 27-28 | viaSport staff     | Full platform capabilities and admin tools |
+| Soft Launch Training    | Week 29     | Pilot cohort PSOs  | Core workflows with intensive support      |
+| PSO Rollout Training    | Week 30     | PSO administrators | Core workflows and reporting               |
 | Ongoing                 | Post-launch | All users          | Refreshers and new features                |
 
 ### PSO Rollout Cohorts

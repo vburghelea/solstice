@@ -1,33 +1,43 @@
 # Appendices
 
-## Appendix A: Live Demo Access
+## Appendix A: Prototype Evaluation Access
 
-A working prototype is available for viaSport evaluation in a dedicated UAT environment. Credentials are listed below to reduce reviewer friction.
+A working prototype is available for viaSport evaluation in a dedicated UAT environment using synthetic data only.
 
-**Demo URL:** https://sin-uat.solstice.viasport.ca (or CloudFront URL TBD)
+**Demo URL:** https://sin-uat.solstice.viasport.ca
 
-**Environment:** `sin-uat` (User Acceptance Testing environment with evaluator
-access and CloudTrail monitoring)
+**Environment:** `sin-uat` (User Acceptance Testing environment with evaluator access and CloudTrail monitoring)
 
-### Data and Monitoring
+### Environment Details
 
-- Synthetic data only, no confidential viaSport data
+- Synthetic test data only - no confidential viaSport data was used
 - Environment monitoring enabled (CloudTrail with CIS Benchmark alarms)
-- Production-equivalent security controls
-- Performance testing is executed in `sin-perf`
+- Production-equivalent security controls active
+- Performance testing is executed separately in `sin-perf`
 
-### Test Accounts
+### Evaluator Access
 
-| Persona        | Email                      | Password        | Access Level                                      |
-| -------------- | -------------------------- | --------------- | ------------------------------------------------- |
-| viaSport Staff | viasport-staff@example.com | testpassword123 | viaSport admin with full org access (MFA enabled) |
-| PSO Admin      | pso-admin@example.com      | testpassword123 | BC Hockey organization admin                      |
-| Club Reporter  | club-reporter@example.com  | testpassword123 | North Shore Club reporter                         |
-| Viewer         | member@example.com         | testpassword123 | View-only access                                  |
+To protect evaluator accounts and align with security best practices, credentials are provided via a secure **Evaluator Access Pack** delivered separately to viaSport's evaluation lead.
 
-**Note:** MFA-enabled accounts use TOTP authentication. Other demo accounts have MFA disabled for faster evaluation.
+**To request access:**
 
-### Suggested Demo Walkthrough
+1. Contact austin@austinwallace.tech with evaluator names and email addresses
+2. Receive the Evaluator Access Pack via secure email
+3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
+4. MFA demonstration available on the viaSport Staff account
+
+Credentials will be rotated periodically and disabled after the evaluation window closes.
+
+### Test Account Personas
+
+| Persona        | Access Level                                  | MFA                             |
+| -------------- | --------------------------------------------- | ------------------------------- |
+| viaSport Staff | Full admin with cross-org access              | Enabled (demonstrates MFA flow) |
+| PSO Admin      | BC Hockey organization administrator          | Disabled for convenience        |
+| Club Reporter  | North Shore Club reporter (submission access) | Disabled for convenience        |
+| Viewer         | Read-only access to assigned organization     | Disabled for convenience        |
+
+### Suggested Evaluation Walkthrough
 
 1. Login as viaSport Staff to see full admin capabilities
 2. Explore the role-based dashboard
@@ -39,6 +49,8 @@ access and CloudTrail monitoring)
 8. Security Dashboard: review recent security events and account lockouts (SEC-AGG-002)
 9. Privacy and Retention: view retention policies and legal hold capabilities (SEC-AGG-003)
 10. Explore help center and guided walkthroughs
+
+For a requirement-by-requirement walkthrough, see the **Prototype Evaluation Guide**.
 
 ## Appendix B: System Architecture
 
@@ -152,11 +164,11 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 
 ### Audit Trail
 
-| Feature      | Implementation                                     |
-| ------------ | -------------------------------------------------- |
-| Scope        | All user actions, data changes, auth events        |
-| Immutability | Append-only audit log with hash chain              |
-| Retention    | Retention policies and legal holds (durations TBD) |
+| Feature      | Implementation                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| Scope        | All user actions, data changes, auth events                                                           |
+| Immutability | Hash chain verification: each entry hashes the previous, rendering the trail mathematically immutable |
+| Retention    | Retention policies and legal holds (durations TBD)                                                    |
 
 ### Compliance
 
@@ -183,7 +195,11 @@ leads platform architecture, data migration strategy, and delivery governance.
 He has 9+ years of enterprise data engineering experience and sport governance
 leadership.
 
-### Soleil Heaney, Sport Sector Advisor
+### Ruslan Hétu, UX and Accessibility Lead
+
+[To be provided by Ruslan Hétu]
+
+### Soleil Heaney, System Navigator
 
 [To be provided by Soleil Heaney]
 
@@ -191,13 +207,12 @@ leadership.
 
 [To be provided by Will Siddall]
 
-### Ruslan Hétu, UX and Accessibility Advisor
-
-[To be provided by Ruslan Hétu]
-
 ### Parul Kharub, Security and Risk Advisor
 
-[To be provided by Parul Kharub]
+Parul is the strategic cybersecurity and risk advisor with 16 years of
+practical experience in Fortune 100 companies across the globe. She also brings
+experience working with regulators and privacy officers to offer breadth of
+security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 

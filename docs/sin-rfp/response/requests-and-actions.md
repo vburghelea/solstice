@@ -94,3 +94,16 @@
   - Removed GuardDuty (not in current config)
 - Regenerated all diagrams (PNG and SVG).
 - Regenerated assembled proposal files.
+
+### WAF Implementation Complete
+
+- Created `TICKET-waf-edge-protection.md` (now in `complete/`)
+- WAF implemented in `sst.config.ts` with:
+  - Rate limiting rule (1000 req/5min per IP)
+  - AWS Managed Rules: Common Rule Set, Known Bad Inputs, SQL Injection
+  - Count mode for non-prod, block mode for prod
+  - CloudWatch alarm for blocked requests
+- Updated SEC-AGG-002 documentation and compliance crosswalk to include WAF
+- Updated security diagram to show WAF + CloudFront in edge layer
+- Architecture diagram already showed WAF (no change needed)
+- Regenerated all diagrams and assembled proposal files

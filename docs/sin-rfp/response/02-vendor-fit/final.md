@@ -30,16 +30,29 @@ to avoid handoffs.
 - **Austin Wallace**: Solution architecture, data engineering, development,
   project management, and delivery governance.
 
+### Execution Capacity and Engagement Model
+
+| Role                               | Engagement                       | Phase Coverage                  |
+| ---------------------------------- | -------------------------------- | ------------------------------- |
+| Austin Wallace (Delivery Lead)     | Full-time, accountable           | All phases                      |
+| Ruslan Hétu (UX/A11y Lead)         | Full-time UX research and design | All phases                      |
+| Soleil Heaney (System Navigator)   | Ongoing community liaison        | Research, UAT, rollout          |
+| Will Siddall (Engineering Support) | Part-time during development     | Weeks 11-22                     |
+| Security Advisors                  | Scheduled reviews at checkpoints | Design freeze, pre-UAT, go-live |
+
+Advisory partners participate in scheduled reviews and provide expertise at
+defined checkpoints rather than full-time allocation.
+
 ### Advisory Partners
 
-| Focus Area                  | Advisor         | Contribution                                                 |
-| --------------------------- | --------------- | ------------------------------------------------------------ |
-| Sport Sector Operations     | Soleil Heaney   | User perspective and workflow validation from PSO experience |
-| Technical Architecture      | Will Siddall    | Architecture review and development support                  |
-| UX and Accessibility        | Ruslan Hétu     | Design research, interface review, accessibility validation  |
-| Security and Risk           | Parul Kharub    | Security strategy and risk advisory                          |
-| Security and Infrastructure | Michael Casinha | Infrastructure security and DevOps review                    |
-| Security and Compliance     | Tyler Piller    | Security operations and compliance validation                |
+| Focus Area                  | Advisor         | Contribution                                            |
+| --------------------------- | --------------- | ------------------------------------------------------- |
+| UX and Accessibility        | Ruslan Hétu     | UX research lead, design, accessibility validation      |
+| Sport Sector / Navigator    | Soleil Heaney   | System navigator connecting team to PSO community needs |
+| Technical Architecture      | Will Siddall    | Architecture review and development support             |
+| Security and Risk           | Parul Kharub    | Security strategy and risk advisory                     |
+| Security and Infrastructure | Michael Casinha | Infrastructure security and DevOps review               |
+| Security and Compliance     | Tyler Piller    | Security operations and compliance validation           |
 
 ## Relevant Delivery Portfolio
 
@@ -80,25 +93,36 @@ years of enterprise data engineering experience.
 Advisory partners provide expertise and review. Short profiles are provided by
 each advisor.
 
-### Soleil Heaney, Sport Sector Advisor
+### Soleil Heaney, System Navigator
 
 [To be provided by Soleil Heaney - 2-3 sentences on relevant sport sector
-experience and perspective they bring to the project]
+experience and their role connecting the team to PSO community needs]
 
 ### Will Siddall, Technical Advisor
 
 [To be provided by Will Siddall - 2-3 sentences on relevant technical
 experience and their focus areas for this project]
 
-### Ruslan Hétu, UX and Accessibility Advisor
+### Ruslan Hétu, UX and Accessibility Lead
 
-[To be provided by Ruslan Hétu - 2-3 sentences on relevant design research
-experience and their focus areas for this project]
+[To be provided by Ruslan Hétu - 2-3 sentences on relevant UX research and
+accessibility experience and their leadership role for this project]
 
 ### Parul Kharub, Security and Risk Advisor
 
-[To be provided by Parul Kharub - 2-3 sentences on relevant security
-experience and their focus areas for this project]
+Secure Transformation Leadership (Teck Resources Limited): Directed security
+architecture and governance for a $1B digital transformation, ensuring secure
+product development, legacy-to-cloud migration and overall robust security
+controls.
+
+Canadian Regulatory Expertise (CBSA): Managed large-scale cloud transformations
+in the Canadian public sector, aligning over 350 security controls with PIPEDA
+and ISO 27001 standards.
+
+Big 4 Consulting North America (Deloitte): A strategic partner in building a
+global Application Security practice across 43 countries - spearheaded the
+development of a DevSecOps practice that embedded "Shift Left" security from
+requirements to production into the CI/CD pipeline.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
@@ -127,6 +151,17 @@ Continuity is supported by the architecture and delivery model:
 
 If a team member changes, the codebase, infrastructure definitions, and
 operational documentation enable efficient transition.
+
+## Data Ownership and Portability
+
+| Aspect             | Commitment                                               |
+| ------------------ | -------------------------------------------------------- |
+| Data Ownership     | viaSport retains full ownership of all data              |
+| Export Formats     | CSV, Excel, and JSON exports available at any time       |
+| Data Extraction    | Full database export available on contract termination   |
+| Documentation      | Operational runbooks and schema documentation provided   |
+| Source Access      | Source code access available under mutually agreed terms |
+| Transition Support | Support available for transition to a replacement system |
 
 ## Proposed Solution Statement
 
@@ -192,11 +227,13 @@ OWASP Top 10 and OWASP ASVS as a verification framework.
 ### Benefits to viaSport
 
 - **Reduced Risk:** Evaluate a working system before committing.
-- **Accelerated Timeline:** 18 weeks to rollout because the platform exists
-  today.
+- **Accelerated Timeline:** 30 weeks to rollout, with time focused on UX
+  research and community engagement rather than building core features.
 - **Direct Accountability:** Principal-led delivery with no organizational
   layers.
 - **Sector Understanding:** Experience leading amateur sport organizations, not
   just building software.
+- **Secure and Safe:** Embedding security and privacy by design from day one of
+  development.
 - **Sustainability:** Serverless architecture and infrastructure as code reduce
   operating overhead.

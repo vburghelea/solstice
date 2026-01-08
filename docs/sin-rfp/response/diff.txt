@@ -1,0 +1,67 @@
+Diff summary:
+ .../docs/sin-rfp/response/{old.txt => new.txt}         | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+Diff:
+diff --git a/Users/austin/dev/solstice/docs/sin-rfp/response/old.txt b/Users/austin/dev/solstice/docs/sin-rfp/response/new.txt
+index 79c1796..26a1183 100644
+--- a/Users/austin/dev/solstice/docs/sin-rfp/response/old.txt
++++ b/Users/austin/dev/solstice/docs/sin-rfp/response/new.txt
+@@ -220,7 +220,11 @@ Will Siddall, Technical Advisor
+Ruslan Hétu, UX and Accessibility Lead
+[To be provided by Ruslan Hétu - 2-3 sentences on relevant UX research and accessibility experience and their leadership role for this project]
+Parul Kharub, Security and Risk Advisor
+[-[To be provided by Parul Kharub - 2-3 sentences on relevant-]{+Secure Transformation Leadership (Teck Resources Limited): Directed+} security [-experience-]{+architecture+} and [-their focus areas-]{+governance+} for [-this project]-]{+a $1B digital transformation, ensuring secure product development, legacy-to-cloud migration and overall robust security controls.+}
+
+{+Canadian Regulatory Expertise (CBSA): Managed large-scale cloud transformations in the Canadian public sector, aligning over 350 security controls with PIPEDA and ISO 27001 standards.+}
+
+{+Big 4 Consulting North America (Deloitte): A strategic partner in building a global Application Security practice across 43 countries - spearheaded the development of a DevSecOps practice that embedded "Shift Left" security—from requirements to production—into the CI/CD pipeline.+}
+Michael Casinha, Security and Infrastructure Advisor
+[To be provided by Michael Casinha - 2-3 sentences on relevant infrastructure and security experience and their focus areas for this project]
+Tyler Piller, Security and Compliance Advisor
+@@ -294,6 +298,7 @@ Reduced Risk: Evaluate a working system before committing.
+Accelerated Timeline: 18 weeks to rollout because the platform exists today.
+Direct Accountability: Principal-led delivery with no organizational layers.
+Sector Understanding: Experience leading amateur sport organizations, not just building software.
+{+Secure and Safe: Embedding security and privacy by design from day 1 of development.+}
+Sustainability: Serverless architecture and infrastructure as code reduce operating overhead.
+Solution Overview
+Workflow Summary
+@@ -967,7 +972,8 @@ Detect runtime web vulnerabilities
+Scheduled and pre-release
+
+Automated Testing
+Automated tests run in CI and gate merges where applicable. Coverage focuses on core workflows: login, data submission, reporting, analytics, and access control. [-Security vulnerability scanning runs on every commit to identify issues early.-]{+There is also automated security testing, please see below for further details.+}
+
+Performance Testing
+Performance testing is conducted in sin-perf with production-scale data. Final validation runs will be executed before submission (TBD).
+
+@@ -1001,6 +1007,7 @@ Evidence is summarized in Section 1.3 (final run TBD).
+Core Web Vitals
+Lighthouse results from the prototype are recorded as noted in Section 1.3. Final Lighthouse runs will be completed before submission (TBD).
+Security Testing
+{+Security vulnerability scanning runs on every commit to identify issues early followed by scheduled and pre-release scans to identify run-time issues.+}
+Security testing covers authentication, authorization, and audit integrity, plus application vulnerability testing.
+
+Automated security checks
+@@ -2511,6 +2518,9 @@ Publicly traded resource sector
+Austin Wallace
+Clio
+Legal technology, public interest clients
+{+Parul Kharub+}
+{+Canadian Border Services Agency (CBSA)+}
+{+Federal Law Enforcement Agency+}
+Will Siddall
+Teck Resources
+Publicly traded resource sector
+@@ -3443,7 +3453,8 @@ Soleil Heaney, System Navigator
+Will Siddall, Technical Advisor
+[To be provided by Will Siddall]
+Parul Kharub, Security and Risk Advisor
+[-[To be provided by-]Parul [-Kharub]-]{+is the strategic cybersecurity and risk advisor with 16 years of practical experience in Fortune 100 companies across the globe. She also brings experience working with regulators and privacy officers to offer breadth of security, privacy and regulatory coverage.+}
+
+Michael Casinha, Security and Infrastructure Advisor
+[To be provided by Michael Casinha]
+Tyler Piller, Security and Compliance Advisor
+@@ -3505,3 +3516,4 @@ A09: Security Logging and Alerting Failures - Lack of real-time monitoring (dire
+A10: Mishandling of Exceptional Conditions - Error messages that leak sensitive info or systems that fail open.

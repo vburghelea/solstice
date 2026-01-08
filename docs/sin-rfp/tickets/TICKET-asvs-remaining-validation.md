@@ -1,9 +1,10 @@
 # TICKET: Validate Remaining ASVS 5 Controls
 
-**Status**: Open
+**Status**: In Progress (Partial Verification Complete)
 **Priority**: P1 (High)
 **Component**: Security / Compliance
 **Date**: 2026-01-06
+**Updated**: 2026-01-07
 **Author**: Claude (AI Assistant)
 
 ---
@@ -15,6 +16,68 @@ marked "NEEDS \*" or "PARTIALLY VERIFIED" still require runtime,
 infrastructure, or database verification. This ticket tracks the validation
 work and evidence updates in
 `docs/sin-rfp/response/asvs-5-verification-results.md`.
+
+---
+
+## Verification Results (2026-01-07)
+
+**Test Environment:** sin-dev (`https://d21gh6khf5uj9x.cloudfront.net`)
+
+### Security Headers ✅ VERIFIED
+
+All required security headers present:
+
+```
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline'...
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-xss-protection: 1; mode=block
+referrer-policy: strict-origin-when-cross-origin
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+cross-origin-embedder-policy: require-corp
+permissions-policy: geolocation=(), microphone=(), camera=()
+```
+
+### HTTP to HTTPS Redirects (4.1.2) ✅ VERIFIED
+
+CloudFront viewer protocol policy redirects HTTP to HTTPS:
+
+```bash
+$ curl -I http://d21gh6khf5uj9x.cloudfront.net 2>&1 | head -5
+HTTP/1.1 301 Moved Permanently
+Location: https://d21gh6khf5uj9x.cloudfront.net/
+```
+
+### CORS Configuration (3.4.2, 3.5.2) ⚠️ NEEDS REVIEW
+
+Current CORS configuration returns permissive `Access-Control-Allow-Origin: *`:
+
+```bash
+$ curl -I -X OPTIONS https://d21gh6khf5uj9x.cloudfront.net/api/health \
+    -H "Origin: https://evil.com" \
+    -H "Access-Control-Request-Method: POST"
+
+access-control-allow-origin: *
+access-control-allow-methods: GET, HEAD, OPTIONS
+```
+
+**Issue**: Should restrict to known origins rather than wildcard.
+
+### Authenticated Resource Embedding (3.5.8) ❌ PARTIALLY VERIFIED
+
+- CloudFront responses have CORP headers ✅
+- S3 presigned downloads bypass CloudFront and lack CORP headers ❌
+- See `TICKET-corp-s3-download-headers.md` for remediation
+
+### Audit Logging ✅ VERIFIED
+
+Audit log entries present with hash chain verification working:
+
+- 197+ audit entries visible in admin UI
+- Hash chain verification functional
+- Entries include user actions, auth events, admin operations
 
 ---
 

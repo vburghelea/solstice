@@ -109,7 +109,6 @@ viaSport's scale of 20M historical rows with 1M rows per year is well within Pos
 | Optimal scale                 | Up to 500M+ rows  | Billions of rows            |
 | viaSport projected (10 years) | 30M rows          | 30M rows                    |
 | Operational complexity        | Low (managed RDS) | Higher (cluster management) |
-| Estimated annual cost         | $3,000 to $6,000  | $12,000+ minimum            |
 | Data freshness                | Real-time         | Requires ETL, often delayed |
 
 PostgreSQL provides real-time analytics and simplified operations while keeping data resident in Canada.

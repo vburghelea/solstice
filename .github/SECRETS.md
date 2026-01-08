@@ -20,10 +20,11 @@ This document outlines the required secrets for GitHub Actions workflows.
 
 ### Optional Secrets
 
-| Secret Name     | Description          | Required For                                         |
-| --------------- | -------------------- | ---------------------------------------------------- |
-| `CODECOV_TOKEN` | Codecov upload token | Code coverage reporting (optional but recommended)   |
-| `SNYK_TOKEN`    | Snyk API token       | Dependency scanning via `.github/workflows/snyk.yml` |
+| Secret Name      | Description          | Required For                                         |
+| ---------------- | -------------------- | ---------------------------------------------------- |
+| `CODECOV_TOKEN`  | Codecov upload token | Code coverage reporting (optional but recommended)   |
+| `SNYK_TOKEN`     | Snyk API token       | Dependency scanning via `.github/workflows/snyk.yml` |
+| `AIKIDO_API_KEY` | Aikido CI API key    | Security scanning via `.github/workflows/aikido.yml` |
 
 ## Setting Up Secrets
 

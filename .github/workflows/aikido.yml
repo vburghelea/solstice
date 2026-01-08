@@ -1,0 +1,42 @@
+name: Aikido Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  aikido-scan:
+    name: Security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Aikido CLI
+        run: npm install -g @aikidosec/ci-api-client
+
+      - name: Configure Aikido
+        run: aikido-api-client apikey "${{ secrets.AIKIDO_API_KEY }}"
+
+      - name: Run Aikido scan
+        run: |
+          aikido-api-client scan-release \
+            "${{ github.repository }}" \
+            "${{ github.sha }}" \
+            --fail-on-sast-scan \
+            --fail-on-secrets-scan \
+            --minimum-severity-level="HIGH"

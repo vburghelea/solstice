@@ -1,10 +1,15 @@
 import type { i18n as I18nInstance, InitOptions, Resource } from "i18next";
 import { createInstance } from "i18next";
-import { randomUUID } from "node:crypto";
 import { initReactI18next } from "react-i18next";
 
 import { i18nConfig, type SupportedLanguage } from "./config";
 import baseI18n from "./i18n";
+
+// Server-only function to generate a random ID
+async function generateId(): Promise<string> {
+  const { randomUUID } = await import("node:crypto");
+  return randomUUID();
+}
 
 declare global {
   var __solsticeRequestI18nRegistry: Map<string, I18nInstance> | undefined;
@@ -57,7 +62,7 @@ export async function createRequestScopedI18n(language: SupportedLanguage) {
     });
   }
 
-  const key = randomUUID();
+  const key = await generateId();
   registry.set(key, instance);
 
   return { key, instance } as const;

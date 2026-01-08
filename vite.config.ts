@@ -1,5 +1,5 @@
+import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
-import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
@@ -50,12 +50,8 @@ export default defineConfig(({ mode }) => {
         },
       }),
 
-      // Nitro v2 plugin for Netlify deployment
-      // Using modern netlify preset (not netlify-legacy) for better performance
-      nitroV2Plugin({
-        preset: "netlify",
-        compatibilityDate: "2026-01-08",
-      }),
+      // Netlify plugin for TanStack Start SSR deployment
+      netlify(),
 
       // React plugin explicitly provided (required for TanStack Start RC v1.132+)
       // with React compiler configuration

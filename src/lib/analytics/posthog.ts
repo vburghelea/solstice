@@ -12,9 +12,18 @@ function resolveCookieDomain(hostname: string): string | undefined {
     hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
   if (isLocal) return undefined;
 
-  // If host already an apex/subdomain (contains a dot), use it as-is.
-  // This avoids invalid domain errors on platforms like Netlify previews.
-  if (hostname.includes(".")) return hostname;
+  // Don't set cookie_domain for Netlify preview URLs or other complex hostnames
+  // to avoid "invalid domain" errors
+  if (hostname.includes("netlify")) return undefined;
+
+  // Extract the root domain (e.g., "roundup.games" from "www.roundup.games")
+  // This allows cookies to work across subdomains
+  const parts = hostname.split(".");
+  if (parts.length >= 2) {
+    // For domains like "roundup.games", use as-is
+    // For subdomains like "www.roundup.games", use "roundup.games"
+    return parts.length === 2 ? hostname : parts.slice(-2).join(".");
+  }
 
   return undefined;
 }

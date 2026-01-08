@@ -9,7 +9,7 @@ import { detectLanguageFromPath, getLocalizedUrl } from "~/lib/i18n/detector";
 import { applyLanguageRouting } from "~/lib/i18n/language-routing";
 import { routeTree as generatedRouteTree } from "./routeTree.gen";
 
-export function createRouter() {
+export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -137,6 +137,6 @@ export function createRouter() {
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof createRouter>;
+    router: ReturnType<typeof getRouter>;
   }
 }

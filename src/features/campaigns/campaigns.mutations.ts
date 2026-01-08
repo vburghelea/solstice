@@ -40,7 +40,7 @@ interface CampaignSummary {
 }
 
 export const createCampaign = createServerFn({ method: "POST" })
-  .validator(createCampaignInputSchema.parse)
+  .inputValidator(createCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -129,7 +129,7 @@ export const createCampaign = createServerFn({ method: "POST" })
   });
 
 export const updateCampaign = createServerFn({ method: "POST" })
-  .validator(updateCampaignInputSchema.parse)
+  .inputValidator(updateCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -232,7 +232,7 @@ export const updateCampaign = createServerFn({ method: "POST" })
   });
 
 export const deleteCampaign = createServerFn({ method: "POST" })
-  .validator(getCampaignSchema.parse)
+  .inputValidator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -272,7 +272,7 @@ export const deleteCampaign = createServerFn({ method: "POST" })
   });
 
 export const addCampaignParticipant = createServerFn({ method: "POST" })
-  .validator(addCampaignParticipantInputSchema.parse)
+  .inputValidator(addCampaignParticipantInputSchema.parse)
   .handler(
     async ({
       data,
@@ -367,7 +367,7 @@ export const addCampaignParticipant = createServerFn({ method: "POST" })
   );
 
 export const updateCampaignParticipant = createServerFn({ method: "POST" })
-  .validator(updateCampaignParticipantInputSchema.parse)
+  .inputValidator(updateCampaignParticipantInputSchema.parse)
   .handler(
     async ({
       data,
@@ -448,7 +448,7 @@ export const updateCampaignParticipant = createServerFn({ method: "POST" })
   );
 
 export const removeCampaignParticipant = createServerFn({ method: "POST" })
-  .validator(removeCampaignParticipantInputSchema.parse)
+  .inputValidator(removeCampaignParticipantInputSchema.parse)
   .handler(
     async ({
       data,
@@ -503,7 +503,7 @@ export const removeCampaignParticipant = createServerFn({ method: "POST" })
   );
 
 export const applyToCampaign = createServerFn({ method: "POST" })
-  .validator(applyToCampaignInputSchema.parse)
+  .inputValidator(applyToCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -622,7 +622,7 @@ export const applyToCampaign = createServerFn({ method: "POST" })
   });
 
 export const respondToCampaignApplication = createServerFn({ method: "POST" })
-  .validator(respondToCampaignApplicationSchema.parse)
+  .inputValidator(respondToCampaignApplicationSchema.parse)
   .handler(
     async ({
       data,
@@ -728,7 +728,7 @@ export const respondToCampaignApplication = createServerFn({ method: "POST" })
   );
 
 export const inviteToCampaign = createServerFn({ method: "POST" })
-  .validator(inviteToCampaignInputSchema.parse)
+  .inputValidator(inviteToCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1036,7 +1036,7 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
   });
 
 export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
-  .validator(removeCampaignParticipantInputSchema.parse)
+  .inputValidator(removeCampaignParticipantInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1099,7 +1099,7 @@ export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
  * Respond to a campaign invitation (accept or reject)
  */
 export const respondToCampaignInvitation = createServerFn({ method: "POST" })
-  .validator(respondToCampaignInvitationSchema.parse)
+  .inputValidator(respondToCampaignInvitationSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant | boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");

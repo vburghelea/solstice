@@ -105,7 +105,7 @@ function mapDbUserToProfile(
 }
 
 export const getUserProfile = createServerFn({ method: "GET" })
-  .validator((data: unknown) => {
+  .inputValidator((data: unknown) => {
     if (data === undefined || data === null) {
       return {}; // Default to empty object if no data is provided
     }
@@ -120,8 +120,8 @@ export const getUserProfile = createServerFn({ method: "GET" })
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       const targetUserId = data?.userId || session?.user?.id;
@@ -135,9 +135,8 @@ export const getUserProfile = createServerFn({ method: "GET" })
 
       const { eq, inArray } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
-      const { gameSystems, userGameSystemPreferences } = await import(
-        "~/db/schema/game-systems.schema"
-      );
+      const { gameSystems, userGameSystemPreferences } =
+        await import("~/db/schema/game-systems.schema");
 
       const db = await getDb();
 
@@ -247,8 +246,8 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -284,7 +283,7 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
 );
 
 export const getGameSystems = createServerFn({ method: "GET" })
-  .validator((data: unknown) => {
+  .inputValidator((data: unknown) => {
     if (!data) return undefined;
     if (typeof data !== "object") return undefined;
     if (!("searchTerm" in data) || typeof data.searchTerm !== "string") return undefined;
@@ -404,7 +403,7 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
 );
 
 export const checkProfileNameAvailability = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     zod$(
       z.object({
         name: profileNameSchema,
@@ -454,7 +453,7 @@ export const checkProfileNameAvailability = createServerFn({ method: "POST" })
   });
 
 export const listUserLocations = createServerFn({ method: "GET" })
-  .validator(zod$(listUserLocationsSchema))
+  .inputValidator(zod$(listUserLocationsSchema))
   .handler(async ({ data }): Promise<CountryLocationGroup[]> => {
     try {
       const limitPerCountry = Math.max(1, Math.min(50, data?.limitPerCountry ?? 6));

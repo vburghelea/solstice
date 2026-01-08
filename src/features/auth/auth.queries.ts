@@ -10,8 +10,8 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     const { getDb } = await import("~/db/server-helpers");
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
     if (!session?.user) {
@@ -85,8 +85,8 @@ export const changePassword = createServerFn({ method: "POST" }).handler(
   async ({ data }: { data: { currentPassword: string; newPassword: string } }) => {
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getRequest();
 
     try {
       await auth.api.changePassword({

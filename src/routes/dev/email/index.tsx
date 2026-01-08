@@ -9,12 +9,11 @@ import { Label } from "~/components/ui/label";
 import { templateNames } from "~/lib/email/templates";
 
 export const resendMembershipReceipt = createServerFn({ method: "POST" })
-  .validator(z.object({ membershipId: z.string().min(1) }).parse)
+  .inputValidator(z.object({ membershipId: z.string().min(1) }).parse)
   .handler(async ({ data }) => {
     const { getDb } = await import("~/db/server-helpers");
-    const { memberships, membershipTypes } = await import(
-      "~/db/schema/membership.schema"
-    );
+    const { memberships, membershipTypes } =
+      await import("~/db/schema/membership.schema");
     const { user } = await import("~/db/schema/auth.schema");
     const { eq } = await import("drizzle-orm");
     const { sendMembershipPurchaseReceipt } = await import("~/lib/email/resend");
@@ -43,11 +42,10 @@ export const resendMembershipReceipt = createServerFn({ method: "POST" })
   });
 
 export const resendGameInvitation = createServerFn({ method: "POST" })
-  .validator(z.object({ participantId: z.string().min(1) }).parse)
+  .inputValidator(z.object({ participantId: z.string().min(1) }).parse)
   .handler(async ({ data }) => {
-    const { findGameParticipantById, findGameById } = await import(
-      "~/features/games/games.repository"
-    );
+    const { findGameParticipantById, findGameById } =
+      await import("~/features/games/games.repository");
     const { sendGameInvitation } = await import("~/lib/email/resend");
 
     const participant = await findGameParticipantById(data.participantId);

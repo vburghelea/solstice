@@ -1,4 +1,4 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
+import { createFileRoute } from "@tanstack/react-router";
 import { z, ZodError } from "zod";
 import { getRelationshipSnapshot } from "~/features/social";
 
@@ -24,10 +24,14 @@ export async function handleRelationship(input: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute("/api/social/relationship").methods({
-  GET: async ({ request }: { request: Request }) => {
-    const url = new URL(request.url);
-    const userId = url.searchParams.get("userId");
-    return handleRelationship({ userId });
+export const Route = createFileRoute("/api/social/relationship")({
+  server: {
+    handlers: {
+      GET: async ({ request }: { request: Request }) => {
+        const url = new URL(request.url);
+        const userId = url.searchParams.get("userId");
+        return handleRelationship({ userId });
+      },
+    },
   },
 });

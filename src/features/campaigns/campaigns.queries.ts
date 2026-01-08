@@ -1,4 +1,4 @@
-import { createServerFn, serverOnly } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { type SQL } from "drizzle-orm";
 import type {
   campaigns as campaignsTable,
@@ -25,7 +25,7 @@ import {
   CampaignWithDetails,
 } from "./campaigns.types";
 
-const getServerDeps = serverOnly(async () => {
+const getServerDeps = createServerOnlyFn(async () => {
   const [drizzle, schema, serverHelpers, authQueries, campaignRepo] = await Promise.all([
     import("drizzle-orm"),
     import("~/db/schema"),
@@ -317,7 +317,7 @@ async function fetchCampaignCount(
 }
 
 export const getCampaign = createServerFn({ method: "POST" })
-  .validator(getCampaignSchema.parse)
+  .inputValidator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails | null>> => {
     try {
       const { findCampaignById } = await loadCampaignDeps();
@@ -433,7 +433,7 @@ export async function listCampaignsWithCountImpl(
 }
 
 export const listCampaignsWithCount = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       // Accept filters without relying on transformed schema shape
       filters: z.any().optional(),
@@ -460,7 +460,7 @@ export const listCampaignsWithCount = createServerFn({ method: "POST" })
   );
 
 export const getCampaignApplications = createServerFn({ method: "POST" })
-  .validator(getCampaignSchema.parse)
+  .inputValidator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication[]>> => {
     try {
       const {
@@ -503,7 +503,7 @@ export const getCampaignApplications = createServerFn({ method: "POST" })
   });
 
 export const getCampaignParticipants = createServerFn({ method: "POST" })
-  .validator(getCampaignSchema.parse)
+  .inputValidator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant[]>> => {
     try {
       const { findCampaignParticipantsByCampaignId } = await loadCampaignDeps();
@@ -522,7 +522,7 @@ export const getCampaignParticipants = createServerFn({ method: "POST" })
  * Get a single campaign application for a specific user
  */
 export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
-  .validator(getCampaignApplicationForUserInputSchema.parse)
+  .inputValidator(getCampaignApplicationForUserInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication | null>> => {
     try {
       const { getDb, and, eq, campaignApplications } = await loadCampaignDeps();
@@ -551,7 +551,7 @@ export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
   });
 
 export const searchUsersForInvitation = createServerFn({ method: "POST" })
-  .validator(searchUsersForInvitationSchema.parse)
+  .inputValidator(searchUsersForInvitationSchema.parse)
   .handler(
     async ({
       data,

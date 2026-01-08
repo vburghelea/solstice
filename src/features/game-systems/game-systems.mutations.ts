@@ -57,7 +57,7 @@ export const upsertCmsContentHandler = async ({
 };
 
 export const upsertCmsContent = createServerFn({ method: "POST" })
-  .validator(upsertCmsContentSchema.parse)
+  .inputValidator(upsertCmsContentSchema.parse)
   .handler(upsertCmsContentHandler);
 
 export const reorderImagesHandler = async ({
@@ -82,7 +82,7 @@ export const reorderImagesHandler = async ({
 };
 
 export const reorderImages = createServerFn({ method: "POST" })
-  .validator(reorderImagesSchema.parse)
+  .inputValidator(reorderImagesSchema.parse)
   .handler(reorderImagesHandler);
 
 export const mapExternalTagHandler = async ({
@@ -173,7 +173,7 @@ export const mapExternalTagHandler = async ({
 };
 
 export const mapExternalTag = createServerFn({ method: "POST" })
-  .validator(mapExternalTagSchema.parse)
+  .inputValidator(mapExternalTagSchema.parse)
   .handler(mapExternalTagHandler);
 
 export const triggerRecrawlHandler = async ({
@@ -205,7 +205,7 @@ export const triggerRecrawlHandler = async ({
 };
 
 export const triggerRecrawl = createServerFn({ method: "POST" })
-  .validator(triggerRecrawlSchema.parse)
+  .inputValidator(triggerRecrawlSchema.parse)
   .handler(triggerRecrawlHandler);
 
 export const updatePublishStatusHandler = async ({
@@ -237,7 +237,7 @@ export const updatePublishStatusHandler = async ({
 };
 
 export const updatePublishStatus = createServerFn({ method: "POST" })
-  .validator(updatePublishStatusSchema.parse)
+  .inputValidator(updatePublishStatusSchema.parse)
   .handler(updatePublishStatusHandler);
 
 export const updateCmsApprovalHandler = async ({
@@ -251,11 +251,11 @@ export const updateCmsApprovalHandler = async ({
     import("~/lib/auth/server-helpers"),
   ]);
   const { eq } = await import("drizzle-orm");
-  const { getWebRequest } = await import("@tanstack/react-start/server");
+  const { getRequest } = await import("@tanstack/react-start/server");
 
   const db = await getDb();
   const auth = await getAuth();
-  const { headers } = getWebRequest();
+  const { headers } = getRequest();
   const session = await auth.api.getSession({ headers });
 
   if (!session?.user?.id) {
@@ -285,7 +285,7 @@ export const updateCmsApprovalHandler = async ({
 };
 
 export const updateCmsApproval = createServerFn({ method: "POST" })
-  .validator(updateCmsApprovalSchema.parse)
+  .inputValidator(updateCmsApprovalSchema.parse)
   .handler(updateCmsApprovalHandler);
 
 export const uploadImageHandler = async ({
@@ -353,7 +353,7 @@ export const uploadImageHandler = async ({
 };
 
 export const uploadImage = createServerFn({ method: "POST" })
-  .validator(uploadImageSchema.parse)
+  .inputValidator(uploadImageSchema.parse)
   .handler(uploadImageHandler);
 
 export const moderateImageHandler = async ({
@@ -384,7 +384,7 @@ export const moderateImageHandler = async ({
 };
 
 export const moderateImage = createServerFn({ method: "POST" })
-  .validator(moderateImageSchema.parse)
+  .inputValidator(moderateImageSchema.parse)
   .handler(moderateImageHandler);
 
 export const selectHeroImageHandler = async ({
@@ -420,5 +420,5 @@ export const selectHeroImageHandler = async ({
 };
 
 export const selectHeroImage = createServerFn({ method: "POST" })
-  .validator(selectHeroImageSchema.parse)
+  .inputValidator(selectHeroImageSchema.parse)
   .handler(selectHeroImageHandler);

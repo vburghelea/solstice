@@ -39,9 +39,6 @@ export const auth = {
   get deleteUser() {
     return getAuthClient().deleteUser;
   },
-  get forgetPassword() {
-    return getAuthClient().forgetPassword;
-  },
   get resetPassword() {
     return getAuthClient().resetPassword;
   },

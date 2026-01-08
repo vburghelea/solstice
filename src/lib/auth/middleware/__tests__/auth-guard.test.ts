@@ -9,12 +9,6 @@ vi.mock("~/lib/auth", () => ({
   },
 }));
 
-// Mock TanStack Start server functions
-vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: vi.fn(() => ({ headers: new Headers() })),
-  setResponseStatus: vi.fn(),
-}));
-
 describe("authMiddleware", () => {
   // Since the authMiddleware uses TanStack Start's createMiddleware which is complex to test,
   // we'll focus on testing the authentication logic separately
@@ -22,7 +16,9 @@ describe("authMiddleware", () => {
   it("should be defined", async () => {
     const { authMiddleware } = await import("../auth-guard");
     expect(authMiddleware).toBeDefined();
-    expect(typeof authMiddleware).toBe("object");
+    // authMiddleware is the result of calling .server() on the middleware object,
+    // which returns a function, not an object
+    expect(typeof authMiddleware).toBe("function");
   });
 
   describe("authentication logic", () => {

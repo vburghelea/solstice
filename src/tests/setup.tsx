@@ -13,6 +13,7 @@ import { setupCampaignMocks } from "~/tests/mocks/campaigns";
 import { setupGameMocks } from "~/tests/mocks/games";
 import "~/tests/mocks/i18n"; // Initialize i18n mocks
 import { mockReactQuery, setupReactQueryMocks } from "~/tests/mocks/react-query";
+import { createMockServerFn } from "~/tests/mocks/server-fn";
 
 // Polyfill Web Crypto for environments where it is missing
 import { webcrypto } from "node:crypto";
@@ -175,6 +176,30 @@ vi.mock("posthog-node", () => ({
     flush: vi.fn(),
     _flush: vi.fn(),
   })),
+}));
+
+// This needs to be defined outside the mock for proper hoisting
+function createServerFn() {
+  return createMockServerFn();
+}
+
+// Mock TanStack Start createServerFn for tests
+// Note: We don't use importOriginal because it would load the actual module
+// and cause issues with the mock. Instead, we provide a complete mock.
+vi.mock("@tanstack/react-start", () => ({
+  createServerFn,
+  createServerOnlyFn: (fn: unknown) => fn,
+  // createMiddleware should return an object with a server method
+  createMiddleware: () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    server: (fn: any) => fn,
+  }),
+}));
+
+// Mock server-side imports from @tanstack/react-start/server
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: vi.fn(() => ({ headers: new Headers() })),
+  setResponseStatus: vi.fn(),
 }));
 
 // Mock Radix Avatar to render <img> synchronously for tests

@@ -39,36 +39,30 @@ export default defineConfig(({ mode }) => {
       }) as any,
       tailwindcss(),
 
-      // IMPORTANT: TanStack Start before react(), and tell it you're supplying the React plugin
+      // IMPORTANT: TanStack Start before react(), with React plugin provided separately
       tanstackStart({
-        customViteReactPlugin: true, // Tell Start we're providing React plugin
-        // https://react.dev/learn/react-compiler
-        react: {
-          babel: {
-            plugins: [
-              [
-                "babel-plugin-react-compiler",
-                {
-                  target: "19",
-                },
-              ],
-            ],
-          },
-        },
-
-        tsr: {
+        router: {
           quoteStyle: "double",
           semicolons: true,
           routeFileIgnorePrefix: "__tests__",
           // verboseFileRoutes: false,
         },
-
-        // Netlify deployment target
-        target: "netlify",
       }),
 
-      // React plugin explicitly provided
-      react(),
+      // React plugin explicitly provided (required for TanStack Start RC v1.132+)
+      // with React compiler configuration
+      react({
+        babel: {
+          plugins: [
+            [
+              "babel-plugin-react-compiler",
+              {
+                target: "19",
+              },
+            ],
+          ],
+        },
+      }),
 
       // Keep PWA after the app framework plugins
       VitePWA({

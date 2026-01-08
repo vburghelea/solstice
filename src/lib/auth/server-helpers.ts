@@ -6,7 +6,6 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { emailOTP } from "better-auth/plugins";
-import { reactStartCookies } from "better-auth/react-start";
 import { sendEmailVerificationOTP, sendSignInOTP } from "~/lib/email/otp-emails";
 import {
   sendEmailVerification,
@@ -23,9 +22,8 @@ const createAuth = async () => {
   // Import server modules when auth is created
   const { db } = await import("~/db");
   const schema = await import("~/db/schema");
-  const { env, getAuthSecret, getBaseUrl, isProduction } = await import(
-    "~/lib/env.server"
-  );
+  const { env, getAuthSecret, getBaseUrl, isProduction } =
+    await import("~/lib/env.server");
 
   const baseUrl = getBaseUrl();
   const isHttpsDeployment = baseUrl?.startsWith("https://") ?? false;
@@ -115,13 +113,10 @@ const createAuth = async () => {
         clientSecret: googleClientSecret,
         ...(allowedOAuthDomains.length > 0
           ? {
-              mapProfileToUser: (profile: {
-                email?: string | null;
-                hd?: string | null;
-              }) => {
+              mapProfileToUser: (profile) => {
                 const email = profile.email?.toLowerCase();
                 const domain = email?.split("@")[1];
-                const hostedDomain = profile.hd?.toLowerCase();
+                const hostedDomain = (profile as { hd?: string }).hd?.toLowerCase();
 
                 const isAllowed = [domain, hostedDomain]
                   .filter((value): value is string => Boolean(value))
@@ -242,7 +237,6 @@ const createAuth = async () => {
           }
         },
       }),
-      reactStartCookies(), // MUST be the last plugin
     ],
   });
 };

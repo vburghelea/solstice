@@ -71,15 +71,15 @@ vi.mock("~/lib/env.server", () => ({
   isServerless: () => false,
 }));
 
-// Simplify TanStack server function wrapper and serverOnly for unit tests
+// Simplify TanStack server function wrapper and createServerOnlyFn for unit tests
 vi.mock("@tanstack/react-start", () => ({
   __esModule: true,
   createServerFn: () => ({
-    validator: () => ({
+    inputValidator: () => ({
       handler: (h: unknown) => h,
     }),
   }),
-  serverOnly: (fn: unknown) => fn,
+  createServerOnlyFn: (fn: unknown) => fn,
 }));
 
 describe("games social enforcement", () => {
@@ -91,9 +91,8 @@ describe("games social enforcement", () => {
   });
 
   it("applyToGame rejects when blocked any direction", async () => {
-    const { enforceApplyEligibility } = await import(
-      "~/features/social/enforcement.helpers"
-    );
+    const { enforceApplyEligibility } =
+      await import("~/features/social/enforcement.helpers");
     relationshipState = { blocked: true, blockedBy: false, isConnection: false };
     const result = await enforceApplyEligibility({
       viewerId: "viewer",
@@ -108,9 +107,8 @@ describe("games social enforcement", () => {
   });
 
   it("applyToGame rejects on protected when not a connection", async () => {
-    const { enforceApplyEligibility } = await import(
-      "~/features/social/enforcement.helpers"
-    );
+    const { enforceApplyEligibility } =
+      await import("~/features/social/enforcement.helpers");
     relationshipState = { blocked: false, blockedBy: false, isConnection: false };
     const result = await enforceApplyEligibility({
       viewerId: "viewer",

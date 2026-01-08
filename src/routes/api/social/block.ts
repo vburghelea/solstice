@@ -1,4 +1,4 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
+import { createFileRoute } from "@tanstack/react-router";
 import { z, ZodError } from "zod";
 import { blockUser } from "~/features/social";
 
@@ -11,8 +11,8 @@ const bodySchema = z.object({
 export async function handleBlock(body: unknown): Promise<Response> {
   try {
     const data = bodySchema.parse(body);
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const uiHeader = getWebRequest().headers.get("x-ui-surface") || undefined;
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const uiHeader = getRequest().headers.get("x-ui-surface") || undefined;
     const result = await blockUser({
       data: { ...data, uiSurface: data.uiSurface ?? uiHeader },
     });
@@ -31,9 +31,13 @@ export async function handleBlock(body: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute("/api/social/block").methods({
-  POST: async ({ request }: { request: Request }) => {
-    const body = await request.json();
-    return handleBlock(body);
+export const Route = createFileRoute("/api/social/block")({
+  server: {
+    handlers: {
+      POST: async ({ request }: { request: Request }) => {
+        const body = await request.json();
+        return handleBlock(body);
+      },
+    },
   },
 });

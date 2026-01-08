@@ -89,7 +89,7 @@ vi.mock("~/lib/auth/server-helpers", () => ({
 // Simplify server wrappers
 vi.mock("@tanstack/react-start", () => ({
   __esModule: true,
-  createServerFn: () => ({ validator: () => ({ handler: (h: unknown) => h }) }),
+  createServerFn: () => ({ inputValidator: () => ({ handler: (h: unknown) => h }) }),
 }));
 
 describe("campaigns social enforcement", () => {
@@ -101,9 +101,8 @@ describe("campaigns social enforcement", () => {
   });
 
   it("applyToCampaign rejects when blocked any direction", async () => {
-    const { enforceApplyEligibility } = await import(
-      "~/features/social/enforcement.helpers"
-    );
+    const { enforceApplyEligibility } =
+      await import("~/features/social/enforcement.helpers");
     relationshipState = { blocked: true, blockedBy: false, isConnection: false };
     const result = await enforceApplyEligibility({
       viewerId: "viewer",
@@ -118,9 +117,8 @@ describe("campaigns social enforcement", () => {
   });
 
   it("applyToCampaign rejects on protected when not a connection", async () => {
-    const { enforceApplyEligibility } = await import(
-      "~/features/social/enforcement.helpers"
-    );
+    const { enforceApplyEligibility } =
+      await import("~/features/social/enforcement.helpers");
     relationshipState = { blocked: false, blockedBy: false, isConnection: false };
     const result = await enforceApplyEligibility({
       viewerId: "viewer",

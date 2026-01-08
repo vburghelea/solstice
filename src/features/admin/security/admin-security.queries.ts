@@ -120,7 +120,7 @@ function toDate(value: string): Date {
 }
 
 export const getAdminSecurityPosture = createServerFn({ method: "GET" })
-  .validator((input: unknown) => securityWindowSchema.parse(input))
+  .inputValidator((input: unknown) => securityWindowSchema.parse(input))
   .handler(async ({ data }): Promise<OperationResult<AdminSecurityPostureWire>> => {
     const [{ getCurrentUser }, { PermissionService }] = await Promise.all([
       import("~/features/auth/auth.queries"),
@@ -300,7 +300,7 @@ export const getAdminSecurityPosture = createServerFn({ method: "GET" })
   });
 
 export const updateAdminSecurityControl = createServerFn({ method: "POST" })
-  .validator((input: unknown) => securityControlMutationSchema.parse(input))
+  .inputValidator((input: unknown) => securityControlMutationSchema.parse(input))
   .handler(
     async ({
       data,

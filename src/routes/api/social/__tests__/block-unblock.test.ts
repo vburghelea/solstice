@@ -5,7 +5,7 @@ vi.mock("~/features/social", () => ({
   unblockUser: vi.fn(),
 }));
 vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: () => ({ headers: new Headers() }),
+  getRequest: () => ({ headers: new Headers() }),
   createServerFileRoute: () => ({ methods: () => ({}) }),
 }));
 

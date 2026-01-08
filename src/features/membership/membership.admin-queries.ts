@@ -29,7 +29,7 @@ export interface MembershipReportRow {
  * Admin-only: Get all memberships with user information
  */
 export const getAllMemberships = createServerFn({ method: "GET" })
-  .validator(zod$(getAllMembershipsSchema))
+  .inputValidator(zod$(getAllMembershipsSchema))
   .handler(
     async ({ data }): Promise<MembershipOperationResult<MembershipReportRow[]>> => {
       try {
@@ -40,8 +40,8 @@ export const getAllMemberships = createServerFn({ method: "GET" })
         ]);
 
         const auth = await getAuth();
-        const { getWebRequest } = await import("@tanstack/react-start/server");
-        const { headers } = getWebRequest();
+        const { getRequest } = await import("@tanstack/react-start/server");
+        const { headers } = getRequest();
         const session = await auth.api.getSession({ headers });
 
         if (!session?.user?.id) {

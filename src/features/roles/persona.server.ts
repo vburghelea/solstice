@@ -12,16 +12,16 @@ const resolvePersonaInputSchema = z
   .default({});
 
 export const resolvePersonaResolution = createServerFn({ method: "POST" })
-  .validator((input) => resolvePersonaInputSchema.parse(input ?? {}))
+  .inputValidator((input) => resolvePersonaInputSchema.parse(input ?? {}))
   .handler(async ({ data }): Promise<PersonaResolution> => {
-    const [{ PermissionService }, { getAuth }, { getWebRequest }] = await Promise.all([
+    const [{ PermissionService }, { getAuth }, { getRequest }] = await Promise.all([
       import("~/features/roles/permission.server"),
       import("~/lib/auth/server-helpers"),
       import("@tanstack/react-start/server"),
     ]);
 
     const auth = await getAuth();
-    const { headers } = getWebRequest();
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
     return PermissionService.resolvePersonaResolution(session?.user?.id ?? null, {

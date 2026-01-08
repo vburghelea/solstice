@@ -149,7 +149,7 @@ function toDateOnlyString(value: Date): string {
 }
 
 export const getAdminInsights = createServerFn({ method: "GET" })
-  .validator((input: unknown) => adminInsightsInputSchema.parse(input))
+  .inputValidator((input: unknown) => adminInsightsInputSchema.parse(input))
   .handler(async ({ data }): Promise<OperationResult<AdminInsightsWire>> => {
     try {
       const [{ getCurrentUser }, { getDb }] = await Promise.all([
@@ -607,11 +607,10 @@ function normalizeInsights(data: AdminInsightsWire): AdminInsightsSnapshot {
   };
 }
 
-export interface UseAdminInsightsOptions
-  extends Omit<
-    UseQueryOptions<AdminInsightsSnapshot, Error, AdminInsightsSnapshot>,
-    "queryKey" | "queryFn"
-  > {
+export interface UseAdminInsightsOptions extends Omit<
+  UseQueryOptions<AdminInsightsSnapshot, Error, AdminInsightsSnapshot>,
+  "queryKey" | "queryFn"
+> {
   windowDays?: number;
   language?: SupportedLanguage;
 }

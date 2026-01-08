@@ -48,7 +48,7 @@ import {
  */
 export const cancelEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(cancelEntireEventSchema))
+  .inputValidator(zod$(cancelEntireEventSchema))
   .handler(
     async ({ data, context }): Promise<EventOperationResult<CancelEventResult>> => {
       const clock = getClockFromContext(context);
@@ -311,9 +311,8 @@ export const cancelEvent = createServerFn({ method: "POST" })
 
         if (data.notify !== false) {
           try {
-            const { sendEventCancellationNotifications } = await import(
-              "~/lib/server/notifications/events/cancellation"
-            );
+            const { sendEventCancellationNotifications } =
+              await import("~/lib/server/notifications/events/cancellation");
             await sendEventCancellationNotifications({
               db,
               event: eventRecord,
@@ -348,7 +347,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
  */
 export const createEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(createEventSchema))
+  .inputValidator(zod$(createEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
@@ -440,7 +439,7 @@ export const createEvent = createServerFn({ method: "POST" })
  */
 export const updateEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(updateEventSchema))
+  .inputValidator(zod$(updateEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
@@ -551,9 +550,8 @@ export const updateEvent = createServerFn({ method: "POST" })
   });
 
 const getSquarePaymentService = async () => {
-  const { getSquarePaymentService: loadSquareService } = await import(
-    "~/lib/payments/square"
-  );
+  const { getSquarePaymentService: loadSquareService } =
+    await import("~/lib/payments/square");
   return loadSquareService();
 };
 
@@ -562,7 +560,7 @@ const getSquarePaymentService = async () => {
  */
 export const registerForEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(registerForEventSchema))
+  .inputValidator(zod$(registerForEventSchema))
   .handler(
     async ({
       data,
@@ -933,7 +931,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
 export const markEventEtransferPaid = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferPaidSchema))
+  .inputValidator(zod$(markEtransferPaidSchema))
   .handler(
     async ({
       data,
@@ -1062,7 +1060,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
 
 export const markEventEtransferReminder = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferReminderSchema))
+  .inputValidator(zod$(markEtransferReminderSchema))
   .handler(
     async ({
       data,
@@ -1171,7 +1169,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
  * Organizer: update registration status/payment
  */
 export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
-  .validator(updateEventRegistrationStatusSchema.parse)
+  .inputValidator(updateEventRegistrationStatusSchema.parse)
   .handler(async ({ data }) => {
     try {
       const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
@@ -1182,8 +1180,8 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
 
       const db = await getDb();
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -1249,7 +1247,7 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
 
 export const uploadEventImage = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(uploadEventImageSchema))
+  .inputValidator(zod$(uploadEventImageSchema))
   .handler(
     async ({
       data,
@@ -1293,7 +1291,7 @@ export const uploadEventImage = createServerFn({ method: "POST" })
  */
 export const cancelEventRegistration = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(cancelEventRegistrationSchema))
+  .inputValidator(zod$(cancelEventRegistrationSchema))
   .handler(
     async ({
       data,

@@ -40,9 +40,9 @@ jobs:
           - 5432:5432
 
     env:
-      APP_PORT: "4173"
+      APP_PORT: "5173"
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_zap
-      VITE_BASE_URL: http://127.0.0.1:4173
+      VITE_BASE_URL: http://127.0.0.1:5173
       BETTER_AUTH_SECRET: 0123456789abcdef0123456789abcdef
       NODE_ENV: development
 
@@ -67,7 +67,7 @@ jobs:
 
       - name: Start app (background)
         run: |
-          pnpm dev -- --host 127.0.0.1 --port "$APP_PORT" &
+          pnpm vite dev --host 127.0.0.1 --port "$APP_PORT" &
           echo $! > .app.pid
 
       - name: Wait for app

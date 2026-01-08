@@ -35,7 +35,7 @@ jobs:
       - name: Run Aikido scan
         run: |
           aikido-api-client scan-release \
-            "${{ github.repository }}" \
+            "solstice" \
             "${{ github.sha }}" \
             --fail-on-sast-scan \
             --fail-on-secrets-scan \

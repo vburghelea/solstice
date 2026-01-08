@@ -490,7 +490,14 @@ export const Route = createFileRoute("/api/test/cleanup")({
                   );
                 }
 
-                const secret = mfaSecret ?? "JBSWY3DPEHPK3PXP";
+                const fallbackSecret = process.env["E2E_TEST_ADMIN_TOTP_SECRET"];
+                const resolvedSecret = mfaSecret ?? fallbackSecret;
+                if (!resolvedSecret) {
+                  throw new Error(
+                    "MFA secret required. Provide mfaSecret or set E2E_TEST_ADMIN_TOTP_SECRET.",
+                  );
+                }
+                const secret = resolvedSecret;
                 const codes = backupCodes ?? [
                   "backup-testcode1",
                   "backup-testcode2",

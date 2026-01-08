@@ -280,6 +280,9 @@ export type FileConfig = {
   maxFiles?: number;
 };
 
+const isJsonRecord = (value: JsonValue): value is Record<string, JsonValue> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 /**
  * Default file config if not specified in form definition
  */
@@ -304,8 +307,8 @@ export const parseFileFieldValue = (value: JsonValue): FilePayload[] => {
   if (!value) return [];
 
   // Single file object
-  if (typeof value === "object" && !Array.isArray(value) && value !== null) {
-    const obj = value as Record<string, JsonValue>;
+  if (isJsonRecord(value)) {
+    const obj = value;
     const fileName = obj["fileName"];
     const mimeType = obj["mimeType"];
     const size = obj["size"];
@@ -332,10 +335,7 @@ export const parseFileFieldValue = (value: JsonValue): FilePayload[] => {
   // Array of file objects
   if (Array.isArray(value)) {
     return value
-      .filter(
-        (item): item is Record<string, JsonValue> =>
-          typeof item === "object" && item !== null && !Array.isArray(item),
-      )
+      .filter((item): item is Record<string, JsonValue> => isJsonRecord(item))
       .filter((item) => {
         const fn = item["fileName"];
         const mt = item["mimeType"];

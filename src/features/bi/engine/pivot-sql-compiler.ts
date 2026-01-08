@@ -3,6 +3,11 @@ import type { AggregationType } from "../bi.schemas";
 import type { DatasetConfig, DatasetField } from "../bi.types";
 import type { NormalizedFilter } from "./filters";
 import type { PivotMeasureMeta } from "./pivot-aggregator";
+import {
+  assertSafeIdentifier,
+  qualifyIdentifier,
+  quoteIdentifier,
+} from "./sql-identifiers";
 
 type PivotSqlDimension = {
   fieldId: string;
@@ -26,11 +31,10 @@ export type PivotSqlPlan = {
 };
 
 const BASE_ALIAS = "base";
-
-const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
+const SAFE_TIME_GRAINS = new Set(["day", "week", "month", "quarter"]);
 
 const buildColumnRef = (column: string) =>
-  `${quoteIdentifier(BASE_ALIAS)}.${quoteIdentifier(column)}`;
+  sql.raw(qualifyIdentifier(assertSafeIdentifier(BASE_ALIAS, "alias"), column));
 
 const toPivotKey = (fields: PivotSqlDimension[], row: Record<string, unknown>) => {
   if (fields.length === 0) return "__total__";
@@ -77,14 +81,17 @@ export const buildFieldExpression = (
   const field = resolveField(dataset, fieldId);
   const columnRef = buildColumnRef(field.sourceColumn);
   if (field.timeGrain) {
-    return sql.raw(`DATE_TRUNC('${field.timeGrain}', ${columnRef})::date`);
+    if (!SAFE_TIME_GRAINS.has(field.timeGrain)) {
+      throw new Error(`Unsupported time grain '${field.timeGrain}'`);
+    }
+    return sql`DATE_TRUNC(${sql.param(field.timeGrain)}, ${columnRef})::date`;
   }
-  return sql.raw(columnRef);
+  return columnRef;
 };
 
 const buildMeasureExpression = (
   measure: { aggregation: AggregationType },
-  columnRef: string | null,
+  columnRef: SQLChunk | null,
 ): SQLChunk => {
   if (!columnRef && measure.aggregation !== "count") {
     return sql.raw("NULL");
@@ -93,21 +100,21 @@ const buildMeasureExpression = (
     case "count":
       return sql.raw("COUNT(*)");
     case "count_distinct":
-      return sql.raw(`COUNT(DISTINCT ${columnRef})`);
+      return sql`COUNT(DISTINCT ${columnRef})`;
     case "sum":
-      return sql.raw(`SUM(${columnRef})`);
+      return sql`SUM(${columnRef})`;
     case "avg":
-      return sql.raw(`AVG(${columnRef})`);
+      return sql`AVG(${columnRef})`;
     case "min":
-      return sql.raw(`MIN(${columnRef})`);
+      return sql`MIN(${columnRef})`;
     case "max":
-      return sql.raw(`MAX(${columnRef})`);
+      return sql`MAX(${columnRef})`;
     case "median":
-      return sql.raw(`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${columnRef})`);
+      return sql`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${columnRef})`;
     case "stddev":
-      return sql.raw(`STDDEV_POP(${columnRef})`);
+      return sql`STDDEV_POP(${columnRef})`;
     case "variance":
-      return sql.raw(`VAR_POP(${columnRef})`);
+      return sql`VAR_POP(${columnRef})`;
     default:
       return sql.raw("NULL");
   }
@@ -219,7 +226,7 @@ export const buildPivotSqlPlan = (params: {
     selectChunks.push(sql`${expression} AS ${sql.raw(quoteIdentifier(measure.alias))}`);
   }
 
-  const viewName = `bi_v_${params.dataset.id}`;
+  const viewName = `bi_v_${assertSafeIdentifier(params.dataset.id, "dataset")}`;
   const whereConditions = params.filters.map((filter) =>
     buildFilterExpression(filter, params.dataset),
   );

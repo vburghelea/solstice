@@ -197,7 +197,10 @@ leadership.
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-[To be provided by Ruslan Hétu]
+Ruslan Hétu is a design and research freelancer with a background in
+human-centered design and systems thinking. He earned a master's degree in
+design and has 6 years of experience applying mixed-methods research to public
+sector projects, healthcare, and startups.
 
 ### Soleil Heaney, System Navigator
 
@@ -220,7 +223,10 @@ security, privacy and regulatory coverage.
 
 ### Tyler Piller, Security and Compliance Advisor
 
-[To be provided by Tyler Piller]
+Tyler Piller is a cybersecurity veteran with over 10 years of experience in
+operational defense and strategic risk management. He currently directs an
+Information Security Risk Management program, providing strategic advisory to
+align technical risk with enterprise business objectives.
 
 ## Appendix G: Glossary
 

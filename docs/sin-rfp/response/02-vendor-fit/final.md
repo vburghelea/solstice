@@ -105,8 +105,19 @@ experience and their focus areas for this project]
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-[To be provided by Ruslan Hétu - 2-3 sentences on relevant UX research and
-accessibility experience and their leadership role for this project]
+He brings 6 years of mixed-methods research and design for projects across the
+public sector, healthcare, and startup environments.
+
+UX Leadership (Founding Designer at Parafoil): Co-led AI product development
+from ideation to Alpha launch, conducting research with 50+ users and
+collaborating cross-functionally to translate complex requirements to human
+digital experiences.
+
+Multistakeholder system transformation (Designer at Coeuraj): Delivered
+multistakeholder research projects through workshops, interviews, and designed
+artifacts working with over 200+ participants. Applied methods such as systems
+thinking, foresight, and human-centered design for strategic outputs for
+clients.
 
 ### Parul Kharub, Security and Risk Advisor
 
@@ -131,8 +142,13 @@ and security experience and their focus areas for this project]
 
 ### Tyler Piller, Security and Compliance Advisor
 
-[To be provided by Tyler Piller - 2-3 sentences on relevant security
-operations experience and their focus areas for this project]
+A cybersecurity veteran with over 10 years of experience specializing in both
+operational defense and strategic risk management. Track record includes
+leading response for major security incidents, conducting complex digital
+forensic investigations, and executing multi-year security assessments for
+critical platforms. He currently directs the Information Security Risk
+Management program, providing strategic advisory to align technical risk with
+enterprise business objectives.
 
 ## Continuity of Services
 

@@ -32,7 +32,14 @@ import {
 // Load environment variables
 dotenv.config({ path: ".env.e2e" });
 
-const FAKE_MFA_SECRET = "JBSWY3DPEHPK3PXP";
+const mfaSecret =
+  process.env["E2E_TEST_ADMIN_TOTP_SECRET"] ?? process.env["SIN_UI_TOTP_SECRET"];
+if (!mfaSecret) {
+  throw new Error(
+    "E2E_TEST_ADMIN_TOTP_SECRET or SIN_UI_TOTP_SECRET is required for MFA seed data.",
+  );
+}
+const FAKE_MFA_SECRET = mfaSecret;
 const FAKE_BACKUP_CODES = [
   "backup-testcode1",
   "backup-testcode2",

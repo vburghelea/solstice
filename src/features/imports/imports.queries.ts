@@ -3,6 +3,7 @@ import { z } from "zod";
 import { forbidden, notFound, unauthorized } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import { assertFeatureEnabled } from "~/tenant/feature-gates";
+import { listImportTemplatesSchema } from "./imports.schemas";
 
 const requireSessionUserId = async () => {
   const { getAuth } = await import("~/lib/auth/server-helpers");
@@ -163,6 +164,44 @@ export const listMappingTemplates = createServerFn({ method: "GET" })
     }
 
     return db.select().from(importMappingTemplates);
+  });
+
+export const listImportTemplates = createServerFn({ method: "GET" })
+  .inputValidator(zod$(listImportTemplatesSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const userId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { importTemplates } = await import("~/db/schema");
+    const { and, desc, eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+
+    if (!data.organizationId) {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(userId);
+      if (!isAdmin) {
+        throw forbidden("Organization access required");
+      }
+    } else {
+      await requireOrgAccess(userId, data.organizationId);
+    }
+
+    const conditions = [];
+    if (data.organizationId) {
+      conditions.push(eq(importTemplates.organizationId, data.organizationId));
+    }
+    if (data.formId) {
+      conditions.push(eq(importTemplates.formId, data.formId));
+    }
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    return db
+      .select()
+      .from(importTemplates)
+      .where(where)
+      .orderBy(desc(importTemplates.createdAt));
   });
 
 export const listImportJobErrors = createServerFn({ method: "GET" })

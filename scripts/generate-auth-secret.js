@@ -17,7 +17,7 @@ if (process.env.BETTER_AUTH_SECRET && process.env.BETTER_AUTH_SECRET !== "") {
 if (!secretExists) {
   for (const file of envFiles) {
     const filePath = path.join(process.cwd(), file);
-    if (fs.existsSync(filePath)) {
+    try {
       const content = fs.readFileSync(filePath, "utf-8");
       if (
         content.includes("BETTER_AUTH_SECRET=") &&
@@ -27,6 +27,8 @@ if (!secretExists) {
         secretExists = true;
         break;
       }
+    } catch {
+      // Ignore missing env files.
     }
   }
 }
@@ -46,8 +48,10 @@ if (!secretExists) {
   const envFilePath = path.join(process.cwd(), ".env");
   let envContent = "";
 
-  if (fs.existsSync(envFilePath)) {
+  try {
     envContent = fs.readFileSync(envFilePath, "utf-8");
+  } catch {
+    envContent = "";
   }
 
   // Add the secret to the env content

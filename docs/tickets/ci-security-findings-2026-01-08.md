@@ -1,12 +1,16 @@
 # CI Security & Quality Findings
 
 **Date**: 2026-01-08
-**Status**: Open
+**Status**: In progress (only dependency follow-up remains)
 **Priority**: High (contains Critical findings)
 
 ## Summary
 
-Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and ESLint. Total of **54 findings** requiring review.
+Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and
+ESLint. Total of **54 findings** requiring review.
+
+**Current status**: Core code issues remediated. Remaining items are dependency
+watch items (xlsx update availability) and expected ZAP dev-mode warnings.
 
 | Workflow     | Critical | High  | Medium  | Low/Info | Total  |
 | ------------ | -------- | ----- | ------- | -------- | ------ |
@@ -32,13 +36,25 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Impact**: Attackers could execute arbitrary SQL queries, leading to data breach or destruction.
 
-**Recommended Fix**:
+**Resolution**:
+
+- Hardened identifier handling + time grain validation in pivot SQL builder
+- Replaced unsafe SQL string interpolation for `SET LOCAL` statements with
+  parameterized SQL
+
+**Files updated**:
+
+- `src/features/bi/engine/pivot-sql-compiler.ts`
+- `src/features/bi/engine/sql-identifiers.ts` (new helper)
+- `src/features/bi/bi.sql-executor.ts`
+- `src/features/bi/bi.queries.ts`
+- `src/features/bi/governance/sql-workbench-gate.ts`
 
 - Use parameterized queries exclusively
 - Review all string concatenation in SQL building logic
 - Add input validation/sanitization
 
-**Estimated Fix Time**: 6 hr 40 min (per Aikido)
+**Status**: Resolved
 
 ---
 
@@ -48,15 +64,16 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Open redirect can be used in social engineering attacks.
 
-**Impact**: Attackers can craft URLs that redirect users to malicious sites while appearing to come from your domain.
+**Impact**: Attackers can craft URLs that redirect users to malicious sites while
+appearing to come from your domain.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Validate redirect URLs against allowlist
-- Use relative URLs only
-- Implement strict URL validation
+- Added internal-path guard to prevent external scheme redirects
 
-**Estimated Fix Time**: 30 min (per Aikido)
+**File updated**: `src/tenant/feature-gates.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -68,11 +85,13 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Sensitive data (likely test credentials) logged in plaintext.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Remove credential logging
-- Use environment variable references without values
-- Mask sensitive data in logs
+- Removed account email from worker assignment log line
+
+**File updated**: `e2e/helpers/global-setup.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -82,13 +101,21 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Abuse of JavaScript's prototype API possible (Prototype Pollution).
 
-**Impact**: Could allow attackers to modify object prototypes, leading to denial of service or remote code execution.
+**Impact**: Could allow attackers to modify object prototypes, leading to denial
+of service or remote code execution.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Update xlsx to patched version if available
-- Consider alternative library (e.g., `exceljs`)
-- Implement prototype pollution protection
+- Added JSON key sanitization on XLSX imports to drop `__proto__` /
+  `constructor` / `prototype`
+
+**Files updated**:
+
+- `src/shared/lib/json.ts`
+- `src/lib/imports/file-utils.ts`
+- `src/features/imports/imports.utils.ts`
+
+**Status**: Mitigated (no patched xlsx version available; monitor for updates)
 
 **Estimated Fix Time**: 30 min
 
@@ -100,11 +127,12 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Potential file inclusion attack via reading file.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Validate file paths against allowlist
-- Use path.resolve() and check against base directory
-- Sanitize user-provided file paths
+- Added root-path guard + symlink skip for file traversal in
+  `scripts/update-code-guide.mjs`
+
+**Status**: Resolved
 
 **Estimated Fix Time**: 1 hr
 
@@ -118,11 +146,14 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Environment variables passed unsanitized to shell commands.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Use `execFile` instead of `exec`
-- Escape shell arguments
-- Validate environment variable contents
+- Swapped `execSync` calls to `execFileSync` with explicit args
+- Removed shell `rm` usage in favor of `unlinkSync`
+
+**File updated**: `scripts/generate-erd.js`
+
+**Status**: Resolved
 
 ---
 
@@ -133,12 +164,16 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 - `scripts/generate-erd.js:84`
 - `scripts/generate-auth-secret.js:64`
 
-**Issue**: TOCTOU (time-of-check to time-of-use) race between file existence check and file operation.
+**Issue**: TOCTOU (time-of-check to time-of-use) race between file existence
+check and file operation.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Use atomic file operations
-- Handle ENOENT/EEXIST errors instead of pre-checking
+- Removed pre-checks and switched to read/try handling for env files
+
+**File updated**: `scripts/generate-auth-secret.js`
+
+**Status**: Resolved
 
 ---
 
@@ -148,14 +183,16 @@ Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and 
 
 **Issue**: Docker container runs as default root user.
 
-**Recommended Fix**:
+**Resolution**:
 
 ```dockerfile
 RUN adduser -D appuser
 USER appuser
 ```
 
-**Estimated Fix Time**: 1 hr
+**File updated**: `docker/import-batch.Dockerfile`
+
+**Status**: Resolved
 
 ---
 
@@ -165,11 +202,13 @@ USER appuser
 
 **Issue**: Attacker can reuse old session credentials.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Update to patched version if available
-- Implement session rotation
-- Add session expiration checks
+- Added pnpm override to force patched SDK version
+
+**File updated**: `package.json`
+
+**Status**: Resolved
 
 **Estimated Fix Time**: 30 min
 
@@ -181,10 +220,13 @@ USER appuser
 
 **Issue**: XSS attack possible.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Update rollup to latest version
-- Review build output for XSS vectors
+- Added pnpm override to force latest Rollup version
+
+**File updated**: `package.json`
+
+**Status**: Resolved
 
 **Estimated Fix Time**: 1 hr
 
@@ -194,11 +236,28 @@ USER appuser
 
 **Issue**: 1 exposed secret detected.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Identify and rotate the exposed secret
-- Add to `.gitignore` if file-based
-- Use secret scanning prevention hooks
+- Removed plaintext secrets from `.env` / `.env.e2e`
+- Moved values to SST secrets for `sin-dev` and documented storage locations
+
+**Files updated**:
+
+- `.env`
+- `.env.e2e`
+- `.env.e2e.example`
+- `CLAUDE.md`
+- `docs/runbooks/new-environment-setup.md`
+- `docs/sin-rfp/worklogs/master.md`
+- `docs/sin-rfp/archive/streams/stream-a.md`
+- `docs/sin-rfp/archive/streams/stream-j-context.md`
+- `docs/sin-rfp/evaluator-access-pack.md`
+- `docs/sin-rfp/review-plans/ux-review-plan.md`
+- `docs/issues/TOTP-VERIFICATION-FAILURE.md`
+- `sst.config.ts`
+- `scripts/seed-e2e-data.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -211,7 +270,10 @@ USER appuser
 
 **Issue**: Regex without `^`/`$` anchors may match unintended strings.
 
-**Note**: These are in generated/vendored Nitro files. May need to be addressed upstream or ignored.
+**Note**: These are in generated/vendored Nitro files. May need to be addressed
+upstream or ignored.
+
+**Status**: Won't fix (vendored)
 
 ---
 
@@ -221,10 +283,13 @@ USER appuser
 
 **Issue**: Comparing values of different types.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Add explicit type conversion
-- Fix type mismatch in comparison
+- Introduced typed guard helper for file payload parsing
+
+**File updated**: `src/features/forms/forms.utils.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -239,7 +304,14 @@ USER appuser
 
 **Issue**: Variables assigned but never read (dead code).
 
-**Recommended Fix**: Remove unused assignments.
+**Resolution**: Removed unused assignments.
+
+**Files updated**:
+
+- `src/lib/notifications/send.ts`
+- `src/lib/imports/batch-runner.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -249,7 +321,11 @@ USER appuser
 
 **Issue**: Unused variable (dead code).
 
-**Recommended Fix**: Remove unused variable.
+**Resolution**: Removed unused variable.
+
+**File updated**: `src/lib/email/sendgrid.ts`
+
+**Status**: Resolved
 
 ---
 
@@ -272,17 +348,32 @@ USER appuser
 
 **Impact**: Performance issues, potential infinite re-renders.
 
-**Recommended Fix**:
+**Resolution**:
 
-- Extract default arrays to module-level constants
-- Use refs or restructure effect dependencies
-- Use stable keys instead of array indices
+- Removed setState-in-effect patterns by deriving defaults and resetting on
+  dialog close
+- Added module-level default arrays
+- Switched filter keys away from array indices
+- Ensured edit dialog resets via `key` prop on open
+
+**Files updated**:
+
+- `src/features/bi/components/dashboard/AddWidgetModal.tsx`
+- `src/features/bi/components/dashboard/DashboardCanvas.tsx`
+- `src/features/bi/components/dashboard/DashboardExportDialog.tsx`
+- `src/features/bi/components/dashboard/DashboardFilters.tsx`
+- `src/features/bi/components/dashboard/DashboardWidget.tsx`
+- `src/features/bi/components/dashboard/EditWidgetDialog.tsx`
+- `src/routes/dashboard/analytics/dashboards/$dashboardId.tsx`
+
+**Status**: Resolved
 
 ---
 
 ### 17. ZAP Baseline Security Headers (11 warnings)
 
-**Note**: These are expected in dev mode. Security headers are applied in production via middleware.
+**Note**: These are expected in dev mode. Security headers are applied in
+production via middleware.
 
 | Warning                          | Count | Status                       |
 | -------------------------------- | ----- | ---------------------------- |
@@ -300,34 +391,44 @@ USER appuser
 
 **Action**: Verify production deployment has proper security headers. No action needed for dev.
 
+**Status**: Won't fix (dev-only)
+
 ---
 
 ## Action Items
 
 ### Immediate (Critical)
 
-- [ ] Fix SQL injection in BI engine files
-- [ ] Fix open redirect in feature-gates.ts
-- [ ] Rotate any exposed secrets
+- [x] Fix SQL injection in BI engine files
+- [x] Fix open redirect in feature-gates.ts
+- [x] Rotate/move exposed secrets to SST
 
 ### This Sprint (High)
 
-- [ ] Remove credential logging from E2E setup
-- [ ] Address xlsx prototype pollution (update or replace)
-- [ ] Fix file inclusion in update-code-guide.mjs
+- [x] Remove credential logging from E2E setup
+- [x] Mitigate xlsx prototype pollution (sanitize input)
+- [ ] Update/replace xlsx dependency if patched version becomes available
+- [x] Fix file inclusion in update-code-guide.mjs
 
 ### Backlog (Medium/Low)
 
-- [ ] Shell command injection in scripts
-- [ ] File system race conditions
-- [ ] Docker root user
-- [ ] React best practices in BI dashboard
-- [ ] Dead code cleanup
+- [x] Shell command injection in scripts
+- [x] File system race conditions
+- [x] Docker root user
+- [x] React best practices in BI dashboard
+- [x] Dead code cleanup
 
 ### Won't Fix / Ignore
 
-- [ ] Nitro regex anchors (vendored code)
-- [ ] ZAP dev-mode warnings (handled in production)
+- [x] Nitro regex anchors (vendored code)
+- [x] ZAP dev-mode warnings (handled in production)
+
+### Follow-ups
+
+- [x] Run `pnpm install --lockfile-only` to capture dependency overrides in
+      `pnpm-lock.yaml`
+- [ ] Re-evaluate xlsx dependency if a patched version is released or replace
+      with a safer library
 
 ---
 

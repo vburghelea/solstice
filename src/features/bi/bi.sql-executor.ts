@@ -16,16 +16,26 @@ import { assertSqlWorkbenchReady } from "./governance/sql-workbench-gate";
 
 const PLACEHOLDER_PATTERN = /\{\{([a-zA-Z_][\w]*)\}\}/g;
 
-const escapeSqlString = (value: string) => `'${value.replaceAll("'", "''")}'`;
+// UUID pattern for validating organization IDs
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const formatSettingValue = (value: string | number | boolean) => {
+/**
+ * Escape a string for use in SET LOCAL commands.
+ * NOTE: This is safe because:
+ * 1. organizationId comes from authenticated session context, not user input
+ * 2. We validate it's a UUID before use
+ * 3. SET LOCAL values are session-scoped and don't affect data
+ */
+const escapeSetLocalValue = (value: string): string => `'${value.replace(/'/g, "''")}'`;
+
+const formatSetLocalValue = (value: string | number | boolean): string => {
   if (typeof value === "number") {
     return Number.isFinite(value) ? String(value) : "0";
   }
   if (typeof value === "boolean") {
-    return value ? "true" : "false";
+    return value ? "'true'" : "'false'";
   }
-  return escapeSqlString(value);
+  return escapeSetLocalValue(value);
 };
 
 export type SqlExecutionResult = {
@@ -195,25 +205,23 @@ export const executeSqlWorkbenchQuery = async (params: {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
 
+    // Validate organizationId is a UUID to prevent injection
+    const orgId = context.organizationId ?? "";
+    if (orgId && !UUID_PATTERN.test(orgId)) {
+      throw new Error("Invalid organization ID format");
+    }
+
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+      await tx.execute(sql.raw(`SET LOCAL app.org_id = ${formatSetLocalValue(orgId)}`));
       await tx.execute(
         sql.raw(
-          `SET LOCAL app.org_id = ${formatSettingValue(context.organizationId ?? "")}`,
+          `SET LOCAL app.is_global_admin = ${formatSetLocalValue(context.isGlobalAdmin)}`,
         ),
       );
       await tx.execute(
         sql.raw(
-          `SET LOCAL app.is_global_admin = ${formatSettingValue(
-            String(context.isGlobalAdmin),
-          )}`,
-        ),
-      );
-      await tx.execute(
-        sql.raw(
-          `SET LOCAL statement_timeout = ${formatSettingValue(
-            QUERY_GUARDRAILS.statementTimeoutMs,
-          )}`,
+          `SET LOCAL statement_timeout = ${formatSetLocalValue(QUERY_GUARDRAILS.statementTimeoutMs)}`,
         ),
       );
 

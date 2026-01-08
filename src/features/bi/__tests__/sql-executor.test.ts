@@ -14,6 +14,10 @@ vi.mock("../governance", () => ({
   logQuery: (...args: unknown[]) => logQueryMock(...args),
 }));
 
+// Valid UUID for testing
+const TEST_ORG_ID = "00000000-0000-0000-0000-000000000001";
+const TEST_USER_ID = "00000000-0000-0000-0000-000000000002";
+
 describe("executeSqlWorkbenchQuery", () => {
   beforeEach(() => {
     getDbMock.mockReset();
@@ -61,8 +65,8 @@ describe("executeSqlWorkbenchQuery", () => {
       datasetId: "organizations",
       maxRows: 25,
       context: {
-        userId: "user-1",
-        organizationId: "org-1",
+        userId: TEST_USER_ID,
+        organizationId: TEST_ORG_ID,
         orgRole: "reporter",
         isGlobalAdmin: false,
         permissions: new Set(["analytics.sql"]),
@@ -72,8 +76,12 @@ describe("executeSqlWorkbenchQuery", () => {
     });
 
     const readStatement = (arg: unknown) => {
-      const query = arg as { queryChunks?: Array<{ value?: string[] }> };
-      return query?.queryChunks?.[0]?.value?.[0] ?? "";
+      const query = arg as {
+        queryChunks?: Array<{ value?: string[]; sql?: string }>;
+      };
+      const chunk = query?.queryChunks?.[0];
+      // sql.raw() stores the SQL in chunk.sql, template literals in chunk.value[0]
+      return chunk?.sql ?? chunk?.value?.[0] ?? "";
     };
 
     const statements = txExecute.mock.calls
@@ -83,7 +91,7 @@ describe("executeSqlWorkbenchQuery", () => {
     expect(statements).toEqual(
       expect.arrayContaining([
         "SET LOCAL ROLE bi_readonly",
-        "SET LOCAL app.org_id = 'org-1'",
+        `SET LOCAL app.org_id = '${TEST_ORG_ID}'`,
         "SET LOCAL app.is_global_admin = 'false'",
         `SET LOCAL statement_timeout = ${guardrails.QUERY_GUARDRAILS.statementTimeoutMs}`,
       ]),
@@ -98,8 +106,10 @@ describe("executeSqlWorkbenchQuery", () => {
 
   it("rejects queries that exceed cost limits", async () => {
     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
-      const raw = query?.queryChunks?.[0] as { value?: string[] } | undefined;
-      const sqlText = raw?.value?.[0] ?? "";
+      const chunk = query?.queryChunks?.[0] as
+        | { value?: string[]; sql?: string }
+        | undefined;
+      const sqlText = chunk?.sql ?? chunk?.value?.[0] ?? "";
       if (sqlText.startsWith("EXPLAIN (FORMAT JSON)")) {
         return [
           {
@@ -122,8 +132,8 @@ describe("executeSqlWorkbenchQuery", () => {
         parameters: {},
         datasetId: "organizations",
         context: {
-          userId: "user-1",
-          organizationId: "org-1",
+          userId: TEST_USER_ID,
+          organizationId: TEST_ORG_ID,
           orgRole: "reporter",
           isGlobalAdmin: false,
           permissions: new Set(["analytics.sql"]),
@@ -150,8 +160,8 @@ describe("executeSqlWorkbenchQuery", () => {
       sqlText: "SELECT * FROM organizations",
       datasetId: "organizations",
       context: {
-        userId: "user-1",
-        organizationId: "org-1",
+        userId: TEST_USER_ID,
+        organizationId: TEST_ORG_ID,
         orgRole: "reporter",
         isGlobalAdmin: false,
         permissions: new Set(["analytics.sql"]),
@@ -190,8 +200,8 @@ describe("executeSqlWorkbenchQuery", () => {
       datasetId: "organizations",
       maxRows: guardrails.QUERY_GUARDRAILS.maxRowsExport,
       context: {
-        userId: "user-1",
-        organizationId: "org-1",
+        userId: TEST_USER_ID,
+        organizationId: TEST_ORG_ID,
         orgRole: "reporter",
         isGlobalAdmin: false,
         permissions: new Set(["analytics.sql"]),
@@ -225,8 +235,8 @@ describe("executeSqlWorkbenchQuery", () => {
         sqlText: "SELECT * FROM organizations",
         datasetId: "organizations",
         context: {
-          userId: "user-1",
-          organizationId: "org-1",
+          userId: TEST_USER_ID,
+          organizationId: TEST_ORG_ID,
           orgRole: "reporter",
           isGlobalAdmin: false,
           permissions: new Set(["analytics.sql"]),

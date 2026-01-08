@@ -204,7 +204,7 @@ Expected for SIN environments:
 3. When MFA prompt appears, generate TOTP:
 
 ```bash
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));"
+npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
 ```
 
 4. Enter the 6-digit code
@@ -238,8 +238,8 @@ After MFA login as `viasport-staff@example.com`, verify sidebar shows:
 
 ### TOTP Secret for Testing
 
-- **For otplib:** `JJBFGV2ZGNCFARKIKBFTGUCYKA`
-- **Raw secret:** `JBSWY3DPEHPK3PXP`
+- Set `SIN_UI_TOTP_SECRET` in your environment (base32-encoded).
+- Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
 
 ### Common Issues
 

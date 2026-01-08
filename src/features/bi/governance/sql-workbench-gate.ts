@@ -5,6 +5,7 @@ import { REDIS_TTLS, buildRedisKey, hashString } from "~/lib/redis/keys";
 import { internalError } from "~/lib/server/errors";
 import { DATASETS } from "../semantic";
 import { QUERY_GUARDRAILS } from "./query-guardrails";
+import { assertSafeIdentifier, quoteIdentifier } from "../engine/sql-identifiers";
 
 const CACHE_TTL_MS = REDIS_TTLS.sqlWorkbenchGateSeconds * 1000;
 
@@ -21,18 +22,6 @@ const getRedisClient = createServerOnlyFn(async () => {
   const { getRedis } = await import("~/lib/redis/client");
   return getRedis({ required: false });
 });
-
-const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
-
-const formatSettingValue = (value: string | number | boolean) => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? String(value) : "0";
-  }
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-  return `'${String(value).replace(/'/g, "''")}'`;
-};
 
 const normalizeRows = <T>(result: unknown): T[] => {
   if (Array.isArray(result)) return result as T[];
@@ -186,27 +175,14 @@ export const assertSqlWorkbenchReady = async (params: {
   if (sampleView) {
     try {
       await db.transaction(async (tx) => {
-        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
+        await tx.execute(sql`SET LOCAL app.org_id = ${params.organizationId ?? ""}`);
+        await tx.execute(sql`SET LOCAL app.is_global_admin = ${params.isGlobalAdmin}`);
         await tx.execute(
-          sql.raw(
-            `SET LOCAL app.org_id = ${formatSettingValue(params.organizationId ?? "")}`,
-          ),
+          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
         );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL app.is_global_admin = ${formatSettingValue(
-              String(params.isGlobalAdmin),
-            )}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL statement_timeout = ${formatSettingValue(
-              QUERY_GUARDRAILS.statementTimeoutMs,
-            )}`,
-          ),
-        );
-        await tx.execute(sql.raw(`SELECT 1 FROM ${quoteIdentifier(sampleView)} LIMIT 1`));
+        const safeSampleView = quoteIdentifier(assertSafeIdentifier(sampleView, "view"));
+        await tx.execute(sql.raw(`SELECT 1 FROM ${safeSampleView} LIMIT 1`));
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown error";

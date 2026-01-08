@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -94,7 +94,7 @@ export function EditWidgetDialog({
   const [widgetType, setWidgetType] = useState<WidgetType>(widget.widgetType);
   const [chartType, setChartType] = useState<ChartType>(config.chartType ?? "bar");
   const [chartOptions, setChartOptions] = useState<ChartOptions>(
-    config.chartOptions ?? getDefaultChartOptions(config.chartType ?? "bar"),
+    () => config.chartOptions ?? getDefaultChartOptions(config.chartType ?? "bar"),
   );
   const [textContent, setTextContent] = useState(config.textContent ?? "");
   const [filterDatasetId, setFilterDatasetId] = useState(config.filterDatasetId ?? "");
@@ -136,46 +136,6 @@ export function EditWidgetDialog({
       : [{ id: createMeasureId(), field: null, aggregation: "count" }];
   });
   const [filters, setFilters] = useState<FilterConfig[]>(query?.filters ?? []);
-
-  // Reset form when widget changes
-  useEffect(() => {
-    const cfg = widget.config ?? {};
-    const q = cfg.query;
-    setTitle(cfg.title ?? "");
-    setWidgetType(widget.widgetType);
-    setChartType(cfg.chartType ?? "bar");
-    setChartOptions(cfg.chartOptions ?? getDefaultChartOptions(cfg.chartType ?? "bar"));
-    setTextContent(cfg.textContent ?? "");
-    setFilterDatasetId(cfg.filterDatasetId ?? "");
-    setFilterField(cfg.filterField ?? "");
-    setFilterType(cfg.filterType ?? "select");
-    setDatasetId(q?.datasetId ?? "");
-    setRows(q?.rows ?? []);
-    setColumns(q?.columns ?? []);
-    // Normalize measures to ensure field is string | null (not undefined)
-    const normalizedMeasures = (q?.measures ?? []).map((m) => {
-      const normalized = ensureMeasureId({
-        id: m.id,
-        field: m.field ?? null,
-        aggregation: m.aggregation,
-        ...(m.metricId ? { metricId: m.metricId } : {}),
-        ...(m.label ? { label: m.label } : {}),
-      });
-      return {
-        id: normalized.id,
-        field: normalized.field ?? null,
-        aggregation: normalized.aggregation,
-        ...(normalized.metricId ? { metricId: normalized.metricId } : {}),
-        ...(normalized.label ? { label: normalized.label } : {}),
-      };
-    });
-    setMeasures(
-      normalizedMeasures.length > 0
-        ? normalizedMeasures
-        : [{ id: createMeasureId(), field: null, aggregation: "count" }],
-    );
-    setFilters(q?.filters ?? []);
-  }, [widget]);
 
   // Fetch datasets
   const datasetsQuery = useQuery({
@@ -229,14 +189,11 @@ export function EditWidgetDialog({
   );
   const chartControlPanel = useMemo(() => getChartControlPanel(chartType), [chartType]);
 
-  useEffect(() => {
-    const defaults = getDefaultChartOptions(chartType);
+  const handleChartTypeChange = (value: ChartType) => {
+    setChartType(value);
+    const defaults = getDefaultChartOptions(value);
     setChartOptions((prev) => ({ ...defaults, ...prev }));
-  }, [chartType]);
-
-  useEffect(() => {
-    setFilterField("");
-  }, [filterDatasetId]);
+  };
 
   // Update mutation
   const updateMutation = useMutation({
@@ -449,7 +406,7 @@ export function EditWidgetDialog({
                 <Label>Chart Type</Label>
                 <Select
                   value={chartType}
-                  onValueChange={(v) => setChartType(v as ChartType)}
+                  onValueChange={(v) => handleChartTypeChange(v as ChartType)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -484,7 +441,13 @@ export function EditWidgetDialog({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Dataset</Label>
-                  <Select value={filterDatasetId} onValueChange={setFilterDatasetId}>
+                  <Select
+                    value={filterDatasetId}
+                    onValueChange={(value) => {
+                      setFilterDatasetId(value);
+                      setFilterField("");
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a dataset" />
                     </SelectTrigger>

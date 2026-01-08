@@ -75,8 +75,6 @@ class MockEmailService {
   }
 
   setApiKey(_key: string): void {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const key = _key;
     console.log("📧 Mock Email Service - API key set");
   }
 }

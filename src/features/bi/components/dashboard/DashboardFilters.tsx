@@ -26,6 +26,9 @@ const renderFilterLabel = (
   return `${datasetPrefix}${fieldName} ${filter.operator} ${value}`.trim();
 };
 
+const serializeFilterValue = (value: FilterConfig["value"]) =>
+  Array.isArray(value) ? value.join("|") : String(value ?? "");
+
 export function DashboardFilters({
   fields,
   fieldOptions,
@@ -77,14 +80,19 @@ export function DashboardFilters({
 
   return (
     <div className="flex flex-wrap gap-2 text-xs">
-      {filters.map((filter, index) => (
-        <span
-          key={`${filter.field}-${index}`}
-          className="rounded-full border bg-muted px-2 py-1"
-        >
-          {renderFilterLabel(filter, fieldMap)}
-        </span>
-      ))}
+      {filters.map((filter) => {
+        const filterKey = [
+          filter.datasetId ?? "any",
+          filter.field,
+          filter.operator,
+          serializeFilterValue(filter.value),
+        ].join(":");
+        return (
+          <span key={filterKey} className="rounded-full border bg-muted px-2 py-1">
+            {renderFilterLabel(filter, fieldMap)}
+          </span>
+        );
+      })}
     </div>
   );
 }

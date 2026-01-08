@@ -109,7 +109,7 @@
   1. Clear all `parent_org_id` references before deleting organizations (breaks circular FK deps)
   2. Pre-enroll MFA for global admins with known TOTP secret and backup codes
 - **Fake MFA for testing** (admin users only):
-  - TOTP Secret: `JBSWY3DPEHPK3PXP` (can be used with any authenticator app)
+  - TOTP Secret: set `SIN_UI_TOTP_SECRET` in your environment (stored in SST secrets, sin-dev)
   - Backup Codes: `backup-testcode1` through `backup-testcode10`
 
 ### 2025-12-27: MCP verification successful
@@ -147,10 +147,10 @@
 
 The seed script pre-enrolls MFA for admin users with known credentials:
 
-| Credential       | Value                                      | Notes                                       |
-| ---------------- | ------------------------------------------ | ------------------------------------------- |
-| **TOTP Secret**  | `JBSWY3DPEHPK3PXP`                         | Base32-encoded; use with any TOTP generator |
-| **Backup Codes** | `backup-testcode1` ... `backup-testcode10` | 10 codes available                          |
+| Credential       | Value                                      | Notes                                           |
+| ---------------- | ------------------------------------------ | ----------------------------------------------- |
+| **TOTP Secret**  | `SIN_UI_TOTP_SECRET`                       | Base32-encoded; stored in SST secrets (sin-dev) |
+| **Backup Codes** | `backup-testcode1` ... `backup-testcode10` | 10 codes available                              |
 
 ### Test Users
 
@@ -167,7 +167,7 @@ The seed script pre-enrolls MFA for admin users with known credentials:
 1. Navigate to `/auth/login`
 2. Enter email and password
 3. When MFA prompt appears:
-   - **Option A (TOTP)**: Generate code from secret `JBSWY3DPEHPK3PXP`
+   - **Option A (TOTP)**: Generate code from `SIN_UI_TOTP_SECRET`
    - **Option B (Backup)**: Click "Backup code", enter `backup-testcode1`
 4. Verify redirect to dashboard
 
@@ -177,10 +177,10 @@ If you need real-time TOTP codes instead of backup codes:
 
 ```bash
 # Using oathtool (install via: brew install oath-toolkit)
-oathtool --totp -b JBSWY3DPEHPK3PXP
+oathtool --totp -b "$SIN_UI_TOTP_SECRET"
 
 # Using Python
-python3 -c "import pyotp; print(pyotp.TOTP('JBSWY3DPEHPK3PXP').now())"
+python3 -c "import os, pyotp; print(pyotp.TOTP(os.environ.get('SIN_UI_TOTP_SECRET','')).now())"
 ```
 
 Or add the secret to Google Authenticator / Authy for manual testing.

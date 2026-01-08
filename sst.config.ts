@@ -320,9 +320,23 @@ export default $config({
       },
     });
 
-    // Define secrets - set via: npx sst secret set <NAME> <value> --stage qc-prod|sin-prod
+    // Define secrets - set via: npx sst secret set <NAME> <value> --stage <stage>
     // Note: BaseUrl should be updated after deploy if CloudFront URL changes.
     // For production, use a custom domain for stable URL.
+    const devOnlySecrets =
+      stageInfo.stageEnv === "dev"
+        ? {
+            databaseUrl: new sst.Secret("DATABASE_URL"),
+            databaseUrlUnpooled: new sst.Secret("DATABASE_URL_UNPOOLED"),
+            e2eDatabaseUrl: new sst.Secret("E2E_DATABASE_URL"),
+            sinUiTotpSecret: new sst.Secret("SIN_UI_TOTP_SECRET"),
+            sinAnalyticsTotpSecret: new sst.Secret("SIN_ANALYTICS_TOTP_SECRET"),
+            sinA11yTotpSecret: new sst.Secret("SIN_A11Y_TOTP_SECRET"),
+            e2eTestAdminTotpSecret: new sst.Secret("E2E_TEST_ADMIN_TOTP_SECRET"),
+            squareProductionAccessToken: new sst.Secret("SQUARE_PRODUCTION_ACCESS_TOKEN"),
+          }
+        : null;
+
     const secrets = {
       baseUrl: new sst.Secret("BaseUrl"),
       betterAuthSecret: new sst.Secret("BetterAuthSecret"),
@@ -335,6 +349,7 @@ export default $config({
       squareWebhookSignatureKey: new sst.Secret("SquareWebhookSignatureKey"),
       sinNotificationsFromEmail: new sst.Secret("SinNotificationsFromEmail"),
       sinNotificationsReplyToEmail: new sst.Secret("SinNotificationsReplyToEmail"),
+      ...devOnlySecrets,
     };
 
     const runtimeEnv = {
@@ -602,6 +617,19 @@ export default $config({
         SQUARE_ACCESS_TOKEN: secrets.squareAccessToken.value,
         SQUARE_LOCATION_ID: secrets.squareLocationId.value,
         SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
+        ...(devOnlySecrets
+          ? {
+              DATABASE_URL: devOnlySecrets.databaseUrl.value,
+              DATABASE_URL_UNPOOLED: devOnlySecrets.databaseUrlUnpooled.value,
+              E2E_DATABASE_URL: devOnlySecrets.e2eDatabaseUrl.value,
+              SIN_UI_TOTP_SECRET: devOnlySecrets.sinUiTotpSecret.value,
+              SIN_ANALYTICS_TOTP_SECRET: devOnlySecrets.sinAnalyticsTotpSecret.value,
+              SIN_A11Y_TOTP_SECRET: devOnlySecrets.sinA11yTotpSecret.value,
+              E2E_TEST_ADMIN_TOTP_SECRET: devOnlySecrets.e2eTestAdminTotpSecret.value,
+              SQUARE_PRODUCTION_ACCESS_TOKEN:
+                devOnlySecrets.squareProductionAccessToken.value,
+            }
+          : {}),
       },
       transform: {
         cdn: (args) => {
@@ -1027,36 +1055,41 @@ export default $config({
     // CloudWatch Alarms for Monitoring
     // =========================================================================
 
-    new aws.cloudwatch.MetricAlarm(
-      "WafBlockedRequestsAlarm",
-      {
-        alarmName: `solstice-${stage}-waf-blocked-requests`,
-        alarmDescription: "WAF is blocking requests at CloudFront",
-        namespace: "AWS/WAFV2",
-        metricName: "BlockedRequests",
-        statistic: "Sum",
-        period: 300, // 5 minutes
-        evaluationPeriods: 1,
-        threshold: 100,
-        comparisonOperator: "GreaterThanOrEqualToThreshold",
-        treatMissingData: "notBreaching",
-        actionsEnabled: isProd || isPerf || isUat,
-        alarmActions: alarmTopic ? [alarmTopic.arn] : [],
-        okActions: alarmTopic ? [alarmTopic.arn] : [],
-        dimensions: {
-          WebACL: wafName,
-          Rule: "ALL",
-          Region: "Global",
-          Scope: "CLOUDFRONT",
+    // WAF CloudFront metrics are only available in us-east-1. The alarm must be
+    // created there with a provider override. Currently disabled for non-prod
+    // due to a Pulumi provider bug (SST #XXXX). TODO: Re-enable once fixed.
+    if (isProd) {
+      new aws.cloudwatch.MetricAlarm(
+        "WafBlockedRequestsAlarm",
+        {
+          alarmName: `solstice-${stage}-waf-blocked-requests`,
+          alarmDescription: "WAF is blocking requests at CloudFront",
+          namespace: "AWS/WAFV2",
+          metricName: "BlockedRequests",
+          statistic: "Sum",
+          period: 300, // 5 minutes
+          evaluationPeriods: 1,
+          threshold: 100,
+          comparisonOperator: "GreaterThanOrEqualToThreshold",
+          treatMissingData: "notBreaching",
+          actionsEnabled: true,
+          alarmActions: alarmTopic ? [alarmTopic.arn] : [],
+          okActions: alarmTopic ? [alarmTopic.arn] : [],
+          dimensions: {
+            WebACL: wafName,
+            Rule: "ALL",
+            Region: "Global",
+            Scope: "CLOUDFRONT",
+          },
+          tags: {
+            Environment: stage,
+            Application: "solstice",
+            AlertType: "waf",
+          },
         },
-        tags: {
-          Environment: stage,
-          Application: "solstice",
-          AlertType: "waf",
-        },
-      },
-      { provider: cloudfrontProvider },
-    );
+        { provider: cloudfrontProvider },
+      );
+    }
 
     // Get the Lambda function name from the web deployment
     // Note: SST creates the function with a generated name, we'll use pattern matching

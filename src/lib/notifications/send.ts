@@ -245,7 +245,6 @@ export const sendNotification = createServerOnlyFn(
         }
       } else if (alreadyEmailSent) {
         emailSent = true;
-        emailMessageId = existingEmailLog?.messageId ?? null;
       }
     }
 

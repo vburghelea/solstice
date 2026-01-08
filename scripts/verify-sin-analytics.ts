@@ -11,8 +11,14 @@ const baseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
 const debug = process.env["SIN_ANALYTICS_DEBUG"] === "true";
 const email = process.env["SIN_ANALYTICS_EMAIL"] ?? "viasport-staff@example.com";
 const password = process.env["SIN_ANALYTICS_PASSWORD"] ?? "testpassword123";
-const totpSecret =
-  process.env["SIN_ANALYTICS_TOTP_SECRET"] ?? "JJBFGV2ZGNCFARKIKBFTGUCYKA";
+const requireEnv = (key: string) => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is required for MFA login.`);
+  }
+  return value;
+};
+const totpSecret = requireEnv("SIN_ANALYTICS_TOTP_SECRET");
 const defaultOrgId =
   process.env["SIN_ANALYTICS_ORG_ID"] ?? "a0000000-0000-4000-8001-000000000002";
 

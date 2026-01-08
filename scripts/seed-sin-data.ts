@@ -81,25 +81,17 @@ import {
 } from "../src/db/schema";
 
 // ============================================================================
-// FAKE MFA CONFIGURATION FOR TESTING
+// MFA CONFIGURATION FOR TESTING
 // ============================================================================
-// These are KNOWN values that can be used by coding agents and E2E tests
-// to authenticate through MFA-protected flows.
-//
-// TOTP Secret (base32 encoded): JBSWY3DPEHPK3PXP
-// - Use any TOTP generator with this secret to generate valid 6-digit codes
-// - The secret decodes to "Hello!HelloWorld" (32 bytes)
-//
-// Backup Codes (for use with verifyBackupCode):
-// - These are encrypted in the database but documented here for testing
-// - backup-testcode1
-// - backup-testcode2
-// - backup-testcode3
-// - backup-testcode4
-// - backup-testcode5
+// Provide a base32-encoded TOTP secret via SIN_UI_TOTP_SECRET so seeded
+// accounts can be validated in local/test environments.
 // ============================================================================
 
-const FAKE_MFA_SECRET = "JBSWY3DPEHPK3PXP"; // Well-known TOTP secret for testing
+const mfaSecret = process.env["SIN_UI_TOTP_SECRET"];
+if (!mfaSecret) {
+  throw new Error("SIN_UI_TOTP_SECRET is required to seed MFA test users.");
+}
+const FAKE_MFA_SECRET = mfaSecret;
 const FAKE_BACKUP_CODES = [
   "backup-testcode1",
   "backup-testcode2",
@@ -2833,11 +2825,10 @@ async function seed() {
     console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)\n");
     console.log("-".repeat(60));
     console.log("🔐 FAKE MFA FOR TESTING (admin users only):");
-    console.log("   TOTP Secret (for otplib): JJBFGV2ZGNCFARKIKBFTGUCYKA");
+    console.log("   TOTP Secret: use SIN_UI_TOTP_SECRET from your environment");
     console.log(
-      "   → Generate codes: npx tsx -e \"import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));\"",
+      "   → Generate codes: npx tsx -e \"import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''))\"",
     );
-    console.log("   → Raw secret stored: JBSWY3DPEHPK3PXP (base32-encoded for otplib)");
     console.log("\n   Backup Codes (use with 'Use backup code' option):");
     console.log("   → backup-testcode1 through backup-testcode10");
     console.log("-".repeat(60));

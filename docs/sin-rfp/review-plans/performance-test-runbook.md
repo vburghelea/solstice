@@ -1,16 +1,21 @@
-# Performance Test Runbook - SIN (viaSport)
+# Performance, DR, and Validation Runbook - SIN (viaSport)
 
 ## Purpose
 
 Stand up a dedicated performance testing environment and run repeatable load
 and baseline performance tests against the SIN application with a 20M row
-synthetic dataset. The goal is to produce consistent, comparable metrics
+synthetic dataset. Additionally, execute disaster recovery drills and retention
+policy validation to provide evidence for RFP compliance claims.
+
+The goal is to produce consistent, comparable metrics and compliance evidence
 without impacting production or shared dev.
 
 This runbook aligns with:
 
 - `docs/sin-rfp/review-plans/performance-testing-plan.md`
 - `docs/sin-rfp/phase-0/architecture-reference.md`
+- `docs/sin-rfp/phase-0/backup-dr-plan.md`
+- `docs/sin-rfp/phase-0/audit-retention-policy.md`
 
 ## Environment Decision
 
@@ -35,6 +40,14 @@ safe resets, may require approvals, and can skew compliance posture.
 - [ ] Ensure no prod endpoints are targeted by test tools
 - [ ] Confirm DB instrumentation plan (Performance Insights, pg_stat_statements)
 
+### DR and Retention Preflight
+
+- [ ] Confirm RDS automated backups are enabled (check `sst.config.ts`)
+- [ ] Confirm at least one automated snapshot exists for sin-perf
+- [ ] Confirm retention policies are seeded (`scripts/seed-retention-policies.ts`)
+- [ ] Confirm S3 bucket for audit archives exists (`SinAuditArchives`)
+- [ ] Document RPO/RTO targets: RPO = 1 hour (PITR), RTO = 4 hours
+
 ## High-Level Phases
 
 1. Provision `sin-perf` infrastructure
@@ -42,8 +55,10 @@ safe resets, may require approvals, and can skew compliance posture.
 3. Generate 20M synthetic rows
 4. Run baseline performance tests
 5. Run load tests
-6. Capture results and report
-7. Clean up or scale down
+6. **Run disaster recovery drill**
+7. **Run retention policy validation**
+8. Capture results and report
+9. Clean up or scale down
 
 ## Phase 1 - Provision `sin-perf`
 
@@ -284,21 +299,285 @@ Capture:
 - Record commit SHA, stage, RDS class/storage, Lambda memory/timeout, and
   CloudFront enabled/disabled in the report
 
-## Phase 6 - Reporting
+## Phase 6 - Disaster Recovery Drill
+
+Execute a full DR drill to validate backup/restore capabilities and document
+RTO/RPO compliance.
+
+### 6.1 Identify Latest Snapshot
+
+```bash
+# List available snapshots for sin-perf
+AWS_PROFILE=techdev aws rds describe-db-snapshots \
+  --db-instance-identifier solstice-sin-perf-databaseinstance-* \
+  --query 'DBSnapshots[*].[DBSnapshotIdentifier,SnapshotCreateTime]' \
+  --output table \
+  --region ca-central-1
+```
+
+For automated snapshots:
+
+```bash
+AWS_PROFILE=techdev aws rds describe-db-snapshots \
+  --snapshot-type automated \
+  --query 'DBSnapshots[?contains(DBSnapshotIdentifier, `sin-perf`)].[DBSnapshotIdentifier,SnapshotCreateTime]' \
+  --output table \
+  --region ca-central-1
+```
+
+Record the snapshot identifier and creation time.
+
+### 6.2 Restore to Temporary Instance
+
+```bash
+# Record start time
+echo "Restore started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+AWS_PROFILE=techdev aws rds restore-db-instance-from-db-snapshot \
+  --db-instance-identifier solstice-sin-perf-dr-$(date +%Y%m%d) \
+  --db-snapshot-identifier <snapshot-identifier> \
+  --db-instance-class db.t4g.micro \
+  --no-multi-az \
+  --region ca-central-1
+
+# Monitor restore progress
+AWS_PROFILE=techdev aws rds describe-db-instances \
+  --db-instance-identifier solstice-sin-perf-dr-$(date +%Y%m%d) \
+  --query 'DBInstances[0].DBInstanceStatus' \
+  --region ca-central-1
+```
+
+### 6.3 Wait for Availability
+
+```bash
+AWS_PROFILE=techdev aws rds wait db-instance-available \
+  --db-instance-identifier solstice-sin-perf-dr-$(date +%Y%m%d) \
+  --region ca-central-1
+
+# Record completion time
+echo "Restore completed: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+```
+
+### 6.4 Validate Restored Data
+
+Connect to the restored instance and verify data integrity:
+
+```bash
+# Get endpoint
+AWS_PROFILE=techdev aws rds describe-db-instances \
+  --db-instance-identifier solstice-sin-perf-dr-$(date +%Y%m%d) \
+  --query 'DBInstances[0].Endpoint.Address' \
+  --output text \
+  --region ca-central-1
+```
+
+Run validation queries:
+
+```sql
+-- Core table counts
+SELECT 'organizations' AS table_name, COUNT(*) FROM organizations
+UNION ALL SELECT 'users', COUNT(*) FROM "user"
+UNION ALL SELECT 'form_submissions', COUNT(*) FROM form_submissions
+UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs;
+
+-- Verify recent data exists (within expected RPO window)
+SELECT MAX(created_at) AS latest_record FROM audit_logs;
+
+-- Verify hash chain integrity (sample)
+SELECT id, previous_hash, content_hash
+FROM audit_logs
+ORDER BY occurred_at DESC
+LIMIT 5;
+```
+
+### 6.5 Document Results
+
+Create evidence file: `docs/sin-rfp/review-plans/evidence/DR-DRILL-sin-perf-YYYYMMDD.md`
+
+Required fields:
+
+- Date and operator
+- Source snapshot identifier and creation time
+- Restore start and completion times
+- RTO achieved (target: 4 hours)
+- RPO achieved (target: 1 hour for prod, 24h acceptable for perf)
+- Validation query results
+- Any issues encountered
+
+### 6.6 Clean Up DR Instance
+
+```bash
+AWS_PROFILE=techdev aws rds delete-db-instance \
+  --db-instance-identifier solstice-sin-perf-dr-$(date +%Y%m%d) \
+  --skip-final-snapshot \
+  --region ca-central-1
+```
+
+## Phase 7 - Retention Policy Validation
+
+Validate that the retention policy engine correctly enforces configured
+retention periods and respects legal holds.
+
+### 7.1 Seed Retention Policies
+
+Ensure retention policies are configured:
+
+```bash
+AWS_PROFILE=techdev npx sst shell --stage sin-perf -- \
+  npx tsx scripts/seed-retention-policies.ts
+```
+
+Verify policies exist:
+
+```sql
+SELECT data_type, retention_days, archive_after_days, purge_after_days, legal_hold
+FROM retention_policies
+ORDER BY data_type;
+```
+
+### 7.2 Create Test Data for Purging
+
+Insert aged test records that should be purged:
+
+```sql
+-- Insert old notifications (90+ days old, should be purged)
+INSERT INTO notifications (id, user_id, type, title, message, created_at)
+SELECT
+  gen_random_uuid(),
+  (SELECT id FROM "user" LIMIT 1),
+  'system',
+  'Test notification ' || g,
+  'This is a test notification for retention validation',
+  NOW() - INTERVAL '100 days'
+FROM generate_series(1, 10) g;
+
+-- Insert old import job errors (90+ days old, should be purged)
+-- (Requires an import job to exist first)
+
+-- Record counts before purge
+SELECT 'notifications' AS table_name,
+       COUNT(*) AS total,
+       COUNT(*) FILTER (WHERE created_at < NOW() - INTERVAL '90 days') AS eligible_for_purge
+FROM notifications;
+```
+
+### 7.3 Create Legal Hold Test
+
+Apply a legal hold to verify it blocks purging:
+
+```sql
+-- Create a legal hold on a specific user
+INSERT INTO legal_holds (scope_type, scope_id, reason, applied_at)
+VALUES ('user', (SELECT id FROM "user" LIMIT 1), 'Retention validation test', NOW());
+
+-- Insert data for that user that would otherwise be purged
+INSERT INTO notifications (id, user_id, type, title, message, created_at)
+SELECT
+  gen_random_uuid(),
+  (SELECT scope_id FROM legal_holds WHERE reason = 'Retention validation test'),
+  'system',
+  'Legal hold test ' || g,
+  'This notification should NOT be purged due to legal hold',
+  NOW() - INTERVAL '100 days'
+FROM generate_series(1, 5) g;
+```
+
+### 7.4 Run Retention Job
+
+Trigger the retention enforcement manually:
+
+```bash
+# Option 1: Via SST shell
+AWS_PROFILE=techdev npx sst shell --stage sin-perf -- \
+  npx tsx -e "import { applyRetentionPolicies } from './src/lib/privacy/retention'; applyRetentionPolicies().then(console.log);"
+
+# Option 2: Invoke the Lambda directly
+AWS_PROFILE=techdev aws lambda invoke \
+  --function-name solstice-sin-perf-RetentionEnforcement \
+  --region ca-central-1 \
+  /dev/stdout
+```
+
+### 7.5 Validate Purge Results
+
+```sql
+-- Verify eligible records were purged
+SELECT 'notifications' AS table_name,
+       COUNT(*) AS remaining,
+       COUNT(*) FILTER (WHERE created_at < NOW() - INTERVAL '90 days') AS old_remaining
+FROM notifications;
+
+-- Verify legal hold records were NOT purged
+SELECT COUNT(*) AS legal_hold_records_remaining
+FROM notifications
+WHERE user_id = (SELECT scope_id FROM legal_holds WHERE reason = 'Retention validation test');
+```
+
+Expected results:
+
+- Old notifications (not under legal hold) should be deleted
+- Notifications under legal hold should remain
+- Audit logs should NEVER be deleted (immutable)
+
+### 7.6 Validate Audit Log Archival
+
+Check that audit log archival works (archives to S3, does not delete):
+
+```sql
+-- Check archive records
+SELECT * FROM audit_log_archives ORDER BY archived_at DESC LIMIT 5;
+```
+
+Verify S3 objects exist:
+
+```bash
+AWS_PROFILE=techdev aws s3 ls s3://solstice-sin-perf-sinauditarchives/ --recursive
+```
+
+### 7.7 Document Results
+
+Create evidence file: `docs/sin-rfp/review-plans/evidence/RETENTION-VALIDATION-sin-perf-YYYYMMDD.md`
+
+Required fields:
+
+- Date and operator
+- Retention policies in effect
+- Test data created (counts)
+- Purge job execution results
+- Legal hold enforcement verified (yes/no)
+- Audit log immutability verified (yes/no)
+- S3 archive objects created (yes/no)
+- Any issues encountered
+
+### 7.8 Clean Up Test Data
+
+```sql
+-- Remove legal hold
+DELETE FROM legal_holds WHERE reason = 'Retention validation test';
+
+-- Any remaining test data will be cleaned up by normal retention runs
+```
+
+## Phase 8 - Reporting
 
 Create a dated report summary with:
 
 - Environment details
 - Data scale and distribution
 - Test parameters
-- Metrics table
+- Metrics table (performance)
+- DR drill results (RTO/RPO achieved)
+- Retention validation results (purge/legal hold/archive)
 - Findings and bottlenecks
 - Recommendations
 
-Suggested location:
-`performance/reports/YYYYMMDD-summary.md`
+Suggested locations:
 
-## Phase 7 - Teardown / Scale Down
+- Performance: `performance/reports/YYYYMMDD-summary.md`
+- DR evidence: `docs/sin-rfp/review-plans/evidence/DR-DRILL-sin-perf-YYYYMMDD.md`
+- Retention evidence: `docs/sin-rfp/review-plans/evidence/RETENTION-VALIDATION-sin-perf-YYYYMMDD.md`
+
+## Phase 9 - Teardown / Scale Down
 
 - If perf is idle, scale down or destroy to control cost
 - Preserve reports in repo
@@ -322,8 +601,28 @@ AWS_PROFILE=techdev npx sst remove --stage sin-perf
 
 ## Acceptance Criteria
 
-- Perf environment is isolated and documented
-- 20M rows loaded successfully with no PII
-- Baseline tests complete with recorded metrics
-- Load test completed at 10-25 concurrent users
-- Findings and recommendations captured in report
+### Performance
+
+- [ ] Perf environment is isolated and documented
+- [ ] 20M rows loaded successfully with no PII
+- [ ] Baseline tests complete with recorded metrics
+- [ ] Load test completed at 10-25 concurrent users
+- [ ] Findings and recommendations captured in report
+
+### Disaster Recovery
+
+- [ ] DR drill executed successfully
+- [ ] RTO achieved (< 4 hours)
+- [ ] RPO documented (24h for perf, 1h capability for prod)
+- [ ] Data integrity validated post-restore
+- [ ] Evidence file created with all required fields
+
+### Retention Policy
+
+- [ ] Retention policies seeded and verified
+- [ ] Purge job executed successfully
+- [ ] Eligible records purged (notifications, import errors)
+- [ ] Legal hold enforcement verified (held records NOT purged)
+- [ ] Audit log immutability verified (never deleted)
+- [ ] S3 archival verified (audit archives exist in Glacier)
+- [ ] Evidence file created with all required fields

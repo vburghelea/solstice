@@ -18,6 +18,8 @@ import { buildMeasureFormatters } from "~/features/bi/utils/formatting";
 import { getDatasetFields as getSemanticFields } from "~/features/bi/semantic";
 import { FilterWidget } from "~/features/bi/components/dashboard/FilterWidget";
 
+const EMPTY_FILTERS: FilterConfig[] = [];
+
 const sumMeasure = (pivot: PivotResult, measureKey: string) => {
   const values = pivot.rows.flatMap((row) =>
     pivot.columnKeys.map((column) => row.cells[column.key]?.[measureKey] ?? null),
@@ -29,7 +31,7 @@ const sumMeasure = (pivot: PivotResult, measureKey: string) => {
 
 export function DashboardWidget({
   widget,
-  globalFilters = [],
+  globalFilters = EMPTY_FILTERS,
   onEdit,
   onRemove,
   editable = false,

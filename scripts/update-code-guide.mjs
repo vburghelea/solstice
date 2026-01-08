@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 const root = process.cwd();
+const rootPrefix = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
 const codeExts = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".sh"];
 const excludeDirs = new Set([
   "node_modules",
@@ -22,12 +23,21 @@ const excludeDirs = new Set([
   "e2e-target-auth-flow",
 ]);
 
+function resolveSafePath(targetPath) {
+  const resolved = path.resolve(targetPath);
+  if (!resolved.startsWith(rootPrefix)) {
+    throw new Error(`Refusing to access path outside repo root: ${targetPath}`);
+  }
+  return resolved;
+}
+
 function walk(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
     if (excludeDirs.has(entry.name)) continue;
-    const fullPath = path.join(dir, entry.name);
+    if (entry.isSymbolicLink()) continue;
+    const fullPath = resolveSafePath(path.join(dir, entry.name));
     if (entry.isDirectory()) {
       files.push(...walk(fullPath));
     } else if (entry.isFile()) {
@@ -211,7 +221,7 @@ function describeFile(file) {
   const baseName = file.endsWith(".d.ts")
     ? path.basename(file, ".d.ts")
     : path.basename(file, ext);
-  const content = fs.readFileSync(path.join(root, file), "utf8");
+  const content = fs.readFileSync(resolveSafePath(path.join(root, file)), "utf8");
 
   if (file.startsWith("e2e/tests/")) {
     const scope = file.includes("/authenticated/") ? "Authenticated" : "Unauthenticated";

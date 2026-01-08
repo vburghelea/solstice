@@ -12,12 +12,17 @@ import { assertFeatureEnabled } from "~/tenant/feature-gates";
 import {
   createImportJobSchema,
   createImportUploadSchema,
+  createImportTemplateSchema,
   createMappingTemplateSchema,
+  deleteImportTemplateSchema,
   deleteMappingTemplateSchema,
+  downloadFormTemplateSchema,
   rollbackImportJobSchema,
   runBatchImportSchema,
   runInteractiveImportSchema,
+  updateImportJobSourceFileSchema,
   updateImportJobStatusSchema,
+  updateImportTemplateSchema,
   updateMappingTemplateSchema,
 } from "./imports.schemas";
 
@@ -154,6 +159,7 @@ export const createMappingTemplate = createServerFn({ method: "POST" })
         name: data.name,
         description: data.description ?? null,
         targetFormId: data.targetFormId ?? null,
+        targetFormVersionId: data.targetFormVersionId ?? null,
         mappings: data.mappings,
         createdBy: actorUserId,
       })
@@ -209,6 +215,8 @@ export const updateMappingTemplate = createServerFn({ method: "POST" })
         name: data.data.name ?? existing.name,
         description: data.data.description ?? existing.description,
         targetFormId: data.data.targetFormId ?? existing.targetFormId,
+        targetFormVersionId:
+          data.data.targetFormVersionId ?? existing.targetFormVersionId,
         mappings: data.data.mappings ?? existing.mappings,
       })
       .where(eq(importMappingTemplates.id, data.templateId))
@@ -272,6 +280,290 @@ export const deleteMappingTemplate = createServerFn({ method: "POST" })
     });
 
     return { success: true };
+  });
+
+export const createImportTemplate = createServerFn({ method: "POST" })
+  .inputValidator(zod$(createImportTemplateSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    if (data.organizationId) {
+      await requireOrgAccess(actorUserId, data.organizationId);
+    } else {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(actorUserId);
+      if (!isAdmin) {
+        throw forbidden("Global admin access required");
+      }
+    }
+    const { getDb } = await import("~/db/server-helpers");
+    const { importTemplates } = await import("~/db/schema");
+
+    const db = await getDb();
+    const [created] = await db
+      .insert(importTemplates)
+      .values({
+        organizationId: data.organizationId ?? null,
+        formId: data.formId,
+        formVersionId: data.formVersionId,
+        name: data.name,
+        description: data.description ?? null,
+        columns: data.columns,
+        defaults: data.defaults ?? {},
+        createdBy: actorUserId,
+      })
+      .returning();
+
+    if (created) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_TEMPLATE_CREATE",
+        actorUserId,
+        targetType: "import_template",
+        targetId: created.id,
+        targetOrgId: created.organizationId ?? null,
+      });
+    }
+
+    return created ?? null;
+  });
+
+export const updateImportTemplate = createServerFn({ method: "POST" })
+  .inputValidator(zod$(updateImportTemplateSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { importTemplates } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [existing] = await db
+      .select()
+      .from(importTemplates)
+      .where(eq(importTemplates.id, data.templateId))
+      .limit(1);
+
+    if (!existing) {
+      throw notFound("Import template not found");
+    }
+
+    if (existing.organizationId) {
+      await requireOrgAccess(actorUserId, existing.organizationId);
+    } else {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(actorUserId);
+      if (!isAdmin) {
+        throw forbidden("Global admin access required");
+      }
+    }
+
+    const [updated] = await db
+      .update(importTemplates)
+      .set({
+        organizationId: data.data.organizationId ?? existing.organizationId,
+        formId: data.data.formId ?? existing.formId,
+        formVersionId: data.data.formVersionId ?? existing.formVersionId,
+        name: data.data.name ?? existing.name,
+        description: data.data.description ?? existing.description,
+        columns: data.data.columns ?? existing.columns,
+        defaults: data.data.defaults ?? existing.defaults,
+      })
+      .where(eq(importTemplates.id, data.templateId))
+      .returning();
+
+    if (updated) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_TEMPLATE_UPDATE",
+        actorUserId,
+        targetType: "import_template",
+        targetId: updated.id,
+        targetOrgId: updated.organizationId ?? null,
+      });
+    }
+
+    return updated ?? null;
+  });
+
+export const deleteImportTemplate = createServerFn({ method: "POST" })
+  .inputValidator(zod$(deleteImportTemplateSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { importTemplates } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [existing] = await db
+      .select()
+      .from(importTemplates)
+      .where(eq(importTemplates.id, data.templateId))
+      .limit(1);
+
+    if (!existing) {
+      throw notFound("Import template not found");
+    }
+
+    if (existing.organizationId) {
+      await requireOrgAccess(actorUserId, existing.organizationId);
+    } else {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(actorUserId);
+      if (!isAdmin) {
+        throw forbidden("Global admin access required");
+      }
+    }
+
+    await db.delete(importTemplates).where(eq(importTemplates.id, data.templateId));
+
+    const { logDataChange } = await import("~/lib/audit");
+    await logDataChange({
+      action: "IMPORT_TEMPLATE_DELETE",
+      actorUserId,
+      targetType: "import_template",
+      targetId: existing.id,
+      targetOrgId: existing.organizationId ?? null,
+    });
+
+    return { success: true };
+  });
+
+export const updateImportJobSourceFile = createServerFn({ method: "POST" })
+  .inputValidator(zod$(updateImportJobSourceFileSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { importJobs } = await import("~/db/schema");
+    const { eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [existing] = await db
+      .select()
+      .from(importJobs)
+      .where(eq(importJobs.id, data.jobId))
+      .limit(1);
+
+    if (!existing) {
+      throw notFound("Import job not found");
+    }
+
+    await requireOrgAccess(actorUserId, existing.organizationId);
+
+    const [updated] = await db
+      .update(importJobs)
+      .set({
+        sourceFileKey: data.sourceFileKey,
+        sourceFileHash: data.sourceFileHash,
+        sourceRowCount: data.sourceRowCount ?? existing.sourceRowCount,
+      })
+      .where(eq(importJobs.id, data.jobId))
+      .returning();
+
+    if (updated) {
+      const { logDataChange } = await import("~/lib/audit");
+      await logDataChange({
+        action: "IMPORT_JOB_SOURCE_UPDATE",
+        actorUserId,
+        targetType: "import_job",
+        targetId: updated.id,
+        targetOrgId: updated.organizationId,
+        metadata: {
+          previousSourceFileKey: existing.sourceFileKey,
+          nextSourceFileKey: updated.sourceFileKey,
+          changeSummary: data.changeSummary ?? null,
+        },
+      });
+    }
+
+    return updated ?? null;
+  });
+
+export const downloadFormTemplate = createServerFn({ method: "POST" })
+  .inputValidator(zod$(downloadFormTemplateSchema))
+  .handler(async ({ data }) => {
+    await assertFeatureEnabled("sin_admin_imports");
+    const actorUserId = await requireSessionUserId();
+    const { getDb } = await import("~/db/server-helpers");
+    const { forms, formVersions } = await import("~/db/schema");
+    const { desc, eq } = await import("drizzle-orm");
+
+    const db = await getDb();
+    const [form] = await db
+      .select({ organizationId: forms.organizationId, name: forms.name })
+      .from(forms)
+      .where(eq(forms.id, data.formId))
+      .limit(1);
+
+    if (!form) {
+      throw notFound("Form not found");
+    }
+
+    if (form.organizationId) {
+      await requireOrgAccess(actorUserId, form.organizationId);
+    } else {
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(actorUserId);
+      if (!isAdmin) {
+        throw forbidden("Global admin access required");
+      }
+    }
+
+    const [latestVersion] = await db
+      .select()
+      .from(formVersions)
+      .where(eq(formVersions.formId, data.formId))
+      .orderBy(desc(formVersions.versionNumber))
+      .limit(1);
+
+    if (!latestVersion) {
+      throw notFound("Form has no published versions");
+    }
+
+    const { createId } = await import("@paralleldrive/cuid2");
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+    const { getArtifactsBucketName, getS3Client } =
+      await import("~/lib/storage/artifacts");
+    const { generateTemplateBuffer, getTemplateFileName } =
+      await import("~/features/imports/template-generator");
+
+    const buffer = await generateTemplateBuffer({
+      definition: latestVersion.definition as FormDefinition,
+      format: data.format,
+      options: data.options,
+    });
+
+    const fileName = getTemplateFileName(form.name, data.format);
+    const storageKey = `imports/templates/${data.formId}/${createId()}-${fileName}`;
+    const bucket = await getArtifactsBucketName();
+    const client = await getS3Client();
+
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: storageKey,
+        Body: buffer,
+        ContentType:
+          data.format === "csv"
+            ? "text/csv"
+            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+    );
+
+    const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const downloadCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: storageKey,
+      ResponseContentDisposition: `attachment; filename="${fileName}"`,
+    });
+    const downloadUrl = await getSignedUrl(client, downloadCommand, {
+      expiresIn: 900,
+    });
+
+    return { downloadUrl, fileName };
   });
 
 export const createImportUpload = createServerFn({ method: "POST" })

@@ -31,7 +31,7 @@ This document contains credentials for accessing the Solstice prototype for the 
 **MFA Setup:** This account has multi-factor authentication enabled to demonstrate the security controls. When prompted for MFA:
 
 - Use any TOTP authenticator app (Google Authenticator, Authy, 1Password, etc.)
-- TOTP Secret: `JBSWY3DPEHPK3PXP`
+- TOTP Secret: set `SIN_UI_TOTP_SECRET` in your environment (stored in SST secrets, sin-dev)
 - Or contact austin@austinwallace.tech for a one-time bypass code
 
 ### PSO Admin

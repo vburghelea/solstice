@@ -1,33 +1,43 @@
 # Appendices
 
-## Appendix A: Live Demo Access
+## Appendix A: Prototype Evaluation Access
 
-A working prototype is available for viaSport evaluation in a dedicated UAT environment. Credentials are listed below to reduce reviewer friction.
+A working prototype is available for viaSport evaluation in a dedicated UAT environment using synthetic data only.
 
-**Demo URL:** https://sin-uat.solstice.viasport.ca (or CloudFront URL TBD)
+**Demo URL:** https://sin-uat.solstice.viasport.ca
 
-**Environment:** `sin-uat` (User Acceptance Testing environment with evaluator
-access and CloudTrail monitoring)
+**Environment:** `sin-uat` (User Acceptance Testing environment with evaluator access and CloudTrail monitoring)
 
-### Data and Monitoring
+### Environment Details
 
-- Synthetic data only, no confidential viaSport data
+- Synthetic test data only - no confidential viaSport data was used
 - Environment monitoring enabled (CloudTrail with CIS Benchmark alarms)
-- Production-equivalent security controls
-- Performance testing is executed in `sin-perf`
+- Production-equivalent security controls active
+- Performance testing is executed separately in `sin-perf`
 
-### Test Accounts
+### Evaluator Access
 
-| Persona        | Email                      | Password        | Access Level                                      |
-| -------------- | -------------------------- | --------------- | ------------------------------------------------- |
-| viaSport Staff | viasport-staff@example.com | testpassword123 | viaSport admin with full org access (MFA enabled) |
-| PSO Admin      | pso-admin@example.com      | testpassword123 | BC Hockey organization admin                      |
-| Club Reporter  | club-reporter@example.com  | testpassword123 | North Shore Club reporter                         |
-| Viewer         | member@example.com         | testpassword123 | View-only access                                  |
+To protect evaluator accounts and align with security best practices, credentials are provided via a secure **Evaluator Access Pack** delivered separately to viaSport's evaluation lead.
 
-**Note:** MFA-enabled accounts use TOTP authentication. Other demo accounts have MFA disabled for faster evaluation.
+**To request access:**
 
-### Suggested Demo Walkthrough
+1. Contact austin@austinwallace.tech with evaluator names and email addresses
+2. Receive the Evaluator Access Pack via secure email
+3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
+4. MFA demonstration available on the viaSport Staff account
+
+Credentials will be rotated periodically and disabled after the evaluation window closes.
+
+### Test Account Personas
+
+| Persona        | Access Level                                  | MFA                             |
+| -------------- | --------------------------------------------- | ------------------------------- |
+| viaSport Staff | Full admin with cross-org access              | Enabled (demonstrates MFA flow) |
+| PSO Admin      | BC Hockey organization administrator          | Disabled for convenience        |
+| Club Reporter  | North Shore Club reporter (submission access) | Disabled for convenience        |
+| Viewer         | Read-only access to assigned organization     | Disabled for convenience        |
+
+### Suggested Evaluation Walkthrough
 
 1. Login as viaSport Staff to see full admin capabilities
 2. Explore the role-based dashboard
@@ -39,6 +49,8 @@ access and CloudTrail monitoring)
 8. Security Dashboard: review recent security events and account lockouts (SEC-AGG-002)
 9. Privacy and Retention: view retention policies and legal hold capabilities (SEC-AGG-003)
 10. Explore help center and guided walkthroughs
+
+For a requirement-by-requirement walkthrough, see the **Prototype Evaluation Guide**.
 
 ## Appendix B: System Architecture
 
@@ -185,7 +197,10 @@ leadership.
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-[To be provided by Ruslan Hétu]
+Ruslan Hétu is a design and research freelancer with a background in
+human-centered design and systems thinking. He earned a master's degree in
+design and has 6 years of experience applying mixed-methods research to public
+sector projects, healthcare, and startups.
 
 ### Soleil Heaney, System Navigator
 
@@ -197,7 +212,10 @@ leadership.
 
 ### Parul Kharub, Security and Risk Advisor
 
-[To be provided by Parul Kharub]
+Parul is the strategic cybersecurity and risk advisor with 16 years of
+practical experience in Fortune 100 companies across the globe. She also brings
+experience working with regulators and privacy officers to offer breadth of
+security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
@@ -205,7 +223,10 @@ leadership.
 
 ### Tyler Piller, Security and Compliance Advisor
 
-[To be provided by Tyler Piller]
+Tyler Piller is a cybersecurity veteran with over 10 years of experience in
+operational defense and strategic risk management. He currently directs an
+Information Security Risk Management program, providing strategic advisory to
+align technical risk with enterprise business objectives.
 
 ## Appendix G: Glossary
 

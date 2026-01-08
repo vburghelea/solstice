@@ -45,6 +45,6 @@
 
 ## MFA test data (master.md)
 
-- Fake MFA secret: `JBSWY3DPEHPK3PXP`.
+- Fake MFA secret: set `SIN_UI_TOTP_SECRET` in your environment (stored in SST secrets, sin-dev).
 - Backup codes: `backup-testcode1` → `backup-testcode10` (track usage in master).
 - Test admins: `admin@example.com`, `viasport-staff@example.com`.

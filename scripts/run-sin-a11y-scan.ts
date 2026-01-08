@@ -23,7 +23,7 @@ const baseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
 // Credentials must be provided via environment variables (no defaults for security)
 const email = requireEnv("SIN_A11Y_EMAIL");
 const password = requireEnv("SIN_A11Y_PASSWORD");
-// TOTP secret for 2FA - base32-encoded (e.g., JJBFGV2ZGNCFARKIKBFTGUCYKA)
+// TOTP secret for 2FA - base32-encoded (e.g., YOUR_TOTP_SECRET)
 const totpSecret = requireEnv("SIN_A11Y_TOTP_SECRET");
 const axeCdnUrl = "https://cdn.jsdelivr.net/npm/axe-core@4.11.0/axe.min.js";
 

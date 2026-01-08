@@ -128,7 +128,8 @@ For each route:
 ```
 1. Navigate to /auth/login
 2. Fill form with admin@example.com / testpassword123
-3. Generate TOTP: npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"
+3. Generate TOTP: npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
+   (stored in SST secrets, sin-dev: `SIN_UI_TOTP_SECRET`)
 4. Enter authenticator code
 5. Verify access to admin routes
 ```

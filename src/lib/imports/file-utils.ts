@@ -1,4 +1,4 @@
-import type { JsonRecord } from "~/shared/lib/json";
+import { sanitizeJsonRecords, type JsonRecord } from "~/shared/lib/json";
 
 export type ImportFileType = "csv" | "excel";
 
@@ -62,7 +62,8 @@ export const parseImportBuffer = async (
   const workbook = read(buffer, { type: "buffer" });
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
-  return utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
+  const rows = utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
+  return sanitizeJsonRecords(rows);
 };
 
 export const loadImportFile = async (

@@ -10,7 +10,14 @@ const baseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
 const debug = process.env["SIN_UI_DEBUG"] === "true";
 const email = process.env["SIN_UI_EMAIL"] ?? "austinwallacetech@gmail.com";
 const password = process.env["SIN_UI_PASSWORD"] ?? "testpassword123";
-const totpSecret = process.env["SIN_UI_TOTP_SECRET"] ?? "JJBFGV2ZGNCFARKIKBFTGUCYKA";
+const requireEnv = (key: string) => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is required for MFA login.`);
+  }
+  return value;
+};
+const totpSecret = requireEnv("SIN_UI_TOTP_SECRET");
 const defaultOrgId =
   process.env["SIN_UI_ORG_ID"] ?? "a0000000-0000-4000-8001-000000000002";
 const formId = process.env["SIN_UI_FORM_ID"] ?? "a0000000-0000-4000-8002-000000000002";

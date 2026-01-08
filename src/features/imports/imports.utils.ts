@@ -1,6 +1,9 @@
 import type { ParseResult } from "papaparse";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
-import type { JsonRecord, JsonValue } from "~/shared/lib/json";
+import { sanitizeJsonRecords, type JsonRecord, type JsonValue } from "~/shared/lib/json";
+
+export const IMPORT_TEMPLATE_MARKER_TOKEN = "solstice-import-template";
+export const IMPORT_TEMPLATE_SKIP_MARKERS = ["# description", "__meta__", "# example"];
 
 export const parseCsvFile = async (file: File): Promise<JsonRecord[]> => {
   const Papa = await import("papaparse");
@@ -8,7 +11,8 @@ export const parseCsvFile = async (file: File): Promise<JsonRecord[]> => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (result: ParseResult<JsonRecord>) => resolve(result.data as JsonRecord[]),
+      complete: (result: ParseResult<JsonRecord>) =>
+        resolve(sanitizeJsonRecords(result.data as JsonRecord[])),
       error: (error: Error) => reject(error),
     });
   });
@@ -24,16 +28,48 @@ export const parseExcelFile = async (file: File): Promise<JsonRecord[]> => {
   const workbook = read(data, { type: "array" });
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
-  return utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
+  const rows = utils.sheet_to_json(sheet, { defval: "" }) as JsonRecord[];
+  return sanitizeJsonRecords(rows);
+};
+
+const shouldSkipMetadataRows = (rows: JsonRecord[], headers: string[]) => {
+  if (rows.length === 0 || headers.length === 0) return false;
+  const firstHeader = headers[0];
+  const firstValue = rows[0]?.[firstHeader];
+  if (typeof firstValue !== "string") return false;
+  const normalized = firstValue.trim().toLowerCase();
+  const hasMarker = IMPORT_TEMPLATE_SKIP_MARKERS.some((marker) =>
+    normalized.startsWith(marker),
+  );
+  if (!hasMarker) return false;
+  return normalized.includes(IMPORT_TEMPLATE_MARKER_TOKEN);
+};
+
+const stripTemplateMetadataRows = (rows: JsonRecord[]) => {
+  if (rows.length === 0) return rows;
+  const headers = Object.keys(rows[0] ?? {});
+  if (!shouldSkipMetadataRows(rows, headers)) return rows;
+  const firstHeader = headers[0];
+  const remaining = rows.slice(1);
+  const nextValue = remaining[0]?.[firstHeader];
+  if (typeof nextValue === "string") {
+    const normalized = nextValue.trim().toLowerCase();
+    if (IMPORT_TEMPLATE_SKIP_MARKERS.some((marker) => normalized.startsWith(marker))) {
+      return remaining.slice(1);
+    }
+  }
+  return remaining;
 };
 
 export const parseImportFile = async (file: File) => {
   const lowerName = file.name.toLowerCase();
   if (lowerName.endsWith(".csv")) {
-    return { type: "csv" as const, rows: await parseCsvFile(file) };
+    const rows = await parseCsvFile(file);
+    return { type: "csv" as const, rows: stripTemplateMetadataRows(rows) };
   }
   if (lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls")) {
-    return { type: "excel" as const, rows: await parseExcelFile(file) };
+    const rows = await parseExcelFile(file);
+    return { type: "excel" as const, rows: stripTemplateMetadataRows(rows) };
   }
   throw new Error("Unsupported file type. Please upload CSV or Excel.");
 };

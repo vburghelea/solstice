@@ -118,7 +118,6 @@ export const runBatchImportJob = createServerOnlyFn(
     const startIndex = job.progressCheckpoint ?? 0;
     const chunkSize = 1000;
     let inserted = 0;
-    let processed = startIndex;
     const failedRows = new Set<number>();
 
     for (let i = startIndex; i < rows.length; i += chunkSize) {
@@ -224,7 +223,7 @@ export const runBatchImportJob = createServerOnlyFn(
         }
       }
 
-      processed = Math.min(rows.length, i + chunk.length);
+      const processed = Math.min(rows.length, i + chunk.length);
       await db
         .update(importJobs)
         .set({

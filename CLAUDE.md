@@ -714,9 +714,8 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 - `admin@example.com` / `testpassword123` (Platform Admin - but NO org membership)
 - `viasport-staff@example.com` / `testpassword123` (Platform Admin + viaSport BC owner - **use this for full access**)
 
-**TOTP Secret (for authenticator apps):** `JJBFGV2ZGNCFARKIKBFTGUCYKA`
-
-> Note: The raw secret stored is `JBSWY3DPEHPK3PXP`, but otplib requires the base32-encoded version above.
+**TOTP Secret:** Set `SIN_UI_TOTP_SECRET` in your environment (base32-encoded).
+Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
 
 **Login Flow:**
 
@@ -726,7 +725,7 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 4. Select "Authenticator code" tab (NOT backup code)
 5. Generate a fresh TOTP code:
    ```bash
-   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));"
+   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
    ```
 6. Enter the 6-digit code and click "Verify code"
 

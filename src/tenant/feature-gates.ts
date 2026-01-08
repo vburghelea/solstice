@@ -21,8 +21,17 @@ export const requireFeatureInRoute = (
   redirectTo = "/dashboard/forbidden",
 ) => {
   if (!isFeatureEnabled(key)) {
-    throw redirect({ to: redirectTo });
+    const safeRedirect = isSafeInternalPath(redirectTo)
+      ? redirectTo
+      : "/dashboard/forbidden";
+    throw redirect({ to: safeRedirect });
   }
+};
+
+const isSafeInternalPath = (value: string) => {
+  if (!value.startsWith("/")) return false;
+  if (value.startsWith("//")) return false;
+  return !/^[a-z][a-z0-9+.-]*:/i.test(value);
 };
 
 export const filterNavItems = (

@@ -20,16 +20,17 @@
 8. `docs/sin-rfp/response/03-service-approach/platform-design/final.md`
 9. `docs/sin-rfp/response/03-service-approach/testing-qa/final.md`
 10. `docs/sin-rfp/response/03-service-approach/training-onboarding/final.md`
-11. `docs/sin-rfp/response/04-system-requirements/00-compliance-crosswalk/final.md`
-12. `docs/sin-rfp/response/04-system-requirements/data-management-dm-agg/final.md`
-13. `docs/sin-rfp/response/04-system-requirements/reporting-rp-agg/final.md`
-14. `docs/sin-rfp/response/04-system-requirements/security-sec-agg/final.md`
-15. `docs/sin-rfp/response/04-system-requirements/training-onboarding-to-agg/final.md`
-16. `docs/sin-rfp/response/04-system-requirements/user-interface-ui-agg/final.md`
-17. `docs/sin-rfp/response/05-capabilities-experience/final.md`
-18. `docs/sin-rfp/response/06-cost-value/final.md`
-19. `docs/sin-rfp/response/07-delivery-schedule/final.md`
-20. `docs/sin-rfp/response/08-appendices/final.md`
+11. `docs/sin-rfp/response/03-service-approach/service-levels/final.md`
+12. `docs/sin-rfp/response/04-system-requirements/00-compliance-crosswalk/final.md`
+13. `docs/sin-rfp/response/04-system-requirements/data-management-dm-agg/final.md`
+14. `docs/sin-rfp/response/04-system-requirements/reporting-rp-agg/final.md`
+15. `docs/sin-rfp/response/04-system-requirements/security-sec-agg/final.md`
+16. `docs/sin-rfp/response/04-system-requirements/training-onboarding-to-agg/final.md`
+17. `docs/sin-rfp/response/04-system-requirements/user-interface-ui-agg/final.md`
+18. `docs/sin-rfp/response/05-capabilities-experience/final.md`
+19. `docs/sin-rfp/response/06-cost-value/final.md`
+20. `docs/sin-rfp/response/07-delivery-schedule/final.md`
+21. `docs/sin-rfp/response/08-appendices/final.md`
 
 ## Assembly Notes
 

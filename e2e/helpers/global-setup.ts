@@ -29,6 +29,6 @@ export default async function globalSetup(config: FullConfig) {
     process.env["E2E_WORKER_EMAIL"] = assignedAccount;
     process.env["E2E_WORKER_PASSWORD"] = `${assignedAccount.split("@")[0]}123`;
 
-    console.log(`Worker ${workerIndex} assigned account: ${assignedAccount}`);
+    console.log(`Worker ${workerIndex} assigned an E2E account`);
   }
 }

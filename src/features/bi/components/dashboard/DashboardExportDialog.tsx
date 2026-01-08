@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -50,16 +50,20 @@ export function DashboardExportDialog({
   );
   const [selectedWidgetId, setSelectedWidgetId] = useState("");
   const [format, setFormat] = useState<ExportFormat>("csv");
+  const defaultWidgetId = exportableWidgets[0]?.id ?? "";
+  const effectiveWidgetId = selectedWidgetId || defaultWidgetId;
 
-  useEffect(() => {
-    if (!open) return;
-    setSelectedWidgetId(exportableWidgets[0]?.id ?? "");
-    setFormat("csv");
-  }, [open, exportableWidgets]);
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setSelectedWidgetId("");
+      setFormat("csv");
+    }
+    onOpenChange(nextOpen);
+  };
 
   const selectedWidget = useMemo(
-    () => exportableWidgets.find((widget) => widget.id === selectedWidgetId) ?? null,
-    [exportableWidgets, selectedWidgetId],
+    () => exportableWidgets.find((widget) => widget.id === effectiveWidgetId) ?? null,
+    [effectiveWidgetId, exportableWidgets],
   );
 
   const { query: mergedQuery } = useMemo(
@@ -127,7 +131,7 @@ export function DashboardExportDialog({
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Export dashboard data</DialogTitle>
@@ -144,7 +148,7 @@ export function DashboardExportDialog({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Widget</Label>
-              <Select value={selectedWidgetId} onValueChange={setSelectedWidgetId}>
+              <Select value={effectiveWidgetId} onValueChange={setSelectedWidgetId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select widget" />
                 </SelectTrigger>

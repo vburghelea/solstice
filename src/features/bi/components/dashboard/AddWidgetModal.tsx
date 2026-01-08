@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -71,15 +71,8 @@ export function AddWidgetModal({
   const [filterType, setFilterType] =
     useState<NonNullable<WidgetConfig["filterType"]>>("select");
 
-  useEffect(() => {
-    if (!datasetId && datasets.length > 0) {
-      setDatasetId(datasets[0]?.id ?? "");
-    }
-  }, [datasetId, datasets]);
-
-  useEffect(() => {
-    setFilterField("");
-  }, [datasetId, widgetType]);
+  const defaultDatasetId = useMemo(() => datasets[0]?.id ?? "", [datasets]);
+  const effectiveDatasetId = datasetId || defaultDatasetId;
 
   const reset = () => {
     setWidgetType("chart");
@@ -91,9 +84,9 @@ export function AddWidgetModal({
   };
 
   const fieldsQuery = useQuery({
-    queryKey: ["bi-fields", datasetId],
-    queryFn: () => getDatasetFields({ data: { datasetId } }),
-    enabled: Boolean(datasetId) && widgetType === "filter",
+    queryKey: ["bi-fields", effectiveDatasetId],
+    queryFn: () => getDatasetFields({ data: { datasetId: effectiveDatasetId } }),
+    enabled: Boolean(effectiveDatasetId) && widgetType === "filter",
   });
   const fields = (fieldsQuery.data?.fields ?? []) as DatasetField[];
 
@@ -114,12 +107,12 @@ export function AddWidgetModal({
     const config: WidgetConfig = { title };
 
     if (widgetType !== "text" && widgetType !== "filter") {
-      if (!datasetId) {
+      if (!effectiveDatasetId) {
         toast.error("Select a dataset for this widget.");
         return;
       }
       const nextQuery: PivotQuery = {
-        datasetId,
+        datasetId: effectiveDatasetId,
         rows: [],
         columns: [],
         measures: [{ id: createMeasureId(), field: null, aggregation: "count" }],
@@ -140,7 +133,7 @@ export function AddWidgetModal({
     }
 
     if (widgetType === "filter") {
-      if (!datasetId) {
+      if (!effectiveDatasetId) {
         toast.error("Select a dataset for this widget.");
         return;
       }
@@ -148,7 +141,7 @@ export function AddWidgetModal({
         toast.error("Select a field to filter.");
         return;
       }
-      config.filterDatasetId = datasetId;
+      config.filterDatasetId = effectiveDatasetId;
       config.filterField = filterField;
       config.filterType = filterType;
     }
@@ -178,7 +171,12 @@ export function AddWidgetModal({
             <Label>Widget type</Label>
             <Select
               value={widgetType}
-              onValueChange={(value) => setWidgetType(value as WidgetType)}
+              onValueChange={(value) => {
+                setWidgetType(value as WidgetType);
+                if (value !== "filter") {
+                  setFilterField("");
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select widget type" />
@@ -201,7 +199,13 @@ export function AddWidgetModal({
           {widgetType !== "text" ? (
             <div className="space-y-1">
               <Label>Dataset</Label>
-              <Select value={datasetId} onValueChange={setDatasetId}>
+              <Select
+                value={effectiveDatasetId}
+                onValueChange={(value) => {
+                  setDatasetId(value);
+                  setFilterField("");
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select dataset" />
                 </SelectTrigger>

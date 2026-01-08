@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { JsonRecord } from "~/shared/lib/json";
 import { user } from "./auth.schema";
-import { forms } from "./forms.schema";
+import { forms, formVersions } from "./forms.schema";
 import { organizations } from "./organizations.schema";
 
 export const importTypeEnum = pgEnum("import_type", ["csv", "excel"]);
@@ -59,6 +59,7 @@ export const importMappingTemplates = pgTable("import_mapping_templates", {
   name: text("name").notNull(),
   description: text("description"),
   targetFormId: uuid("target_form_id").references(() => forms.id),
+  targetFormVersionId: uuid("target_form_version_id").references(() => formVersions.id),
   mappings: jsonb("mappings").$type<JsonRecord>().notNull(),
   createdBy: text("created_by")
     .notNull()
@@ -83,9 +84,34 @@ export const importJobErrors = pgTable("import_job_errors", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const importTemplates = pgTable("import_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id),
+  formId: uuid("form_id")
+    .notNull()
+    .references(() => forms.id),
+  formVersionId: uuid("form_version_id")
+    .notNull()
+    .references(() => formVersions.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  columns: jsonb("columns").$type<JsonRecord>().notNull(),
+  defaults: jsonb("defaults").$type<JsonRecord>().notNull().default({}),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 export type ImportJob = typeof importJobs.$inferSelect;
 export type NewImportJob = typeof importJobs.$inferInsert;
 export type ImportMappingTemplate = typeof importMappingTemplates.$inferSelect;
 export type NewImportMappingTemplate = typeof importMappingTemplates.$inferInsert;
 export type ImportJobError = typeof importJobErrors.$inferSelect;
 export type NewImportJobError = typeof importJobErrors.$inferInsert;
+export type ImportTemplate = typeof importTemplates.$inferSelect;
+export type NewImportTemplate = typeof importTemplates.$inferInsert;

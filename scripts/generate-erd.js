@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { execSync } from "child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { execFileSync } from "child_process";
+import { mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
@@ -14,13 +14,16 @@ const schemaDocPath = join(rootDir, "docs/quadball-plan/database/schema-overview
 const outputDir = join(rootDir, "docs/reference/database");
 const outputPath = join(outputDir, "schema-erd.svg");
 
-if (!existsSync(schemaDocPath)) {
+let content = "";
+try {
+  content = readFileSync(schemaDocPath, "utf-8");
+} catch (error) {
   console.error("Schema documentation not found at:", schemaDocPath);
+  console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 }
 
 // Extract mermaid diagram from markdown
-const content = readFileSync(schemaDocPath, "utf-8");
 const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)```/);
 
 if (!mermaidMatch) {
@@ -32,9 +35,7 @@ if (!mermaidMatch) {
 const mermaidDiagram = mermaidMatch[1];
 
 // Create output directory if it doesn't exist
-if (!existsSync(outputDir)) {
-  mkdirSync(outputDir, { recursive: true });
-}
+mkdirSync(outputDir, { recursive: true });
 
 // Create a temporary mermaid file
 const tempMermaidPath = join(rootDir, "temp-erd.mmd");
@@ -44,24 +45,44 @@ try {
   // Generate SVG using mermaid CLI
   console.log("Generating ERD...");
   const puppeteerConfigPath = join(rootDir, "puppeteer.config.json");
-  execSync(
-    `pnpm mmdc -i ${tempMermaidPath} -o ${outputPath} -t dark -b transparent -p ${puppeteerConfigPath}`,
-    {
-      cwd: rootDir,
-      stdio: "inherit",
-    },
+  execFileSync(
+    "pnpm",
+    [
+      "mmdc",
+      "-i",
+      tempMermaidPath,
+      "-o",
+      outputPath,
+      "-t",
+      "dark",
+      "-b",
+      "transparent",
+      "-p",
+      puppeteerConfigPath,
+    ],
+    { cwd: rootDir, stdio: "inherit" },
   );
 
   console.log("✅ ERD generated successfully at:", outputPath);
 
   // Also generate a PNG version
   const pngPath = join(outputDir, "schema-erd.png");
-  execSync(
-    `pnpm mmdc -i ${tempMermaidPath} -o ${pngPath} -t dark -b white -p ${puppeteerConfigPath}`,
-    {
-      cwd: rootDir,
-      stdio: "inherit",
-    },
+  execFileSync(
+    "pnpm",
+    [
+      "mmdc",
+      "-i",
+      tempMermaidPath,
+      "-o",
+      pngPath,
+      "-t",
+      "dark",
+      "-b",
+      "white",
+      "-p",
+      puppeteerConfigPath,
+    ],
+    { cwd: rootDir, stdio: "inherit" },
   );
 
   console.log("✅ PNG version generated at:", pngPath);
@@ -70,8 +91,10 @@ try {
   process.exit(1);
 } finally {
   // Clean up temp file
-  if (existsSync(tempMermaidPath)) {
-    execSync(`rm ${tempMermaidPath}`);
+  try {
+    unlinkSync(tempMermaidPath);
+  } catch {
+    // Ignore cleanup errors.
   }
 }
 

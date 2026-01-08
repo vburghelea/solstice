@@ -388,6 +388,7 @@ function DashboardDetailPage() {
 
       {editingWidget && (
         <EditWidgetDialog
+          key={editingWidget.id}
           open={Boolean(editingWidgetId)}
           onOpenChange={(open) => {
             if (!open) setEditingWidgetId(null);

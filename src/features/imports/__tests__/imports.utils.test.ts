@@ -42,6 +42,20 @@ describe("imports.utils", () => {
     expect(result.rows).toEqual([{ name: "Alex", age: 31 }]);
   });
 
+  it("skips template metadata rows when marker is present", async () => {
+    const csv = [
+      "name,age",
+      "# description | solstice-import-template,Age in years",
+      "# example,Alice",
+      "Bob,25",
+    ].join("\n");
+    const file = createFile([csv], "template.csv", "text/csv");
+
+    const result = await parseImportFile(file);
+
+    expect(result.rows).toEqual([{ name: "Bob", age: "25" }]);
+  });
+
   it("rejects unsupported files", async () => {
     const file = createFile(["hello"], "notes.txt", "text/plain");
 

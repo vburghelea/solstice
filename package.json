@@ -178,5 +178,11 @@
     "node": ">=24.12.0",
     "pnpm": ">=10.26.1"
   },
-  "packageManager": "pnpm@10.26.1"
+  "packageManager": "pnpm@10.26.1",
+  "pnpm": {
+    "overrides": {
+      "@modelcontextprotocol/sdk": "1.25.2",
+      "rollup": "4.55.1"
+    }
+  }
 }

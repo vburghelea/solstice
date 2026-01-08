@@ -14,6 +14,7 @@ import { executePivotBatch } from "../../bi.queries";
 import { mergeDashboardFilters } from "./dashboard-utils";
 
 const GridLayout = WidthProvider(ReactGridLayout);
+const EMPTY_FILTERS: FilterConfig[] = [];
 
 type WidgetPosition = {
   x: number;
@@ -25,7 +26,7 @@ type WidgetPosition = {
 export function DashboardCanvas({
   layout,
   widgets,
-  globalFilters = [],
+  globalFilters = EMPTY_FILTERS,
   editable,
   onPositionChange,
   onEditWidget,

@@ -8,7 +8,9 @@
 
 ### Root Cause
 
-Better Auth stores the **raw secret string** (e.g., `JBSWY3DPEHPK3PXP`) but authenticator apps expect the **base32 encoding of that string** (e.g., `JJBFGV2ZGNCFARKIKBFTGUCYKA`).
+Better Auth stores the **raw secret string** (e.g., `<RAW_TOTP_SECRET>`) but
+authenticator apps expect the **base32 encoding of that string** (e.g.,
+`<BASE32_TOTP_SECRET>`).
 
 ### Solution
 
@@ -16,11 +18,13 @@ When generating TOTP codes for testing, use the base32-encoded version:
 
 ```bash
 # CORRECT - use base32-encoded secret
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JJBFGV2ZGNCFARKIKBFTGUCYKA'));"
+npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
 
 # WRONG - raw secret produces different codes
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"
+npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
 ```
+
+`SIN_UI_TOTP_SECRET` is stored in SST secrets (sin-dev).
 
 ---
 
@@ -32,7 +36,7 @@ npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.ge
 - **Database**: AWS RDS PostgreSQL via SST tunnel
 - **Auth Library**: Better Auth with `twoFactor` plugin
 - **Test User**: `admin@example.com` / `testpassword123`
-- **TOTP Secret**: `JBSWY3DPEHPK3PXP` (base32-encoded)
+- **TOTP Secret**: `<RAW_TOTP_SECRET>` (base32-encoded)
 
 ## Symptoms
 
@@ -45,7 +49,7 @@ npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.ge
 ### What Fails
 
 - TOTP code verification: ❌ "Invalid code" / 401 UNAUTHORIZED
-- Codes generated with `otplib.authenticator.generate('JBSWY3DPEHPK3PXP')` are rejected
+- Codes generated with `otplib.authenticator.generate(<RAW_TOTP_SECRET>)` are rejected
 
 ## Technical Details
 
@@ -76,7 +80,7 @@ await db.insert(twoFactor).values({
 ### How TOTP Secret Is Stored (Failing)
 
 ```typescript
-const FAKE_MFA_SECRET = "JBSWY3DPEHPK3PXP"; // Base32 string
+const FAKE_MFA_SECRET = "<RAW_TOTP_SECRET>"; // Base32 string
 
 // Encrypt the base32 string directly
 const encryptedSecret = await symmetricEncrypt({
@@ -113,8 +117,8 @@ What format does `createOTP()` expect for the `decrypted` secret?
 
 **Possibilities:**
 
-1. **Base32 string** (what we're storing): `"JBSWY3DPEHPK3PXP"`
-2. **Raw bytes** (decoded from base32): `Buffer.from(base32Decode('JBSWY3DPEHPK3PXP'))`
+1. **Base32 string** (what we're storing): `"<RAW_TOTP_SECRET>"`
+2. **Raw bytes** (decoded from base32): `Buffer.from(base32Decode('<RAW_TOTP_SECRET>'))`
 3. **Hex string**: The hex representation of the raw bytes
 4. **Something else**: Better Auth may generate secrets in a specific format
 
@@ -124,7 +128,7 @@ What format does `createOTP()` expect for the `decrypted` secret?
 
 ```typescript
 const encryptedSecret = await symmetricEncrypt({
-  data: "JBSWY3DPEHPK3PXP",
+  data: "<RAW_TOTP_SECRET>",
   key: authSecret,
 });
 ```
@@ -137,7 +141,7 @@ const encryptedSecret = await symmetricEncrypt({
 function base32Decode(input: string): Uint8Array {
   // ... decode base32 to raw bytes
 }
-const rawBytes = base32Decode("JBSWY3DPEHPK3PXP");
+const rawBytes = base32Decode("<RAW_TOTP_SECRET>");
 const encryptedSecret = await symmetricEncrypt({
   data: Buffer.from(rawBytes).toString(), // or .toString('hex')?
   key: authSecret,
@@ -181,7 +185,7 @@ const encryptedSecret = await symmetricEncrypt({
 
 5. When prompted for 2FA, try:
    - **Backup code**: `backup-testcode1` → ✅ Works
-   - **TOTP code**: Generate with `npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"` → ❌ Fails
+   - **TOTP code**: Generate with `npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"` → ❌ Fails
 
 ## Potential Solutions
 

@@ -66,7 +66,8 @@ For coding agents and E2E tests that need to authenticate through MFA-protected 
 
 **Password for all test users:** `testpassword123`
 
-**TOTP Secret:** `JBSWY3DPEHPK3PXP`
+**TOTP Secret:** set `SIN_UI_TOTP_SECRET` in your environment
+Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
 
 ### Login Flow for Agents (Recommended)
 
@@ -76,7 +77,7 @@ For coding agents and E2E tests that need to authenticate through MFA-protected 
 4. Select **"Authenticator code"** tab (NOT backup code)
 5. Generate a fresh TOTP code:
    ```bash
-   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('JBSWY3DPEHPK3PXP'));"
+   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
    ```
 6. Enter the 6-digit code and click "Verify code"
 7. Redirects to dashboard/onboarding

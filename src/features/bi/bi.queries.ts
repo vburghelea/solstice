@@ -26,6 +26,7 @@ import {
   buildPivotResultFromSqlRows,
   buildPivotSqlPlan,
 } from "./engine/pivot-sql-compiler";
+import { assertSafeIdentifier, quoteIdentifier } from "./engine/sql-identifiers";
 import { normalizeFilter, type NormalizedFilter } from "./engine/filters";
 import {
   acquireConcurrencySlot,
@@ -354,19 +355,10 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
     const MAX_SUGGESTIONS = 50;
     const maxValues = suggestionsConfig?.maxValues ?? MAX_SUGGESTIONS;
     const limit = Math.min(data.limit ?? 25, maxValues, MAX_SUGGESTIONS);
-    const quoteIdentifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
-    const viewName = quoteIdentifier(`bi_v_${dataset.id}`);
+    const viewName = quoteIdentifier(
+      `bi_v_${assertSafeIdentifier(dataset.id, "dataset")}`,
+    );
     const baseAlias = quoteIdentifier("base");
-
-    const formatSettingValue = (value: string | number | boolean) => {
-      if (typeof value === "number") {
-        return Number.isFinite(value) ? String(value) : "0";
-      }
-      if (typeof value === "boolean") {
-        return value ? "true" : "false";
-      }
-      return `'${String(value).replace(/'/g, "''")}'`;
-    };
 
     const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
     try {
@@ -374,25 +366,11 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
       const db = await getDb();
 
       const result = await db.transaction(async (tx) => {
-        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
+        await tx.execute(sql`SET LOCAL app.org_id = ${scopedOrganizationId ?? ""}`);
+        await tx.execute(sql`SET LOCAL app.is_global_admin = ${isGlobalAdmin}`);
         await tx.execute(
-          sql.raw(
-            `SET LOCAL app.org_id = ${formatSettingValue(scopedOrganizationId ?? "")}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL app.is_global_admin = ${formatSettingValue(
-              String(isGlobalAdmin),
-            )}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL statement_timeout = ${formatSettingValue(
-              QUERY_GUARDRAILS.statementTimeoutMs,
-            )}`,
-          ),
+          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
         );
 
         return tx.execute<Record<string, unknown>>(sql`
@@ -714,16 +692,6 @@ const runPivotQuery = async (params: {
   let pivotResult: ReturnType<typeof buildPivotResult>;
   let rowsReturned = 0;
 
-  const formatSettingValue = (value: string | number | boolean) => {
-    if (typeof value === "number") {
-      return Number.isFinite(value) ? String(value) : "0";
-    }
-    if (typeof value === "boolean") {
-      return value ? "true" : "false";
-    }
-    return `'${String(value).replace(/'/g, "''")}'`;
-  };
-
   const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
   try {
     const plan = buildPivotSqlPlan({
@@ -742,25 +710,11 @@ const runPivotQuery = async (params: {
 
     try {
       const result = await db.transaction(async (tx) => {
-        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
+        await tx.execute(sql`SET LOCAL app.org_id = ${scopedOrganizationId ?? ""}`);
+        await tx.execute(sql`SET LOCAL app.is_global_admin = ${isGlobalAdmin}`);
         await tx.execute(
-          sql.raw(
-            `SET LOCAL app.org_id = ${formatSettingValue(scopedOrganizationId ?? "")}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL app.is_global_admin = ${formatSettingValue(
-              String(isGlobalAdmin),
-            )}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL statement_timeout = ${formatSettingValue(
-              QUERY_GUARDRAILS.statementTimeoutMs,
-            )}`,
-          ),
+          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
         );
 
         return tx.execute<Record<string, unknown>>(plan.sql);

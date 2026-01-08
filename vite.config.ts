@@ -51,8 +51,10 @@ export default defineConfig(({ mode }) => {
       }),
 
       // Nitro v2 plugin for Netlify deployment
+      // Using modern netlify preset (not netlify-legacy) for better performance
       nitroV2Plugin({
-        // target: "netlify",
+        preset: "netlify",
+        compatibilityDate: "2026-01-08",
       }),
 
       // React plugin explicitly provided (required for TanStack Start RC v1.132+)

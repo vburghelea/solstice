@@ -2,6 +2,10 @@
   publish = ".output/public"
   command = "pnpm build"
 
+# Increase Node.js heap size for builds (Nitro server build requires more memory)
+[build.environment]
+  NODE_OPTIONS = "--max-old-space-size=4096"
+
 [functions]
   directory = "netlify/functions"
 

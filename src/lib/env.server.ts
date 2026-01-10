@@ -46,6 +46,16 @@ export const env = createEnv({
     // Auth secret is validated lazily in getAuthSecret().
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    MICROSOFT_CLIENT_ID: z.string().optional(),
+    MICROSOFT_CLIENT_SECRET: z.string().optional(),
+    MICROSOFT_TENANT_ID: z.string().optional(),
+    MICROSOFT_AUTHORITY: z.url().optional(),
+    MICROSOFT_PROMPT: z
+      .enum(["none", "select_account", "consent", "login", "select_account consent"])
+      .optional(),
+    APPLE_CLIENT_ID: z.string().optional(),
+    APPLE_CLIENT_SECRET: z.string().optional(),
+    APPLE_APP_BUNDLE_IDENTIFIER: z.string().optional(),
     OAUTH_ALLOWED_DOMAINS: z
       .string()
       .optional()

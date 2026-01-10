@@ -1,6 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import type { User } from "~/lib/auth/types";
+
+export type SocialAuthProvider = "google" | "microsoft" | "apple";
+
+const checkPasskeysByEmailSchema = z.object({
+  email: z.string().email(),
+});
 
 /**
  * Server function to get the current user with all custom fields
@@ -110,3 +117,92 @@ export const authQueryOptions = () =>
     queryKey: authQueryKey,
     queryFn: ({ signal }) => getCurrentUser({ signal }),
   });
+
+export const getAvailableSocialProviders = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SocialAuthProvider[]> => {
+    const { env } = await import("~/lib/env.server");
+    const providers: SocialAuthProvider[] = [];
+
+    if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+      providers.push("google");
+    }
+
+    if (env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+      providers.push("microsoft");
+    }
+
+    if (env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET) {
+      providers.push("apple");
+    }
+
+    return providers;
+  },
+);
+
+/**
+ * Check if a user (by email) has any passkeys registered.
+ * Used for identifier-first login flow - check after email entry.
+ */
+export const checkPasskeysByEmail = createServerFn({ method: "POST" })
+  .inputValidator(checkPasskeysByEmailSchema.parse)
+  .handler(async ({ data }): Promise<{ hasPasskeys: boolean }> => {
+    const [{ getDb }, { eq }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { user, passkey } = await import("~/db/schema");
+
+    const db = await getDb();
+
+    // Find user by email first
+    const [foundUser] = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(eq(user.email, data.email));
+
+    if (!foundUser) {
+      // Don't reveal whether user exists - return false
+      return { hasPasskeys: false };
+    }
+
+    // Check if user has any passkeys
+    const passkeys = await db
+      .select({ id: passkey.id })
+      .from(passkey)
+      .where(eq(passkey.userId, foundUser.id))
+      .limit(1);
+
+    return { hasPasskeys: passkeys.length > 0 };
+  });
+
+/**
+ * Get the current user's passkey count.
+ * Used for post-login passkey creation prompts.
+ */
+export const getCurrentUserPasskeyCount = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ count: number }> => {
+    const [{ getDb }, { getSessionFromHeaders }, { getRequest }, { eq, count }] =
+      await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/session"),
+        import("@tanstack/react-start/server"),
+        import("drizzle-orm"),
+      ]);
+    const { headers } = getRequest();
+    const session = await getSessionFromHeaders(headers);
+
+    if (!session?.user) {
+      return { count: 0 };
+    }
+
+    const { passkey } = await import("~/db/schema");
+    const db = await getDb();
+
+    const [result] = await db
+      .select({ count: count() })
+      .from(passkey)
+      .where(eq(passkey.userId, session.user.id));
+
+    return { count: result?.count ?? 0 };
+  },
+);

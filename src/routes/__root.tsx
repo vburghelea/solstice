@@ -398,11 +398,9 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
               };
             }
 
-            // Theme toggle
-            document.documentElement.classList.toggle(
-              'dark',
-              localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            );
+            // Theme toggle - TEMPORARILY DISABLED: Dark mode disabled app-wide
+            // To re-enable, restore: document.documentElement.classList.toggle('dark', localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches));
+            document.documentElement.classList.remove('dark');
           `}
         </ScriptOnce>
 

@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Playwright MCP**: Use for UI verification; see "Playwright MCP" section at end
 - **SST Console**: https://console.sst.dev/ausjndsfakjdnfakjdsfnak/solstice - View resources, deployments, logs
 - **New Environment Setup**: See `docs/runbooks/new-environment-setup.md` for standing up new stages
+- **Database/Tunnel Failures**: When `sst tunnel` or database operations fail, check `docs/runbooks/new-environment-setup.md` for stale bastion IP diagnosis and SSM workaround
 - **Server Functions**: Always use `.inputValidator(schema.parse)` with Zod schemas
 - **Imports**: Avoid `@tanstack/react-start/server` in client code; use dynamic imports or `serverOnly()`
 - **Package**: Use `@tanstack/react-start` (not `@tanstack/start`)
@@ -39,8 +40,8 @@ For creating AI context bundles, see `repomix-configs/README.md`. Pre-configured
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173)
-- `npx sst dev --stage qc-dev` - Start SST dev mode with live Lambda (QC)
-- `npx sst dev --stage sin-dev` - Start SST dev mode with live Lambda (viaSport)
+- `npx sst dev --stage qc-austin` - Start SST dev mode with live Lambda (QC)
+- `npx sst dev --stage sin-austin` - Start SST dev mode with live Lambda (viaSport)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run oxlint (fast, ~30ms)
@@ -170,8 +171,8 @@ Required SST secrets:
    - OAuth credentials must be valid (not placeholders) for routes to work
 
 3. **Development Servers**:
-   - `AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono` - SST dev mode (QC)
-   - `AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono` - SST dev mode (viaSport)
+   - `AWS_PROFILE=techdev npx sst dev --stage qc-austin --mode mono` - SST dev mode (QC)
+   - `AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono` - SST dev mode (viaSport)
 
 ### Database Connections
 
@@ -211,20 +212,26 @@ pkill -f "sst" && sudo pkill -f "/opt/sst/tunnel"
 
 | Issue                    | Symptom                                           | Fix                                                      |
 | ------------------------ | ------------------------------------------------- | -------------------------------------------------------- |
-| **Stale bastion IP**     | "server closed connection unexpectedly"           | Run `sst deploy --stage <stage>` to update tunnel config |
+| **Stale bastion IP**     | "server closed connection unexpectedly"           | See runbook; use SSM workaround if redeploy doesn't help |
 | **Multiple tunnels**     | Connection timeouts, wrong data                   | Kill ALL tunnels, run only ONE at a time                 |
 | **SST shell stage bug**  | Wrong DATABASE_URL returned                       | Pass env vars explicitly, don't trust `sst shell` output |
 | **Login downloads file** | Browser downloads instead of rendering login page | Clear browser cookies (session from different stage)     |
 
-**Diagnosing stale bastion IP:**
+> **When database/tunnel operations fail**, see `docs/runbooks/new-environment-setup.md` for:
+>
+> - Diagnosing stale bastion IPs
+> - SSM port forwarding workaround (bypasses broken tunnel entirely)
+> - Full recovery procedures with examples
+
+**Quick diagnosis for stale bastion IP:**
 
 ```bash
-# Check what IP the tunnel is using (shown when tunnel starts)
-# Then verify that IP exists:
+# 1. Note the IP shown when tunnel starts (e.g., "▤  99.79.69.136")
+# 2. Check if that IP exists:
 AWS_PROFILE=techdev aws ec2 describe-instances --region ca-central-1 \
-  --filters "Name=instance-state-name,Values=running" \
-  --query 'Reservations[*].Instances[*].{Name:Tags[?Key==`Name`].Value|[0],PublicIP:PublicIpAddress}'
-# If tunnel IP doesn't match any instance, redeploy: sst deploy --stage <stage>
+  --filters "Name=tag:sst:stage,Values=<stage>" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].PublicIpAddress' --output text
+# 3. If tunnel IP is NOT in the list, it's stale - see runbook for recovery
 ```
 
 #### Accessing the Dev Database
@@ -356,10 +363,10 @@ The most reliable way to run database operations is through SST dev mode (which 
 
 ```bash
 # Start SST dev (tunnel is automatic)
-AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono
+AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono
 
 # In another terminal, push schema through SST shell
-AWS_PROFILE=techdev npx sst shell --stage sin-dev -- npx drizzle-kit push --force
+AWS_PROFILE=techdev npx sst shell --stage sin-austin -- npx drizzle-kit push --force
 ```
 
 ### Security Features
@@ -680,6 +687,35 @@ AWS_PROFILE=techprod npx sst secret set DatabaseUrl "..." --stage sin-prod
 
 See `~/.aws/config` for profile configuration.
 
+### Domain Management
+
+**Production domain**: `solsticeapp.ca` (registered via GoDaddy, DNS managed by Route53)
+
+**Route53 Hosted Zone**: `Z05949293SV56QAGUR6E2`
+
+**Stage → Subdomain mapping** (configured in `sst.config.ts`):
+| Stage | URL |
+|-------|-----|
+| sin-dev | https://sindev.solsticeapp.ca |
+| sin-uat | https://sinuat.solsticeapp.ca |
+| sin-prod | https://sin.solsticeapp.ca |
+| qc-dev | https://qcdev.solsticeapp.ca |
+| qc-prod | https://qc.solsticeapp.ca |
+
+GoDaddy API credentials for DNS management are stored in `~/.zshrc`:
+
+- `GODADDY_API_KEY` - API key for GoDaddy production API
+- `GODADDY_API_SECRET` - API secret for GoDaddy production API
+
+**DNS Setup**: GoDaddy nameservers point to Route53:
+
+- ns-201.awsdns-25.com
+- ns-1416.awsdns-49.org
+- ns-1848.awsdns-39.co.uk
+- ns-784.awsdns-34.net
+
+viaSport will eventually use their own domain; `solsticeapp.ca` serves as the interim/demo domain.
+
 ---
 
 ## Playwright MCP
@@ -687,9 +723,22 @@ See `~/.aws/config` for profile configuration.
 Use Playwright to verify UI changes on localhost:5173.
 
 1. Check if dev server is running: `curl -s http://localhost:5173/api/health`
-   - If not running, start with `AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono`
+   - If not running, start with `AWS_PROFILE=techdev npx sst dev --stage qc-austin --mode mono`
 2. If browser already in use, close first: `mcp__playwright__browser_close`
 3. Always verify UI behavior with MCP before writing/updating E2E tests
+
+### Troubleshooting
+
+**Pages download as files instead of rendering** (you'll see `Downloaded file` or `Download is starting` in output):
+
+- Cause: Stale cookies from a different stage
+- Fix: Clear cookies before navigating:
+  ```javascript
+  // Using browser_run_code
+  async (page) => {
+    await page.context().clearCookies();
+  }
+  ```
 
 ### Test Users and Access Rights (sin-dev)
 
@@ -714,8 +763,10 @@ When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-
 - `admin@example.com` / `testpassword123` (Platform Admin - but NO org membership)
 - `viasport-staff@example.com` / `testpassword123` (Platform Admin + viaSport BC owner - **use this for full access**)
 
-**TOTP Secret:** Set `SIN_UI_TOTP_SECRET` in your environment (base32-encoded).
-Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
+**TOTP Secret:** `SIN_UI_TOTP_SECRET` stores the **raw string** in SST secrets.
+
+- **Raw string (for createOTP):** `solstice-test-totp-secret-32char`
+- **Base32 encoded (for otplib):** `ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA`
 
 **Login Flow:**
 
@@ -723,10 +774,22 @@ Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
 2. Enter email and password
 3. Click Login → 2FA prompt appears
 4. Select "Authenticator code" tab (NOT backup code)
-5. Generate a fresh TOTP code:
+5. Generate a fresh TOTP code (either method works):
+
    ```bash
-   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
+   # Option 1: Better Auth's createOTP (recommended)
+   npx tsx -e "
+   import { createOTP } from '@better-auth/utils/otp';
+   (async () => {
+     const code = await createOTP('solstice-test-totp-secret-32char', { period: 30, digits: 6 }).totp();
+     console.log(code);
+   })();
+   "
+
+   # Option 2: otplib with base32-encoded secret
+   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA'));"
    ```
+
 6. Enter the 6-digit code and click "Verify code"
 
 **Important:** TOTP codes are time-based (~30 second validity). Generate a fresh code immediately before entering it. If verification fails, generate a new code and retry.

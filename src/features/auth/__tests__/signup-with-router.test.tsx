@@ -4,6 +4,9 @@ import { auth } from "~/lib/auth-client";
 import { renderWithRouter, screen, waitFor } from "~/tests/utils";
 import SignupForm from "../components/signup";
 
+type SignUpEmailArgs = Parameters<typeof auth.signUp.email>;
+type SignUpEmailReturn = ReturnType<typeof auth.signUp.email>;
+
 // Mock auth client
 vi.mock("~/lib/auth-client", () => ({
   auth: {
@@ -54,11 +57,17 @@ describe("SignupForm with Router", () => {
   it("handles successful signup", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(auth.signUp.email).mockImplementation((data, handlers) => {
-      handlers?.onSuccess?.({ data: { user: {}, session: {} } } as Parameters<
-        NonNullable<typeof handlers.onSuccess>
-      >[0]);
-      return Promise.resolve({ data: { user: {}, session: {} }, error: null });
+    vi.mocked(auth.signUp.email).mockImplementation((...args: SignUpEmailArgs) => {
+      const handlers = args[1];
+      handlers?.onSuccess?.({
+        data: { user: {}, session: {} },
+        response: new Response(),
+        request: new Request("http://localhost"),
+      });
+      return Promise.resolve({
+        data: { user: {}, session: {} },
+        error: null,
+      }) as SignUpEmailReturn;
     });
 
     const { router } = await renderWithRouter(<SignupForm />);

@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getAvailableSocialProviders } from "~/features/auth/auth.queries";
 import type {
   ApiResult,
   LinkedAccountsOverview,
   SessionsOverview,
 } from "./settings.types";
 
-const AVAILABLE_PROVIDERS = ["email", "google"] as const;
+const resolveAvailableProviders = async () => {
+  const socialProviders = await getAvailableSocialProviders();
+  return ["email", ...socialProviders];
+};
 
 export const getSessionsOverview = createServerFn({ method: "GET" }).handler(
   async (): Promise<ApiResult<SessionsOverview>> => {
@@ -116,7 +120,7 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
           },
           accounts: normalizedAccounts,
           hasPassword,
-          availableProviders: Array.from(AVAILABLE_PROVIDERS),
+          availableProviders: await resolveAvailableProviders(),
         },
       };
     } catch (error) {

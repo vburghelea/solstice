@@ -34,6 +34,7 @@ import {
   getFieldsToMask,
 } from "./governance";
 import { assertPivotCardinality, QUERY_GUARDRAILS } from "./governance/query-guardrails";
+import { formatSetLocalValue } from "./governance/set-local";
 import { DATASETS, getDataset } from "./semantic";
 import { getMetric } from "./semantic/metrics.config";
 
@@ -366,11 +367,23 @@ export const getFieldValueSuggestions = createServerFn({ method: "GET" })
       const db = await getDb();
 
       const result = await db.transaction(async (tx) => {
-        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
-        await tx.execute(sql`SET LOCAL app.org_id = ${scopedOrganizationId ?? ""}`);
-        await tx.execute(sql`SET LOCAL app.is_global_admin = ${isGlobalAdmin}`);
+        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
         await tx.execute(
-          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
+          sql.raw(
+            `SET LOCAL app.org_id = ${formatSetLocalValue(scopedOrganizationId ?? "")}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.is_global_admin = ${formatSetLocalValue(isGlobalAdmin)}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL statement_timeout = ${formatSetLocalValue(
+              QUERY_GUARDRAILS.statementTimeoutMs,
+            )}`,
+          ),
         );
 
         return tx.execute<Record<string, unknown>>(sql`
@@ -710,11 +723,23 @@ const runPivotQuery = async (params: {
 
     try {
       const result = await db.transaction(async (tx) => {
-        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
-        await tx.execute(sql`SET LOCAL app.org_id = ${scopedOrganizationId ?? ""}`);
-        await tx.execute(sql`SET LOCAL app.is_global_admin = ${isGlobalAdmin}`);
+        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
         await tx.execute(
-          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
+          sql.raw(
+            `SET LOCAL app.org_id = ${formatSetLocalValue(scopedOrganizationId ?? "")}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.is_global_admin = ${formatSetLocalValue(isGlobalAdmin)}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL statement_timeout = ${formatSetLocalValue(
+              QUERY_GUARDRAILS.statementTimeoutMs,
+            )}`,
+          ),
         );
 
         return tx.execute<Record<string, unknown>>(plan.sql);

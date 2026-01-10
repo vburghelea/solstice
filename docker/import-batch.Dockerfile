@@ -8,6 +8,7 @@ RUN useradd --create-home --shell /bin/bash appuser
 # Copy package files and scripts directory (needed for preinstall hook)
 COPY package.json pnpm-lock.yaml ./
 COPY scripts/ ./scripts/
+COPY vendor/sst/ ./vendor/sst/
 RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the application

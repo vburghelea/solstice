@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { getAvailableSocialProviders } from "~/features/auth/auth.queries";
 import SignupForm from "~/features/auth/components/signup";
 
 const searchSchema = z.object({
@@ -9,13 +10,19 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/auth/signup")({
   validateSearch: (search) => searchSchema.parse(search),
+  loader: async () => ({
+    socialProviders: await getAvailableSocialProviders(),
+  }),
   component: SignupRoute,
 });
 
 function SignupRoute() {
   const { invite } = Route.useSearch();
+  const { socialProviders } = Route.useLoaderData() as {
+    socialProviders: Awaited<ReturnType<typeof getAvailableSocialProviders>>;
+  };
   if (invite) {
-    return <SignupForm inviteToken={invite} />;
+    return <SignupForm inviteToken={invite} socialProviders={socialProviders} />;
   }
-  return <SignupForm />;
+  return <SignupForm socialProviders={socialProviders} />;
 }

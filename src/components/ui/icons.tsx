@@ -11,6 +11,62 @@ export function GoogleIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function MicrosoftIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <rect x="1" y="1" width="10" height="10" fill="currentColor" />
+      <rect x="13" y="1" width="10" height="10" fill="currentColor" />
+      <rect x="1" y="13" width="10" height="10" fill="currentColor" />
+      <rect x="13" y="13" width="10" height="10" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function AppleIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        d="M16.2 2.2c-.8.9-1.4 2.1-1.2 3.4 1.1.1 2.2-.5 3-1.4.7-.9 1.3-2.1 1.1-3.3-1.1-.1-2.2.5-2.9 1.3z"
+        fill="currentColor"
+      />
+      <path
+        d="M20.1 14.2c-.2 3.1 2.5 4.1 2.5 4.1s-1.9 5.5-4.6 5.5c-1.2 0-2.1-.8-3.4-.8-1.3 0-2.3.8-3.5.8-2.4 0-5.3-5.2-5.3-9.4 0-3.3 2.1-5 4.1-5 1.2 0 2.3.8 3.1.8.8 0 2.1-.9 3.6-.9.6 0 2.6.1 3.8 2.1-2.9 1.6-2.4 4.6-.3 5.8z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/**
+ * FIDO Alliance Passkey Icon
+ * Standard icon for passkey/WebAuthn authentication
+ * Based on the official FIDO Alliance design guidelines
+ */
+export function PasskeyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* Person/head */}
+      <circle cx="10" cy="7" r="4" />
+      {/* Body */}
+      <path d="M10 21v-4" />
+      <path d="M10 13c-4 0-6 2-6 4v4h8" />
+      {/* Key */}
+      <circle cx="18" cy="16" r="3" />
+      <path d="M18 19v3" />
+      <path d="M16 21h4" />
+    </svg>
+  );
+}
+
 // Re-export commonly used Lucide icons for consistency
 export {
   AlertCircle,

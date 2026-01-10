@@ -4,19 +4,21 @@ import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
-import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
+import { AppleIcon, GoogleIcon, LogoIcon, MicrosoftIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import { getBrand } from "~/tenant";
+import type { SocialAuthProvider } from "../auth.queries";
 import { authQueryKey } from "../auth.queries";
 import { signupFormFields } from "../auth.schemas";
 
 type SignupFormProps = {
   inviteToken?: string;
+  socialProviders?: SocialAuthProvider[];
 };
 
-export default function SignupForm({ inviteToken }: SignupFormProps) {
+export default function SignupForm({ inviteToken, socialProviders }: SignupFormProps) {
   const brand = getBrand();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -28,6 +30,16 @@ export default function SignupForm({ inviteToken }: SignupFormProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const availableProviders = socialProviders ?? ["google"];
+  const providerConfig: Record<
+    SocialAuthProvider,
+    { label: string; Icon: typeof GoogleIcon }
+  > = {
+    google: { label: "Google", Icon: GoogleIcon },
+    microsoft: { label: "Microsoft", Icon: MicrosoftIcon },
+    apple: { label: "Apple", Icon: AppleIcon },
+  };
 
   const form = useAppForm({
     defaultValues: {
@@ -178,39 +190,58 @@ export default function SignupForm({ inviteToken }: SignupFormProps) {
           {errorMessage && (
             <span className="text-destructive text-center text-sm">{errorMessage}</span>
           )}
-          <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-            <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or
-            </span>
-          </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            type="button"
-            disabled={isLoading || form.state.isSubmitting}
-            onClick={() =>
-              auth.signInWithOAuth(
-                {
-                  provider: "google",
-                  callbackURL: redirectUrl,
-                },
-                {
-                  onRequest: () => {
-                    setIsLoading(true);
-                    setErrorMessage("");
-                  },
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onError: (ctx: any) => {
-                    setIsLoading(false);
-                    setErrorMessage(ctx.error?.message || "OAuth signup failed");
-                  },
-                },
-              )
-            }
-          >
-            <GoogleIcon />
-            Sign up with Google
-          </Button>
+          {availableProviders.length > 0 ? (
+            <>
+              <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+                <span className="bg-background text-muted-foreground relative z-10 px-2">
+                  Or
+                </span>
+              </div>
+              <div className="space-y-2">
+                {availableProviders.map((providerId) => {
+                  const config = providerConfig[providerId];
+                  if (!config) {
+                    return null;
+                  }
+
+                  const { Icon, label } = config;
+                  return (
+                    <Button
+                      key={providerId}
+                      variant="outline"
+                      className="w-full"
+                      type="button"
+                      disabled={isLoading || form.state.isSubmitting}
+                      onClick={() =>
+                        auth.signInWithOAuth(
+                          {
+                            provider: providerId,
+                            callbackURL: redirectUrl,
+                          },
+                          {
+                            onRequest: () => {
+                              setIsLoading(true);
+                              setErrorMessage("");
+                            },
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onError: (ctx: any) => {
+                              setIsLoading(false);
+                              setErrorMessage(
+                                ctx.error?.message || "OAuth signup failed",
+                              );
+                            },
+                          },
+                        )
+                      }
+                    >
+                      <Icon />
+                      Sign up with {label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </>
+          ) : null}
         </div>
       </form>
 

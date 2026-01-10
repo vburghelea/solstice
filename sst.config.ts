@@ -131,7 +131,52 @@ export default $config({
     const stage = stageInfo.stage;
     const isProd = stageInfo.stageEnv === "prod";
     const isPerf = stageInfo.stageEnv === "perf";
-    const isUat = stageInfo.stageEnv === "uat";
+    const isUat = stage.toLowerCase().includes("uat");
+
+    // GUARD: Prevent `sst dev` on non-local stages to avoid state corruption
+    // See: docs/issues/SIN-UAT-INTERMITTENT-OUTAGES.md
+    // When `sst dev` runs, it creates placeholder resources that corrupt the state
+    // and prevent proper CloudFront/CDN creation on subsequent deploys.
+    const protectedStages = [
+      "sin-dev",
+      "sin-uat",
+      "sin-prod",
+      "qc-prod",
+      "sin-perf",
+      "qc-perf",
+    ];
+    if ($dev && protectedStages.includes(stage.toLowerCase())) {
+      throw new Error(
+        `BLOCKED: Cannot run 'sst dev' on protected stage "${stage}".\n` +
+          `This would corrupt the deployment state and cause intermittent outages.\n` +
+          `Use 'sst deploy --stage ${stage}' for deployments.\n` +
+          `For local development, use 'sst dev --stage sin-austin' or 'sst dev --stage qc-austin'.`,
+      );
+    }
+
+    // Custom domain mapping for solsticeapp.ca subdomains
+    // Route53 hosted zones (one per AWS account):
+    //   techdev: Z08572962E2ART44DDU47
+    //   techprod: Z05949293SV56QAGUR6E2
+    // For cross-account to work, GoDaddy must point to the correct account's nameservers
+    const solsticeAppZoneId = isProd
+      ? "Z05949293SV56QAGUR6E2" // techprod
+      : "Z08572962E2ART44DDU47"; // techdev
+    const domainMap: Record<string, string> = {
+      "sin-dev": "sindev.solsticeapp.ca",
+      "sin-uat": "sinuat.solsticeapp.ca",
+      "sin-prod": "sin.solsticeapp.ca",
+      "qc-dev": "qcdev.solsticeapp.ca",
+      "qc-prod": "qc.solsticeapp.ca",
+    };
+    const customDomainName = domainMap[stage.toLowerCase()];
+    const customDomain = customDomainName
+      ? {
+          name: customDomainName,
+          dns: sst.aws.dns({ zone: solsticeAppZoneId }),
+        }
+      : undefined;
+
     const cloudfrontProvider = new aws.Provider("CloudFrontProvider", {
       region: "us-east-1",
     });
@@ -329,13 +374,19 @@ export default $config({
     // Define secrets - set via: npx sst secret set <NAME> <value> --stage <stage>
     // Note: BaseUrl should be updated after deploy if CloudFront URL changes.
     // For production, use a custom domain for stable URL.
+    const mfaSecrets =
+      stageInfo.stageEnv === "dev" || stageInfo.stageEnv === "uat"
+        ? {
+            sinUiTotpSecret: new sst.Secret("SIN_UI_TOTP_SECRET"),
+          }
+        : null;
+
     const devOnlySecrets =
       stageInfo.stageEnv === "dev"
         ? {
             databaseUrl: new sst.Secret("DATABASE_URL"),
             databaseUrlUnpooled: new sst.Secret("DATABASE_URL_UNPOOLED"),
             e2eDatabaseUrl: new sst.Secret("E2E_DATABASE_URL"),
-            sinUiTotpSecret: new sst.Secret("SIN_UI_TOTP_SECRET"),
             sinAnalyticsTotpSecret: new sst.Secret("SIN_ANALYTICS_TOTP_SECRET"),
             sinA11yTotpSecret: new sst.Secret("SIN_A11Y_TOTP_SECRET"),
             e2eTestAdminTotpSecret: new sst.Secret("E2E_TEST_ADMIN_TOTP_SECRET"),
@@ -355,12 +406,13 @@ export default $config({
       squareWebhookSignatureKey: new sst.Secret("SquareWebhookSignatureKey"),
       sinNotificationsFromEmail: new sst.Secret("SinNotificationsFromEmail"),
       sinNotificationsReplyToEmail: new sst.Secret("SinNotificationsReplyToEmail"),
+      ...mfaSecrets,
       ...devOnlySecrets,
     };
 
     const runtimeEnv = {
       SST_STAGE: stage,
-      NODE_ENV: isProd || isPerf ? "production" : "development",
+      NODE_ENV: isProd || isPerf || isUat ? "production" : "development",
     };
 
     const contentSecurityPolicy = [
@@ -531,7 +583,12 @@ export default $config({
     );
 
     const devBaseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
-    const baseUrl = $dev ? devBaseUrl : secrets.baseUrl.value;
+    // Use custom domain if configured, otherwise fall back to BaseUrl secret
+    const baseUrl = $dev
+      ? devBaseUrl
+      : customDomainName
+        ? `https://${customDomainName}`
+        : secrets.baseUrl.value;
 
     const { tenantKey, viteTenantKey } = resolveTenantEnv(stageInfo);
 
@@ -580,8 +637,12 @@ export default $config({
     });
 
     // Deploy TanStack Start app
+    const buildCommand =
+      isProd || isPerf || isUat ? "NODE_ENV=production pnpm build" : "pnpm build";
+
     const web = new sst.aws.TanStackStart("Web", {
-      buildCommand: "pnpm build",
+      buildCommand,
+      domain: customDomain,
       dev: {
         command: "pnpm dev",
         url: devBaseUrl,
@@ -623,12 +684,16 @@ export default $config({
         SQUARE_ACCESS_TOKEN: secrets.squareAccessToken.value,
         SQUARE_LOCATION_ID: secrets.squareLocationId.value,
         SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
+        ...(mfaSecrets
+          ? {
+              SIN_UI_TOTP_SECRET: mfaSecrets.sinUiTotpSecret.value,
+            }
+          : {}),
         ...(devOnlySecrets
           ? {
               DATABASE_URL: devOnlySecrets.databaseUrl.value,
               DATABASE_URL_UNPOOLED: devOnlySecrets.databaseUrlUnpooled.value,
               E2E_DATABASE_URL: devOnlySecrets.e2eDatabaseUrl.value,
-              SIN_UI_TOTP_SECRET: devOnlySecrets.sinUiTotpSecret.value,
               SIN_ANALYTICS_TOTP_SECRET: devOnlySecrets.sinAnalyticsTotpSecret.value,
               SIN_A11Y_TOTP_SECRET: devOnlySecrets.sinA11yTotpSecret.value,
               E2E_TEST_ADMIN_TOTP_SECRET: devOnlySecrets.e2eTestAdminTotpSecret.value,

@@ -6,6 +6,7 @@ import { internalError } from "~/lib/server/errors";
 import { DATASETS } from "../semantic";
 import { QUERY_GUARDRAILS } from "./query-guardrails";
 import { assertSafeIdentifier, quoteIdentifier } from "../engine/sql-identifiers";
+import { formatSetLocalValue } from "./set-local";
 
 const CACHE_TTL_MS = REDIS_TTLS.sqlWorkbenchGateSeconds * 1000;
 
@@ -175,11 +176,23 @@ export const assertSqlWorkbenchReady = async (params: {
   if (sampleView) {
     try {
       await db.transaction(async (tx) => {
-        await tx.execute(sql`SET LOCAL ROLE bi_readonly`);
-        await tx.execute(sql`SET LOCAL app.org_id = ${params.organizationId ?? ""}`);
-        await tx.execute(sql`SET LOCAL app.is_global_admin = ${params.isGlobalAdmin}`);
+        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
         await tx.execute(
-          sql`SET LOCAL statement_timeout = ${QUERY_GUARDRAILS.statementTimeoutMs}`,
+          sql.raw(
+            `SET LOCAL app.org_id = ${formatSetLocalValue(params.organizationId ?? "")}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL app.is_global_admin = ${formatSetLocalValue(params.isGlobalAdmin)}`,
+          ),
+        );
+        await tx.execute(
+          sql.raw(
+            `SET LOCAL statement_timeout = ${formatSetLocalValue(
+              QUERY_GUARDRAILS.statementTimeoutMs,
+            )}`,
+          ),
         );
         const safeSampleView = quoteIdentifier(assertSafeIdentifier(sampleView, "view"));
         await tx.execute(sql.raw(`SELECT 1 FROM ${safeSampleView} LIMIT 1`));

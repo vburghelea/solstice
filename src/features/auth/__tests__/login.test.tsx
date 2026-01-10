@@ -15,6 +15,7 @@ vi.mock("~/lib/auth-client", () => ({
       email: vi.fn(),
     },
     signInWithOAuth: vi.fn(),
+    signInWithPasskey: vi.fn(),
     signOut: vi.fn(),
     getSession: vi.fn(),
   },
@@ -75,6 +76,15 @@ vi.mock("~/features/security/security.queries", () => ({
   getAccountLockStatus: vi.fn().mockResolvedValue(null),
 }));
 
+// Mock checkPasskeysByEmail for identifier-first flow
+vi.mock("~/features/auth/auth.queries", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("~/features/auth/auth.queries")>();
+  return {
+    ...actual,
+    checkPasskeysByEmail: vi.fn().mockResolvedValue({ hasPasskeys: false }),
+  };
+});
+
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>();
   return {
@@ -94,16 +104,20 @@ describe("LoginForm", () => {
     vi.clearAllMocks();
   });
 
-  it("renders login form with all elements", () => {
+  it("renders login form with email step initially (identifier-first flow)", () => {
     render(<LoginForm />);
 
-    // Check for form elements
+    // Email step: only email field and Continue button shown
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Login" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
 
-    // Check for social login button
+    // Password field should NOT be visible in email step
+    expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
+
+    // Social login button should be visible
     expect(screen.getByRole("button", { name: "Login with Google" })).toBeInTheDocument();
+
+    // Note: Passkey button is only shown if WebAuthn is supported (not in jsdom)
 
     // Check for signup link
     expect(screen.getByText("Don't have an account?")).toBeInTheDocument();
@@ -111,6 +125,22 @@ describe("LoginForm", () => {
       "href",
       "/auth/signup",
     );
+  });
+
+  it("shows password field after entering email and clicking Continue", async () => {
+    const user = userEvent.setup();
+
+    render(<LoginForm />);
+
+    // Enter email and click Continue
+    await user.type(screen.getByLabelText("Email"), "test@example.com");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    // Wait for credentials step to appear
+    await waitFor(() => {
+      expect(screen.getByLabelText("Password")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Login" })).toBeInTheDocument();
+    });
   });
 
   it("handles successful email login", async () => {
@@ -125,11 +155,17 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    // Fill in form
+    // Step 1: Enter email and continue
     await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
 
-    // Submit form
+    // Wait for password field
+    await waitFor(() => {
+      expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    });
+
+    // Step 2: Enter password and login
+    await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Login" }));
 
     await waitFor(() => {
@@ -161,11 +197,17 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    // Fill in form
+    // Step 1: Enter email and continue
     await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "wrongpassword");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
 
-    // Submit form
+    // Wait for password field
+    await waitFor(() => {
+      expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    });
+
+    // Step 2: Enter wrong password and login
+    await user.type(screen.getByLabelText("Password"), "wrongpassword");
     await user.click(screen.getByRole("button", { name: "Login" }));
 
     await waitFor(() => {
@@ -184,20 +226,22 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    // Fill in form
+    // Step 1: Enter email and continue
     await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
 
-    // Submit form
+    // Wait for password field
+    await waitFor(() => {
+      expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    });
+
+    // Step 2: Enter password and submit
+    await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Login" }));
 
     // Check loading state
     expect(screen.getByRole("button", { name: "Logging in..." })).toBeDisabled();
-    expect(screen.getByLabelText("Email")).toBeDisabled();
     expect(screen.getByLabelText("Password")).toBeDisabled();
-
-    // Social login button should also be disabled
-    expect(screen.getByRole("button", { name: "Login with Google" })).toBeDisabled();
   });
 
   it("handles Google social login", async () => {
@@ -228,15 +272,24 @@ describe("LoginForm", () => {
     );
   });
 
-  it("validates required fields", async () => {
+  it("validates email before allowing submission", async () => {
     const user = userEvent.setup();
 
     render(<LoginForm />);
 
-    // Try to submit empty form
+    // Step 1: Enter email and continue
+    await user.type(screen.getByLabelText("Email"), "test@example.com");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    // Wait for password field
+    await waitFor(() => {
+      expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    });
+
+    // Try to login without password - form should not submit
     await user.click(screen.getByRole("button", { name: "Login" }));
 
-    // Auth client should not be called
+    // Auth client should not be called without password
     expect(auth.signIn.email).not.toHaveBeenCalled();
   });
 });

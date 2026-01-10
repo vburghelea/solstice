@@ -21,6 +21,9 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
     // Check OAuth buttons
     await expect(page.getByRole("button", { name: "Login with Google" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Sign in with a passkey" }),
+    ).toBeVisible();
 
     // Check signup link
     await expect(

@@ -5,6 +5,7 @@ import { AppSidebar } from "~/components/ui/app-sidebar";
 import { Breadcrumbs } from "~/components/ui/breadcrumbs";
 import { Button } from "~/components/ui/button";
 import { MobileAppHeader } from "~/components/ui/mobile-app-header";
+import { PasskeyPrompt } from "~/features/auth/components/passkey-prompt";
 import { GlobalSearchCommandPalette } from "~/features/search/components/global-search-command-palette";
 
 export function AppLayout() {
@@ -13,6 +14,7 @@ export function AppLayout() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <GlobalSearchCommandPalette />
+      <PasskeyPrompt />
       <div className="hidden lg:block">
         <AppSidebar />
       </div>

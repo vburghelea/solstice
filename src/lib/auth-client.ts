@@ -1,3 +1,4 @@
+import { passkeyClient } from "@better-auth/passkey/client";
 import { twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { getBaseUrl } from "./env.client";
@@ -6,7 +7,7 @@ import { getBaseUrl } from "./env.client";
 const createClient = (baseURL: string) =>
   createAuthClient({
     baseURL,
-    plugins: [twoFactorClient()],
+    plugins: [twoFactorClient(), passkeyClient()],
   });
 
 type AuthClient = ReturnType<typeof createClient>;
@@ -40,6 +41,9 @@ export const auth = {
   get signInWithOAuth() {
     return getAuthClient().signIn.social;
   },
+  get signInWithPasskey() {
+    return getAuthClient().signIn.passkey;
+  },
   get getSession() {
     return getAuthClient().getSession;
   },
@@ -69,6 +73,9 @@ export const auth = {
   },
   get twoFactor() {
     return getAuthClient().twoFactor;
+  },
+  get passkey() {
+    return getAuthClient().passkey;
   },
   get $client() {
     return getAuthClient();

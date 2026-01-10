@@ -8,9 +8,10 @@ import {
   Loader2,
   LogOut,
   Shield,
+  Smartphone,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
@@ -33,9 +34,11 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { PasskeyIcon } from "~/components/ui/icons";
 import { MfaEnrollmentCard } from "~/features/auth/mfa/mfa-enrollment";
 import { MfaRecoveryCard } from "~/features/auth/mfa/mfa-recovery";
 import { NotificationPreferencesCard } from "~/features/notifications/components/notification-preferences-card";
+import type { SocialAuthProvider } from "~/features/auth/auth.queries";
 import type {
   ChangePasswordInput,
   LinkedAccountsOverview,
@@ -62,6 +65,35 @@ interface AccountOverviewResult extends LinkedAccountsOverview {
   availableProviders: string[];
 }
 
+type PasskeyEntry = {
+  id: string;
+  name?: string | null | undefined;
+  createdAt?: string | Date | null | undefined;
+  deviceType?: string | null | undefined;
+  backedUp?: boolean | null | undefined;
+  transports?: string | null | undefined;
+  aaguid?: string | null | undefined;
+};
+
+// Map common AAGUIDs to friendly authenticator names
+function getAuthenticatorName(aaguid: string | null | undefined): string | null {
+  if (!aaguid) return null;
+  const knownAuthenticators: Record<string, string> = {
+    // Apple
+    "00000000-0000-0000-0000-000000000000": "iCloud Keychain",
+    "adce0002-35bc-c60a-648b-0b25f1f05503": "Apple Touch/Face ID",
+    // Google
+    "ea9b8d66-4d01-1d21-3ce4-b6b48cb575d4": "Google Password Manager",
+    // Microsoft
+    "6028b017-b1d4-4c02-b4b3-afcdafc96bb2": "Windows Hello",
+    // 1Password
+    "bada5566-a7aa-401f-bd96-45619a55120d": "1Password",
+    // Bitwarden
+    "d548826e-79b4-db40-a3d8-11116f7e8349": "Bitwarden",
+  };
+  return knownAuthenticators[aaguid] ?? null;
+}
+
 type ChangePasswordFormValues = ChangePasswordInput & {
   confirmPassword: string;
 };
@@ -80,9 +112,21 @@ function maskToken(token: string) {
   return `${token.slice(0, 4)}••••${token.slice(-4)}`;
 }
 
+function formatPasskeyDate(createdAt: PasskeyEntry["createdAt"]) {
+  if (!createdAt) return "Unknown";
+  const date = createdAt instanceof Date ? createdAt : new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return formatDistanceToNow(date, { addSuffix: true });
+}
+
 export function SettingsView() {
   const queryClient = useQueryClient();
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passkeySupported, setPasskeySupported] = useState(false);
+
+  useEffect(() => {
+    setPasskeySupported(Boolean(window.PublicKeyCredential));
+  }, []);
 
   const {
     data: accountOverview,
@@ -116,6 +160,22 @@ export function SettingsView() {
       return result.data;
     },
     refetchInterval: 60_000,
+  });
+
+  const {
+    data: passkeys,
+    isLoading: passkeysLoading,
+    error: passkeysError,
+    refetch: refetchPasskeys,
+  } = useQuery({
+    queryKey: ["passkeys"],
+    queryFn: async (): Promise<PasskeyEntry[]> => {
+      const result = await auth.passkey.listUserPasskeys({});
+      if (result?.error) {
+        throw new Error(result.error.message || "Failed to load passkeys");
+      }
+      return result?.data ?? [];
+    },
   });
 
   const changePasswordMutation = useMutation({
@@ -187,6 +247,40 @@ export function SettingsView() {
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : "Failed to unlink account";
       toast.error(message);
+    },
+  });
+
+  const addPasskeyMutation = useMutation({
+    mutationFn: async () => {
+      const result = await auth.passkey.addPasskey({});
+      if (result?.error) {
+        throw new Error(result.error.message || "Failed to add passkey");
+      }
+      return result;
+    },
+    onSuccess: async () => {
+      await refetchPasskeys();
+      toast.success("Passkey added");
+    },
+    onError: (error) => {
+      toast.error((error as Error).message || "Failed to add passkey");
+    },
+  });
+
+  const deletePasskeyMutation = useMutation({
+    mutationFn: async (passkeyId: string) => {
+      const result = await auth.passkey.deletePasskey({ id: passkeyId });
+      if (result?.error) {
+        throw new Error(result.error.message || "Failed to delete passkey");
+      }
+      return result;
+    },
+    onSuccess: async () => {
+      await refetchPasskeys();
+      toast.success("Passkey removed");
+    },
+    onError: (error) => {
+      toast.error((error as Error).message || "Failed to delete passkey");
     },
   });
 
@@ -388,6 +482,138 @@ export function SettingsView() {
               </AlertDescription>
             </Alert>
           )}
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <PasskeyIcon className="h-5 w-5 text-primary" />
+                <CardTitle>Passkeys</CardTitle>
+              </div>
+              <CardDescription>
+                Use passkeys for fast, phishing-resistant sign in with your fingerprint,
+                face, or screen lock.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {passkeysLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              ) : passkeysError ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Unable to load passkeys</AlertTitle>
+                  <AlertDescription>
+                    {(passkeysError as Error).message ||
+                      "Please refresh the page and try again."}
+                  </AlertDescription>
+                </Alert>
+              ) : passkeys && passkeys.length > 0 ? (
+                <div className="space-y-3">
+                  {passkeys.map((passkeyEntry) => {
+                    const authenticatorName = getAuthenticatorName(passkeyEntry.aaguid);
+                    const displayName =
+                      passkeyEntry.name ||
+                      authenticatorName ||
+                      (passkeyEntry.deviceType
+                        ? `${passkeyEntry.deviceType} Passkey`
+                        : "Passkey");
+
+                    return (
+                      <div
+                        key={passkeyEntry.id}
+                        className="border-border flex items-start justify-between rounded-lg border p-4"
+                      >
+                        <div className="flex gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                            <Smartphone className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="space-y-1">
+                            <div className="font-medium">{displayName}</div>
+                            <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                              {passkeyEntry.deviceType && (
+                                <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5">
+                                  {passkeyEntry.deviceType}
+                                </span>
+                              )}
+                              {passkeyEntry.backedUp && (
+                                <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-green-700">
+                                  Synced
+                                </span>
+                              )}
+                              <span>
+                                Added {formatPasskeyDate(passkeyEntry.createdAt)}
+                              </span>
+                            </div>
+                            {authenticatorName &&
+                              passkeyEntry.name !== authenticatorName && (
+                                <div className="text-muted-foreground text-xs">
+                                  via {authenticatorName}
+                                </div>
+                              )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          disabled={deletePasskeyMutation.isPending}
+                          onClick={() => deletePasskeyMutation.mutate(passkeyEntry.id)}
+                        >
+                          {deletePasskeyMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">Remove passkey</span>
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 text-center">
+                  <PasskeyIcon className="mx-auto h-10 w-10 text-muted-foreground/50" />
+                  <p className="mt-2 text-sm font-medium">No passkeys yet</p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Add a passkey to sign in faster without a password
+                  </p>
+                </div>
+              )}
+
+              {!passkeySupported ? (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Passkeys unavailable</AlertTitle>
+                  <AlertDescription>
+                    Your browser or device does not support passkeys yet. Try using a
+                    modern browser like Chrome, Safari, or Edge.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  disabled={!passkeySupported || addPasskeyMutation.isPending}
+                  onClick={() => addPasskeyMutation.mutate()}
+                >
+                  {addPasskeyMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <PasskeyIcon className="mr-2 h-4 w-4" />
+                      Add passkey
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <NotificationPreferencesCard />
 
@@ -689,7 +915,7 @@ export function SettingsView() {
                             onClick={() =>
                               auth.signInWithOAuth(
                                 {
-                                  provider: providerId as "google",
+                                  provider: providerId as SocialAuthProvider,
                                   callbackURL: window.location.href,
                                 },
                                 {

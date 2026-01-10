@@ -11,6 +11,7 @@ import {
   inlineParameters,
   stripTrailingSemicolons,
 } from "./governance/query-guardrails";
+import { formatSetLocalValue } from "./governance/set-local";
 import { DATASETS, getDataset } from "./semantic";
 import { assertSqlWorkbenchReady } from "./governance/sql-workbench-gate";
 
@@ -18,25 +19,6 @@ const PLACEHOLDER_PATTERN = /\{\{([a-zA-Z_][\w]*)\}\}/g;
 
 // UUID pattern for validating organization IDs
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Escape a string for use in SET LOCAL commands.
- * NOTE: This is safe because:
- * 1. organizationId comes from authenticated session context, not user input
- * 2. We validate it's a UUID before use
- * 3. SET LOCAL values are session-scoped and don't affect data
- */
-const escapeSetLocalValue = (value: string): string => `'${value.replace(/'/g, "''")}'`;
-
-const formatSetLocalValue = (value: string | number | boolean): string => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? String(value) : "0";
-  }
-  if (typeof value === "boolean") {
-    return value ? "'true'" : "'false'";
-  }
-  return escapeSetLocalValue(value);
-};
 
 export type SqlExecutionResult = {
   rows: JsonRecord[];

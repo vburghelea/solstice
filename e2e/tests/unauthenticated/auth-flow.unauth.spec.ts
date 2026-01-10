@@ -104,6 +104,11 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     await expect(googleLoginButton).toBeVisible();
     await expect(googleLoginButton).toBeEnabled();
 
+    const passkeyLoginButton = page.getByRole("button", {
+      name: "Sign in with a passkey",
+    });
+    await expect(passkeyLoginButton).toBeVisible();
+
     // Note: We can't test the actual OAuth flow in E2E tests
     // as it involves external services
   });

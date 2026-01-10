@@ -2,6 +2,7 @@
  * Server-only auth helpers
  * This module contains auth configuration that requires server-side environment variables
  */
+import { passkey } from "@better-auth/passkey";
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
@@ -37,6 +38,17 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     : [];
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
+  const microsoftClientId = env.MICROSOFT_CLIENT_ID || "";
+  const microsoftClientSecret = env.MICROSOFT_CLIENT_SECRET || "";
+  const microsoftTenantId = env.MICROSOFT_TENANT_ID;
+  const microsoftAuthority = env.MICROSOFT_AUTHORITY;
+  const microsoftPrompt = env.MICROSOFT_PROMPT;
+  const appleClientId = env.APPLE_CLIENT_ID || "";
+  const appleClientSecret = env.APPLE_CLIENT_SECRET || "";
+  const appleAppBundleIdentifier = env.APPLE_APP_BUNDLE_IDENTIFIER;
+
+  const microsoftConfigured = Boolean(microsoftClientId && microsoftClientSecret);
+  const appleConfigured = Boolean(appleClientId && appleClientSecret);
 
   if (process.env["NODE_ENV"] !== "production") {
     console.log("Auth config loading...");
@@ -85,7 +97,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     hooks: {
       before: [
         {
-          matcher(context: { path: string }) {
+          matcher(context: { path?: string }) {
             return context.path === "/sign-up/email";
           },
           handler: createAuthMiddleware(async (ctx) => {
@@ -108,7 +120,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
           }),
         },
         {
-          matcher(context: { path: string }) {
+          matcher(context: { path?: string }) {
             return context.path === "/sign-in/email";
           },
           handler: createAuthMiddleware(async (ctx) => {
@@ -130,7 +142,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
           }),
         },
         {
-          matcher(context: { path: string }) {
+          matcher(context: { path?: string }) {
             return context.path === "/sign-out";
           },
           handler: createAuthMiddleware(async (ctx) => {
@@ -151,11 +163,11 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
       ],
       after: [
         {
-          matcher(context: { path: string }) {
+          matcher(context: { path?: string }) {
             return (
               context.path === "/sign-in/email" ||
               context.path === "/sign-out" ||
-              context.path.startsWith("/two-factor/verify-")
+              context.path?.startsWith("/two-factor/verify-") === true
             );
           },
           handler: createAuthMiddleware(async (ctx) => {
@@ -295,19 +307,33 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     },
   };
 
+  const trustedOrigins = isProduction()
+    ? [baseUrl]
+    : [
+        baseUrl,
+        "http://localhost:3001",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:8888",
+      ];
+
+  if (appleConfigured) {
+    trustedOrigins.push("https://appleid.apple.com");
+  }
+
+  const trustedOAuthProviders = ["google"];
+  if (microsoftConfigured) {
+    trustedOAuthProviders.push("microsoft");
+  }
+
+  const passkeyOrigin = baseUrl ? new URL(baseUrl).origin : undefined;
+  const passkeyRpId = baseUrl ? new URL(baseUrl).hostname : "localhost";
+
   return betterAuth({
     appName: brand.name,
     baseURL: baseUrl,
     secret: getAuthSecret(),
-    trustedOrigins: isProduction()
-      ? [baseUrl]
-      : [
-          baseUrl,
-          "http://localhost:3001",
-          "http://localhost:5173",
-          "http://localhost:5174",
-          "http://localhost:8888",
-        ],
+    trustedOrigins: Array.from(new Set(trustedOrigins)),
     database: drizzleAdapter(dbConnection, {
       provider: "pg",
       schema: {
@@ -383,6 +409,28 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
             }
           : {}),
       },
+      ...(microsoftConfigured
+        ? {
+            microsoft: {
+              clientId: microsoftClientId,
+              clientSecret: microsoftClientSecret,
+              ...(microsoftTenantId ? { tenantId: microsoftTenantId } : {}),
+              ...(microsoftAuthority ? { authority: microsoftAuthority } : {}),
+              ...(microsoftPrompt ? { prompt: microsoftPrompt } : {}),
+            },
+          }
+        : {}),
+      ...(appleConfigured
+        ? {
+            apple: {
+              clientId: appleClientId,
+              clientSecret: appleClientSecret,
+              ...(appleAppBundleIdentifier
+                ? { appBundleIdentifier: appleAppBundleIdentifier }
+                : {}),
+            },
+          }
+        : {}),
     },
 
     // Email and password authentication
@@ -395,7 +443,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     account: {
       accountLinking: {
         enabled: true,
-        trustedProviders: ["google"], // Auto-link these providers
+        trustedProviders: trustedOAuthProviders, // Auto-link these providers
       },
     },
 
@@ -411,6 +459,11 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
           amount: 10,
           length: 8,
         },
+      }),
+      passkey({
+        rpID: passkeyRpId,
+        rpName: brand.name,
+        ...(passkeyOrigin ? { origin: passkeyOrigin } : {}),
       }),
       securityEventPlugin,
       tanstackStartCookies(), // MUST be the last plugin

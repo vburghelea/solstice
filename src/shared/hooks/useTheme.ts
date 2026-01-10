@@ -6,8 +6,15 @@ export type Theme = "light" | "dark" | "system";
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+// TEMPORARILY DISABLED: Dark mode is disabled app-wide.
+// To re-enable, remove the FORCE_LIGHT_MODE constant and restore original logic.
+const FORCE_LIGHT_MODE = true;
+
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
+    // Dark mode disabled - always start with light
+    if (FORCE_LIGHT_MODE) return "light";
+
     if (typeof window !== "undefined") {
       const storedTheme = localStorage.getItem("theme");
       if (["light", "dark", "system"].includes(storedTheme!)) {
@@ -18,6 +25,9 @@ export function useTheme() {
   });
 
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">(() => {
+    // Dark mode disabled - always light
+    if (FORCE_LIGHT_MODE) return "light";
+
     if (typeof window !== "undefined") {
       return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
@@ -25,6 +35,9 @@ export function useTheme() {
   });
 
   useIsomorphicLayoutEffect(() => {
+    // Dark mode disabled - skip system theme listener
+    if (FORCE_LIGHT_MODE) return;
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const updateSystemTheme = (e: MediaQueryListEvent) => {
       setSystemTheme(e.matches ? "dark" : "light");
@@ -35,18 +48,33 @@ export function useTheme() {
     return () => mediaQuery.removeEventListener("change", updateSystemTheme);
   }, []);
 
-  const resolvedTheme = theme === "system" ? systemTheme : theme;
+  // Dark mode disabled - always resolve to light
+  const resolvedTheme = FORCE_LIGHT_MODE
+    ? "light"
+    : theme === "system"
+      ? systemTheme
+      : theme;
 
   useIsomorphicLayoutEffect(() => {
     const root = document.documentElement;
+    // Dark mode disabled - always remove dark class
+    if (FORCE_LIGHT_MODE) {
+      root.classList.remove("dark");
+      return;
+    }
     root.classList.toggle("dark", resolvedTheme === "dark");
   }, [resolvedTheme]);
 
   useEffect(() => {
+    // Dark mode disabled - don't persist theme changes
+    if (FORCE_LIGHT_MODE) return;
     localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
+    // Dark mode disabled - no-op
+    if (FORCE_LIGHT_MODE) return;
+
     setTheme((prevTheme) => {
       if (prevTheme === "light") return "dark";
       if (prevTheme === "dark") return "light";
@@ -57,7 +85,7 @@ export function useTheme() {
   }, []);
 
   return {
-    theme,
+    theme: FORCE_LIGHT_MODE ? ("light" as Theme) : theme,
     setTheme,
     resolvedTheme,
     toggleTheme,

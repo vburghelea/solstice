@@ -31,9 +31,11 @@ import type {
   EventWithDetails,
 } from "~/features/events/events.types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import { createPageHead } from "~/shared/lib/page-head";
 import { cn } from "~/shared/lib/utils";
 
 export const Route = createFileRoute("/dashboard/events/$slug/")({
+  head: () => createPageHead("Event Details"),
   component: EventDetailPage,
 });
 

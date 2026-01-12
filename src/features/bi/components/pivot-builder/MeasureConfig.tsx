@@ -1,3 +1,5 @@
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -5,8 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Button } from "~/components/ui/button";
-import { Trash2 } from "lucide-react";
 import type { AggregationType } from "../../bi.schemas";
 
 const aggregationLabels: Record<AggregationType, string> = {
@@ -27,12 +27,16 @@ export function MeasureConfig({
   disabled,
   onChange,
   onRemove,
+  onMoveUp,
+  onMoveDown,
 }: {
   aggregation: AggregationType;
   options: AggregationType[];
   disabled?: boolean;
   onChange: (next: AggregationType) => void;
   onRemove?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -61,6 +65,28 @@ export function MeasureConfig({
           aria-label="Remove measure"
         >
           <Trash2 className="h-4 w-4" />
+        </Button>
+      ) : null}
+      {onMoveUp ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onMoveUp}
+          aria-label="Move measure up"
+        >
+          <ChevronUp className="h-4 w-4" />
+        </Button>
+      ) : null}
+      {onMoveDown ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onMoveDown}
+          aria-label="Move measure down"
+        >
+          <ChevronDown className="h-4 w-4" />
         </Button>
       ) : null}
     </div>

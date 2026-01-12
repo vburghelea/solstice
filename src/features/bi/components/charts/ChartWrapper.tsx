@@ -29,6 +29,7 @@ export function ChartWrapper({
   ariaLabel?: string;
   ariaDescription?: string;
 }) {
+  const computedAriaLabel = ariaLabel || "Chart visualization";
   const onEvents = useMemo(() => {
     const events: Record<string, (params: unknown) => void> = {};
 
@@ -72,7 +73,7 @@ export function ChartWrapper({
       option={options}
       {...(style ? { style } : {})}
       {...(onEvents ? { onEvents } : {})}
-      {...(ariaLabel ? { ariaLabel } : {})}
+      ariaLabel={computedAriaLabel}
       {...(ariaDescription ? { ariaDescription } : {})}
     />
   );

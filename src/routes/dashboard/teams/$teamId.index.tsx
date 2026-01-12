@@ -17,8 +17,10 @@ import { useAuth } from "~/features/auth";
 import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
+  head: () => createPageHead("Team Details"),
   component: TeamDetailsPage,
 });
 

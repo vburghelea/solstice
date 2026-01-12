@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { LiveAnnouncerProvider } from "~/components/ui/live-region";
 import { OrgContextProvider } from "~/features/organizations/org-context";
 import { renderWithRouter, screen } from "~/tests/utils";
 import { AppLayout } from "../app-layout";
@@ -22,9 +23,11 @@ describe("AdminLayout with Router", () => {
 
   it("renders admin layout with navigation", async () => {
     await renderWithRouter(
-      <OrgContextProvider>
-        <AppLayout />
-      </OrgContextProvider>,
+      <LiveAnnouncerProvider>
+        <OrgContextProvider>
+          <AppLayout />
+        </OrgContextProvider>
+      </LiveAnnouncerProvider>,
     );
 
     // Check navigation elements - Dashboard appears at least once
@@ -74,9 +77,11 @@ describe("AdminLayout with Router", () => {
     };
 
     await renderWithRouter(
-      <OrgContextProvider>
-        <AppLayout />
-      </OrgContextProvider>,
+      <LiveAnnouncerProvider>
+        <OrgContextProvider>
+          <AppLayout />
+        </OrgContextProvider>
+      </LiveAnnouncerProvider>,
       { user: customUser },
     );
 
@@ -92,9 +97,11 @@ describe("AdminLayout with Router", () => {
 
   it("handles mobile menu toggle", async () => {
     await renderWithRouter(
-      <OrgContextProvider>
-        <AppLayout />
-      </OrgContextProvider>,
+      <LiveAnnouncerProvider>
+        <OrgContextProvider>
+          <AppLayout />
+        </OrgContextProvider>
+      </LiveAnnouncerProvider>,
     );
 
     // Mobile menu is hidden by default on desktop
@@ -104,9 +111,11 @@ describe("AdminLayout with Router", () => {
 
   it("displays all navigation links with correct hrefs", async () => {
     await renderWithRouter(
-      <OrgContextProvider>
-        <AppLayout />
-      </OrgContextProvider>,
+      <LiveAnnouncerProvider>
+        <OrgContextProvider>
+          <AppLayout />
+        </OrgContextProvider>
+      </LiveAnnouncerProvider>,
     );
 
     const dashboardLinks = screen.getAllByRole("link", { name: /dashboard/i });

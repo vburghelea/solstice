@@ -4,6 +4,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { getSinAdminNav } from "~/features/layouts/sin-admin-nav";
+import { createPageHead } from "~/shared/lib/page-head";
 import { filterNavItems } from "~/tenant/feature-gates";
 
 const adminCardConfig = {
@@ -75,6 +76,7 @@ const adminCardConfig = {
 };
 
 export const Route = createFileRoute("/dashboard/admin/sin/")({
+  head: () => createPageHead("SIN Admin Overview"),
   component: SinAdminOverview,
 });
 

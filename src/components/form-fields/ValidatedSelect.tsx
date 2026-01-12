@@ -77,8 +77,13 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
         </SelectContent>
       </Select>
       {meta.isTouched && meta.errors.length > 0 && (
-        <div id={`${selectId}-errors`} className="text-destructive text-sm font-medium">
-          {meta.errors.join(", ")}
+        <div
+          id={`${selectId}-errors`}
+          role="alert"
+          aria-live="polite"
+          className="text-destructive text-sm font-medium"
+        >
+          {label}: {meta.errors.join(", ")}
         </div>
       )}
     </div>

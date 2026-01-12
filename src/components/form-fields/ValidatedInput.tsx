@@ -69,8 +69,13 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
       {description && <p className="text-muted-foreground text-sm">{description}</p>}
       {/* Show errors only if the field has been touched and has errors */}
       {meta.isTouched && meta.errors.length > 0 && (
-        <div id={`${inputId}-errors`} className="text-destructive text-sm font-medium">
-          {meta.errors.join(", ")}
+        <div
+          id={`${inputId}-errors`}
+          role="alert"
+          aria-live="polite"
+          className="text-destructive text-sm font-medium"
+        >
+          {label}: {meta.errors.join(", ")}
         </div>
       )}
     </div>

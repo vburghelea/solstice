@@ -289,6 +289,7 @@ export function SqlWorkbench() {
               <Button
                 onClick={() => queryMutation.mutate()}
                 disabled={queryMutation.isPending}
+                aria-describedby="sql-shortcuts"
               >
                 Run query
               </Button>
@@ -316,6 +317,10 @@ export function SqlWorkbench() {
                 {exportMutation.isPending ? "Exporting..." : "Export"}
               </Button>
             </div>
+            <p className="text-muted-foreground text-xs" id="sql-shortcuts">
+              Keyboard shortcut: Press Ctrl or Cmd + Enter to run the query from the
+              editor.
+            </p>
           </CardContent>
         </Card>
 

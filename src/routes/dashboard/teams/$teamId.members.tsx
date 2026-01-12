@@ -51,6 +51,7 @@ import type {
   UpdateTeamMemberInput,
 } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 type TeamMembersLoaderData = {
   team: NonNullable<TeamWithMemberCount>;
@@ -66,6 +67,7 @@ export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
     if (!team) throw new Error("Team not found");
     return { team, members } satisfies TeamMembersLoaderData;
   },
+  head: () => createPageHead("Team members"),
   component: TeamMembersPage,
 });
 
@@ -358,7 +360,11 @@ function TeamMembersPage() {
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Remove ${user.name || user.email}`}
+                      >
                         <XCircle className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>

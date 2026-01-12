@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { createPageHead } from "~/shared/lib/page-head";
 import { isFeatureEnabled } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/admin/")({
+  head: () => createPageHead("Admin"),
   component: AdminHome,
 });
 

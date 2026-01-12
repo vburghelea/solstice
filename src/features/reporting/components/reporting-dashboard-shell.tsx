@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -54,6 +55,12 @@ const submissionStatusOptions = [
   { value: "overdue", label: "Overdue" },
   { value: "rejected", label: "Rejected" },
 ];
+
+const parseReminderDays = (value: string) =>
+  value
+    .split(",")
+    .map((entry) => Number(entry.trim()))
+    .filter((entry) => !Number.isNaN(entry) && entry >= 0);
 
 export function ReportingDashboardShell() {
   const queryClient = useQueryClient();
@@ -147,10 +154,7 @@ export function ReportingDashboardShell() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const reminderDays = value.reminderDays
-          .split(",")
-          .map((entry) => Number(entry.trim()))
-          .filter((entry) => !Number.isNaN(entry));
+        const reminderDays = parseReminderDays(value.reminderDays);
 
         const created = await createReportingTask({
           data: {
@@ -170,6 +174,12 @@ export function ReportingDashboardShell() {
         if (created) {
           taskForm.reset();
           await queryClient.invalidateQueries({ queryKey: ["reporting", "overview"] });
+          toast.success("Reporting task created", {
+            description:
+              reminderDays.length > 0
+                ? `Reminders scheduled: ${reminderDays.join(", ")} days before due date`
+                : "Reminders scheduled: none",
+          });
         }
       } catch (error) {
         if (handleStepUpError(error)) return;
@@ -179,6 +189,21 @@ export function ReportingDashboardShell() {
       }
     },
   });
+
+  const reminderPreview = useMemo(() => {
+    const dueDate = taskForm.state.values.dueDate;
+    if (!dueDate) return [];
+    const parsed = parseReminderDays(taskForm.state.values.reminderDays);
+    const due = new Date(`${dueDate}T00:00:00Z`);
+    return parsed
+      .map((days) => {
+        const reminderDate = new Date(due);
+        reminderDate.setDate(reminderDate.getDate() - days);
+        if (Number.isNaN(reminderDate.getTime())) return null;
+        return { days, label: reminderDate.toLocaleDateString() };
+      })
+      .filter(Boolean) as Array<{ days: number; label: string }>;
+  }, [taskForm.state.values.dueDate, taskForm.state.values.reminderDays]);
 
   const reviewForm = useAppForm({
     defaultValues: {
@@ -437,6 +462,18 @@ export function ReportingDashboardShell() {
                 />
               )}
             </taskForm.Field>
+            {reminderPreview.length > 0 ? (
+              <div className="text-xs text-muted-foreground">
+                <p className="font-semibold text-foreground">Reminder schedule</p>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {reminderPreview.map((reminder) => (
+                    <Badge key={reminder.days} variant="outline">
+                      {reminder.label} ({reminder.days}d before)
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <FormSubmitButton className="w-fit">Create task</FormSubmitButton>
           </form>
         </CardContent>

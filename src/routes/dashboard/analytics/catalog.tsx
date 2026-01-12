@@ -25,8 +25,10 @@ import type { DatasetField } from "~/features/bi/bi.types";
 import type { AuthUser } from "~/lib/auth/types";
 import { GLOBAL_ADMIN_ROLE_NAMES } from "~/lib/auth/utils/admin-check";
 import { useOrgContext } from "~/features/organizations/org-context";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/analytics/catalog")({
+  head: () => createPageHead("Data Catalog"),
   component: AnalyticsCatalogPage,
 });
 

@@ -28,6 +28,7 @@ import {
   listSubmissionFiles,
 } from "~/features/forms/forms.queries";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/submissions/$submissionId")({
   beforeLoad: () => {
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/dashboard/sin/submissions/$submissionId")
     });
     return { submission };
   },
+  head: () => createPageHead("Submission details"),
   component: SubmissionDetailPage,
 });
 

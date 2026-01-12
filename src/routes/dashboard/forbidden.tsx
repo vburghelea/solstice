@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { createPageHead } from "~/shared/lib/page-head";
 import { getBrand } from "~/tenant";
 
 export const Route = createFileRoute("/dashboard/forbidden")({
+  head: () => createPageHead("Access Restricted"),
   component: ForbiddenPage,
 });
 

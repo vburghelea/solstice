@@ -65,6 +65,7 @@ import { listRegistrationGroupsForEvent } from "~/features/events/registration-g
 import type { RegistrationGroupRoster } from "~/features/events/registration-groups.types";
 import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 import { cn } from "~/shared/lib/utils";
 
 type ManagementTab = "overview" | "registrations" | "groups" | "settings";
@@ -90,6 +91,7 @@ export const Route = createFileRoute("/dashboard/events/$eventId/manage")({
 
     await requireGlobalAdmin(user, "/dashboard/events", "/dashboard/settings");
   },
+  head: () => createPageHead("Manage Event"),
   component: EventManagementPage,
 });
 

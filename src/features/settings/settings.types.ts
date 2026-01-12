@@ -38,6 +38,21 @@ export interface LinkedAccountsOverview {
   accounts: ConnectedAccount[];
 }
 
+export interface AccountUserOverview {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  twoFactorEnabled: boolean;
+  mfaEnrolledAt?: string | null;
+}
+
+export interface AccountOverview extends LinkedAccountsOverview {
+  user: AccountUserOverview;
+  hasPassword: boolean;
+  availableProviders: string[];
+}
+
 export interface ApiResult<T> {
   success: boolean;
   data?: T;

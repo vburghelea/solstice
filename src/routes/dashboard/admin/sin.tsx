@@ -2,12 +2,14 @@ import { createFileRoute, Outlet, useRouteContext } from "@tanstack/react-router
 import { useMemo } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { getSinAdminNav } from "~/features/layouts/sin-admin-nav";
+import { createPageHead } from "~/shared/lib/page-head";
 import { filterNavItems, requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/admin/sin")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_admin");
   },
+  head: () => createPageHead("SIN Admin"),
   component: SinAdminLayout,
 });
 

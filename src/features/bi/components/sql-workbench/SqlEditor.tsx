@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useState, useId, type ComponentType } from "react";
 import { EditorView } from "@codemirror/view";
 import { PostgreSQL, sql, type SQLNamespace } from "@codemirror/lang-sql";
 import type { ReactCodeMirrorProps } from "@uiw/react-codemirror";
@@ -21,6 +21,8 @@ export function SqlEditor({
 }) {
   const [CodeMirror, setCodeMirror] =
     useState<ComponentType<ReactCodeMirrorProps> | null>(null);
+  const instructionsId = useId();
+  const editorLabel = "SQL query editor";
 
   useEffect(() => {
     let active = true;
@@ -58,12 +60,22 @@ export function SqlEditor({
         placeholder="SELECT * FROM organizations WHERE id = {{organization_id}}"
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        aria-label={editorLabel}
+        aria-describedby={instructionsId}
       />
     );
   }
 
   return (
-    <div className="rounded-md border">
+    <div
+      className="rounded-md border"
+      role="region"
+      aria-label={editorLabel}
+      aria-describedby={instructionsId}
+    >
+      <p id={instructionsId} className="sr-only">
+        Edit SQL query. Use Ctrl or Cmd with Enter to run. Results appear below.
+      </p>
       <CodeMirror
         value={value}
         minHeight="240px"
@@ -77,6 +89,8 @@ export function SqlEditor({
           highlightActiveLine: true,
           highlightActiveLineGutter: true,
         }}
+        aria-label={editorLabel}
+        aria-describedby={instructionsId}
       />
     </div>
   );

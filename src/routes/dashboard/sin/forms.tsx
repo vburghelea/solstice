@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { listForms } from "~/features/forms/forms.queries";
 import { useOrgContext } from "~/features/organizations/org-context";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/forms")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_forms");
   },
+  head: () => createPageHead("Forms"),
   component: SinFormsLayout,
 });
 

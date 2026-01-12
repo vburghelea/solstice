@@ -308,8 +308,13 @@ export const ValidatedDatePicker: React.FC<ValidatedDatePickerProps> = (props) =
         {rangeHint}
       </span>
       {errorMessages.length > 0 && (
-        <div id={errorId} className="text-destructive text-sm font-medium">
-          {errorMessages.join(", ")}
+        <div
+          id={errorId}
+          role="alert"
+          aria-live="polite"
+          className="text-destructive text-sm font-medium"
+        >
+          {label}: {errorMessages.join(", ")}
         </div>
       )}
     </div>

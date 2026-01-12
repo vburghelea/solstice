@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { FormErrorSummary } from "~/components/form-fields/FormErrorSummary";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { AppleIcon, GoogleIcon, LogoIcon, MicrosoftIcon } from "~/components/ui/icons";
@@ -187,9 +188,7 @@ export default function SignupForm({ inviteToken, socialProviders }: SignupFormP
               Sign up
             </FormSubmitButton>
           </div>
-          {errorMessage && (
-            <span className="text-destructive text-center text-sm">{errorMessage}</span>
-          )}
+          {errorMessage ? <FormErrorSummary errors={[errorMessage]} /> : null}
           {availableProviders.length > 0 ? (
             <>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">

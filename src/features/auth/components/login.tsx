@@ -21,6 +21,7 @@ import { getBrand } from "~/tenant";
 import type { SocialAuthProvider } from "../auth.queries";
 import { authQueryKey, checkPasskeysByEmail } from "../auth.queries";
 import { loginFormSchema } from "../auth.schemas";
+import { FormErrorSummary } from "~/components/form-fields/FormErrorSummary";
 
 type LoginFormProps = {
   redirectPath?: string | undefined;
@@ -389,9 +390,7 @@ export default function LoginForm(props?: LoginFormProps) {
               </Button>
             </div>
 
-            {errorMessage && (
-              <span className="text-destructive text-center text-sm">{errorMessage}</span>
-            )}
+            {errorMessage && <FormErrorSummary errors={[errorMessage]} />}
 
             <div className="relative text-center text-sm">
               <span className="text-muted-foreground">or</span>
@@ -575,9 +574,7 @@ export default function LoginForm(props?: LoginFormProps) {
             </FormSubmitButton>
           </div>
 
-          {errorMessage && (
-            <span className="text-destructive text-center text-sm">{errorMessage}</span>
-          )}
+          {errorMessage && <FormErrorSummary errors={[errorMessage]} />}
 
           {/* Social providers and passkey button - shown in email step */}
           {loginStep === "email" && (

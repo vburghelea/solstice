@@ -25,7 +25,7 @@ export function ResultsTable({ rows }: { rows: JsonRecord[] }) {
   );
 
   return (
-    <Table>
+    <Table aria-label="Query results">
       <TableHeader>
         <TableRow>
           {columns.map((column) => (

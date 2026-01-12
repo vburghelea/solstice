@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin")({
   beforeLoad: ({ context, location }) => {
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/dashboard/sin")({
       });
     }
   },
+  head: () => createPageHead("SIN dashboard"),
   component: SinLayout,
 });
 

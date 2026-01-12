@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { redeemInviteLink } from "~/features/organizations/invite-links/invite-links.mutations";
 import { requireAuth } from "~/lib/auth/guards/route-guards";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/join/$token")({
   beforeLoad: ({ context, location, params }) => {
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/join/$token")({
     }
     requireAuth({ user: context.user, location });
   },
+  head: () => createPageHead("Join Organization"),
   component: JoinLinkPage,
 });
 

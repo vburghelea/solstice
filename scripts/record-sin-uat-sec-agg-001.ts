@@ -1,146 +1,95 @@
 #!/usr/bin/env tsx
 /**
  * SEC-AGG-001: Record complete MFA login flow video with settings page.
- * Improved version with better pacing to avoid loading states.
+ * Shows MFA login, then settings page with MFA badge, passkeys, and sessions.
  */
 
-import { chromium } from "@playwright/test";
-import { authenticator } from "otplib";
-import { mkdir, rename } from "node:fs/promises";
-import path from "node:path";
+import {
+  config,
+  createScreenshotHelper,
+  finalizeVideo,
+  getTimestamp,
+  login,
+  safeGoto,
+  selectOrg,
+  setupEvidenceCapture,
+  waitForIdle,
+} from "./sin-uat-evidence-utils";
 
-const email = process.env["SIN_UAT_EMAIL"] ?? "viasport-staff@example.com";
-const password = process.env["SIN_UAT_PASSWORD"] ?? "testpassword123";
-const totpSecret =
-  process.env["SIN_UI_TOTP_SECRET_BASE32"] ??
-  "ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA";
-const baseUrl = "https://sinuat.solsticeapp.ca";
-
-const stamp = new Date()
-  .toISOString()
-  .replace(/[-:]/g, "")
-  .replace(/\..+/, "")
-  .slice(0, 12);
-
-const evidenceDir = "docs/sin-rfp/review-plans/evidence/2026-01-10";
-const videoDir = path.resolve(evidenceDir, "videos");
-const screenshotDir = path.resolve(evidenceDir, "screenshots/SEC-AGG-001");
-const videoName = `SEC-AGG-001-auth-mfa-login-flow-${stamp}.mp4`;
+const reqId = "SEC-AGG-001";
+const stamp = getTimestamp();
+const videoName = `${reqId}-auth-mfa-login-flow-${stamp}.mp4`;
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const run = async () => {
-  await mkdir(videoDir, { recursive: true });
-  await mkdir(screenshotDir, { recursive: true });
+  // Setup with video recording including login
+  const { browser, context, page, videoDir, screenshotDir } = await setupEvidenceCapture(
+    reqId,
+    { recordLogin: true },
+  );
+  const takeScreenshot = createScreenshotHelper(page, screenshotDir);
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
-    recordVideo: { dir: videoDir, size: { width: 1440, height: 900 } },
-  });
+  // Login (recorded in video) - handles MFA automatically
+  console.log("Starting MFA login flow...");
+  await login(page);
+  await waitForIdle(page);
 
-  const page = await context.newPage();
-  await page.context().clearCookies();
-
-  // Step 1: Navigate to login page
-  console.log("Step 1: Navigating to login page...");
-  await page.goto(`${baseUrl}/auth/login`, { waitUntil: "networkidle" });
-  await page.waitForTimeout(1000); // Let page settle
-
-  // Step 2: Enter email and continue
-  console.log("Step 2: Entering email...");
-  await page.getByRole("textbox", { name: "Email" }).fill(email);
-  await page.waitForTimeout(750);
-  await page.screenshot({ path: path.join(screenshotDir, "01-login-email-entry.png") });
-  await page.getByRole("button", { name: "Continue" }).click();
-
-  // Step 3: Wait for password field (avoid capturing "Checking..." state)
-  console.log("Step 3: Waiting for password field...");
-  const passwordInput = page.locator('input[type="password"]');
-  await passwordInput.waitFor({ state: "visible", timeout: 30000 });
-  await page.waitForTimeout(500); // Extra wait for UI to settle
-
-  // Step 4: Enter password and login
-  console.log("Step 4: Entering password...");
-  await passwordInput.fill(password);
-  await page.waitForTimeout(750);
-  await page.getByRole("button", { name: "Login" }).click();
-
-  // Step 5: Wait for MFA prompt (avoid "Logging in..." state)
-  console.log("Step 5: Waiting for MFA prompt...");
-  const authButton = page.getByRole("button", { name: "Authenticator code" });
-  await authButton.waitFor({ state: "visible", timeout: 30000 });
-  await page.waitForTimeout(500);
-
-  // Step 6: Complete MFA
-  console.log("Step 6: Completing MFA...");
-  await page.screenshot({ path: path.join(screenshotDir, "02-mfa-totp-challenge.png") });
-  await authButton.click();
-  await page.waitForTimeout(500);
-
-  const code = authenticator.generate(totpSecret);
-  await page.getByRole("textbox", { name: "Authentication code" }).fill(code);
-  await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Verify code" }).click();
-
-  // Step 7: Wait for dashboard (avoid "Verifying..." state)
-  console.log("Step 7: Waiting for dashboard...");
-  await page.waitForURL(/\/dashboard(\/select-org|\/sin)?/, { timeout: 30000 });
-  await page.waitForLoadState("networkidle");
-  await page.waitForTimeout(1000);
-
-  // Step 8: Handle org selection if needed
-  if (page.url().includes("/dashboard/select-org")) {
-    console.log("Step 8: Selecting organization...");
-    const combobox = page.getByRole("combobox");
-    await combobox.waitFor({ state: "visible", timeout: 20000 });
-    await combobox.click();
-    await page.waitForTimeout(500);
-
-    // Try to select BC Hockey or first option
-    const option = page.getByRole("option").first();
-    await option.click();
-    await page.waitForURL(/\/dashboard\/sin/, { timeout: 20000 });
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
+  // Handle org selection if needed
+  if (page.url().includes("/select-org")) {
+    console.log("Selecting organization...");
+    await selectOrg(page);
+    await waitForIdle(page);
   }
 
-  // Step 9: Capture dashboard
-  console.log("Step 9: Capturing dashboard...");
-  await page.screenshot({
-    path: path.join(screenshotDir, "03-post-login-dashboard.png"),
-  });
-  await page.waitForTimeout(1500);
+  // Capture dashboard briefly
+  console.log("Capturing dashboard...");
+  await wait(1000);
+  await takeScreenshot("01-post-login-dashboard.png");
 
-  // Step 10: Navigate to settings
-  console.log("Step 10: Navigating to settings...");
-  await page.goto(`${baseUrl}/dashboard/settings`, { waitUntil: "networkidle" });
-  await page.waitForTimeout(1000);
+  // Navigate to settings via sidebar (avoid direct URL issues)
+  console.log("Navigating to settings...");
+  const settingsLink = page.getByRole("link", { name: /Settings/i });
+  if (await settingsLink.isVisible().catch(() => false)) {
+    await settingsLink.click();
+  } else {
+    await safeGoto(page, `${config.baseUrl}/dashboard/settings`);
+  }
+  await waitForIdle(page);
+  await wait(800);
+  await takeScreenshot("02-settings-page.png");
 
-  // Scroll to MFA section
-  const mfaSection = page.getByText("Multi-Factor Authentication");
+  // Find and scroll to Two-Factor Authentication section
+  console.log("Capturing MFA enabled badge...");
+  const mfaSection = page.getByText("Two-Factor Authentication").first();
   if (await mfaSection.isVisible().catch(() => false)) {
     await mfaSection.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
+    await wait(600);
+    await takeScreenshot("03-mfa-enabled-badge.png");
   }
 
-  // Step 11: Capture settings with MFA section
-  console.log("Step 11: Capturing MFA settings...");
-  await page.screenshot({ path: path.join(screenshotDir, "04-mfa-status-settings.png") });
-  await page.waitForTimeout(2000); // Hold on final frame
-
-  // Finalize
-  console.log("Finalizing video...");
-  const videoPath = await page.video()?.path();
-  await context.close();
-  await browser.close();
-
-  if (!videoPath) {
-    throw new Error("Video recording failed to save.");
+  // Find Passkeys section
+  console.log("Capturing passkeys section...");
+  const passkeySection = page.getByText("Passkeys").first();
+  if (await passkeySection.isVisible().catch(() => false)) {
+    await passkeySection.scrollIntoViewIfNeeded();
+    await wait(600);
+    await takeScreenshot("04-passkeys-section.png");
   }
 
-  const finalPath = path.join(videoDir, videoName);
-  await rename(videoPath, finalPath);
-  console.log(`Video saved to ${finalPath}`);
-  console.log(`Screenshots saved to ${screenshotDir}`);
+  // Find Active Sessions section
+  console.log("Capturing active sessions...");
+  const sessionsSection = page.getByText("Active sessions").first();
+  if (await sessionsSection.isVisible().catch(() => false)) {
+    await sessionsSection.scrollIntoViewIfNeeded();
+    await wait(600);
+    await takeScreenshot("05-active-sessions.png");
+  }
+
+  // Scroll back to top for final view
+  await page.mouse.wheel(0, -1000);
+  await wait(500);
+
+  await finalizeVideo(page, context, browser, videoDir, videoName);
 };
 
 run().catch((error) => {

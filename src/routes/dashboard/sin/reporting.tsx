@@ -33,11 +33,13 @@ import { reportingMetadataSchema } from "~/features/reporting/reporting.schemas"
 import type { ReportingMetadata } from "~/features/reporting/reporting.schemas";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/reporting")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_reporting");
   },
+  head: () => createPageHead("Reporting"),
   component: SinReportingPage,
 });
 

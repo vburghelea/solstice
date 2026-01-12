@@ -54,9 +54,11 @@ export const ValidatedCheckbox: React.FC<ValidatedCheckboxProps> = (props) => {
       {meta.isTouched && meta.errors.length > 0 && (
         <div
           id={`${inputId}-errors`}
+          role="alert"
+          aria-live="polite"
           className="text-destructive ml-6 text-sm font-medium"
         >
-          {meta.errors.join(", ")}
+          {label}: {meta.errors.join(", ")}
         </div>
       )}
     </div>

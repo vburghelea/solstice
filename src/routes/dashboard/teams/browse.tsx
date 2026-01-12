@@ -15,6 +15,7 @@ import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/dashboard/teams/browse")({
     const teams = await listTeams({ data: { includeInactive: false } });
     return { teams };
   },
+  head: () => createPageHead("Browse Teams"),
   component: BrowseTeamsPage,
 });
 

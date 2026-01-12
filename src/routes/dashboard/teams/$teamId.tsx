@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/dashboard/teams/$teamId")({
 
     return { teamData, members };
   },
+  head: () => createPageHead("Team Details"),
   component: TeamLayout,
 });
 

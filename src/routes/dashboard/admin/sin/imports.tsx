@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { SmartImportWizard } from "~/features/imports/components/smart-import-wizard";
 import { ImportTemplatesPanel } from "~/features/imports/components/import-templates-panel";
 import { ImportJobsPanel } from "~/features/imports/components/import-jobs-panel";
+import { createPageHead } from "~/shared/lib/page-head";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 const searchSchema = z.object({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/dashboard/admin/sin/imports")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_admin_imports");
   },
+  head: () => createPageHead("Import Administration"),
   component: SinImportsAdminPage,
 });
 

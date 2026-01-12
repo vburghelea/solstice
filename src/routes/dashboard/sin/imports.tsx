@@ -8,11 +8,13 @@ import { listImportJobs } from "~/features/imports/imports.queries";
 import { useOrgContext } from "~/features/organizations/org-context";
 import { TutorialPanel } from "~/features/tutorials/components/tutorial-panel";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/imports")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_imports");
   },
+  head: () => createPageHead("Imports"),
   component: SinImportsPage,
 });
 

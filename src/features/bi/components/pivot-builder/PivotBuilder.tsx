@@ -11,7 +11,7 @@ import { arrayMove, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/so
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, GripVertical, Hand, ListPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -56,6 +56,8 @@ import { PivotPreview } from "./PivotPreview";
 import { SaveToDashboardDialog } from "./SaveToDashboardDialog";
 import { ControlPanel } from "../chart-config/ControlPanel";
 import { getChartControlPanel, getDefaultChartOptions } from "../chart-config/panels";
+import { FieldMoveButtons } from "./FieldMoveButtons";
+import { useLiveAnnouncer } from "~/hooks/useLiveAnnouncer";
 
 const chartTypeOptions: Array<{ value: ChartType; label: string }> = [
   { value: "table", label: "Table" },
@@ -143,17 +145,19 @@ function SortableField({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center justify-between gap-2 rounded-md border bg-background px-3 py-2 text-sm"
+      className="group flex items-center justify-between gap-2 rounded-md border bg-background px-3 py-2 text-sm"
       data-testid={`field-${id}`}
     >
-      <span
+      <button
+        type="button"
         {...attributes}
         {...listeners}
-        aria-label={`Drag ${label}`}
-        className="cursor-grab rounded-sm text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1"
+        aria-label={`Move ${label} (Space to grab, arrows to move)`}
+        className="flex min-w-0 cursor-grab items-center gap-2 rounded-sm text-left text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1"
       >
-        {label}
-      </span>
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+        <span className="truncate">{label}</span>
+      </button>
       {children}
     </div>
   );
@@ -179,9 +183,11 @@ export function PivotBuilder() {
   const [showGrandTotal, setShowGrandTotal] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [autoRunEnabled, setAutoRunEnabled] = useState(true);
+  const [interactionMode, setInteractionMode] = useState<"drag" | "buttons">("drag");
 
   const runSourceRef = useRef<"manual" | "auto" | "sample">("manual");
   const autoRunKeyRef = useRef<string | null>(null);
+  const { announcePolite } = useLiveAnnouncer();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -265,6 +271,92 @@ export function PivotBuilder() {
   const availableFields = fields
     .filter((field) => !usedFields.has(field.id))
     .map((field) => field.id);
+
+  const getFieldLabel = (id: string) => fieldsById.get(id)?.name ?? id;
+
+  const announceAction = (message: string) => {
+    if (!message) return;
+    try {
+      announcePolite(message);
+    } catch {
+      // no-op if announcer not ready
+    }
+  };
+
+  const addFieldToContainer = (
+    container: "rows" | "columns" | "measures",
+    fieldId: string,
+  ) => {
+    const field = fieldsById.get(fieldId);
+    const label = getFieldLabel(fieldId);
+    if (!field) return;
+
+    if (container === "rows") {
+      if (!field.allowGroupBy) {
+        toast.error("This field cannot be used as a row.");
+        return;
+      }
+      if (!rows.includes(fieldId)) {
+        setRows([...rows, fieldId]);
+        announceAction(`${label} added to rows`);
+      }
+      return;
+    }
+
+    if (container === "columns") {
+      if (!field.allowGroupBy) {
+        toast.error("This field cannot be used as a column.");
+        return;
+      }
+      if (!columns.includes(fieldId)) {
+        setColumns([...columns, fieldId]);
+        announceAction(`${label} added to columns`);
+      }
+      return;
+    }
+
+    if (container === "measures") {
+      if (!field.allowAggregate) {
+        toast.error("This field cannot be used as a measure.");
+        return;
+      }
+      setMeasures([
+        ...measures,
+        {
+          id: createMeasureId(),
+          field: fieldId,
+          aggregation: field.defaultAggregation ?? "count",
+        },
+      ]);
+      announceAction(`${label} added to measures`);
+    }
+  };
+
+  const removeFieldFromContainer = (container: "rows" | "columns", fieldId: string) => {
+    const label = getFieldLabel(fieldId);
+    if (container === "rows") {
+      setRows(rows.filter((item) => item !== fieldId));
+      announceAction(`${label} removed from rows`);
+      return;
+    }
+    setColumns(columns.filter((item) => item !== fieldId));
+    announceAction(`${label} removed from columns`);
+  };
+
+  const moveMeasure = (measureId: string, direction: "up" | "down") => {
+    const items = measures.map((item) => item.id);
+    const currentIndex = items.indexOf(measureId);
+    if (currentIndex === -1) return;
+    const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (nextIndex < 0 || nextIndex >= items.length) return;
+    const reordered = arrayMove(items, currentIndex, nextIndex);
+    const nextMeasures = reordered.map((id) => measures.find((item) => item.id === id)!);
+    setMeasures(nextMeasures);
+    const label = getFieldLabel(
+      measures.find((entry) => entry.id === measureId)?.field ?? measureId,
+    );
+    announceAction(`${label} moved ${direction === "up" ? "up" : "down"}`);
+  };
 
   useEffect(() => {
     if (!datasetId && datasets.length > 0) {
@@ -459,6 +551,7 @@ export function PivotBuilder() {
         const newIndex = rows.indexOf(overId);
         if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           setRows(arrayMove(rows, oldIndex, newIndex));
+          announceAction(`${getFieldLabel(activeId)} moved within rows`);
         }
       }
       if (activeContainer === "columns") {
@@ -466,6 +559,7 @@ export function PivotBuilder() {
         const newIndex = columns.indexOf(overId);
         if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           setColumns(arrayMove(columns, oldIndex, newIndex));
+          announceAction(`${getFieldLabel(activeId)} moved within columns`);
         }
       }
       if (activeContainer === "measures") {
@@ -475,65 +569,46 @@ export function PivotBuilder() {
         if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           const ordered = arrayMove(items, oldIndex, newIndex);
           setMeasures(ordered.map((id) => measures.find((item) => item.id === id)!));
+          const label = getFieldLabel(
+            measures.find((entry) => entry.id === activeMeasureId)?.field ?? activeId,
+          );
+          announceAction(`${label} moved within measures`);
         }
       }
       return;
     }
-
-    const removeFrom = (container: string) => {
-      if (container === "rows") setRows(rows.filter((item) => item !== activeId));
-      if (container === "columns")
-        setColumns(columns.filter((item) => item !== activeId));
-      if (container === "measures") {
-        if (!activeMeasureId) return;
-        setMeasures(measures.filter((item) => item.id !== activeMeasureId));
-      }
-    };
-
-    const addTo = (container: string) => {
-      const field = fieldsById.get(activeId);
-
-      if (container === "rows") {
-        if (!field?.allowGroupBy) {
-          toast.error("This field cannot be used as a row.");
-          return;
-        }
-        if (!rows.includes(activeId)) {
-          setRows([...rows, activeId]);
-        }
-      }
-      if (container === "columns") {
-        if (!field?.allowGroupBy) {
-          toast.error("This field cannot be used as a column.");
-          return;
-        }
-        if (!columns.includes(activeId)) {
-          setColumns([...columns, activeId]);
-        }
-      }
-      if (container === "measures") {
-        if (!field?.allowAggregate) {
-          toast.error("This field cannot be used as a measure.");
-          return;
-        }
-        setMeasures([
-          ...measures,
-          {
-            id: createMeasureId(),
-            field: activeId,
-            aggregation: field.defaultAggregation ?? "count",
-          },
-        ]);
-      }
-    };
 
     if (overContainer === "available") {
-      removeFrom(activeContainer);
+      if (activeContainer === "rows" || activeContainer === "columns") {
+        removeFieldFromContainer(activeContainer, activeId);
+      }
+      if (activeContainer === "measures" && activeMeasureId) {
+        removeMeasure(activeMeasureId);
+      }
       return;
     }
 
-    removeFrom(activeContainer);
-    addTo(overContainer);
+    if (activeContainer === "rows" || activeContainer === "columns") {
+      removeFieldFromContainer(activeContainer, activeId);
+    }
+    if (activeContainer === "measures" && activeMeasureId) {
+      removeMeasure(activeMeasureId);
+    }
+
+    if (
+      overContainer === "rows" ||
+      overContainer === "columns" ||
+      overContainer === "measures"
+    ) {
+      const targetFieldId = activeMeasureId
+        ? measures.find((item) => item.id === activeMeasureId)?.field
+        : activeId;
+      if (!targetFieldId) return;
+      addFieldToContainer(
+        overContainer as "rows" | "columns" | "measures",
+        targetFieldId,
+      );
+    }
   };
 
   const updateMeasure = (measureId: string, aggregation: AggregationType) => {
@@ -543,7 +618,12 @@ export function PivotBuilder() {
   };
 
   const removeMeasure = (measureId: string) => {
+    const removed = measures.find((item) => item.id === measureId);
     setMeasures((prev) => prev.filter((item) => item.id !== measureId));
+    if (removed) {
+      const label = removed.label ?? getFieldLabel(removed.field);
+      announceAction(`${label} removed from measures`);
+    }
   };
 
   const addMetric = (metricId: string) => {
@@ -568,6 +648,7 @@ export function PivotBuilder() {
         label: metric.name,
       },
     ]);
+    announceAction(`${metric.name} added to measures`);
   };
 
   const handleApplySample = () => {
@@ -706,6 +787,34 @@ export function PivotBuilder() {
             </div>
           ) : null}
 
+          <div className="flex flex-wrap items-center gap-3">
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Interaction mode
+            </Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={interactionMode === "drag" ? "default" : "outline"}
+                aria-pressed={interactionMode === "drag"}
+                onClick={() => setInteractionMode("drag")}
+              >
+                <Hand className="mr-1 h-4 w-4" aria-hidden />
+                Drag
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={interactionMode === "buttons" ? "default" : "outline"}
+                aria-pressed={interactionMode === "buttons"}
+                onClick={() => setInteractionMode("buttons")}
+              >
+                <ListPlus className="mr-1 h-4 w-4" aria-hidden />
+                Buttons
+              </Button>
+            </div>
+          </div>
+
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -715,14 +824,42 @@ export function PivotBuilder() {
               <FieldPalette
                 availableFields={availableFields}
                 fieldsById={fieldsById}
-                renderItem={(item, label) => <SortableField id={item} label={label} />}
+                renderItem={(item, label) => (
+                  <SortableField id={item} label={label}>
+                    <FieldMoveButtons
+                      label={label}
+                      interactionMode={interactionMode}
+                      onAddToRows={() => addFieldToContainer("rows", item)}
+                      onAddToColumns={() => addFieldToContainer("columns", item)}
+                      onAddToMeasures={() => addFieldToContainer("measures", item)}
+                    />
+                  </SortableField>
+                )}
               />
               <DropZone
                 id="rows"
                 label="Rows"
                 items={rows}
                 renderItem={(item) => (
-                  <SortableField id={item} label={fieldsById.get(item)?.name ?? item} />
+                  <SortableField id={item} label={fieldsById.get(item)?.name ?? item}>
+                    <div
+                      className={`items-center gap-1 ${
+                        interactionMode === "buttons"
+                          ? "flex"
+                          : "hidden group-hover:flex group-focus-within:flex"
+                      }`}
+                    >
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removeFieldFromContainer("rows", item)}
+                        aria-label={`Remove ${fieldsById.get(item)?.name ?? item} from rows`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </SortableField>
                 )}
               />
               <DropZone
@@ -730,7 +867,25 @@ export function PivotBuilder() {
                 label="Columns"
                 items={columns}
                 renderItem={(item) => (
-                  <SortableField id={item} label={fieldsById.get(item)?.name ?? item} />
+                  <SortableField id={item} label={fieldsById.get(item)?.name ?? item}>
+                    <div
+                      className={`items-center gap-1 ${
+                        interactionMode === "buttons"
+                          ? "flex"
+                          : "hidden group-hover:flex group-focus-within:flex"
+                      }`}
+                    >
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removeFieldFromContainer("columns", item)}
+                        aria-label={`Remove ${fieldsById.get(item)?.name ?? item} from columns`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </SortableField>
                 )}
               />
               <DropZone
@@ -759,6 +914,12 @@ export function PivotBuilder() {
                           measure ? updateMeasure(measure.id, next) : undefined
                         }
                         onRemove={() => (measure ? removeMeasure(measure.id) : undefined)}
+                        onMoveUp={() =>
+                          measure ? moveMeasure(measure.id, "up") : undefined
+                        }
+                        onMoveDown={() =>
+                          measure ? moveMeasure(measure.id, "down") : undefined
+                        }
                       />
                     </SortableField>
                   );

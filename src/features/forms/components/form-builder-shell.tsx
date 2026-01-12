@@ -1,6 +1,8 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
@@ -20,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -395,6 +398,7 @@ export function DynamicFormRenderer(props: {
   definition: FormDefinition;
 }) {
   const { formId, organizationId, definition } = props;
+  const queryClient = useQueryClient();
   const [submitMode, setSubmitMode] = useState<"draft" | "submitted">("submitted");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -419,9 +423,19 @@ export function DynamicFormRenderer(props: {
             status: submitMode,
           },
         });
-        if (result && "error" in result && result.error) {
-          setSubmitError(result.error);
+        if (!result || ("error" in result && result.error)) {
+          setSubmitError(
+            (result as { error?: string })?.error ?? "Failed to submit form.",
+          );
+          return;
         }
+        toast.success("Submission received", {
+          description: `ID: ${result.id} · Status: ${result.status}`,
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["forms", "submissions", formId],
+        });
+        form.reset(defaultValues);
       } catch (error) {
         setSubmitError(error instanceof Error ? error.message : "Failed to submit form.");
       }
@@ -686,6 +700,11 @@ export function FormBuilderShell() {
     queryKey: ["forms", "list"],
     queryFn: () => listForms({ data: {} }),
   });
+
+  const selectedForm = useMemo(
+    () => forms.find((form) => form.id === selectedFormId) ?? null,
+    [forms, selectedFormId],
+  );
 
   const { data: latestVersion } = useQuery({
     queryKey: ["forms", "latest", selectedFormId],
@@ -1520,7 +1539,15 @@ export function FormBuilderShell() {
       {selectedFormId ? (
         <Card>
           <CardHeader>
-            <CardTitle>Form settings</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Form settings</CardTitle>
+              {selectedForm?.status === "published" ? (
+                <Badge variant="success" className="flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Published
+                </Badge>
+              ) : null}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2 text-sm">
@@ -1606,9 +1633,7 @@ export function FormBuilderShell() {
             ) : (
               <DynamicFormRenderer
                 formId={selectedFormId}
-                organizationId={
-                  forms.find((form) => form.id === selectedFormId)?.organizationId ?? null
-                }
+                organizationId={selectedForm?.organizationId ?? null}
                 definition={definition}
               />
             )}

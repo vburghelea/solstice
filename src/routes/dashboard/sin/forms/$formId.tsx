@@ -18,6 +18,7 @@ import {
 import { listTemplates } from "~/features/templates/templates.queries";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/forms/$formId")({
   beforeLoad: () => {
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/dashboard/sin/forms/$formId")({
 
     return { form, latestVersion };
   },
+  head: () => createPageHead("Form details"),
   component: SinFormDetailPage,
 });
 

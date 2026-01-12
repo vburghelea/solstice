@@ -34,6 +34,12 @@ export function DashboardWidget({
   globalFilters = EMPTY_FILTERS,
   onEdit,
   onRemove,
+  onMoveUp,
+  onMoveDown,
+  onMoveLeft,
+  onMoveRight,
+  onExpand,
+  onShrink,
   editable = false,
   onFilterChange,
   onFilterAdd,
@@ -49,6 +55,12 @@ export function DashboardWidget({
   globalFilters?: FilterConfig[];
   onEdit?: () => void;
   onRemove?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
+  onExpand?: () => void;
+  onShrink?: () => void;
   editable?: boolean;
   onFilterChange?: (
     filter: FilterConfig | null,
@@ -137,7 +149,14 @@ export function DashboardWidget({
         )
       : null;
   const chartAriaLabel = `${config.title ?? "Chart"} chart`;
-  const chartAriaDescription = `Chart of ${measureLabel}`;
+  const chartAriaDescription = useMemo(() => {
+    if (!pivot) return `Chart of ${measureLabel}`;
+    const rowLabels = pivot.rowFields.map((id) => fieldsById.get(id)?.name ?? id);
+    const columnLabels = pivot.columnFields.map((id) => fieldsById.get(id)?.name ?? id);
+    const parts = [...rowLabels, ...columnLabels].filter(Boolean);
+    if (parts.length === 0) return `Chart of ${measureLabel}`;
+    return `Chart of ${measureLabel} by ${parts.join(" and ")}`;
+  }, [fieldsById, measureLabel, pivot]);
   const measureFormatters = useMemo(() => {
     if (!pivot) return undefined;
     return buildMeasureFormatters(pivot.measures, fieldsById);
@@ -232,6 +251,12 @@ export function DashboardWidget({
         ]}
         {...(editable && onEdit ? { onEdit } : {})}
         {...(editable && onRemove ? { onRemove } : {})}
+        {...(editable && onMoveUp ? { onMoveUp } : {})}
+        {...(editable && onMoveDown ? { onMoveDown } : {})}
+        {...(editable && onMoveLeft ? { onMoveLeft } : {})}
+        {...(editable && onMoveRight ? { onMoveRight } : {})}
+        {...(editable && onExpand ? { onExpand } : {})}
+        {...(editable && onShrink ? { onShrink } : {})}
       />
       {ignoredFilters.length > 0 ? (
         <div

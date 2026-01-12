@@ -7,9 +7,11 @@ import {
   listUserPolicyAcceptances,
 } from "~/features/privacy/privacy.queries";
 import { CompleteProfileForm } from "~/features/profile/components/complete-profile-form-simple";
+import { createPageHead } from "~/shared/lib/page-head";
 import { cn } from "~/shared/lib/utils";
 
 export const Route = createFileRoute("/onboarding/")({
+  head: () => createPageHead("Complete Your Profile"),
   component: OnboardingPage,
 });
 

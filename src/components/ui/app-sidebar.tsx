@@ -17,9 +17,10 @@ import { filterNavItems } from "~/tenant/feature-gates";
 
 interface AppSidebarProps {
   onNavigation?: () => void;
+  navigationId?: string;
 }
 
-export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
+export function AppSidebar({ onNavigation, navigationId }: AppSidebarProps = {}) {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
@@ -95,7 +96,11 @@ export function AppSidebar({ onNavigation }: AppSidebarProps = {}) {
         </Button>
       </div>
 
-      <nav className="flex-1 space-y-6 px-4 pb-4">
+      <nav
+        id={navigationId}
+        aria-label="Primary navigation"
+        className="flex-1 space-y-6 px-4 pb-4"
+      >
         {sections.map((section) => (
           <div key={section.label} className="space-y-2">
             <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">

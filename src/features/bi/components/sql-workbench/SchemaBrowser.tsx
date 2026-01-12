@@ -83,6 +83,7 @@ export function SchemaBrowser({ datasetId, onInsert }: SchemaBrowserProps) {
           placeholder="Search tables or columns"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          aria-label="Search tables or columns"
         />
         {!datasetId ? (
           <p className="text-muted-foreground text-sm">Select a dataset first.</p>
@@ -93,9 +94,18 @@ export function SchemaBrowser({ datasetId, onInsert }: SchemaBrowserProps) {
         ) : filteredTables.length === 0 ? (
           <p className="text-muted-foreground text-sm">No tables match your search.</p>
         ) : (
-          <div className="space-y-3">
-            {filteredTables.map((table) => (
-              <div key={table.viewName} className="rounded-md border">
+          <div className="space-y-3" role="tree" aria-label="Tables and columns">
+            {filteredTables.map((table, index) => (
+              <div
+                key={table.viewName}
+                className="rounded-md border"
+                role="treeitem"
+                aria-level={1}
+                aria-expanded
+                aria-label={`${table.datasetName} ${table.viewName}`}
+                aria-setsize={filteredTables.length}
+                aria-posinset={index + 1}
+              >
                 <div className="flex items-start justify-between gap-3 border-b bg-muted/40 px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">{table.datasetName}</p>
@@ -108,18 +118,28 @@ export function SchemaBrowser({ datasetId, onInsert }: SchemaBrowserProps) {
                     type="button"
                     size="sm"
                     variant="ghost"
+                    aria-label={`Insert table ${table.viewName}`}
                     onClick={() => onInsert(table.viewName)}
                   >
                     Insert table
                   </Button>
                 </div>
-                <div className="max-h-64 divide-y overflow-auto">
-                  {table.columns.map((column) => (
+                <div
+                  className="max-h-64 divide-y overflow-auto"
+                  role="group"
+                  aria-label={`Columns for ${table.viewName}`}
+                >
+                  {table.columns.map((column, columnIndex) => (
                     <button
                       key={`${table.viewName}.${column.name}`}
                       type="button"
                       onClick={() => onInsert(`${table.viewName}.${column.name}`)}
                       className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs hover:bg-muted/50"
+                      aria-label={`Insert column ${column.name}${column.label ? ` (${column.label})` : ""} from ${table.viewName}`}
+                      role="treeitem"
+                      aria-level={2}
+                      aria-setsize={table.columns.length}
+                      aria-posinset={columnIndex + 1}
                     >
                       <div className="space-y-1">
                         <p className="font-mono text-xs">{column.name}</p>

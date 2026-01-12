@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { ChartType, PivotMeasure, PivotResult } from "../../bi.schemas";
 import { buildPivotChartOptions } from "../charts/pivot-chart";
@@ -71,12 +71,31 @@ export function PivotPreview({
   const selectedMeasureLabel =
     pivot?.measures.find((measure) => measure.key === selectedMeasureKey)?.label ??
     "Value";
-  const chartAriaLabel = `${chartType} chart preview`;
-  const chartAriaDescription = `Preview of ${selectedMeasureLabel}`;
+  const rowLabels = useMemo(
+    () => rows.map((id) => fieldLabels?.get(id) ?? id),
+    [fieldLabels, rows],
+  );
+  const columnLabels = useMemo(
+    () => columns.map((id) => fieldLabels?.get(id) ?? id),
+    [columns, fieldLabels],
+  );
+  const chartAriaLabel = `${chartType} chart preview of ${selectedMeasureLabel}`;
+  const chartAriaDescription =
+    rowLabels.length === 0 && columnLabels.length === 0
+      ? `Preview of ${selectedMeasureLabel} with no dimensions applied`
+      : `Preview of ${selectedMeasureLabel} by ${[...rowLabels, ...columnLabels].join(
+          " and ",
+        )}`;
   const measureFormatters = useMemo(() => {
     if (!pivot || !fieldsById) return undefined;
     return buildMeasureFormatters(pivot.measures, fieldsById);
   }, [fieldsById, pivot]);
+  const [showDataTable, setShowDataTable] = useState(false);
+  const dataTableId = useId();
+
+  useEffect(() => {
+    setShowDataTable(false);
+  }, [chartType, selectedMeasureKey]);
 
   if (!pivot) {
     if (isLoading) {
@@ -159,11 +178,39 @@ export function PivotPreview({
           value={sumMeasure(pivot, selectedMeasureKey) ?? "-"}
         />
       ) : chartOption ? (
-        <ChartWrapper
-          options={chartOption}
-          ariaLabel={chartAriaLabel}
-          ariaDescription={chartAriaDescription}
-        />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-muted-foreground">Chart preview</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDataTable((prev) => !prev)}
+              aria-expanded={showDataTable}
+              aria-controls={dataTableId}
+            >
+              {showDataTable ? "Hide data table" : "View data table"}
+            </Button>
+          </div>
+          <ChartWrapper
+            options={chartOption}
+            ariaLabel={chartAriaLabel}
+            ariaDescription={chartAriaDescription}
+          />
+          {showDataTable ? (
+            <div id={dataTableId} className="rounded-md border bg-muted/30 p-3">
+              <PivotTable
+                pivot={pivot}
+                showRowTotals={showRowTotals}
+                showColumnTotals={showColumnTotals}
+                showGrandTotal={showGrandTotal}
+                {...(measureFormatters ? { measureFormatters } : {})}
+                {...(fieldLabels ? { fieldLabels } : {})}
+                {...(fieldsById ? { fieldsById } : {})}
+              />
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div
           className={

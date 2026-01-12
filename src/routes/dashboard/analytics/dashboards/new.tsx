@@ -17,8 +17,10 @@ import { Textarea } from "~/components/ui/textarea";
 import { addWidget } from "~/features/bi/bi.mutations";
 import { useCreateDashboard } from "~/features/bi/hooks/use-dashboard";
 import { DASHBOARD_TEMPLATES } from "~/features/bi/templates/dashboard-templates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/analytics/dashboards/new")({
+  head: () => createPageHead("New Dashboard"),
   component: NewDashboardPage,
 });
 

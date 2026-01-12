@@ -40,8 +40,8 @@ import { MfaRecoveryCard } from "~/features/auth/mfa/mfa-recovery";
 import { NotificationPreferencesCard } from "~/features/notifications/components/notification-preferences-card";
 import type { SocialAuthProvider } from "~/features/auth/auth.queries";
 import type {
+  AccountOverview,
   ChangePasswordInput,
-  LinkedAccountsOverview,
   SessionsOverview,
 } from "~/features/settings";
 import {
@@ -58,12 +58,6 @@ import {
   getPasswordStrengthLabel,
   validatePassword,
 } from "~/lib/security/utils/password-validator";
-
-interface AccountOverviewResult extends LinkedAccountsOverview {
-  user: { id: string; name: string; email: string; emailVerified: boolean };
-  hasPassword: boolean;
-  availableProviders: string[];
-}
 
 type PasskeyEntry = {
   id: string;
@@ -93,6 +87,13 @@ function getAuthenticatorName(aaguid: string | null | undefined): string | null 
   };
   return knownAuthenticators[aaguid] ?? null;
 }
+
+const formatDateString = (value?: string | null) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toLocaleDateString();
+};
 
 type ChangePasswordFormValues = ChangePasswordInput & {
   confirmPassword: string;
@@ -135,7 +136,7 @@ export function SettingsView() {
     error: accountError,
   } = useQuery({
     queryKey: ["account-overview"],
-    queryFn: async (): Promise<AccountOverviewResult> => {
+    queryFn: async (): Promise<AccountOverview> => {
       const result = await getAccountOverview();
       if (!result.success || !result.data) {
         throw new Error(result.errors?.[0]?.message || "Failed to load account overview");
@@ -469,10 +470,39 @@ export function SettingsView() {
           </Card>
 
           {accountOverview?.hasPassword ? (
-            <>
-              <MfaEnrollmentCard />
-              <MfaRecoveryCard />
-            </>
+            accountOverview.user.twoFactorEnabled ? (
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-green-500" />
+                      Two-Factor Authentication
+                      <Badge variant="success" className="flex items-center gap-1">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Enabled
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      Your account is protected with TOTP authentication
+                      {formatDateString(accountOverview.user.mfaEnrolledAt)
+                        ? ` (enabled on ${formatDateString(accountOverview.user.mfaEnrolledAt)})`
+                        : "."}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm">
+                      Regenerate backup codes
+                    </Button>
+                  </CardContent>
+                </Card>
+                <MfaRecoveryCard />
+              </>
+            ) : (
+              <>
+                <MfaEnrollmentCard />
+                <MfaRecoveryCard />
+              </>
+            )
           ) : (
             <Alert>
               <AlertCircle className="h-4 w-4" />

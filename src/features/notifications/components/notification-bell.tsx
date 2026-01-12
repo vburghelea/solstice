@@ -29,7 +29,13 @@ export function NotificationBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          aria-label="Open notifications"
+          aria-haspopup="dialog"
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge

@@ -3,8 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useDashboards } from "~/features/bi/hooks/use-dashboard";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/analytics/dashboards/")({
+  head: () => createPageHead("Dashboards"),
   component: DashboardsIndexPage,
 });
 

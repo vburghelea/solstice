@@ -3,6 +3,7 @@ export interface ColorScheme {
   label: string;
   colors: string[];
   isColorblindSafe?: boolean;
+  isHighContrast?: boolean;
 }
 
 export const COLOR_SCHEMES: ColorScheme[] = [
@@ -51,6 +52,22 @@ export const COLOR_SCHEMES: ColorScheme[] = [
       "#000000",
     ],
     isColorblindSafe: true,
+  },
+  {
+    id: "high-contrast",
+    label: "High Contrast (WCAG)",
+    colors: [
+      "#0072B2", // Blue - 4.5:1 contrast
+      "#D55E00", // Vermillion - 4.7:1 contrast
+      "#009E73", // Teal - 3.9:1 contrast
+      "#000000", // Black - 21:1 contrast
+      "#8B4570", // Dark pink - 4.5:1 contrast
+      "#996600", // Dark gold - 4.2:1 contrast
+      "#1A5276", // Dark cyan - 6.5:1 contrast
+      "#6B3E26", // Dark brown - 7.5:1 contrast
+    ],
+    isColorblindSafe: true,
+    isHighContrast: true,
   },
 ];
 

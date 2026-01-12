@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { TemplateHub } from "~/features/templates/components/template-hub";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 const searchSchema = z.object({
   context: z.enum(["forms", "imports", "reporting", "analytics", "general"]).optional(),
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/dashboard/sin/templates")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_templates");
   },
+  head: () => createPageHead("Templates"),
   component: SinTemplatesPage,
 });
 

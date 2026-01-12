@@ -1,10 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getAvailableSocialProviders } from "~/features/auth/auth.queries";
-import type {
-  ApiResult,
-  LinkedAccountsOverview,
-  SessionsOverview,
-} from "./settings.types";
+import type { ApiResult, AccountOverview, SessionsOverview } from "./settings.types";
 
 const resolveAvailableProviders = async () => {
   const socialProviders = await getAvailableSocialProviders();
@@ -67,15 +63,7 @@ export const getSessionsOverview = createServerFn({ method: "GET" }).handler(
 );
 
 export const getAccountOverview = createServerFn({ method: "GET" }).handler(
-  async (): Promise<
-    ApiResult<
-      LinkedAccountsOverview & {
-        user: { id: string; name: string; email: string; emailVerified: boolean };
-        hasPassword: boolean;
-        availableProviders: string[];
-      }
-    >
-  > => {
+  async (): Promise<ApiResult<AccountOverview>> => {
     try {
       const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
@@ -94,6 +82,21 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
       }
 
       const accounts = await auth.api.listUserAccounts({ headers });
+
+      const [{ getDb }, { user }, { eq }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/db/schema"),
+        import("drizzle-orm"),
+      ]);
+      const db = await getDb();
+      const [userRecord] = await db
+        .select({
+          twoFactorEnabled: user.twoFactorEnabled,
+          mfaEnrolledAt: user.mfaEnrolledAt,
+        })
+        .from(user)
+        .where(eq(user.id, sessionResult.user.id))
+        .limit(1);
 
       const normalizedAccounts = accounts.map((account) => ({
         id: account.id,
@@ -117,6 +120,10 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
             name: sessionResult.user.name,
             email: sessionResult.user.email,
             emailVerified: sessionResult.user.emailVerified ?? false,
+            twoFactorEnabled: userRecord?.twoFactorEnabled ?? false,
+            mfaEnrolledAt: userRecord?.mfaEnrolledAt
+              ? userRecord.mfaEnrolledAt.toISOString()
+              : null,
           },
           accounts: normalizedAccounts,
           hasPassword,

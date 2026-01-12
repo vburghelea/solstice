@@ -5,12 +5,14 @@ import { useAuth } from "~/features/auth";
 import { useOrgContext } from "~/features/organizations/org-context";
 import type { AuthUser } from "~/lib/auth/types";
 import { GLOBAL_ADMIN_ROLE_NAMES } from "~/lib/auth/utils/admin-check";
+import { createPageHead } from "~/shared/lib/page-head";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/analytics/sql")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_analytics_sql_workbench");
   },
+  head: () => createPageHead("SQL Workbench"),
   component: SqlWorkbenchPage,
 });
 

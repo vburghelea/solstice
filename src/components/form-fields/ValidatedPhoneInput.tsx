@@ -58,8 +58,13 @@ export function ValidatedPhoneInput(props: ValidatedPhoneInputProps) {
       />
       {description && <p className="text-muted-foreground text-sm">{description}</p>}
       {meta.isTouched && meta.errors.length > 0 && (
-        <div id={`${inputId}-errors`} className="text-destructive text-sm font-medium">
-          {meta.errors.join(", ")}
+        <div
+          id={`${inputId}-errors`}
+          role="alert"
+          aria-live="polite"
+          className="text-destructive text-sm font-medium"
+        >
+          {label}: {meta.errors.join(", ")}
         </div>
       )}
     </div>

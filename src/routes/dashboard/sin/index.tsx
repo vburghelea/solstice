@@ -22,6 +22,7 @@ import {
   isFeatureEnabled,
   requireFeatureInRoute,
 } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 const portalCardConfig = {
   "/dashboard/sin/reporting": {
@@ -72,6 +73,7 @@ export const Route = createFileRoute("/dashboard/sin/")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_portal");
   },
+  head: () => createPageHead("SIN overview"),
   component: SinPortalHome,
 });
 

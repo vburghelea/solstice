@@ -7,6 +7,7 @@ import ReactGridLayout, {
   type LegacyReactGridLayoutProps,
 } from "react-grid-layout/legacy";
 import { useMemo, type ComponentProps } from "react";
+import { useLiveAnnouncer } from "~/hooks/useLiveAnnouncer";
 import { DashboardWidget } from "./DashboardWidget";
 import type { FilterConfig, PivotResult, WidgetType } from "../../bi.schemas";
 import type { WidgetConfig } from "../../bi.types";
@@ -59,6 +60,7 @@ export function DashboardCanvas({
   ) => void;
   onFilterAdd?: (filters: FilterConfig[]) => void;
 }) {
+  const { announcePolite } = useLiveAnnouncer();
   const gridLayout: Layout = widgets.map((widget) => ({
     i: widget.id,
     x: widget.x,
@@ -172,6 +174,38 @@ export function DashboardCanvas({
         const prefetchedResult = resolvePrefetchedResult(
           widget.id,
         ) as DashboardWidgetProps["prefetchedResult"];
+        const widgetLabel =
+          (widget.config as WidgetConfig | null)?.title ?? widget.widgetType ?? "Widget";
+
+        // Create move/resize handlers for keyboard-accessible widget manipulation
+        const createMoveHandler = (dx: number, dy: number) => () => {
+          const newX = Math.max(0, Math.min(layout.columns - widget.w, widget.x + dx));
+          const newY = Math.max(0, widget.y + dy);
+          if (newX !== widget.x || newY !== widget.y) {
+            onPositionChange(widget.id, { x: newX, y: newY, w: widget.w, h: widget.h });
+            announcePolite?.(
+              `Moved ${widgetLabel} to column ${newX + 1}, row ${newY + 1}`,
+            );
+          }
+        };
+        const handleExpand = () => {
+          const newW = Math.min(layout.columns - widget.x, widget.w + 1);
+          const newH = widget.h + 1;
+          if (newW !== widget.w || newH !== widget.h) {
+            onPositionChange(widget.id, { x: widget.x, y: widget.y, w: newW, h: newH });
+            announcePolite?.(`Resized ${widgetLabel} to ${newW} columns by ${newH} rows`);
+          }
+        };
+        const handleShrink = () => {
+          const minSize = 2;
+          const newW = Math.max(minSize, widget.w - 1);
+          const newH = Math.max(minSize, widget.h - 1);
+          if (newW !== widget.w || newH !== widget.h) {
+            onPositionChange(widget.id, { x: widget.x, y: widget.y, w: newW, h: newH });
+            announcePolite?.(`Resized ${widgetLabel} to ${newW} columns by ${newH} rows`);
+          }
+        };
+
         return (
           <div
             key={widget.id}
@@ -190,6 +224,12 @@ export function DashboardCanvas({
                 {...(onFilterAdd ? { onFilterAdd } : {})}
                 {...(onEditWidget ? { onEdit: () => onEditWidget(widget.id) } : {})}
                 onRemove={() => onRemoveWidget(widget.id)}
+                {...(editable ? { onMoveUp: createMoveHandler(0, -1) } : {})}
+                {...(editable ? { onMoveDown: createMoveHandler(0, 1) } : {})}
+                {...(editable ? { onMoveLeft: createMoveHandler(-1, 0) } : {})}
+                {...(editable ? { onMoveRight: createMoveHandler(1, 0) } : {})}
+                {...(editable ? { onExpand: handleExpand } : {})}
+                {...(editable ? { onShrink: handleShrink } : {})}
               />,
             ]}
           </div>

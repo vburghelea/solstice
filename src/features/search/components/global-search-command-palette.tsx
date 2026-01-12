@@ -10,6 +10,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "~/components/ui/command";
+import { useLiveAnnouncer } from "~/hooks/useLiveAnnouncer";
 import { getAppNavSections } from "~/features/layouts/app-nav";
 import { getSinAdminNav } from "~/features/layouts/sin-admin-nav";
 import { useOrgContext } from "~/features/organizations/org-context";
@@ -33,6 +34,7 @@ export function GlobalSearchCommandPalette() {
   const context = useRouteContext({ strict: false });
   const { organizationRole } = useOrgContext();
   const user = context?.user ?? null;
+  const { announcePolite } = useLiveAnnouncer();
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -112,6 +114,20 @@ export function GlobalSearchCommandPalette() {
     };
   }, [enabled]);
 
+  useEffect(() => {
+    if (!announcePolite || !shouldSearch) return;
+    if (isFetching) {
+      announcePolite(`Searching for ${query}`);
+      return;
+    }
+
+    if (results.length > 0) {
+      announcePolite(`${results.length} results found`);
+    } else {
+      announcePolite("No matching results found");
+    }
+  }, [announcePolite, isFetching, query, results.length, shouldSearch]);
+
   if (!enabled) return null;
 
   return (
@@ -126,6 +142,8 @@ export function GlobalSearchCommandPalette() {
         placeholder="Search actions, templates, forms, and more..."
         value={query}
         onValueChange={setQuery}
+        aria-label="Global search"
+        aria-expanded={open}
       />
       <CommandList>
         {actionItems.length > 0 ? (

@@ -33,6 +33,7 @@ import {
 import { getRegistrationInvitePreview } from "~/features/events/registration-groups.queries";
 import type { RegistrationInviteRedemptionResult } from "~/features/events/registration-groups.types";
 import { callServerFn } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/join/registration/$token")({
   beforeLoad: async ({ context, location }) => {
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/join/registration/$token")({
       });
     }
   },
+  head: () => createPageHead("Registration Invitation"),
   component: RegistrationInvitePage,
 });
 

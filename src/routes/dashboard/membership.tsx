@@ -27,6 +27,7 @@ import {
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 import { getBrand } from "~/tenant";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/dashboard/membership")({
   beforeLoad: () => {
     requireFeatureInRoute("membership");
   },
+  head: () => createPageHead("Membership"),
   component: MembershipPage,
 });
 

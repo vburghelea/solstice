@@ -116,10 +116,15 @@ function ProgressStepper({
   completedSteps: Set<WizardStepId>;
 }) {
   const currentIndex = WIZARD_STEPS.findIndex((s) => s.id === currentStep);
+  const currentStepLabel = WIZARD_STEPS.find((s) => s.id === currentStep)?.label ?? "";
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between">
+    <nav className="mb-6" aria-label="Import wizard progress">
+      {/* Live region for step change announcements */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        Step {currentIndex + 1} of {WIZARD_STEPS.length}: {currentStepLabel}
+      </div>
+      <ol className="flex items-center justify-between">
         {WIZARD_STEPS.map((step, index) => {
           const isCompleted = completedSteps.has(step.id);
           const isCurrent = step.id === currentStep;
@@ -127,7 +132,11 @@ function ProgressStepper({
           const Icon = step.icon;
 
           return (
-            <div key={step.id} className="flex flex-1 items-center">
+            <li
+              key={step.id}
+              className="flex flex-1 items-center"
+              aria-current={isCurrent ? "step" : undefined}
+            >
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
@@ -140,6 +149,7 @@ function ProgressStepper({
                           ? "border-muted-foreground/50 bg-muted text-muted-foreground"
                           : "border-muted bg-background text-muted-foreground",
                   )}
+                  aria-hidden="true"
                 >
                   {isCompleted ? (
                     <Check className="h-5 w-5" />
@@ -157,6 +167,10 @@ function ProgressStepper({
                         : "text-muted-foreground",
                   )}
                 >
+                  <span className="sr-only">
+                    Step {index + 1}:{" "}
+                    {isCompleted ? "(completed) " : isCurrent ? "(current) " : ""}
+                  </span>
                   {step.label}
                 </span>
               </div>
@@ -168,13 +182,14 @@ function ProgressStepper({
                       ? "bg-primary"
                       : "bg-muted",
                   )}
+                  aria-hidden="true"
                 />
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ol>
+    </nav>
   );
 }
 
@@ -704,6 +719,7 @@ export function SmartImportWizard() {
 
   return (
     <div className="space-y-6">
+      <h1 className="sr-only">Smart import wizard</h1>
       <ProgressStepper currentStep={currentStep} completedSteps={completedSteps} />
 
       <Card>
@@ -868,17 +884,26 @@ export function SmartImportWizard() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" role="table" aria-label="Column mappings">
                 {headers.map((header) => (
-                  <div key={header} className="flex items-center gap-3 text-xs">
-                    <div className="w-1/2 truncate">{header}</div>
-                    <SelectField
-                      options={fieldOptions}
-                      value={mapping[header] ?? ""}
-                      onChange={(value) =>
-                        setMapping((prev) => ({ ...prev, [header]: value }))
-                      }
-                    />
+                  <div
+                    key={header}
+                    className="flex items-center gap-3 text-xs"
+                    role="row"
+                  >
+                    <div className="w-1/2 truncate" role="cell">
+                      {header}
+                    </div>
+                    <div role="cell">
+                      <SelectField
+                        label={`Map column ${header} to form field`}
+                        options={fieldOptions}
+                        value={mapping[header] ?? ""}
+                        onChange={(value) =>
+                          setMapping((prev) => ({ ...prev, [header]: value }))
+                        }
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1117,6 +1142,7 @@ function SelectField(props: {
   options: Array<{ value: string; label: string }>;
   value: string;
   onChange: (value: string) => void;
+  label: string;
 }) {
   const effectiveValue = props.value || "__ignore__";
   return (
@@ -1124,7 +1150,7 @@ function SelectField(props: {
       value={effectiveValue}
       onValueChange={(value) => props.onChange(value === "__ignore__" ? "" : value)}
     >
-      <SelectTrigger className="h-8 w-48 text-xs">
+      <SelectTrigger className="h-8 w-48 text-xs" aria-label={props.label}>
         <SelectValue placeholder="Ignore" />
       </SelectTrigger>
       <SelectContent>

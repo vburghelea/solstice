@@ -31,6 +31,7 @@ import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
 import type { UpdateTeamInput } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 // Canadian provinces and territories
 const PROVINCES = [
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
     if (!teamData) throw new Error("Team not found");
     return { teamData };
   },
+  head: () => createPageHead("Manage Team"),
   component: ManageTeamPage,
 });
 

@@ -3,10 +3,16 @@ import type { ChartOptions } from "../../bi.types";
 import { COLOR_SCHEMES } from "../../utils/color-schemes";
 import type { ChartControlPanel, ControlConfig } from "./types";
 
-const colorSchemeOptions = COLOR_SCHEMES.map((scheme) => ({
-  value: scheme.id,
-  label: scheme.label,
-}));
+const colorSchemeOptions = COLOR_SCHEMES.map((scheme) => {
+  const badges: string[] = [];
+  if (scheme.isHighContrast) badges.push("WCAG");
+  if (scheme.isColorblindSafe && !scheme.isHighContrast) badges.push("CVD");
+  const suffix = badges.length > 0 ? ` (${badges.join(", ")})` : "";
+  return {
+    value: scheme.id,
+    label: `${scheme.label}${suffix}`,
+  };
+});
 
 const baseControls: ControlConfig[] = [
   {

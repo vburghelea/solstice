@@ -18,6 +18,7 @@ import { updateOrganizationAccessSettings } from "~/features/organizations/join-
 import { useOrgContext } from "~/features/organizations/org-context";
 import { getOrganization } from "~/features/organizations/organizations.queries";
 import { isFeatureEnabled, requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/organization-access")({
   beforeLoad: () => {
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/dashboard/sin/organization-access")({
       requireFeatureInRoute("org_join_requests");
     }
   },
+  head: () => createPageHead("Organization access"),
   component: OrganizationAccessPage,
 });
 

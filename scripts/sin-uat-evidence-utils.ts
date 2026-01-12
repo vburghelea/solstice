@@ -109,9 +109,27 @@ export const settlePostLogin = async (page: Page) => {
   }
 };
 
+// Robust dashboard navigation with fallback
+export const ensureDashboard = async (page: Page) => {
+  const target = /\/dashboard(\/select-org)?/;
+  try {
+    await page.waitForURL(target, { timeout: 30_000 });
+    return;
+  } catch {
+    // Fallback: force navigation and wait again (handles odd download intercepts)
+    try {
+      await safeGoto(page, `${config.baseUrl}/dashboard/sin`);
+    } catch {
+      // ignore and rely on final wait
+    }
+    await page.waitForURL(target, { timeout: 15_000 }).catch(() => {});
+  }
+};
+
 // Complete full MFA login flow
 export const login = async (page: Page) => {
   await page.context().clearCookies();
+  console.log("Login: navigating to auth/login...");
   await page.goto(`${config.baseUrl}/auth/login`, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(750);
 
@@ -122,28 +140,70 @@ export const login = async (page: Page) => {
   }
 
   // Enter email
+  console.log("Login: entering email...");
   await page.getByRole("textbox", { name: "Email" }).fill(config.email);
   await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Enter password
-  await page.waitForTimeout(750);
+  // Enter password - wait for field to be ready
+  await page.waitForTimeout(2000);
   const passwordInput = page.locator('input[type="password"]');
   await passwordInput.waitFor({ state: "visible", timeout: 60_000 });
-  await passwordInput.fill(config.password);
   await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Login" }).click();
 
-  // Handle MFA if shown
-  const authButton = page.getByRole("button", { name: "Authenticator code" });
+  // Simple fill approach
+  console.log("Login: filling password...");
+  await passwordInput.fill(config.password);
+  await page.waitForTimeout(800);
+
+  // Verify and log
+  const passwordValue = await passwordInput.inputValue();
+  console.log(`Login: password length entered: ${passwordValue?.length ?? 0}`);
+  if (!passwordValue) {
+    console.log("Login: password empty, trying click + fill...");
+    await passwordInput.click();
+    await page.waitForTimeout(300);
+    await passwordInput.fill(config.password);
+    await page.waitForTimeout(500);
+  }
+
+  console.log("Login: submitting password...");
+  console.log(`Login: current URL before click: ${page.url()}`);
+  await page.getByRole("button", { name: "Login" }).click();
+  await page.waitForTimeout(2000);
+  console.log(`Login: current URL after click: ${page.url()}`);
+
+  // Give the MFA form time to render before racing
+  await page.waitForTimeout(3000);
+
+  const authChoiceButton = page.getByRole("button", { name: "Authenticator code" });
+  const immediateCodeInput = page.getByRole("textbox", { name: "Authentication code" });
+  if (await authChoiceButton.isVisible().catch(() => false)) {
+    console.log("Login: authenticator choice visible immediately, completing MFA...");
+    await authChoiceButton.click();
+    await immediateCodeInput
+      .waitFor({ state: "visible", timeout: 10_000 })
+      .catch(() => {});
+    if (await immediateCodeInput.isVisible().catch(() => false)) {
+      const code = generateTOTP();
+      await immediateCodeInput.fill(code);
+      await page.getByRole("button", { name: /Verify/ }).click();
+      await ensureDashboard(page);
+      await settlePostLogin(page);
+      return;
+    }
+  }
+
+  // Handle MFA if shown - detect either MFA code input or dashboard URL
+  const mfaCodeInput = page.getByRole("textbox", { name: "Authentication code" });
   let nextStep: "auth" | "dashboard" | null = null;
   try {
     nextStep = await Promise.race([
-      authButton
-        .waitFor({ state: "visible", timeout: 20_000 })
+      mfaCodeInput
+        .waitFor({ state: "visible", timeout: 30_000 })
         .then(() => "auth" as const),
       page
-        .waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 })
+        .waitForURL(/\/dashboard(\/select-org)?/, { timeout: 30_000 })
         .then(() => "dashboard" as const),
     ]);
   } catch {
@@ -151,22 +211,57 @@ export const login = async (page: Page) => {
   }
 
   if (nextStep === "auth") {
-    await authButton.click();
+    console.log("Login: MFA challenge visible, entering code...");
     const code = generateTOTP();
-    await page.getByRole("textbox", { name: "Authentication code" }).fill(code);
+    await mfaCodeInput.fill(code);
     await page.waitForTimeout(500);
     await page.getByRole("button", { name: "Verify code" }).click();
-    await page.waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 });
+    await ensureDashboard(page);
   } else if (nextStep !== "dashboard") {
+    console.log("Login: dashboard not reached yet, checking for errors...");
+    console.log(`Login: page URL after wait: ${page.url()}`);
+    // Save debug screenshot
+    await page.screenshot({ path: "outputs/debug-login-failure.png" }).catch(() => {});
+    // Check for inline error message first
+    const inlineError = await page
+      .locator(".text-destructive, .text-red-500, [role='alert']")
+      .first()
+      .textContent({ timeout: 3000 })
+      .catch(() => null);
+    console.log(`Login: inline error text: ${inlineError ?? "none"}`);
+    if (inlineError && /invalid|incorrect|error/i.test(inlineError)) {
+      throw new Error(`Login failed: ${inlineError.trim()}`);
+    }
     // Check for error toast
-    const toast = await page.locator("[data-sonner-toast]").first().textContent();
-    if (toast) {
+    const toast = await page
+      .locator("[data-sonner-toast]")
+      .first()
+      .textContent({ timeout: 3000 })
+      .catch(() => null);
+    console.log(`Login: toast text: ${toast ?? "none"}`);
+    if (toast && /invalid|incorrect|error|failed/i.test(toast)) {
       throw new Error(`Login failed: ${toast.trim()}`);
     }
-    await page.waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 });
+    await ensureDashboard(page);
   }
 
   // Handle org selection
+  if (!page.url().includes("/dashboard")) {
+    const authButton = page.getByRole("button", { name: "Authenticator code" });
+    const codeInput = page.getByRole("textbox", { name: "Authentication code" });
+    if (await authButton.isVisible().catch(() => false)) {
+      console.log("Login: retrying MFA via authenticator button...");
+      await authButton.click();
+      await codeInput.waitFor({ state: "visible", timeout: 10_000 }).catch(() => {});
+      if (await codeInput.isVisible().catch(() => false)) {
+        const code = generateTOTP();
+        await codeInput.fill(code);
+        await page.getByRole("button", { name: /Verify/ }).click();
+        await ensureDashboard(page);
+      }
+    }
+  }
+
   await settlePostLogin(page);
 };
 
@@ -288,7 +383,10 @@ export const safeGoto = async (page: Page, url: string) => {
   try {
     await page.goto(url, { waitUntil: "domcontentloaded" });
   } catch (error) {
-    if (!(error instanceof Error) || !error.message.includes("net::ERR_ABORTED")) {
+    const message = error instanceof Error ? error.message : "";
+    const allowed =
+      message.includes("net::ERR_ABORTED") || message.includes("Download is starting");
+    if (!allowed) {
       throw error;
     }
   }
@@ -323,14 +421,64 @@ export const dragTo = async (
 };
 
 // Launch browser and setup for evidence capture
-export const setupEvidenceCapture = async (reqId: string, recordVideo = true) => {
+type SetupOptions = {
+  recordVideo?: boolean;
+  recordLogin?: boolean;
+};
+
+export const setupEvidenceCapture = async (reqId: string, options: SetupOptions = {}) => {
+  const recordVideo = options.recordVideo ?? true;
+  const recordLogin = options.recordLogin ?? true;
   const screenshotDir = getScreenshotDir(reqId);
   const videoDir = getVideoDir();
 
   await mkdir(screenshotDir, { recursive: true });
   await mkdir(videoDir, { recursive: true });
+  await mkdir("outputs", { recursive: true });
 
   const browser = await chromium.launch({ headless: true });
+  // If we want to avoid recording login, authenticate in a temporary context,
+  // persist storage state, then start a recorded context reusing that state.
+  if (!recordLogin && recordVideo) {
+    const storageStatePath = path.join(
+      "outputs",
+      `storage-${reqId}-${getTimestamp()}.json`,
+    );
+
+    const stagingContext = await browser.newContext({
+      viewport: config.viewport,
+      acceptDownloads: true,
+    });
+    const stagingPage = await stagingContext.newPage();
+    await login(stagingPage);
+    await waitForIdle(stagingPage);
+    await settlePostLogin(stagingPage);
+    await stagingContext.storageState({ path: storageStatePath });
+    await stagingContext.close();
+
+    const recordedContext = await browser.newContext({
+      viewport: config.viewport,
+      acceptDownloads: true,
+      storageState: storageStatePath,
+      recordVideo: { dir: videoDir, size: config.viewport },
+    });
+
+    const page = await recordedContext.newPage();
+    const takeScreenshot = createScreenshotHelper(page, screenshotDir);
+    await safeGoto(page, `${config.baseUrl}/dashboard`);
+    await settlePostLogin(page);
+    await waitForIdle(page);
+
+    return {
+      browser,
+      context: recordedContext,
+      page,
+      takeScreenshot,
+      screenshotDir,
+      videoDir,
+    };
+  }
+
   const context = recordVideo
     ? await createRecordingContext(browser, videoDir)
     : await browser.newContext({

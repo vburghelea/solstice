@@ -5,8 +5,10 @@ import { useAuth } from "~/features/auth";
 import { useOrgContext } from "~/features/organizations/org-context";
 import type { AuthUser } from "~/lib/auth/types";
 import { GLOBAL_ADMIN_ROLE_NAMES } from "~/lib/auth/utils/admin-check";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/analytics/explore")({
+  head: () => createPageHead("Analytics Explorer"),
   component: AnalyticsExplorePage,
 });
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { FormErrorSummary } from "~/components/form-fields/FormErrorSummary";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { LogoIcon } from "~/components/ui/icons";
@@ -133,9 +134,7 @@ export default function ForgotPasswordForm() {
             Send reset link
           </FormSubmitButton>
 
-          {errorMessage ? (
-            <span className="text-destructive text-center text-sm">{errorMessage}</span>
-          ) : null}
+          {errorMessage ? <FormErrorSummary errors={[errorMessage]} /> : null}
         </div>
       </form>
 

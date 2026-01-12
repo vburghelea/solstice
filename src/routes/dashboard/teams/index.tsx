@@ -14,6 +14,7 @@ import { LoaderIcon, PlusIcon, UsersIcon } from "~/components/ui/icons";
 import { TeamInvitationsSection } from "~/features/teams/components/team-invitations";
 import type { PendingTeamInvite, UserTeam } from "~/features/teams/teams.queries";
 import { getPendingTeamInvites, getUserTeams } from "~/features/teams/teams.queries";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/dashboard/teams/")({
     const pendingInvites = (await getPendingTeamInvites()) as PendingTeamInvite[];
     return { userTeams, pendingInvites };
   },
+  head: () => createPageHead("My Teams"),
   component: TeamsIndexPage,
 });
 

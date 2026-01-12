@@ -23,6 +23,10 @@ const CANONICAL_STAGE_LIST = [
   "sin-prod",
 ] as const;
 
+// Personal dev stages for `sst dev` (not deployed, just local development)
+// Format: {tenant}-{username} e.g., sin-austin, qc-austin
+const PERSONAL_DEV_STAGE_PATTERN = /^(qc|sin)-([a-z][a-z0-9-]*)$/;
+
 const parseTenantKey = (value: string | undefined, label: string) => {
   if (!value) return undefined;
   if (value === "qc" || value === "viasport") return value;
@@ -40,11 +44,21 @@ const resolveStageInfo = (rawStage: string | undefined): StageInfo => {
     return { stage, stageEnv, stageTenant, isCanonical: true };
   }
 
+  // Check for personal dev stages (e.g., sin-austin, qc-austin)
+  const personalDevMatch = PERSONAL_DEV_STAGE_PATTERN.exec(stage);
+  if (personalDevMatch) {
+    const prefix = personalDevMatch[1] as "qc" | "sin";
+    const stageTenant: StageTenantKey = prefix === "qc" ? "qc" : "viasport";
+    // Personal dev stages are always "dev" environment
+    return { stage, stageEnv: "dev", stageTenant, isCanonical: false };
+  }
+
+  // If starts with qc- or sin- but doesn't match canonical or personal dev pattern, error
   if (stage.startsWith("qc-") || stage.startsWith("sin-")) {
     throw new Error(
-      `Invalid canonical stage "${stage}". Expected one of: ${CANONICAL_STAGE_LIST.join(
+      `Invalid stage "${stage}". Expected one of: ${CANONICAL_STAGE_LIST.join(
         ", ",
-      )}`,
+      )}, or a personal dev stage like "sin-austin" or "qc-austin".`,
     );
   }
 
@@ -72,8 +86,9 @@ const resolveTenantEnv = (info: StageInfo) => {
     );
   }
 
-  if (info.isCanonical) {
-    const expected = info.stageTenant!;
+  // Use stageTenant if set (canonical or personal dev stages)
+  if (info.stageTenant) {
+    const expected = info.stageTenant;
     if (envTenantKey && envTenantKey !== expected) {
       throw new Error(
         `Stage "${info.stage}" maps to tenant "${expected}" but TENANT_KEY="${envTenantKey}" was provided.`,

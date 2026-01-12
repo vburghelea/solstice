@@ -170,6 +170,7 @@ const IDS = {
   coachingFormId: "a0000000-0000-4000-8002-000000000004",
   bcHockeyFacilitiesFormId: "a0000000-0000-4000-8002-000000000005",
   bcHockeySafetyFormId: "a0000000-0000-4000-8002-000000000006",
+  facilityUsageDemoFormId: "a0000000-0000-4000-8002-000000000007",
 
   // Form Versions (RFC 4122 compliant UUIDs)
   annualStatsFormV1Id: "a0000000-0000-4000-8003-000000000001",
@@ -178,11 +179,13 @@ const IDS = {
   coachingFormV1Id: "a0000000-0000-4000-8003-000000000004",
   bcHockeyFacilitiesFormV1Id: "a0000000-0000-4000-8003-000000000005",
   bcHockeySafetyFormV1Id: "a0000000-0000-4000-8003-000000000006",
+  facilityUsageDemoFormV1Id: "a0000000-0000-4000-8003-000000000007",
 
   // Reporting Cycles (RFC 4122 compliant UUIDs)
   fy2425CycleId: "a0000000-0000-4000-8004-000000000001",
   q42024CycleId: "a0000000-0000-4000-8004-000000000002",
   q12025CycleId: "a0000000-0000-4000-8004-000000000003",
+  q12026CycleId: "a0000000-0000-4000-8004-000000000004",
 
   // Reporting Tasks (RFC 4122 compliant UUIDs)
   annualTask1Id: "a0000000-0000-4000-8005-000000000001",
@@ -192,6 +195,8 @@ const IDS = {
   annualTask4Id: "a0000000-0000-4000-8005-000000000005",
   annualTask5Id: "a0000000-0000-4000-8005-000000000006",
   quarterlyTask2Id: "a0000000-0000-4000-8005-000000000007",
+  q12026TaskId: "a0000000-0000-4000-8005-000000000008",
+  viasportBcTaskId: "a0000000-0000-4000-8005-000000000009",
 
   // Policy Documents (RFC 4122 compliant UUIDs)
   privacyPolicyId: "a0000000-0000-4000-8006-000000000001",
@@ -205,9 +210,11 @@ const IDS = {
   bcHockeyUnderReviewSubmissionId: "a0000000-0000-4000-8007-000000000005",
   bcHockeyApprovedSubmissionId: "a0000000-0000-4000-8007-000000000006",
   bcHockeyRejectedSubmissionId: "a0000000-0000-4000-8007-000000000007",
+  facilityUsageDemoSubmissionId: "a0000000-0000-4000-8007-000000000008",
 
   // Submission Files (RFC 4122 compliant UUIDs)
   quarterlyFinFileId: "a0000000-0000-4000-8008-000000000001",
+  facilityUsageDemoFileId: "a0000000-0000-4000-8008-000000000002",
 
   // Templates (RFC 4122 compliant UUIDs)
   reportingTemplateId: "a0000000-0000-4000-8009-000000000001",
@@ -303,6 +310,9 @@ const IDS = {
   reportingSubmissionChangesRequestedId: "a0000000-0000-4000-8028-000000000003",
   reportingSubmissionOverdueId: "a0000000-0000-4000-8028-000000000004",
   reportingSubmissionUnderReviewId: "a0000000-0000-4000-8028-000000000005",
+  q12026SubmissionBcHockeyId: "a0000000-0000-4000-8028-000000000006",
+  q12026SubmissionBcSoccerId: "a0000000-0000-4000-8028-000000000007",
+  viasportBcSubmissionId: "a0000000-0000-4000-8028-000000000008",
 
   // Reporting Submission History (RFC 4122 compliant UUIDs)
   reportingHistoryId1: "a0000000-0000-4000-8029-000000000001",
@@ -403,6 +413,11 @@ const computeBiChecksum = (params: {
   return createHmac("sha256", params.secret).update(payload).digest("hex");
 };
 
+// Deterministic UUID generator (keeps variant nibble set via namespace group)
+const makeDeterministicUuid = (namespace: string, counter: number): string => {
+  return `b0000000-0000-4000-${namespace}-${counter.toString().padStart(12, "0")}`;
+};
+
 async function seed() {
   console.log("🌱 Seeding viaSport SIN test data...");
   console.log("   This creates a realistic org hierarchy and reporting environment.\n");
@@ -468,6 +483,7 @@ async function seed() {
     await db.delete(reportingSubmissions);
     await db.delete(reportingTasks);
     await db.delete(reportingCycles);
+    await db.delete(auditLogs);
     await db.delete(submissionFiles);
     await db.delete(formSubmissionVersions);
     await db.delete(formSubmissions);
@@ -1335,6 +1351,45 @@ async function seed() {
           settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
         },
       },
+      {
+        id: IDS.facilityUsageDemoFormId,
+        versionId: IDS.facilityUsageDemoFormV1Id,
+        organizationId: IDS.viasportBcId,
+        name: "Facility Usage Survey (Demo)",
+        slug: "facility-usage-demo",
+        description: "Demo facility usage survey with file upload",
+        status: "published" as const,
+        definition: {
+          fields: [
+            {
+              key: "facility_name",
+              type: "text",
+              label: "Facility Name",
+              required: true,
+            },
+            {
+              key: "usage_date",
+              type: "date",
+              label: "Usage Date",
+              required: true,
+            },
+            {
+              key: "total_hours",
+              type: "number",
+              label: "Total Hours Used",
+              required: true,
+            },
+            {
+              key: "usage_report",
+              type: "file",
+              label: "Usage Report",
+              required: true,
+              fileConfig: { allowedTypes: ["application/pdf"] },
+            },
+          ],
+          settings: { allowDraft: true, requireApproval: true, notifyOnSubmit: [] },
+        },
+      },
     ];
 
     for (const form of formsData) {
@@ -1397,8 +1452,17 @@ async function seed() {
         status: "upcoming",
         createdBy: IDS.viasportStaffId,
       },
+      {
+        id: IDS.q12026CycleId,
+        name: "Q1 2026 Quarterly",
+        description: "Quarterly reporting cycle for Q1 2026",
+        startDate: "2026-01-01",
+        endDate: "2026-03-31",
+        status: "active",
+        createdBy: IDS.viasportStaffId,
+      },
     ]);
-    console.log("   ✓ Created 3 reporting cycles\n");
+    console.log("   ✓ Created 4 reporting cycles\n");
 
     // ========================================
     // PHASE 9: Create reporting tasks
@@ -1484,8 +1548,28 @@ async function seed() {
         dueDate: formatDateOnly(dueSoon),
         reminderConfig: { daysBeforeDue: [14, 7] },
       },
+      {
+        id: IDS.q12026TaskId,
+        cycleId: IDS.q12026CycleId,
+        formId: IDS.annualStatsFormId,
+        organizationType: "pso",
+        title: "Q1 2026 Statistics Report - All PSOs",
+        description: "Quarterly statistics for all PSOs",
+        dueDate: "2026-03-15",
+        reminderConfig: { daysBeforeDue: [14, 7, 3, 1] },
+      },
+      {
+        id: IDS.viasportBcTaskId,
+        cycleId: IDS.q12026CycleId,
+        formId: IDS.facilityUsageDemoFormId,
+        organizationId: IDS.viasportBcId,
+        title: "Q1 2026 Facility Usage - viaSport BC",
+        description: "Demonstrate viaSport BC task assignment for walkthroughs",
+        dueDate: formatDateOnly(dueSoon),
+        reminderConfig: { daysBeforeDue: [14, 7, 3, 1] },
+      },
     ]);
-    console.log("   ✓ Created 7 reporting tasks\n");
+    console.log("   ✓ Created 9 reporting tasks\n");
 
     // ========================================
     // PHASE 10: Create sample submissions
@@ -1577,6 +1661,64 @@ async function seed() {
         checksum: "seed",
         storageKey: supportingDocs.storageKey,
         uploadedBy: IDS.psoAdminId,
+      });
+    }
+
+    // Facility usage submission (demo form with file upload)
+    const facilityUsageReport = await uploadSeedArtifact({
+      key: `submissions/${IDS.facilityUsageDemoSubmissionId}/usage-report.pdf`,
+      body: "Sample facility usage report (seed data)",
+      contentType: "application/pdf",
+    });
+
+    const facilityUsagePayload: JsonRecord = {
+      facility_name: "Richmond Olympic Oval",
+      usage_date: new Date().toISOString().slice(0, 10),
+      total_hours: 42,
+      usage_report: null,
+    };
+
+    if (facilityUsageReport) {
+      facilityUsagePayload["usage_report"] = {
+        storageKey: facilityUsageReport.storageKey,
+        fileName: "usage-report.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: facilityUsageReport.sizeBytes,
+        checksum: "seed",
+      };
+    } else {
+      facilityUsagePayload["usage_report"] = {
+        storageKey: "seed/usage-report.pdf",
+        fileName: "usage-report.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 0,
+        checksum: "seed",
+      };
+    }
+
+    await db.insert(formSubmissions).values({
+      id: IDS.facilityUsageDemoSubmissionId,
+      formId: IDS.facilityUsageDemoFormId,
+      formVersionId: IDS.facilityUsageDemoFormV1Id,
+      organizationId: IDS.viasportBcId,
+      submitterId: IDS.viasportStaffId,
+      status: "submitted",
+      payload: facilityUsagePayload,
+      completenessScore: 100,
+      submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 12),
+    });
+
+    if (facilityUsageReport) {
+      await db.insert(submissionFiles).values({
+        id: IDS.facilityUsageDemoFileId,
+        submissionId: IDS.facilityUsageDemoSubmissionId,
+        fieldKey: "usage_report",
+        fileName: "usage-report.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: facilityUsageReport.sizeBytes,
+        checksum: "seed",
+        storageKey: facilityUsageReport.storageKey,
+        uploadedBy: IDS.viasportStaffId,
       });
     }
 
@@ -1677,6 +1819,57 @@ async function seed() {
       },
     ]);
 
+    // Broad analytics dataset across PSOs and clubs for pivot/exports
+    const analyticsOrgs = [
+      IDS.bcHockeyId,
+      IDS.bcSoccerId,
+      IDS.bcAthleticsId,
+      IDS.vanMinorHockeyId,
+      IDS.victoriaHockeyId,
+      IDS.whitecapsAcademyId,
+      IDS.bcSoccerDevLeagueId,
+      IDS.vanThunderbirdsId,
+      IDS.northShoreClubId,
+    ];
+
+    const analyticsStatuses: Array<"submitted" | "approved" | "under_review" | "draft"> =
+      ["submitted", "approved", "under_review", "draft"];
+
+    const analyticsSubmissions = analyticsOrgs.flatMap((orgId, idx) => {
+      return Array.from({ length: 3 }, (_, n) => {
+        const status = analyticsStatuses[(idx + n) % analyticsStatuses.length];
+        const submittedAt =
+          status === "draft"
+            ? null
+            : new Date(Date.now() - (idx * 3 + n + 1) * 1000 * 60 * 60 * 24);
+
+        return {
+          id: makeDeterministicUuid("8007", 1000 + idx * 3 + n),
+          formId: IDS.annualStatsFormId,
+          formVersionId: IDS.annualStatsFormV1Id,
+          organizationId: orgId,
+          submitterId: IDS.psoAdminId,
+          status,
+          payload: {
+            total_participants: 150 + 15 * (idx + n),
+            male_participants: 80 + 10 * (idx + n),
+            female_participants: 60 + 8 * (idx + n),
+            youth_under_18: 90 + 12 * (idx + n),
+            adults_18_plus: 60 + 6 * (idx + n),
+            coaches_certified: 10 + (idx + n),
+            events_held: 5 + (idx % 4),
+          },
+          completenessScore: 100,
+          submittedAt: submittedAt ?? undefined,
+        };
+      });
+    });
+
+    const bcHockeyAnalyticsSubmissionId = makeDeterministicUuid("8007", 1000);
+    const bcSoccerAnalyticsSubmissionId = makeDeterministicUuid("8007", 1003);
+
+    await db.insert(formSubmissions).values(analyticsSubmissions);
+
     await db.insert(formSubmissionVersions).values([
       {
         id: IDS.submissionVersionId1,
@@ -1758,6 +1951,31 @@ async function seed() {
         submittedAt: submittedAtUnderReview,
         submittedBy: IDS.psoAdminId,
       },
+      {
+        id: IDS.q12026SubmissionBcHockeyId,
+        taskId: IDS.q12026TaskId,
+        organizationId: IDS.bcHockeyId,
+        formSubmissionId: null,
+        status: "not_started",
+      },
+      {
+        id: IDS.q12026SubmissionBcSoccerId,
+        taskId: IDS.q12026TaskId,
+        organizationId: IDS.bcSoccerId,
+        formSubmissionId: bcSoccerAnalyticsSubmissionId,
+        status: "submitted",
+        submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+        submittedBy: IDS.psoAdminId,
+      },
+      {
+        id: IDS.viasportBcSubmissionId,
+        taskId: IDS.viasportBcTaskId,
+        organizationId: IDS.viasportBcId,
+        formSubmissionId: IDS.facilityUsageDemoSubmissionId,
+        status: "submitted",
+        submittedAt: new Date(Date.now() - 1000 * 60 * 30),
+        submittedBy: IDS.viasportStaffId,
+      },
     ]);
 
     await db.insert(reportingSubmissionHistory).values([
@@ -1807,14 +2025,14 @@ async function seed() {
         organizationId: IDS.bcHockeyId,
         type: "csv",
         lane: "interactive",
-        sourceFileKey: "imports/bc-hockey/validating-upload.csv",
+        sourceFileKey: "imports/demo/import-demo-annual-stats-errors.csv",
         sourceFileHash: "seed-validating-hash",
-        sourceRowCount: 95,
+        sourceRowCount: 4,
         targetFormId: IDS.annualStatsFormId,
         mappingTemplateId: IDS.importTemplateId1,
         status: "validating",
-        progressCheckpoint: 42,
-        stats: { rowsProcessed: 42 },
+        progressCheckpoint: 2,
+        stats: { rowsProcessed: 2 },
         createdBy: IDS.psoAdminId,
         startedAt: new Date(Date.now() - 1000 * 60 * 15),
       },
@@ -1823,16 +2041,16 @@ async function seed() {
         organizationId: IDS.bcHockeyId,
         type: "csv",
         lane: "batch",
-        sourceFileKey: "imports/bc-hockey/failed-upload.csv",
+        sourceFileKey: "imports/errors/import-demo-annual-stats-errors.csv",
         sourceFileHash: "seed-failed-hash",
-        sourceRowCount: 140,
+        sourceRowCount: 4,
         targetFormId: IDS.annualStatsFormId,
         mappingTemplateId: IDS.importTemplateId1,
         status: "failed",
-        progressCheckpoint: 67,
-        stats: { rowsProcessed: 67, errors: 5 },
-        errorReportKey: "imports/errors/bc-hockey-failed.csv",
-        errorSummary: { missingFields: 3, invalidValues: 2 },
+        progressCheckpoint: 4,
+        stats: { rowsProcessed: 4, errors: 2 },
+        errorReportKey: "imports/errors/import-demo-annual-stats-errors.csv",
+        errorSummary: { missingFields: 1, invalidValues: 1 },
         createdBy: IDS.psoAdminId,
         startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
         completedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
@@ -1842,14 +2060,14 @@ async function seed() {
         organizationId: IDS.bcHockeyId,
         type: "csv",
         lane: "interactive",
-        sourceFileKey: "imports/bc-hockey/completed-upload.csv",
+        sourceFileKey: "imports/demo/import-demo-annual-stats-large.csv",
         sourceFileHash: "seed-completed-hash",
-        sourceRowCount: 210,
+        sourceRowCount: 50,
         targetFormId: IDS.annualStatsFormId,
         mappingTemplateId: IDS.importTemplateId1,
         status: "completed",
-        progressCheckpoint: 210,
-        stats: { rowsProcessed: 210 },
+        progressCheckpoint: 50,
+        stats: { rowsProcessed: 50 },
         createdBy: IDS.psoAdminId,
         startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
         completedAt: new Date(Date.now() - 1000 * 60 * 60 * 23),
@@ -1877,20 +2095,20 @@ async function seed() {
       {
         id: IDS.importJobErrorId1,
         jobId: IDS.importJobFailedId,
-        rowNumber: 12,
-        fieldKey: "total_participants",
+        rowNumber: 1,
+        fieldKey: "certified_coaches",
         errorType: "required",
-        errorMessage: "Total Participants is required.",
-        rawValue: "",
+        errorMessage: "Missing required column: certified_coaches.",
+        rawValue: null,
       },
       {
         id: IDS.importJobErrorId2,
         jobId: IDS.importJobFailedId,
-        rowNumber: 24,
-        fieldKey: "male_participants",
+        rowNumber: 2,
+        fieldKey: "total_registered",
         errorType: "invalid",
-        errorMessage: "Value must be a number.",
-        rawValue: "N/A",
+        errorMessage: "Invalid number format.",
+        rawValue: "not a number",
       },
     ]);
 
@@ -2566,105 +2784,319 @@ async function seed() {
     console.log("   ✓ Created data quality run history\n");
 
     // ========================================
-    // PHASE 23: Create audit log entries (if empty)
+    // PHASE 23: Create audit log entries
     // ========================================
     console.log("Phase 23: Creating audit log entries...");
 
-    const [{ count: auditCount }] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(auditLogs);
+    const auditId = (index: number) => makeDeterministicUuid("8035", 200 + index);
 
-    if (Number(auditCount) === 0) {
-      const auditSeedEntries = [
-        {
-          id: IDS.auditLogId1,
-          action: "organization.update",
-          actionCategory: "ADMIN",
-          actorUserId: IDS.viasportStaffId,
-          actorOrgId: IDS.viasportBcId,
-          actorIp: "203.0.113.10",
-          actorUserAgent: "SeedScript/1.0",
-          targetType: "organization",
-          targetId: IDS.bcHockeyId,
-          targetOrgId: IDS.bcHockeyId,
-          changes: {
-            "metadata.reportingFrequency": { old: "Annual", new: "Quarterly" },
-          },
-          metadata: { source: "seed" },
-          requestId: "seed-audit-001",
+    const auditSeedEntries = [
+      {
+        id: IDS.auditLogId1,
+        action: "organization.update",
+        actionCategory: "ADMIN",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        actorIp: "203.0.113.10",
+        actorUserAgent: "SeedScript/1.0",
+        targetType: "organization",
+        targetId: IDS.bcHockeyId,
+        targetOrgId: IDS.bcHockeyId,
+        changes: {
+          "metadata.reportingFrequency": { old: "Annual", new: "Quarterly" },
         },
-        {
-          id: IDS.auditLogId2,
-          action: "reporting.submission.review",
-          actionCategory: "DATA",
-          actorUserId: IDS.viasportStaffId,
-          actorOrgId: IDS.bcHockeyId,
-          actorIp: "203.0.113.10",
-          actorUserAgent: "SeedScript/1.0",
-          targetType: "reporting_submission",
-          targetId: IDS.reportingSubmissionQuarterlyId,
-          targetOrgId: IDS.bcHockeyId,
-          changes: { status: { old: "submitted", new: "approved" } },
-          metadata: { source: "seed" },
-          requestId: "seed-audit-002",
+        metadata: { source: "seed" },
+        requestId: "seed-audit-001",
+      },
+      {
+        id: IDS.auditLogId2,
+        action: "reporting.submission.review",
+        actionCategory: "DATA",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.bcHockeyId,
+        actorIp: "203.0.113.10",
+        actorUserAgent: "SeedScript/1.0",
+        targetType: "reporting_submission",
+        targetId: IDS.reportingSubmissionQuarterlyId,
+        targetOrgId: IDS.bcHockeyId,
+        changes: { status: { old: "submitted", new: "approved" } },
+        metadata: { source: "seed" },
+        requestId: "seed-audit-002",
+      },
+      {
+        id: auditId(1),
+        action: "auth.login_success",
+        actionCategory: "AUTH",
+        actorUserId: IDS.viasportStaffId,
+        actorIp: "203.0.113.12",
+        targetType: "session",
+        targetId: "sess-login-001",
+        metadata: { method: "password" },
+        requestId: "seed-audit-003",
+      },
+      {
+        id: auditId(2),
+        action: "auth.mfa_verify",
+        actionCategory: "AUTH",
+        actorUserId: IDS.viasportStaffId,
+        actorIp: "203.0.113.12",
+        targetType: "session",
+        targetId: "sess-login-001",
+        metadata: { method: "totp" },
+        requestId: "seed-audit-004",
+      },
+      {
+        id: auditId(3),
+        action: "data.form_submitted",
+        actionCategory: "DATA",
+        actorUserId: IDS.psoAdminId,
+        actorOrgId: IDS.bcHockeyId,
+        targetType: "form_submission",
+        targetId: IDS.annualStatsSubmissionId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: { includesPii: true },
+        requestId: "seed-audit-005",
+      },
+      {
+        id: auditId(4),
+        action: "data.form_approved",
+        actionCategory: "DATA",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "form_submission",
+        targetId: IDS.bcHockeyApprovedSubmissionId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: { includesPii: false },
+        requestId: "seed-audit-006",
+      },
+      {
+        id: auditId(5),
+        action: "bi.export",
+        actionCategory: "EXPORT",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "bi_dataset",
+        targetId: "form_submissions",
+        targetOrgId: IDS.viasportBcId,
+        metadata: {
+          includesPii: true,
+          stepUpAuthUsed: true,
+          format: "csv",
+          rowCount: 47,
         },
-      ];
+        requestId: "seed-audit-007",
+      },
+      {
+        id: auditId(6),
+        action: "bi.export",
+        actionCategory: "EXPORT",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "bi_dataset",
+        targetId: "form_submissions",
+        targetOrgId: IDS.viasportBcId,
+        metadata: {
+          includesPii: false,
+          stepUpAuthUsed: true,
+          format: "xlsx",
+          rowCount: 128,
+        },
+        requestId: "seed-audit-008",
+      },
+      {
+        id: auditId(7),
+        action: "security.mfa_enabled",
+        actionCategory: "SECURITY",
+        actorUserId: IDS.viasportStaffId,
+        targetType: "user",
+        targetId: IDS.psoAdminId,
+        metadata: {},
+        requestId: "seed-audit-009",
+      },
+      {
+        id: auditId(8),
+        action: "security.password_changed",
+        actionCategory: "SECURITY",
+        actorUserId: IDS.clubReporterId,
+        targetType: "user",
+        targetId: IDS.clubReporterId,
+        metadata: { method: "self_service" },
+        requestId: "seed-audit-010",
+      },
+      {
+        id: auditId(9),
+        action: "admin.user_role_changed",
+        actionCategory: "ADMIN",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "user",
+        targetId: IDS.clubReporterId,
+        metadata: { changes: { role: { old: "viewer", new: "reporter" } } },
+        requestId: "seed-audit-011",
+      },
+      {
+        id: auditId(10),
+        action: "admin.org_settings_updated",
+        actionCategory: "ADMIN",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "organization",
+        targetId: IDS.bcHockeyId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: { settings: { fiscalYearEnd: "03-31" } },
+        requestId: "seed-audit-012",
+      },
+      {
+        id: auditId(11),
+        action: "reporting.task_assigned",
+        actionCategory: "DATA",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "reporting_task",
+        targetId: IDS.q12026TaskId,
+        targetOrgId: IDS.bcSoccerId,
+        metadata: { reminders: [14, 7, 3, 1] },
+        requestId: "seed-audit-013",
+      },
+      {
+        id: auditId(12),
+        action: "reporting.submission.approved",
+        actionCategory: "DATA",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "reporting_submission",
+        targetId: IDS.reportingSubmissionQuarterlyId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: { status: "approved" },
+        requestId: "seed-audit-014",
+      },
+      {
+        id: auditId(13),
+        action: "data.import_completed",
+        actionCategory: "DATA",
+        actorUserId: IDS.psoAdminId,
+        actorOrgId: IDS.bcHockeyId,
+        targetType: "import_job",
+        targetId: IDS.importJobCompletedId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: { rowsProcessed: 50, file: "import-demo-annual-stats-large.csv" },
+        requestId: "seed-audit-015",
+      },
+      {
+        id: auditId(14),
+        action: "data.import_failed",
+        actionCategory: "DATA",
+        actorUserId: IDS.psoAdminId,
+        actorOrgId: IDS.bcHockeyId,
+        targetType: "import_job",
+        targetId: IDS.importJobFailedId,
+        targetOrgId: IDS.bcHockeyId,
+        metadata: {
+          rowsProcessed: 4,
+          errors: 2,
+          includesPii: false,
+          stepUpAuthUsed: false,
+        },
+        requestId: "seed-audit-016",
+      },
+      {
+        id: auditId(15),
+        action: "auth.session_terminated",
+        actionCategory: "AUTH",
+        actorUserId: IDS.viasportStaffId,
+        targetType: "session",
+        targetId: "sess-login-002",
+        metadata: { reason: "manual_logout" },
+        requestId: "seed-audit-017",
+      },
+      {
+        id: auditId(16),
+        action: "security.step_up_challenge",
+        actionCategory: "SECURITY",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "bi_export",
+        targetId: "export-analytics-001",
+        metadata: { includesPii: true, stepUpAuthUsed: true },
+        requestId: "seed-audit-018",
+      },
+      {
+        id: auditId(17),
+        action: "audit.hash_verified",
+        actionCategory: "SECURITY",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "audit_log",
+        targetId: "chain-verify",
+        metadata: { verifiedCount: 47 },
+        requestId: "seed-audit-019",
+      },
+      {
+        id: auditId(18),
+        action: "data.form_submission.reviewed",
+        actionCategory: "DATA",
+        actorUserId: IDS.viasportStaffId,
+        actorOrgId: IDS.viasportBcId,
+        targetType: "form_submission",
+        targetId: bcSoccerAnalyticsSubmissionId,
+        targetOrgId: IDS.bcSoccerId,
+        metadata: { status: "submitted" },
+        requestId: "seed-audit-020",
+      },
+    ];
 
-      const auditRows = [];
-      let previousAuditHash: string | null = null;
-      let auditTimestamp = new Date(Date.now() - 1000 * 60 * 60 * 2);
+    const auditRows = [];
+    let previousAuditHash: string | null = null;
+    let auditTimestamp = new Date(Date.now() - 1000 * 60 * 60 * 2);
 
-      for (const entry of auditSeedEntries) {
-        const occurredAt = new Date(auditTimestamp.getTime());
-        const payload = {
-          id: entry.id,
-          occurredAt,
-          action: entry.action,
-          actionCategory: entry.actionCategory,
-          actorUserId: entry.actorUserId ?? null,
-          actorOrgId: entry.actorOrgId ?? null,
-          actorIp: entry.actorIp ?? null,
-          actorUserAgent: entry.actorUserAgent ?? null,
-          targetType: entry.targetType ?? null,
-          targetId: entry.targetId ?? null,
-          targetOrgId: entry.targetOrgId ?? null,
-          changes: entry.changes ?? null,
-          metadata: entry.metadata ?? {},
-          requestId: entry.requestId,
-          prevHash: previousAuditHash,
-        };
+    for (const entry of auditSeedEntries) {
+      const occurredAt = new Date(auditTimestamp.getTime());
+      const payload = {
+        id: entry.id,
+        occurredAt,
+        action: entry.action,
+        actionCategory: entry.actionCategory,
+        actorUserId: entry.actorUserId ?? null,
+        actorOrgId: entry.actorOrgId ?? null,
+        actorIp: entry.actorIp ?? null,
+        actorUserAgent: entry.actorUserAgent ?? null,
+        targetType: entry.targetType ?? null,
+        targetId: entry.targetId ?? null,
+        targetOrgId: entry.targetOrgId ?? null,
+        changes: entry.changes ?? null,
+        metadata: entry.metadata ?? {},
+        requestId: entry.requestId,
+        prevHash: previousAuditHash,
+      };
 
-        const entryHash = hashValue(payload);
+      const entryHash = hashValue(payload);
 
-        auditRows.push({
-          id: entry.id,
-          occurredAt,
-          createdAt: occurredAt,
-          actorUserId: entry.actorUserId ?? null,
-          actorOrgId: entry.actorOrgId ?? null,
-          actorIp: entry.actorIp ?? null,
-          actorUserAgent: entry.actorUserAgent ?? null,
-          action: entry.action,
-          actionCategory: entry.actionCategory,
-          targetType: entry.targetType ?? null,
-          targetId: entry.targetId ?? null,
-          targetOrgId: entry.targetOrgId ?? null,
-          changes: entry.changes ?? null,
-          metadata: entry.metadata ?? {},
-          requestId: entry.requestId,
-          prevHash: previousAuditHash,
-          entryHash,
-        });
+      auditRows.push({
+        id: entry.id,
+        occurredAt,
+        createdAt: occurredAt,
+        actorUserId: entry.actorUserId ?? null,
+        actorOrgId: entry.actorOrgId ?? null,
+        actorIp: entry.actorIp ?? null,
+        actorUserAgent: entry.actorUserAgent ?? null,
+        action: entry.action,
+        actionCategory: entry.actionCategory,
+        targetType: entry.targetType ?? null,
+        targetId: entry.targetId ?? null,
+        targetOrgId: entry.targetOrgId ?? null,
+        changes: entry.changes ?? null,
+        metadata: entry.metadata ?? {},
+        requestId: entry.requestId,
+        prevHash: previousAuditHash,
+        entryHash,
+      });
 
-        previousAuditHash = entryHash;
-        auditTimestamp = new Date(auditTimestamp.getTime() + 1000 * 60 * 10);
-      }
-
-      await db.insert(auditLogs).values(auditRows);
-      console.log("   ✓ Created audit log entries\n");
-    } else {
-      console.log("   → Audit logs already present; skipping audit seed.\n");
+      previousAuditHash = entryHash;
+      auditTimestamp = new Date(auditTimestamp.getTime() + 1000 * 60 * 10);
     }
+
+    await db.insert(auditLogs).values(auditRows);
+    console.log("   ✓ Created audit log entries\n");
 
     // ========================================
     // PHASE 24: Create policy documents
@@ -2821,8 +3253,8 @@ async function seed() {
     console.log(
       "Organizations created: 10 (1 governing body, 3 PSOs, 2 leagues, 4 clubs)",
     );
-    console.log("Forms created: 6 (5 published, 1 draft)");
-    console.log("Reporting cycles: 3 (1 active, 1 closed, 1 upcoming)\n");
+    console.log("Forms created: 7 (6 published, 1 draft)");
+    console.log("Reporting cycles: 4 (2 active, 1 closed, 1 upcoming)\n");
     console.log("-".repeat(60));
     console.log("🔐 FAKE MFA FOR TESTING (admin users only):");
     console.log("   TOTP Secret: use SIN_UI_TOTP_SECRET from your environment");

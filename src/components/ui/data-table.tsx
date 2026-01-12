@@ -9,7 +9,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { useLiveAnnouncer } from "~/hooks/useLiveAnnouncer";
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -43,6 +44,10 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const { announcePolite } = useLiveAnnouncer();
+  const previousVisibility = useRef<VisibilityState>({});
+  const hasAnnouncedPagination = useRef(false);
+  const hasAnnouncedSorting = useRef(false);
 
   const table = useReactTable({
     data,
@@ -64,6 +69,60 @@ export function DataTable<TData, TValue>({
   });
 
   const canRenderToolbar = enableColumnToggle || Boolean(onExport);
+  const { pageIndex, pageSize: currentPageSize } = table.getState().pagination;
+  const totalPages = table.getPageCount();
+
+  const getColumnLabel = (columnId: string) => {
+    const column = table.getColumn(columnId);
+    const header = column?.columnDef.header;
+    if (typeof header === "string") return header;
+    if (typeof header === "number") return String(header);
+    return columnId;
+  };
+
+  useEffect(() => {
+    if (!announcePolite) return;
+    if (!sorting.length) {
+      if (hasAnnouncedSorting.current) {
+        announcePolite("Sorting cleared");
+      }
+      hasAnnouncedSorting.current = true;
+      return;
+    }
+    const [currentSort] = sorting;
+    const direction = currentSort.desc ? "descending" : "ascending";
+    const label = getColumnLabel(currentSort.id);
+    announcePolite(`Sorted by ${label} ${direction}`);
+    hasAnnouncedSorting.current = true;
+  }, [announcePolite, sorting]);
+
+  useEffect(() => {
+    if (!announcePolite) return;
+    if (!hasAnnouncedPagination.current) {
+      hasAnnouncedPagination.current = true;
+      return;
+    }
+    const totalPages = table.getPageCount();
+    announcePolite(
+      `Page ${pageIndex + 1} of ${totalPages || 1}, showing up to ${currentPageSize} rows`,
+    );
+  }, [announcePolite, currentPageSize, pageIndex, totalPages]);
+
+  useEffect(() => {
+    if (!announcePolite) return;
+
+    const changedColumn = Object.keys(columnVisibility).find(
+      (key) => previousVisibility.current[key] !== columnVisibility[key],
+    );
+
+    if (changedColumn) {
+      const isVisible = columnVisibility[changedColumn] ?? true;
+      const label = getColumnLabel(changedColumn);
+      announcePolite(`${label} ${isVisible ? "shown" : "hidden"}`);
+    }
+
+    previousVisibility.current = columnVisibility;
+  }, [announcePolite, columnVisibility]);
 
   return (
     <div className="space-y-4">
@@ -110,8 +169,17 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const sortState = header.column.getIsSorted();
+                  const ariaSort =
+                    sortState === "asc"
+                      ? "ascending"
+                      : sortState === "desc"
+                        ? "descending"
+                        : header.column.getCanSort()
+                          ? "none"
+                          : undefined;
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} aria-sort={ariaSort}>
                       {header.isPlaceholder ? null : (
                         <div className="flex items-center space-x-2">
                           {flexRender(
@@ -124,6 +192,7 @@ export function DataTable<TData, TValue>({
                               size="sm"
                               className="data-[state=open]:bg-accent -ml-3 h-8"
                               onClick={header.column.getToggleSortingHandler()}
+                              aria-label={`Sort by ${getColumnLabel(header.column.id)}`}
                             >
                               <ArrowUpDown className="h-4 w-4" />
                             </Button>
@@ -163,6 +232,7 @@ export function DataTable<TData, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          aria-label="Previous page"
         >
           Previous
         </Button>
@@ -171,6 +241,7 @@ export function DataTable<TData, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          aria-label="Next page"
         >
           Next
         </Button>

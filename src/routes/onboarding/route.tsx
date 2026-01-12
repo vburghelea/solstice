@@ -4,9 +4,9 @@ import {
   getLatestPolicyDocument,
   listUserPolicyAcceptances,
 } from "~/features/privacy/privacy.queries";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/onboarding")({
-  component: OnboardingLayout,
   beforeLoad: async ({ context }) => {
     // First check if user is authenticated
     if (!context.user) {
@@ -35,6 +35,8 @@ export const Route = createFileRoute("/onboarding")({
       throw redirect({ to: "/dashboard" });
     }
   },
+  component: OnboardingLayout,
+  head: () => createPageHead("Onboarding"),
 });
 
 function OnboardingLayout() {

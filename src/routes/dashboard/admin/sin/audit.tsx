@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { AuditLogTable } from "~/features/audit/components/audit-log-table";
 import { BiQueryLogTable } from "~/features/audit/components/bi-query-log-table";
+import { createPageHead } from "~/shared/lib/page-head";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
 export const Route = createFileRoute("/dashboard/admin/sin/audit")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_admin_audit");
   },
+  head: () => createPageHead("Audit Logs"),
   component: SinAuditPage,
 });
 

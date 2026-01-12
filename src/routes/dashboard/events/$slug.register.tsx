@@ -56,6 +56,7 @@ import {
 } from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 type EmergencyContact = {
   name: string;
@@ -149,6 +150,7 @@ export const Route = createFileRoute("/dashboard/events/$slug/register")({
       });
     }
   },
+  head: () => createPageHead("Event Registration"),
   component: EventRegistrationPage,
 });
 

@@ -14,7 +14,12 @@ export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white lg:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onMenuClick}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            aria-label="Open navigation menu"
+          >
             <Menu className="h-6 w-6" />
           </Button>
           <div>

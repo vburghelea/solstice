@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SupportRequestsPanel } from "~/features/support/components/support-requests-panel";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/sin/support")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_support");
   },
+  head: () => createPageHead("Support"),
   component: SinSupportPage,
 });
 

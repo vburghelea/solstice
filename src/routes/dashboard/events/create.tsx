@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { EventCreateForm } from "~/features/events/components/event-create-form";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/events/create")({
   beforeLoad: async ({ context, location }) => {
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/dashboard/events/create")({
       });
     }
   },
+  head: () => createPageHead("Create Event"),
   component: CreateEventPage,
 });
 

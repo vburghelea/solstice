@@ -7,6 +7,7 @@ import { OrgSwitcher } from "~/features/organizations/components/org-switcher";
 import { useOrgContext } from "~/features/organizations/org-context";
 import { getBrand } from "~/tenant";
 import { isFeatureEnabled, requireFeatureInRoute } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 const isSafeRedirect = (value: string) => {
   if (!value.startsWith("/dashboard")) return false;
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/dashboard/select-org")({
   beforeLoad: () => {
     requireFeatureInRoute("sin_portal");
   },
+  head: () => createPageHead("Select organization"),
   component: SelectOrgPage,
 });
 

@@ -90,7 +90,15 @@ export function ValidatedFileUpload(props: ValidatedFileUploadProps) {
           }}
         />
         {helperText && <p className="text-xs text-gray-500">{helperText}</p>}
-        {sizeError && <p className="text-destructive text-sm font-medium">{sizeError}</p>}
+        {sizeError && (
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="text-destructive text-sm font-medium"
+          >
+            {label}: {sizeError}
+          </p>
+        )}
 
         {objectUrl && (
           <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4">
@@ -125,8 +133,13 @@ export function ValidatedFileUpload(props: ValidatedFileUploadProps) {
       </div>
       {description && <p className="text-muted-foreground text-sm">{description}</p>}
       {meta.isTouched && meta.errors.length > 0 && (
-        <div className="text-destructive text-sm font-medium">
-          {meta.errors.join(", ")}
+        <div
+          id={`${inputId}-errors`}
+          role="alert"
+          aria-live="polite"
+          className="text-destructive text-sm font-medium"
+        >
+          {label}: {meta.errors.join(", ")}
         </div>
       )}
     </div>

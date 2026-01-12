@@ -21,6 +21,9 @@ import { OrgContextProvider } from "~/features/organizations/org-context";
 // Note: validateActiveOrganization removed - using direct resolveOrganizationAccess to avoid redundant session validation
 // Note: getLatestPolicyDocument/listUserPolicyAcceptances removed - using inline DB queries to avoid redundant session validation
 import appCss from "~/styles.css?url";
+import { SkipLinks } from "~/components/ui/skip-link";
+import { LiveAnnouncerProvider, ToastAnnouncements } from "~/components/ui/live-region";
+import { useFocusOnRouteChange } from "~/hooks/useFocusOnRouteChange";
 import { getBrand } from "~/tenant";
 import { getTenantKey } from "~/tenant/tenant-env";
 
@@ -371,11 +374,25 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <StepUpProvider>
-        <OrgContextProvider>
-          <Outlet />
-        </OrgContextProvider>
-      </StepUpProvider>
+      <LiveAnnouncerProvider>
+        <FocusManager />
+        <StepUpProvider>
+          <OrgContextProvider>
+            <Outlet />
+          </OrgContextProvider>
+        </StepUpProvider>
+        <Suspense fallback={null}>
+          <Toaster richColors closeButton />
+        </Suspense>
+        <ToastAnnouncements />
+        {import.meta.env.DEV && ReactQueryDevtools && TanStackRouterDevtools && (
+          <Suspense fallback={null}>
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <TanStackRouterDevtools position="bottom-right" />
+          </Suspense>
+        )}
+        <Scripts />
+      </LiveAnnouncerProvider>
     </RootDocument>
   );
 }
@@ -403,21 +420,14 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             document.documentElement.classList.remove('dark');
           `}
         </ScriptOnce>
-
+        <SkipLinks />
         {children}
-
-        <Suspense fallback={null}>
-          <Toaster richColors closeButton />
-        </Suspense>
-        {import.meta.env.DEV && ReactQueryDevtools && TanStackRouterDevtools && (
-          <Suspense fallback={null}>
-            <ReactQueryDevtools buttonPosition="bottom-left" />
-            <TanStackRouterDevtools position="bottom-right" />
-          </Suspense>
-        )}
-
-        <Scripts />
       </body>
     </html>
   );
+}
+
+function FocusManager() {
+  useFocusOnRouteChange();
+  return null;
 }

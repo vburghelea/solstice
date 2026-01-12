@@ -25,6 +25,7 @@ import type { MembershipStatus } from "~/features/membership/membership.types";
 import { getUserTeams, type UserTeam } from "~/features/teams/teams.queries";
 import { getBrand } from "~/tenant";
 import { isFeatureEnabled } from "~/tenant/feature-gates";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/")({
   beforeLoad: () => {
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/dashboard/")({
       userTeams: userTeams || [],
     };
   },
+  head: () => createPageHead("Dashboard"),
   component: DashboardIndex,
 });
 

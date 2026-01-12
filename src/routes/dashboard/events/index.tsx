@@ -2,8 +2,10 @@ import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { EventList } from "~/features/events/components/event-list";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/events/")({
+  head: () => createPageHead("Events"),
   component: EventsPage,
 });
 

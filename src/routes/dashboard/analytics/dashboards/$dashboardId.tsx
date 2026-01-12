@@ -16,8 +16,10 @@ import type { PivotQuery, WidgetType } from "~/features/bi/bi.schemas";
 import type { DatasetField, WidgetConfig } from "~/features/bi/bi.types";
 import { useDashboard } from "~/features/bi/hooks/use-dashboard";
 import type { FilterConfig } from "~/features/bi/bi.schemas";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/analytics/dashboards/$dashboardId")({
+  head: () => createPageHead("Dashboard"),
   component: DashboardDetailPage,
 });
 

@@ -16,7 +16,7 @@ export function AppLayout() {
       <GlobalSearchCommandPalette />
       <PasskeyPrompt />
       <div className="hidden lg:block">
-        <AppSidebar />
+        <AppSidebar navigationId="primary-navigation" />
       </div>
 
       {sidebarOpen && (
@@ -36,7 +36,10 @@ export function AppLayout() {
               <X className="h-5 w-5" />
             </Button>
             <div className="flex-1 overflow-y-auto">
-              <AppSidebar onNavigation={() => setSidebarOpen(false)} />
+              <AppSidebar
+                navigationId="primary-navigation-drawer"
+                onNavigation={() => setSidebarOpen(false)}
+              />
             </div>
           </div>
         </div>
@@ -44,7 +47,7 @@ export function AppLayout() {
 
       <div className="flex flex-1 flex-col">
         <MobileAppHeader onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-6">
             <Breadcrumbs />
             <Outlet />

@@ -16,7 +16,12 @@ export function MobileAppHeader({ onMenuClick }: MobileAppHeaderProps) {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white lg:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onMenuClick}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            aria-label="Open navigation menu"
+          >
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex items-center gap-2">
@@ -30,7 +35,12 @@ export function MobileAppHeader({ onMenuClick }: MobileAppHeaderProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={openGlobalSearch}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={openGlobalSearch}
+            aria-label="Open search"
+          >
             <Search className="h-5 w-5" />
           </Button>
           <NotificationBell />

@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { PublicPortalPage } from "~/features/dashboard";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async ({ context }) => {
@@ -7,6 +8,7 @@ export const Route = createFileRoute("/")({
       throw redirect({ to: "/dashboard" });
     }
   },
+  head: () => createPageHead("Home"),
   component: HomePage,
 });
 

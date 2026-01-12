@@ -20,6 +20,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { createTeam } from "~/features/teams/teams.mutations";
 import type { CreateTeamInput } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { createPageHead } from "~/shared/lib/page-head";
 
 // Canadian provinces and territories
 const PROVINCES = [
@@ -39,6 +40,7 @@ const PROVINCES = [
 ];
 
 export const Route = createFileRoute("/dashboard/teams/create")({
+  head: () => createPageHead("Create Team"),
   component: CreateTeamPage,
 });
 

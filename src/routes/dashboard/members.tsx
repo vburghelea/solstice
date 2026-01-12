@@ -34,6 +34,7 @@ import {
   type MemberDirectoryResponse,
 } from "~/features/members";
 import { exportToCSV, formatDate } from "~/lib/utils/csv-export";
+import { createPageHead } from "~/shared/lib/page-head";
 import { getBrand } from "~/tenant";
 import { requireFeatureInRoute } from "~/tenant/feature-gates";
 
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/dashboard/members")({
   beforeLoad: () => {
     requireFeatureInRoute("members_directory");
   },
+  head: () => createPageHead("Members Directory"),
   component: MembersPage,
 });
 

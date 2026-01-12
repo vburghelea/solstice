@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProfileView } from "~/features/profile/components/profile-view";
+import { createPageHead } from "~/shared/lib/page-head";
 
 export const Route = createFileRoute("/dashboard/profile")({
+  head: () => createPageHead("My Profile"),
   component: ProfilePage,
 });
 

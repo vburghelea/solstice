@@ -1,30 +1,29 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 
+// ============================================================================
+// PERFORMANCE OPTIMIZATION: Shared Database Connection
+// ============================================================================
+// c15t uses the same database connection pool as the main app to avoid:
+// - Connection pool exhaustion in serverless environments
+// - Multiple competing pools creating unnecessary connections
+// - "Failed query" errors due to connection limits
+//
+// The c15t tables are in the same database, just with a separate schema.
+// ============================================================================
+
 const createInstance = async () => {
-  const [{ c15tInstance }, { drizzleAdapter }, { default: postgres }, { drizzle }] =
-    await Promise.all([
-      import("@c15t/backend/v2"),
-      import("@c15t/backend/v2/db/adapters/drizzle"),
-      import("postgres"),
-      import("drizzle-orm/postgres-js"),
-    ]);
+  const [{ c15tInstance }, { drizzleAdapter }] = await Promise.all([
+    import("@c15t/backend/v2"),
+    import("@c15t/backend/v2/db/adapters/drizzle"),
+  ]);
 
-  const { consentSchema } = await import("~/features/consent/c15t.schema");
+  const { env, getConsentTrustedOrigins } = await import("~/lib/env.server");
 
-  const { env, getConsentDbUrl, getConsentTrustedOrigins } =
-    await import("~/lib/env.server");
+  // Get the underlying client to pass to c15t's drizzle adapter
+  // We use a helper that creates a client with c15t's schema
+  const { getDbClient } = await import("~/features/consent/c15t-client-helpers");
+  const drizzleClient = await getDbClient();
 
-  const connectionString = getConsentDbUrl();
-  const sql = postgres(connectionString, {
-    max: 5,
-    idle_timeout: 20,
-    connect_timeout: 10,
-  });
-
-  const db = drizzle(sql, {
-    schema: consentSchema,
-    casing: "snake_case",
-  });
   const trustedOrigins = getConsentTrustedOrigins();
 
   return c15tInstance({
@@ -32,7 +31,7 @@ const createInstance = async () => {
     basePath: "/api/c15t",
     trustedOrigins,
     adapter: drizzleAdapter({
-      db,
+      db: drizzleClient,
       provider: "postgresql",
     }),
     advanced: {

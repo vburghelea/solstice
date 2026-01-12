@@ -170,5 +170,39 @@ export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";
 export const isTest = () => env.NODE_ENV === "test";
-export const isServerless = () =>
-  !!(env.NETLIFY || env.VERCEL_ENV || process.env["VERCEL"] === "1");
+
+/**
+ * Check if we're running in a serverless environment (Netlify, Vercel, etc.)
+ *
+ * IMPORTANT: In Netlify Edge Functions/Serverless, we need to use POOLED database connections
+ * for optimal performance. This function detects the serverless environment by checking
+ * for Netlify-specific environment variables that are always set.
+ */
+export const isServerless = () => {
+  // Check for explicit environment variables
+  if (env.NETLIFY || env.VERCEL_ENV || process.env["VERCEL"] === "1") {
+    return true;
+  }
+
+  // Check for Netlify-specific environment variables that are always set in Netlify
+  // These are set even if NETLIFY env var isn't explicitly defined
+  if (
+    process.env["NETLIFY_SITE_ID"] ||
+    process.env["NETLIFY_DEPLOY_ID"] ||
+    process.env["NETLIFY_ACCOUNT_ID"]
+  ) {
+    return true;
+  }
+
+  // Check for Netlify build/deploy context
+  if (process.env["CONTEXT"] || process.env["DEPLOY_PRIME_URL"] || process.env["URL"]) {
+    return true;
+  }
+
+  // Check if we're running in a Deno edge environment (used by Netlify Edge)
+  if (process.env["DENO_DEPLOYMENT_ID"]) {
+    return true;
+  }
+
+  return false;
+};

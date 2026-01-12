@@ -23,8 +23,29 @@ const bundledResources = Object.entries(resourceModules).reduce(
 
 const isServer = typeof window === "undefined";
 
+// ============================================================================
+// PERFORMANCE: Prevent duplicate i18n initialization in serverless environments
+// ============================================================================
+// In serverless/edge environments, modules can be re-imported on each request.
+// We use a global flag to ensure initialization only happens once per process lifetime.
+// ============================================================================
+
+declare global {
+  var __solsticeI18nInitialized: boolean | undefined;
+}
+
+const shouldInitialize =
+  !i18n.isInitialized &&
+  (typeof globalThis.__solsticeI18nInitialized === "undefined" ||
+    !globalThis.__solsticeI18nInitialized);
+
 // Prevent duplicate initialization when this module is imported more than once.
-if (!i18n.isInitialized) {
+if (shouldInitialize) {
+  // Mark as initialized globally before starting the async initialization
+  if (isServer) {
+    globalThis.__solsticeI18nInitialized = true;
+  }
+
   if (isServer && i18nConfig.debug) {
     console.info("[i18n] bundled resource languages", Object.keys(bundledResources));
   }

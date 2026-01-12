@@ -55,10 +55,30 @@ export default async function handler(req: Request, context: Context) {
 
   // For HTML responses, read the body, inject nonce, and create a new response
   const text = await response.text();
-  const withScripts = text.replace(
-    /<script(?![^>]*\snonce=)/g,
-    `<script nonce="${nonce}"`,
-  );
+
+  // PERFORMANCE: Quick check - if no <script> tags without nonce exist, skip regex
+  // This avoids expensive regex on pages that don't need it
+  if (!/<script(?![^>]*\snonce=)/.test(text)) {
+    // Still need to inject the meta tag with nonce
+    const modifiedHtml = text.replace(
+      "</head>",
+      `<meta name="csp-nonce" content="${nonce}"></head>`,
+    );
+    const newResponse = new Response(modifiedHtml, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+    });
+    Object.entries(headers).forEach(([key, value]) => {
+      newResponse.headers.set(key, value);
+    });
+    newResponse.headers.delete("X-Powered-By");
+    return newResponse;
+  }
+
+  // Pre-compile regex for better performance (reuse same pattern object)
+  const scriptPattern = /<script(?![^>]*\snonce=)/g;
+  const withScripts = text.replace(scriptPattern, `<script nonce="${nonce}"`);
   const modifiedHtml = withScripts.replace(
     "</head>",
     `<meta name="csp-nonce" content="${nonce}"></head>`,

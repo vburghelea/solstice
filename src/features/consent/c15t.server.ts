@@ -41,8 +41,9 @@ const createInstance = async () => {
         enabled: env.NODE_ENV !== "production",
       },
     },
+    // Only log errors in production to reduce noise and improve performance
     logger: {
-      level: env.NODE_ENV === "production" ? "warn" : "debug",
+      level: env.NODE_ENV === "production" ? "error" : "debug",
     },
   });
 };

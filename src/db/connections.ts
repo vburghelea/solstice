@@ -99,10 +99,8 @@ export const unpooledDb = createServerOnlyFn(async () => {
 export const getDb = createServerOnlyFn(async () => {
   const { isServerless } = await import("../lib/env.server");
   if (isServerless()) {
-    console.log("Using pooled connection for serverless environment");
     return await pooledDb();
   } else {
-    console.log("Using unpooled connection for traditional environment");
     return await unpooledDb();
   }
 });

@@ -376,7 +376,7 @@ export const inviteRegistrationGroupMember = createServerFn({ method: "POST" })
     });
 
     {
-      const { sendRegistrationGroupInviteEmail } = await import("~/lib/email/sendgrid");
+      const { sendRegistrationGroupInviteEmail } = await import("~/lib/email/email");
       try {
         await sendRegistrationGroupInviteEmail({
           to: {

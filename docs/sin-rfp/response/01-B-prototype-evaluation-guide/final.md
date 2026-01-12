@@ -9,7 +9,7 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 **No viaSport confidential data was used.** Performance testing used synthetic data designed to match the scale characteristics described in the RFP:
 
 | Table            | Rows      | Purpose                                |
-| ---------------- | --------- | -------------------------------------- |
+| :--------------- | :-------- | :------------------------------------- |
 | form_submissions | 10.0M     | Simulates 10+ years of PSO submissions |
 | audit_logs       | 7.0M      | Realistic audit trail volume           |
 | notifications    | 2.0M      | Email and in-app notification history  |
@@ -33,36 +33,37 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## What Will Be Finalized With viaSport
 
-| Item                                                    | Timing                | Dependency                 |
-| ------------------------------------------------------- | --------------------- | -------------------------- |
-| BCAR and BCSI extraction method                         | Discovery (Weeks 1-6) | Legacy system access       |
-| Form templates and reporting metadata                   | Discovery (Weeks 1-6) | viaSport data dictionary   |
-| Branding (logo, colors)                                 | Design (Week 11)      | Brand assets from viaSport |
-| Program-specific fields (NCCP, contribution agreements) | Design (Weeks 11-18)  | viaSport SME input         |
+| Item                                                    | Timing                | Dependency                                 |
+| :------------------------------------------------------ | :-------------------- | :----------------------------------------- |
+| BCAR and BCSI extraction method                         | Discovery (Weeks 1-6) | Legacy system access                       |
+| Form templates and reporting metadata                   | Discovery (Weeks 1-6) | viaSport data dictionary                   |
+| Branding (logo, colors)                                 | Design (Week 11\)     | Brand assets from viaSport                 |
+| Program-specific fields (NCCP, contribution agreements) | Design (Weeks 11-18)  | viaSport Subject Matter Expert (SME) input |
 
 ## Demo Access
 
-Demo credentials are listed in **Appendix A: Prototype Evaluation Access** to reduce reviewer friction.
+Prototype evaluation credentials are provided via a secure Evaluator Access Pack (see **Appendix A: Prototype Evaluation Access**).
 
-**Contact:** austinwallacetech@gmail.com
+**Contact:** [support@solsticeapp.ca](mailto:support@solsticeapp.ca)
 
-**Environment:** sin-uat (User Acceptance Testing environment with evaluator
-access and CloudTrail monitoring). Performance testing is run in sin-perf.
+**Environment:** sin-uat (User Acceptance Testing environment with evaluator access and CloudTrail monitoring). Performance testing is run in sin-perf.
 
 **MFA:** The viaSport Staff account has MFA enabled to demonstrate the full authentication flow. Other demo accounts have MFA disabled for faster evaluation.
 
 **Data:** Synthetic only, with environment monitoring enabled (CloudTrail with CIS Benchmark alarms).
 
-## What to Ignore in the Prototype
+## Prototype Placeholders and Items to Be Finalized Post-Award
 
-Some elements are placeholders and will be replaced with viaSport-approved content during Discovery:
+The prototype is fully functional for the workflows listed in the Requirements Compliance Crosswalk. The following items are content placeholders that will be finalized with viaSport during Discovery (needs assessment/gap analysis):
 
-- Form labels and field names (will match viaSport terminology)
-- Sample templates (will be replaced with viaSport reporting templates)
-- Help center content (will be refined per UX interviews)
-- Logo and color scheme (will apply viaSport branding assets)
+- Form labels and field names are representative placeholders and will be aligned to viaSport terminology during Discovery
+- Sample templates are illustrative; viaSport's reporting templates will be configured during Discovery
+- Help-center content will be refined during Discovery based on needs assessment and user research
+- Logo and color scheme are placeholders; viaSport branding assets will be applied during Discovery
 
-## 15-Minute Demo Script
+## 15-Minute Evaluator Walkthrough
+
+This optional walkthrough is provided to help evaluators validate key workflows quickly and consistently.
 
 1. Login and MFA, authenticate with email/password and complete TOTP
 2. Dashboard, observe role-based content (admin vs reporter)
@@ -78,26 +79,28 @@ Some elements are placeholders and will be replaced with viaSport-approved conte
 
 ## Requirement Validation Crosswalk
 
-| To validate...                  | Requirement | Demo path                                                             |
-| ------------------------------- | ----------- | --------------------------------------------------------------------- |
-| Form building                   | DM-AGG-001  | Dashboard -> Forms -> Create Form                                     |
-| File uploads                    | DM-AGG-001  | Form Builder -> Add File Field -> Submit                              |
-| Import and rollback             | DM-AGG-006  | Dashboard -> Imports -> New Import                                    |
-| Submission tracking             | RP-AGG-003  | Dashboard -> Reporting                                                |
-| Self-service analytics          | RP-AGG-005  | Analytics -> New Query -> Pivot                                       |
-| Export with access control      | RP-AGG-005  | Pivot -> Export -> Verify scoping                                     |
-| MFA authentication              | SEC-AGG-001 | Login flow                                                            |
-| Role-based access               | SEC-AGG-001 | Compare admin vs reporter dashboards                                  |
-| Monitoring and threat detection | SEC-AGG-002 | Admin -> Security -> Events / Account Locks                           |
-| Privacy and compliance controls | SEC-AGG-003 | Admin -> Privacy -> Retention Policies / Legal Holds, plus Appendix D |
-| Audit trail                     | SEC-AGG-004 | Admin -> Audit Logs -> Filter                                         |
-| Hash chain verification         | SEC-AGG-004 | Audit Logs -> Verify Integrity                                        |
-| Guided walkthroughs             | TO-AGG-002  | Help -> Guided Walkthroughs                                           |
-| Help center search              | TO-AGG-003  | Help -> Search                                                        |
-| Support requests                | UI-AGG-006  | Help -> Support Request                                               |
+| To validate...                  | Requirement | Demo path                                                                 |
+| :------------------------------ | :---------- | :------------------------------------------------------------------------ |
+| Form building                   | DM-AGG-001  | Dashboard \-\> Forms \-\> Create Form                                     |
+| File uploads                    | DM-AGG-001  | Form Builder \-\> Add File Field \-\> Submit                              |
+| Import and rollback             | DM-AGG-006  | Dashboard \-\> Admin \-\> Imports \-\> New Import (Smart wizard)          |
+| Submission tracking             | RP-AGG-003  | Dashboard \-\> Reporting                                                  |
+| Self-service analytics          | RP-AGG-005  | Analytics \-\> New Query \-\> Pivot                                       |
+| Export with access control      | RP-AGG-005  | Pivot \-\> Export \-\> Verify scoping                                     |
+| MFA authentication              | SEC-AGG-001 | Login flow                                                                |
+| Role-based access               | SEC-AGG-001 | Compare admin vs reporter dashboards                                      |
+| Monitoring and threat detection | SEC-AGG-002 | Admin \-\> Security \-\> Events / Account Locks                           |
+| Privacy and compliance controls | SEC-AGG-003 | Admin \-\> Privacy \-\> Retention Policies / Legal Holds, plus Appendix D |
+| Audit trail                     | SEC-AGG-004 | Admin \-\> Audit Logs \-\> Filter                                         |
+| Hash chain verification         | SEC-AGG-004 | Audit Logs \-\> Verify Integrity                                          |
+| Guided walkthroughs             | TO-AGG-002  | Help \-\> Guided Walkthroughs                                             |
+| Help center search              | TO-AGG-003  | Help \-\> Search                                                          |
+| Support requests                | UI-AGG-006  | Help \-\> Support Request                                                 |
 
 Where evidence is platform-level (for example AWS compliance reports), we provide supporting artifacts through AWS Artifact and standard AWS compliance documentation upon request.
 
 ## Prototype Positioning
 
-We built this prototype to prove feasibility and reduce delivery risk. Discovery remains mandatory to validate workflows, templates, and migration realities. The prototype is not a substitute for stakeholder alignment, it is an accelerator.
+We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows, templates, data definitions, and migration rules with viaSport. The prototype accelerates delivery by starting from proven components, but it does not replace stakeholder alignment.
+
+---

@@ -7,7 +7,7 @@
 The platform is hosted entirely on Amazon Web Services in a serverless architecture that reduces infrastructure overhead.
 
 | Component        | AWS Service       | Purpose                                    |
-| ---------------- | ----------------- | ------------------------------------------ |
+| :--------------- | :---------------- | :----------------------------------------- |
 | Application Tier | Lambda            | Serverless compute, auto-scaling           |
 | Database         | RDS PostgreSQL    | Managed relational database                |
 | Caching          | ElastiCache Redis | Rate limiting, BI caching, permissions     |
@@ -22,18 +22,18 @@ The platform is hosted entirely on Amazon Web Services in a serverless architect
 
 ### Data Residency
 
-Standard data residency assumptions are defined in Section 1.1. The table below
-lists the specific data stores and regions for this service approach.
+Standard data residency assumptions are defined in Section 1.1. The table below lists the specific data stores and regions for this service approach.
 
 | Data Type            | Storage Location      | Region       |
-| -------------------- | --------------------- | ------------ |
+| :------------------- | :-------------------- | :----------- |
 | Application database | RDS PostgreSQL        | ca-central-1 |
 | Documents and files  | S3                    | ca-central-1 |
 | Audit archives       | S3 Deep Archive       | ca-central-1 |
 | Backups              | RDS automated backups | ca-central-1 |
 
-See Section 1.2 for the shared responsibility model and AWS Artifact
-references.
+**Multi-AZ Architecture:** All production data is hosted in AWS Canada (Central) (ca-central-1). Production infrastructure uses Multi-AZ deployment within ca-central-1 for automatic failover and high availability. This provides fault tolerance across multiple data centers within the same Canadian region while maintaining data residency compliance.
+
+See Section 1.2 for the shared responsibility model and AWS Artifact references.
 
 ### Tenancy Model
 
@@ -46,20 +46,21 @@ The platform uses a multi-tenant architecture with strict organization scoping:
 
 ### Regulatory Alignment
 
-| Requirement         | Implementation                                                                                              |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| PIPEDA alignment    | Canadian data residency, TLS 1.2+ encryption in transit, encryption at rest, access controls, audit logging |
-| Transport security  | All APIs served over HTTPS (TLS 1.2+); no unencrypted endpoints                                             |
-| Data minimization   | Configurable retention policies and legal holds                                                             |
-| Right to access     | Data export workflows with audit trail                                                                      |
-| Breach notification | Audit logging and anomaly detection                                                                         |
+| Requirement                | Implementation                                                                                                                                                   |
+| :------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PIPA and PIPEDA compliance | Canadian data residency, TLS 1.2+ encryption in transit, encryption at rest, access controls, audit logging, data minimization controls                          |
+| Transport security         | All APIs served over HTTPS (TLS 1.2+); no unencrypted endpoints                                                                                                  |
+| Data minimization          | Configurable retention policies, legal holds, collection limited to necessary purposes                                                                           |
+| Right to access            | Data export workflows with audit trail                                                                                                                           |
+| Breach notification        | Audit logging and anomaly detection                                                                                                                              |
+| Security safeguards        | Reasonable security measures protect personal information from unauthorized access, collection, use, disclosure, copying, modification, disposal, or destruction |
 
-AWS maintains a Data Processing Addendum that covers all services used by the platform, including SES for email delivery: https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf
+AWS maintains a Data Processing Addendum that covers all services used by the platform, including SES for email delivery: [https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf](https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf)
 
 ### Sub-Processors
 
 | Service              | Provider | Purpose                   | Data Residency        |
-| -------------------- | -------- | ------------------------- | --------------------- |
+| :------------------- | :------- | :------------------------ | :-------------------- |
 | Cloud infrastructure | AWS      | Hosting, compute, storage | Canada (ca-central-1) |
 | Email delivery       | AWS SES  | Transactional emails      | Canada (ca-central-1) |
 
@@ -70,7 +71,7 @@ No additional sub-processors are used.
 ### Backup Strategy
 
 | Parameter                | Value                                          |
-| ------------------------ | ---------------------------------------------- |
+| :----------------------- | :--------------------------------------------- |
 | Backup frequency         | Continuous (point-in-time recovery)            |
 | Backup retention         | 35 days in production, 7 days in dev and perf  |
 | Backup location          | RDS automated backups, ca-central-1            |
@@ -79,7 +80,7 @@ No additional sub-processors are used.
 ### Recovery Objectives
 
 | Metric                         | Target              | Evidence                               |
-| ------------------------------ | ------------------- | -------------------------------------- |
+| :----------------------------- | :------------------ | :------------------------------------- |
 | Recovery Point Objective (RPO) | 1 hour (production) | Final production drill TBD             |
 | Recovery Time Objective (RTO)  | 4 hours             | sin-dev drill completed, final run TBD |
 
@@ -91,9 +92,11 @@ Production uses Multi-AZ for automatic failover. Dev and perf use single-AZ for 
 
 ### Encryption Standards
 
-**In Transit:** TLS 1.2+ for client and service communication.
+**In Transit:** TLS 1.2+ for all client-server and server-database connections.
 
 **At Rest:** AES-256 via AWS KMS for database storage and S3 objects.
+
+**Application Layer:** Sensitive authentication fields (e.g., TOTP secrets, backup codes) are encrypted before database storage using application-level symmetric encryption with secrets managed in AWS Secrets Manager.
 
 Encryption evidence is summarized in Section 1.2.
 
@@ -106,10 +109,14 @@ Audit logs are immutable and archived to S3 Deep Archive based on retention poli
 viaSport's scale of 20M historical rows with 1M rows per year is well within PostgreSQL capability. A dedicated columnar warehouse would add cost and complexity without benefit at this scale.
 
 | Factor                        | PostgreSQL        | Columnar Warehouse          |
-| ----------------------------- | ----------------- | --------------------------- |
+| :---------------------------- | :---------------- | :-------------------------- |
 | Optimal scale                 | Up to 500M+ rows  | Billions of rows            |
 | viaSport projected (10 years) | 30M rows          | 30M rows                    |
 | Operational complexity        | Low (managed RDS) | Higher (cluster management) |
 | Data freshness                | Real-time         | Requires ETL, often delayed |
 
 PostgreSQL provides real-time analytics and simplified operations while keeping data resident in Canada.
+
+If viaSport later requires a dedicated warehouse for sector-wide benchmarking or very large-scale analytics (250M+ rows), the platform can replicate curated datasets into AWS Redshift without changing the submission system.
+
+---

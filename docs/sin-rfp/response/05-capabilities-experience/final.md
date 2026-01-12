@@ -8,25 +8,25 @@ Austin Wallace Tech brings experience delivering information systems in sports a
 
 The most relevant evidence is the Solstice prototype itself, built for viaSport requirements.
 
-| Metric                | Value                                                |
-| --------------------- | ---------------------------------------------------- |
-| Requirements coverage | Majority of System Requirements Addendum implemented |
-| Load testing          | 20.1 million rows, sub-250ms p95 latency             |
-| Server errors         | Zero under concurrent load                           |
-| Codebase size         | 97,000+ lines of TypeScript (app plus tests)         |
+| Metric                | Value                                                         |
+| :-------------------- | :------------------------------------------------------------ |
+| Requirements coverage | 23 of 25 (92%) System Requirements Addendum items implemented |
+| Load testing          | 20.1 million rows, p95 latency 162ms (target: <500ms)         |
+| Server errors         | Zero under concurrent load                                    |
+| Codebase size         | 97,000+ lines of TypeScript (app plus tests)                  |
 
 ## Delivery and Advisory Team
 
 ### Delivery Lead
 
 | Role                              | Name           | Responsibilities                                                 | Status    |
-| --------------------------------- | -------------- | ---------------------------------------------------------------- | --------- |
+| :-------------------------------- | :------------- | :--------------------------------------------------------------- | :-------- |
 | Project Lead / Solution Architect | Austin Wallace | Architecture, data engineering, development, delivery governance | Committed |
 
 ### Advisory Partners
 
 | Focus Area                  | Name            | Contribution                                  | Status    |
-| --------------------------- | --------------- | --------------------------------------------- | --------- |
+| :-------------------------- | :-------------- | :-------------------------------------------- | :-------- |
 | UX and Accessibility        | Ruslan Hétu     | UX research lead, design, accessibility       | Committed |
 | Sport Sector / Navigator    | Soleil Heaney   | System navigator connecting team to PSO needs | Committed |
 | Technical Architecture      | Will Siddall    | Architecture review and development support   | Committed |
@@ -56,14 +56,14 @@ Continuity is supported by:
 ### Sport Sector Experience
 
 | Organization                        | Relationship              | Scope                                                                           |
-| ----------------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
+| :---------------------------------- | :------------------------ | :------------------------------------------------------------------------------ |
 | International Quidditch Association | Chair, Board of Directors | Led governance, data, and technology strategy for 30+ national governing bodies |
 | Volunteer Media Organization        | CEO                       | Managed operations for a 70-person volunteer organization                       |
 
 ### Public and Enterprise Experience
 
 | Team Member    | Organization                           | Sector                                    |
-| -------------- | -------------------------------------- | ----------------------------------------- |
+| :------------- | :------------------------------------- | :---------------------------------------- |
 | Austin Wallace | Teck Resources                         | Publicly traded resource sector           |
 | Austin Wallace | Clio                                   | Legal technology, public interest clients |
 | Parul Kharub   | Canadian Border Services Agency (CBSA) | Federal Law Enforcement Agency            |
@@ -75,8 +75,7 @@ Continuity is supported by:
 
 **Context:** viaSport requires replacement of BCAR and BCSI with a modern information system.
 
-**Approach:** Deliver a prototype that meets the System Requirements Addendum
-and demonstrate performance at scale.
+**Approach:** Deliver a prototype that meets the System Requirements Addendum and demonstrate performance at scale.
 
 **Deliverables:**
 
@@ -89,7 +88,7 @@ and demonstrate performance at scale.
 
 **Results:**
 
-- 20.1M rows tested, sub-250ms p95 latency
+- 20.1M rows tested, ≤250ms p95 latency
 - Zero server errors under concurrent load
 - Prototype available for evaluator validation
 
@@ -106,7 +105,7 @@ Processed 10 million rows per game for NHL tracking data and supported multi-mil
 ### Automation (Production-Ready)
 
 | Feature                 | Schedule        | Purpose                                     |
-| ----------------------- | --------------- | ------------------------------------------- |
+| :---------------------- | :-------------- | :------------------------------------------ |
 | Scheduled notifications | Every 5 minutes | Process reminder and alert queue            |
 | Retention enforcement   | Daily           | Archive and purge data per policy           |
 | Data quality monitoring | Daily           | Detect missing fields and validation errors |
@@ -115,26 +114,26 @@ Processed 10 million rows per game for NHL tracking data and supported multi-mil
 
 ### AI Enablement Foundation (Built)
 
-The platform includes a production-ready AI foundation layer that enables rapid delivery of AI features during the engagement. This infrastructure is fully implemented:
+Austin Wallace Tech (AWT) provides a pre-configured AI infrastructure within the Solstice platform, designed to enhance data quality and reporting efficiency without compromising viaSport's data residency or governance requirements. The AI foundation is fully implemented in the current prototype and resides exclusively within the AWS Canada (Central) region. This infrastructure includes:
 
-| Component                    | Description                                                             |
-| ---------------------------- | ----------------------------------------------------------------------- |
-| AWS Bedrock integration      | Claude, Amazon Nova, and Cohere models via Bedrock in ca-central-1      |
-| Central AI service           | Unified interface with retries, timeouts, and error handling            |
-| Prompt template registry     | Versioned prompts with audit trail and rollback capability              |
-| Structured output validation | Zod schema validation ensuring AI responses match expected formats      |
-| Usage logging and costs      | Per-request tracking of tokens, latency, cost estimates by org and user |
-| Quota enforcement            | Rate limiting and budget controls per tenant and user                   |
-| Embedding support            | Cohere and Amazon Titan embeddings for semantic search                  |
+| Component                    | Description                                                                                                                            |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS Bedrock integration      | Claude, Amazon Nova, and Cohere models via Bedrock in ca-central-1                                                                     |
+| Central AI service           | Unified interface with retries, timeouts, and error handling                                                                           |
+| Prompt template registry     | Versioned prompts with audit trail and rollback capability                                                                             |
+| Structured output validation | Zod schema validation ensuring AI responses match expected formats                                                                     |
+| Usage logging and costs      | Per-request tracking of tokens, latency, cost estimates by org and user. Usage reports/exports available to viaSport for auditability. |
+| Quota enforcement            | Rate limiting and budget controls per tenant and user                                                                                  |
+| Embedding support            | Cohere and Amazon Titan embeddings for semantic search                                                                                 |
 
-AI features use AWS Bedrock with models hosted exclusively in ca-central-1. No AI provider outside Canada will be used without explicit written authorization from viaSport.
+AI features use AWS Bedrock hosted in AWS Canada (Central) (ca-central-1). We log per-request token usage, latency, and cost estimates by organization/user for auditability, and we can provide usage reports/exports to viaSport. No AI provider outside Canada will be used without explicit written authorization from viaSport, and viaSport data will not be used for model fine-tuning/training without explicit written approval.
 
 ### AI Feature Candidates
 
 The following AI features are included in the contract scope. During Planning, we will conduct UX research with viaSport staff and PSO representatives to determine which features deliver the highest value and should be prioritized for implementation.
 
 | Feature                  | Description                                                                                   | Target Users         | Value                                   |
-| ------------------------ | --------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------- |
+| :----------------------- | :-------------------------------------------------------------------------------------------- | :------------------- | :-------------------------------------- |
 | AI report narratives     | Generate natural language summaries from analytics dashboards for board reports and briefings | viaSport admins      | Reduce manual report writing by 60-80%  |
 | Natural language query   | Ask questions in plain English and receive structured answers from the data warehouse         | viaSport admins, PSO | Self-service analytics without SQL      |
 | AI dashboard builder     | Describe a visualization in words and generate chart configurations automatically             | viaSport admins      | Faster dashboard creation               |
@@ -153,10 +152,10 @@ AI features will not be enabled without user research. Our approach:
 
 The foundation work is complete. We will implement the AI features that drive real value for viaSport and PSOs based on what we learn during research.
 
-## Responsible AI Approach
+## Responsible AI Governance
 
 | Principle                | Implementation                                                                            |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
+| :----------------------- | :---------------------------------------------------------------------------------------- |
 | Transparency             | All AI-generated content is clearly labeled; users see when AI assisted                   |
 | Human-in-the-loop        | AI outputs require human review before publishing or external sharing                     |
 | Privacy by design        | No PII in prompts; data aggregated or anonymized before AI processing                     |
@@ -169,7 +168,7 @@ The foundation work is complete. We will implement the AI features that drive re
 
 ### Open Standards
 
-- TOTP (RFC 6238) for MFA
+- TOTP (RFC 6238\) for MFA
 - CSV and Excel for import and export
 - JSON for data interchange
 - TLS 1.2+ for transport security
@@ -182,7 +181,7 @@ Internal APIs are structured for extension. External integrations will be scoped
 ### Open Source Foundations
 
 | Layer          | Technologies                                                 |
-| -------------- | ------------------------------------------------------------ |
+| :------------- | :----------------------------------------------------------- |
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL                                                   |
@@ -191,3 +190,5 @@ Internal APIs are structured for extension. External integrations will be scoped
 | Validation     | Zod                                                          |
 
 The application code is proprietary to Austin Wallace Tech, with source access available under mutually agreed terms.
+
+---

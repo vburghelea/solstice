@@ -3,9 +3,11 @@
  * Verify analytics pivot build + export with Playwright.
  */
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { authenticator } from "otplib";
+import path from "node:path";
 
 const baseUrl = process.env["VITE_BASE_URL"] ?? "http://localhost:5173";
 const debug = process.env["SIN_ANALYTICS_DEBUG"] === "true";
@@ -21,6 +23,20 @@ const requireEnv = (key: string) => {
 const totpSecret = requireEnv("SIN_ANALYTICS_TOTP_SECRET");
 const defaultOrgId =
   process.env["SIN_ANALYTICS_ORG_ID"] ?? "a0000000-0000-4000-8001-000000000002";
+const screenshotDir =
+  process.env["SIN_ANALYTICS_SCREENSHOT_DIR"] ??
+  "docs/sin-rfp/review-plans/evidence/2026-01-10/screenshots/RP-AGG-005";
+const videoDir =
+  process.env["SIN_ANALYTICS_VIDEO_DIR"] ??
+  "docs/sin-rfp/review-plans/evidence/2026-01-10/videos";
+const stamp = new Date()
+  .toISOString()
+  .replace(/[-:]/g, "")
+  .replace(/\..+/, "")
+  .slice(0, 12);
+const videoName = `RP-AGG-005-analytics-export-flow-${stamp}.mp4`;
+const storageStatePath =
+  process.env["SIN_ANALYTICS_STORAGE_STATE"] ?? "outputs/sin-uat-storage.json";
 
 async function acceptOnboarding(page: import("@playwright/test").Page) {
   if (!page.url().includes("/onboarding")) return;
@@ -90,46 +106,82 @@ async function settlePostLogin(page: import("@playwright/test").Page) {
 }
 
 async function login(page: import("@playwright/test").Page) {
+  await page.context().clearCookies();
   await page.goto(`${baseUrl}/auth/login`, { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(750);
   if (page.url().includes("/dashboard") || page.url().includes("/onboarding")) {
     await settlePostLogin(page);
     return;
   }
 
-  await page
-    .locator('[data-testid="login-form"][data-hydrated="true"]')
-    .waitFor({ state: "visible", timeout: 20_000 });
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
+  await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.waitForTimeout(750);
+  const passwordCandidates = [
+    page.locator('input[type="password"]'),
+    page.locator('input[name="password"]'),
+    page.getByRole("textbox", { name: /Password/i }),
+    page.getByTestId("login-password"),
+  ];
+  const passwordInput = await Promise.any(
+    passwordCandidates.map((candidate) =>
+      candidate.waitFor({ state: "visible", timeout: 60000 }).then(() => candidate),
+    ),
+  );
+  await passwordInput.fill(password);
+  await page.getByRole("button", { name: "Login" }).click();
 
-  await page.getByTestId("login-email").fill(email);
-  await page.getByTestId("login-password").fill(password);
-  await page.getByRole("button", { name: "Login", exact: true }).click();
-
-  const twoFactorForm = page.getByTestId("login-2fa-form");
+  const authButton = page.getByRole("button", { name: "Authenticator code" });
+  let nextStep: "auth" | "dashboard" | null = null;
   try {
-    await twoFactorForm.waitFor({ state: "visible", timeout: 10_000 });
-    await page.getByRole("button", { name: "Authenticator code" }).click();
-    const code = authenticator.generate(totpSecret);
-    await page.getByTestId("login-2fa-code").fill(code);
-    await page.getByRole("button", { name: "Verify code" }).click();
+    nextStep = await Promise.race([
+      authButton
+        .waitFor({ state: "visible", timeout: 20_000 })
+        .then(() => "auth" as const),
+      page
+        .waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 })
+        .then(() => "dashboard" as const),
+    ]);
   } catch {
-    // No 2FA required.
+    nextStep = null;
   }
 
-  await page.waitForURL(/\/(dashboard|onboarding)\//, {
-    timeout: 30_000,
-    waitUntil: "domcontentloaded",
-  });
-  await settlePostLogin(page);
-  const activeOrg = await page.evaluate(() =>
-    window.localStorage.getItem("active_org_id"),
-  );
-  console.log(`Active org after login: ${activeOrg ?? "none"}`);
+  if (nextStep === "auth") {
+    await authButton.click();
+    const code = authenticator.generate(totpSecret);
+    await page.getByRole("textbox", { name: "Authentication code" }).fill(code);
+    await page.getByRole("button", { name: "Verify code" }).click();
+    await page.waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 });
+  } else if (nextStep !== "dashboard") {
+    const toast = await page.locator("[data-sonner-toast]").first().textContent();
+    if (toast) {
+      throw new Error(`Login failed: ${toast.trim()}`);
+    }
+    await page.waitForURL(/\/dashboard(\/select-org)?/, { timeout: 20_000 });
+  }
+  if (page.url().includes("/dashboard/select-org")) {
+    await page.getByRole("combobox").click();
+    await page.getByRole("option").first().click();
+    await page.waitForURL(/\/dashboard\/sin/, { timeout: 20_000 });
+  }
 }
 
 async function run() {
+  await mkdir(screenshotDir, { recursive: true });
+  await mkdir(videoDir, { recursive: true });
+
   const browser = await chromium.launch();
-  const context = await browser.newContext({ acceptDownloads: true });
+  const context = await browser.newContext({
+    acceptDownloads: true,
+    viewport: { width: 1440, height: 900 },
+    recordVideo: { dir: videoDir, size: { width: 1440, height: 900 } },
+    ...(existsSync(storageStatePath) && { storageState: storageStatePath }),
+  });
   const page = await context.newPage();
+  const takeShot = async (name: string) => {
+    await page.screenshot({ path: path.join(screenshotDir, name) });
+  };
   const logSessionTimes = async (label: string) => {
     if (!debug) return;
     try {
@@ -188,14 +240,18 @@ async function run() {
       }
     }
   };
-  const dragTo = async (sourceSelector: string, targetSelector: string) => {
-    const source = page.locator(sourceSelector);
+  const dragTo = async (
+    sourceSelector: string | import("@playwright/test").Locator,
+    targetSelector: string,
+  ) => {
+    const source =
+      typeof sourceSelector === "string" ? page.locator(sourceSelector) : sourceSelector;
     const target = page.locator(targetSelector);
     const sourceBox = await source.boundingBox();
     const targetBox = await target.boundingBox();
 
     if (!sourceBox || !targetBox) {
-      throw new Error(`Unable to drag from ${sourceSelector} to ${targetSelector}.`);
+      throw new Error(`Unable to drag to ${targetSelector}.`);
     }
 
     await page.mouse.move(
@@ -209,7 +265,7 @@ async function run() {
     );
     await page.mouse.up();
   };
-  const completeStepUpIfNeeded = async () => {
+  const completeStepUpIfNeeded = async (onVisible?: () => Promise<void>) => {
     const stepUpTitle = page.getByRole("heading", { name: "Confirm your identity" });
     const stepUpVisible = await stepUpTitle
       .waitFor({ state: "visible", timeout: 3000 })
@@ -217,6 +273,9 @@ async function run() {
       .catch(() => false);
     if (!stepUpVisible) {
       return false;
+    }
+    if (onVisible) {
+      await onVisible();
     }
 
     const emailInput = page.locator("#step-up-email");
@@ -264,7 +323,9 @@ async function run() {
   };
 
   console.log("Logging in for analytics verification...");
-  await login(page);
+  if (!existsSync(storageStatePath)) {
+    await login(page);
+  }
   await logSessionTimes("post-login");
 
   await context.addCookies([
@@ -303,9 +364,33 @@ async function run() {
     throw error;
   }
   await datasetCombo.click();
-  const datasetOption = page.getByRole("option", { name: "Organizations" });
-  if (await datasetOption.isVisible().catch(() => false)) {
+  await page
+    .getByRole("listbox")
+    .waitFor({ timeout: 20_000 })
+    .catch(() => {});
+  await page.keyboard.type("Reporting Submissions");
+  const datasetOption = page.getByRole("option", { name: /Reporting Submissions/i });
+  const optionVisible = await datasetOption.isVisible().catch(() => false);
+  const optionLabels = await page
+    .getByRole("option")
+    .allTextContents()
+    .catch(() => []);
+  if (optionLabels.length > 0) {
+    console.log(
+      `Dataset options: ${optionLabels.map((label) => label.trim()).join(" | ")}`,
+    );
+  }
+  if (optionVisible) {
     await datasetOption.click();
+  } else {
+    const anyOption = page.getByRole("option").first();
+    const anyVisible = await anyOption.isVisible().catch(() => false);
+    if (anyVisible) {
+      await anyOption.click();
+    } else {
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Enter");
+    }
   }
   await page.keyboard.press("Escape");
 
@@ -320,9 +405,33 @@ async function run() {
     }
     throw error;
   }
+  const fieldLabels = await fieldsLocator.allTextContents();
+  console.log(
+    `Available fields: ${fieldLabels.map((label) => label.trim()).join(" | ")}`,
+  );
   await page.getByTestId("field-name").waitFor({ state: "visible", timeout: 20_000 });
-  await dragTo("[data-testid=field-name] span", "[data-testid=rows-dropzone]");
-  await dragTo("[data-testid=field-id] span", "[data-testid=measures-dropzone]");
+  const rowField = page.locator("[data-testid^=field-]", {
+    hasText: /Organization|Club/i,
+  });
+  const measureField = page.locator("[data-testid^=field-]", {
+    hasText: /Submission|Count|Total/i,
+  });
+  await rowField.first().waitFor({ state: "visible", timeout: 20_000 });
+  await dragTo(rowField.first().locator("span").first(), "[data-testid=rows-dropzone]");
+  const measureVisible = await measureField
+    .first()
+    .waitFor({ state: "visible", timeout: 20_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!measureVisible) {
+    await fieldsLocator.nth(1).waitFor({ state: "visible", timeout: 20_000 });
+  }
+  await dragTo(
+    (measureVisible ? measureField.first() : fieldsLocator.nth(1))
+      .locator("span")
+      .first(),
+    "[data-testid=measures-dropzone]",
+  );
 
   const rowCount = await page
     .locator("[data-testid=rows-dropzone] [data-testid^=field-]")
@@ -355,6 +464,28 @@ async function run() {
     }
     throw error;
   }
+
+  await takeShot("01-pivot-table.png");
+
+  const chartTab = page.getByRole("tab", { name: /chart/i });
+  if (await chartTab.isVisible().catch(() => false)) {
+    await chartTab.click();
+  } else {
+    const chartButton = page.getByRole("button", { name: /chart/i });
+    if (await chartButton.isVisible().catch(() => false)) {
+      await chartButton.click();
+    }
+  }
+  const chartTypeButton = page.getByRole("button", { name: /Bar|Line|Chart/i });
+  if (await chartTypeButton.isVisible().catch(() => false)) {
+    await chartTypeButton.click();
+    const chartOption = page.getByRole("option", { name: /Bar|Line/i });
+    if (await chartOption.isVisible().catch(() => false)) {
+      await chartOption.first().click();
+    }
+  }
+  await page.waitForTimeout(1000);
+  await takeShot("02-chart-view.png");
 
   console.log("Exporting CSV...");
   const exportRequests: string[] = [];
@@ -494,7 +625,7 @@ async function run() {
   try {
     exportPayload = await triggerExport(8_000);
   } catch (error) {
-    if (await completeStepUpIfNeeded()) {
+    if (await completeStepUpIfNeeded(async () => takeShot("03-step-up-export.png"))) {
       try {
         exportPayload = await triggerExport(30_000);
       } catch (innerError) {
@@ -533,7 +664,15 @@ async function run() {
   const outputPath = `outputs/${exportPayload.fileName}`;
   await writeFile(outputPath, buffer);
 
+  await takeShot("04-export-success.png");
+
+  const videoPath = await page.video()?.path();
+  await context.close();
   await browser.close();
+
+  if (videoPath) {
+    await rename(videoPath, path.join(videoDir, videoName));
+  }
 
   console.log(`Analytics export saved to ${outputPath}`);
 }

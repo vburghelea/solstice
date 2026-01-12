@@ -309,7 +309,7 @@ export const Route = createFileRoute("/api/payments/square/callback")({
                 if (membershipUser?.email) {
                   try {
                     const { sendMembershipPurchaseReceipt } =
-                      await import("~/lib/email/sendgrid");
+                      await import("~/lib/email/email");
 
                     await sendMembershipPurchaseReceipt({
                       to: {

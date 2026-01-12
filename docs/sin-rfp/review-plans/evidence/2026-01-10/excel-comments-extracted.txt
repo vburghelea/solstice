@@ -1,0 +1,1173 @@
+=== Sheet: Reviewer Comments ===
+Columns: ['Comment #', 'Label', 'Reviewer comment', 'Section', 'Sentence/section referred to', 'Proposed replacement text', 'Sureness (%)', 'Adjust?', 'Needs info?', 'Question for you']
+Rows: 89
+
+--- Row 0 ---
+  Comment #: 1
+  Label: [a]
+  Reviewer comment: Overall, do not use informal jargon or things in quotes to describe a service. Make sure that you state exactly what you’re gonna provide. The first time in acronyms it is, you should spell it out.
+  Section: Executive Summary (global style note)
+  Sentence/section referred to: Executive Summary
+  Proposed replacement text: Applies to the full document: remove informal/jargon phrases (especially quoted terms) and spell out acronyms on first use.
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 1 ---
+  Comment #: 2
+  Label: [b]
+  Reviewer comment: To demonstrate our capabilities, we
+  Section: Executive Summary
+  Sentence/section referred to: Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project. We built a working prototype that aligns to the System Requirements Addendum and d...
+  Proposed replacement text: Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project. To demonstrate delivery feasibility, we built a working prototype aligned to the S...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 2 ---
+  Comment #: 3
+  Label: [c]
+  Reviewer comment: Bold? Why?
+  Section: What viaSport is Buying
+  Sentence/section referred to: Solstice is proposed as a term subscription with managed service , structured to reduce ongoing procurement overhead and operational risk :
+  Proposed replacement text: Solstice is offered as a subscription (SaaS) with an included managed service, so viaSport can procure implementation and ongoing operations under one agreement with defined service levels and clear o...
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 3 ---
+  Comment #: 4
+  Label: [d]
+  Reviewer comment: Is that a thing that they’re looking for in the description of the RP? Or is that something that you are saying is something they should be concerned about? You should find out how this is scored. Onl...
+  Section: What viaSport is Buying
+  Sentence/section referred to: Solstice is proposed as a term subscription with managed service , structured to reduce ongoing procurement overhead and operational risk :
+  Proposed replacement text: Solstice is offered as a subscription (SaaS) with an included managed service, so viaSport can procure implementation and ongoing operations under one agreement with defined service levels and clear o...
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 4 ---
+  Comment #: 5
+  Label: [e]
+  Reviewer comment: What makes it an operational risk?
+  Section: What viaSport is Buying
+  Sentence/section referred to: Solstice is proposed as a term subscription with managed service , structured to reduce ongoing procurement overhead and operational risk :
+  Proposed replacement text: Solstice is offered as a subscription (SaaS) with an included managed service, so viaSport can procure implementation and ongoing operations under one agreement with defined service levels and clear o...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 5 ---
+  Comment #: 6
+  Label: [f]
+  Reviewer comment: Is this a normal acronym? Usually when you use an acronym for the first time, you spell it out and then use the acronym afterwards
+  Section: What viaSport is Buying
+  Sentence/section referred to: Implementation/Standup to complete viaSport configuration, migration, UAT , and rollout
+  Proposed replacement text: One-time implementation to complete viaSport configuration, data migration, User Acceptance Testing (UAT), and rollout.
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 6 ---
+  Comment #: 7
+  Label: [g]
+  Reviewer comment: Monitoring what?
+  Section: What viaSport is Buying
+  Sentence/section referred to: Platform Subscription + Managed Service covering hosting, monitoring , security patching, support , ongoing product updates, and 200 hours/year of enhancement capacity
+  Proposed replacement text: Platform subscription + managed service covering Canadian-region hosting, availability/performance/security monitoring, security patching, ticket-based support and incident response, ongoing product u...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 7 ---
+  Comment #: 8
+  Label: [h]
+  Reviewer comment: What kind of support?
+  Section: What viaSport is Buying
+  Sentence/section referred to: Platform Subscription + Managed Service covering hosting, monitoring , security patching, support , ongoing product updates, and 200 hours/year of enhancement capacity
+  Proposed replacement text: Platform subscription + managed service covering Canadian-region hosting, availability/performance/security monitoring, security patching, ticket-based support and incident response, ongoing product u...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 8 ---
+  Comment #: 9
+  Label: [i]
+  Reviewer comment: This is clear
+  Section: What viaSport is Buying
+  Sentence/section referred to: Platform Subscription + Managed Service covering hosting, monitoring , security patching, support , ongoing product updates, and 200 hours/year of enhancement capacity
+  Proposed replacement text: No change needed (reviewer noted this item is clear).
+  Sureness (%): 15
+  Adjust?: Maybe/No
+  Needs info?: No
+
+--- Row 9 ---
+  Comment #: 10
+  Label: [j]
+  Reviewer comment: Pick something else
+  Section: What viaSport is Buying
+  Sentence/section referred to: This " batteries included " model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+  Proposed replacement text: This integrated, single-vendor delivery and operations model enables viaSport to procure implementation and ongoing managed service under one agreement, avoiding separate annual procurements for hosti...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 10 ---
+  Comment #: 11
+  Label: [k]
+  Reviewer comment: agreed - this is a is a tech industry term that might confuse a traditional public sector evaluator
+  Section: What viaSport is Buying
+  Sentence/section referred to: This " batteries included " model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+  Proposed replacement text: This integrated, single-vendor delivery and operations model enables viaSport to procure implementation and ongoing managed service under one agreement, avoiding separate annual procurements for hosti...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 11 ---
+  Comment #: 12
+  Label: [l]
+  Reviewer comment: Same comment as above. Is this part of how it is scored?
+  Section: What viaSport is Buying
+  Sentence/section referred to: This " batteries included " model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+  Proposed replacement text: This integrated, single-vendor delivery and operations model enables viaSport to procure implementation and ongoing managed service under one agreement, avoiding separate annual procurements for hosti...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 12 ---
+  Comment #: 13
+  Label: [m]
+  Reviewer comment: ?
+  Section: Response Overview
+  Sentence/section referred to: Workflow summary, admin and PSO capabilities, and migration overview.
+  Proposed replacement text: Workflow summary, administrator and Provincial Sport Organization (PSO) capabilities, and migration overview.
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 13 ---
+  Comment #: 14
+  Label: [n]
+  Reviewer comment: Doesn’t this mean up time?
+  Section: Response Overview
+  Sentence/section referred to: Service Levels , Support, and Reliability
+  Proposed replacement text: Service Level Agreement (SLA): Uptime, Support, and Reliability
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 14 ---
+  Comment #: 15
+  Label: [o]
+  Reviewer comment: Is this a real term?
+  Section: Response Overview
+  Sentence/section referred to: Term subscription pricing (3+1+1), standup fee, included services, and options.
+  Proposed replacement text: Term subscription pricing (3+1+1), one-time implementation fee, included services, and options.
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 15 ---
+  Comment #: 16
+  Label: [p]
+  Reviewer comment: Of?
+  Section: Response Overview
+  Sentence/section referred to: Performance, security, service levels, exit/portability options, and supporting evidence .
+  Proposed replacement text: Performance, security, service levels, exit/portability options, and supporting evidence (prototype, performance results, and security documentation).
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 16 ---
+  Comment #: 17
+  Label: [q]
+  Reviewer comment: This seems like jargon. Use formal terms.
+  Section: 1.1 Data Residency and Privacy Summary
+  Sentence/section referred to: Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated content is configured to avoid edge caching. Email...
+  Proposed replacement text: All primary data storage (databases, document storage, backups, and audit logs) is hosted in the AWS Canada (Central) region (ca-central-1). The application is configured so authenticated user content...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 17 ---
+  Comment #: 18
+  Label: [r]
+  Reviewer comment: As an evaluator, I would flag the statement that email notifications "may traverse external networks". In a strict BC privacy impact assessment (PIA), I would need to know if any metadata or PII in th...
+  Section: 1.1 Data Residency and Privacy Summary
+  Sentence/section referred to: Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated content is configured to avoid edge caching. Email...
+  Proposed replacement text: Email notifications are sent via AWS Simple Email Service (SES) hosted in AWS Canada (Central) (ca-central-1). While email delivery may traverse external networks, messages contain only non-sensitive ...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 18 ---
+  Comment #: 19
+  Label: [s]
+  Reviewer comment: ?
+  Section: 1.2 Security Model Summary
+  Sentence/section referred to: The security model follows the AWS shared responsibility approach: AWS secures the underlying cloud infrastructure, and we implement and operate the application controls, configuration, and monitoring...
+  Proposed replacement text: The platform implements multi-factor authentication (MFA), role-based access control, organization scoping, and an immutable audit log with tamper-evident hashing.
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 19 ---
+  Comment #: 20
+  Label: [t]
+  Reviewer comment: Only simulated that I was used for demonstration purposes
+  Section: 1.3 Prototype and Data Provenance Summary
+  Sentence/section referred to: A working prototype is available for evaluation in the sin-uat environment. No viaSport confidential data was used. Performance testing is run in sin-perf using synthetic data designed to match the sc...
+  Proposed replacement text: A working prototype is available for evaluator review in a dedicated evaluation environment (sin-uat). The prototype contains only synthetic (simulated) data; no viaSport confidential data or personal...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 20 ---
+  Comment #: 21
+  Label: [u]
+  Reviewer comment: Is this a real term?
+  Section: 1.3 Prototype and Data Provenance Summary
+  Sentence/section referred to: A working prototype is available for evaluation in the sin-uat environment. No viaSport confidential data was used. Performance testing is run in sin-perf using synthetic data designed to match the sc...
+  Proposed replacement text: A working prototype is available for evaluator review in a dedicated evaluation environment (sin-uat). The prototype contains only synthetic (simulated) data; no viaSport confidential data or personal...
+  Sureness (%): 70
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 21 ---
+  Comment #: 22
+  Label: [v]
+  Reviewer comment: What demo?
+  Section: 1.3 Prototype and Data Provenance Summary
+  Sentence/section referred to: A working prototype is available for evaluation in the sin-uat environment. No viaSport confidential data was used. Performance testing is run in sin-perf using synthetic data designed to match the sc...
+  Proposed replacement text: A working prototype is available for evaluator review in a dedicated evaluation environment (sin-uat). The prototype contains only synthetic (simulated) data; no viaSport confidential data or personal...
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 22 ---
+  Comment #: 23
+  Label: [w]
+  Reviewer comment: What does comprehensive mean? Doesn’t mean it works? Does it mean it’s still in testing face?
+  Section: At a Glance
+  Sentence/section referred to: 30 weeks targeting Fall 2026 launch with comprehensive UX research (See Project Plan )
+  Proposed replacement text: 30 weeks targeting Fall 2026 launch, including a 6-week discovery and UX research phase (interviews, workflow mapping, and usability testing).
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 23 ---
+  Comment #: 24
+  Label: [x]
+  Reviewer comment: I’m not sure this is true.
+  Section: Key Highlights
+  Sentence/section referred to: De-risked Delivery A working prototype is available for evaluation. This reduces delivery risk and allows evaluators to validate requirements directly. Access details are in Appendix A: Prototype Eval...
+  Proposed replacement text: Working Prototype for Evaluator Validation: Evaluators can log into a working prototype to validate key workflows and requirements prior to award. Access details are in Appendix A. The Prototype Evalu...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 24 ---
+  Comment #: 25
+  Label: [y]
+  Reviewer comment: Talk in the positive here rather than negative. A working prototype allows the evaluators to …
+  Section: Key Highlights
+  Sentence/section referred to: De-risked Delivery A working prototype is available for evaluation. This reduces delivery risk and allows evaluators to validate requirements directly. Access details are in Appendix A: Prototype Eval...
+  Proposed replacement text: Working Prototype for Evaluator Validation: Evaluators can log into a working prototype to validate key workflows and requirements prior to award. Access details are in Appendix A. The Prototype Evalu...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 25 ---
+  Comment #: 26
+  Label: [z]
+  Reviewer comment: I assume this is a common term?
+  Section: Key Highlights
+  Sentence/section referred to: De-risked Delivery A working prototype is available for evaluation. This reduces delivery risk and allows evaluators to validate requirements directly. Access details are in Appendix A: Prototype Eval...
+  Proposed replacement text: Working Prototype for Evaluator Validation: Evaluators can log into a working prototype to validate key workflows and requirements prior to award. Access details are in Appendix A. The Prototype Evalu...
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 26 ---
+  Comment #: 27
+  Label: [aa]
+  Reviewer comment: Give a percentage
+  Section: Key Highlights
+  Sentence/section referred to: Requirements Coverage The prototype covers the majority of the System Requirements Addendum today . Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery ap...
+  Proposed replacement text: Requirements Coverage (January 2026 prototype): 23 of 25 System Requirements Addendum items are fully implemented (92%), and 2 of 25 are partially implemented (8%). The remaining scope for partial ite...
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 27 ---
+  Comment #: 28
+  Label: [ab]
+  Reviewer comment: What do you mean today?
+  Section: Key Highlights
+  Sentence/section referred to: Requirements Coverage The prototype covers the majority of the System Requirements Addendum today . Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery ap...
+  Proposed replacement text: Requirements Coverage (January 2026 prototype): 23 of 25 System Requirements Addendum items are fully implemented (92%), and 2 of 25 are partially implemented (8%). The remaining scope for partial ite...
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 28 ---
+  Comment #: 29
+  Label: [ac]
+  Reviewer comment: Percentage
+  Section: Key Highlights
+  Sentence/section referred to: Requirements Coverage The prototype covers the majority of the System Requirements Addendum today . Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery ap...
+  Proposed replacement text: Requirements Coverage (January 2026 prototype): 23 of 25 System Requirements Addendum items are fully implemented (92%), and 2 of 25 are partially implemented (8%). The remaining scope for partial ite...
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 29 ---
+  Comment #: 30
+  Label: [ad]
+  Reviewer comment: Is this jargon or a real term?
+  Section: Key Highlights
+  Sentence/section referred to: Requirements Coverage The prototype covers the majority of the System Requirements Addendum today . Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery ap...
+  Proposed replacement text: Requirements Coverage (January 2026 prototype): 23 of 25 System Requirements Addendum items are fully implemented (92%), and 2 of 25 are partially implemented (8%). The remaining scope for partial ite...
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 30 ---
+  Comment #: 31
+  Label: [ae]
+  Reviewer comment: Instead of "viaSport is purchasing an outcome", use "viaSport is procuring a Performance-Based Service Level Agreement (SLA)." This signals that the you are accountable for specific uptime and support...
+  Section: Key Highlights
+  Sentence/section referred to: Managed Service Model viaSport is purchasing an outcome : a reliable platform with clear service levels, operational ownership, and included enhancement capacity. The subscription includes monitoring,...
+  Proposed replacement text: Managed Service Model: viaSport is procuring a performance-based Service Level Agreement (SLA) covering uptime, support response targets, and reliability, with Austin Wallace Tech responsible for day-...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 31 ---
+  Comment #: 32
+  Label: [af]
+  Reviewer comment: This doesn’t make any sense to me
+  Section: Key Highlights
+  Sentence/section referred to: Managed Service Model viaSport is purchasing an outcome : a reliable platform with clear service levels, operational ownership, and included enhancement capacity. The subscription includes monitoring,...
+  Proposed replacement text: Managed Service Model: viaSport is procuring a performance-based Service Level Agreement (SLA) covering uptime, support response targets, and reliability, with Austin Wallace Tech responsible for day-...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 32 ---
+  Comment #: 33
+  Label: [ag]
+  Reviewer comment: Same comment as before. Only simulated data.
+  Section: Data Provenance
+  Sentence/section referred to: No viaSport confidential data was used. Performance testing used synthetic data designed to match the scale characteristics described in the RFP:
+  Proposed replacement text: Only synthetic (simulated) data is used in the prototype and performance tests; no viaSport confidential data or personal information is included. Performance testing data is designed to match the sca...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 33 ---
+  Comment #: 34
+  Label: [ah]
+  Reviewer comment: ?
+  Section: Data Provenance
+  Sentence/section referred to: No viaSport confidential data was used. Performance testing used synthetic data designed to match the scale characteristics described in the RFP:
+  Proposed replacement text: Only synthetic (simulated) data is used in the prototype and performance tests; no viaSport confidential data or personal information is included. Performance testing data is designed to match the sca...
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 34 ---
+  Comment #: 35
+  Label: [ai]
+  Reviewer comment: Demonstration credentials are provided to the … site
+  Section: Demo Access
+  Sentence/section referred to: Demo credentials are provided via a secure Evaluator Access Pack (see Appendix A: Prototype Evaluation Access ).
+  Proposed replacement text: Prototype evaluation credentials are provided in a secure Evaluator Access Pack (see Appendix A: Prototype Evaluation Access).
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 35 ---
+  Comment #: 36
+  Label: [aj]
+  Reviewer comment: Change this
+  Section: Demo Access
+  Sentence/section referred to: What to Ignore in the Prototype
+  Proposed replacement text: Prototype Placeholders and Items to Be Finalized Post-Award
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 36 ---
+  Comment #: 37
+  Label: [ak]
+  Reviewer comment: Although the … x site is at 90 % build for demonstration and evaluation. The following are non-functioning and are there to provide content holders for the future full build post RFP award.,
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: Some elements are placeholders and will be replaced with viaSport-approved content during Discovery:
+  Proposed replacement text: The prototype is fully functional for the workflows listed in the Requirements Compliance Crosswalk. The following items are content placeholders that will be finalized with viaSport during Discovery ...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 37 ---
+  Comment #: 38
+  Label: [al]
+  Reviewer comment: Field names were simulated to show function a full needs assessment will be … so content match … post RFP
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: Form labels and field names (will match viaSport terminology)
+  Proposed replacement text: Form labels and field names are representative placeholders and will be aligned to viaSport terminology during Discovery.
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 38 ---
+  Comment #: 39
+  Label: [am]
+  Reviewer comment: Same as above
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: Sample templates (will be replaced with viaSport reporting templates)
+  Proposed replacement text: Sample templates are illustrative; viaSport’s reporting templates will be configured during Discovery.
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 39 ---
+  Comment #: 40
+  Label: [an]
+  Reviewer comment: Needs assessment. Or gap analysis
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: Help center content (will be refined per UX interviews )
+  Proposed replacement text: Help-center content will be refined during Discovery based on a needs assessment/gap analysis and user research.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 40 ---
+  Comment #: 41
+  Label: [ao]
+  Reviewer comment: Explain why you did this
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: 1 5-Minute Demo Script
+  Proposed replacement text: 5-Minute Evaluator Walkthrough (Optional)
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 41 ---
+  Comment #: 42
+  Label: [ap]
+  Reviewer comment: (adding note to mysefl. Why does reader care. what does it show, etc)
+  Section: What to Ignore in the Prototype
+  Sentence/section referred to: 1 5-Minute Demo Script
+  Proposed replacement text: Add a one-sentence lead-in under this heading: “This optional 5-minute walkthrough is provided to help evaluators validate key workflows quickly and consistently.”
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 42 ---
+  Comment #: 43
+  Label: [aq]
+  Reviewer comment: Describe what this means. Is this written documentation?
+  Section: Requirement Validation Crosswalk
+  Sentence/section referred to: Where evidence is platform-level (for example AWS compliance reports), we provide supporting artifacts through AWS Artifact and standard AWS compliance documentation upon request.
+  Proposed replacement text: For platform-level compliance evidence (e.g., AWS SOC 2 / ISO reports), we can provide the relevant AWS compliance reports (downloaded via AWS Artifact) and associated security documentation during du...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 43 ---
+  Comment #: 44
+  Label: [ar]
+  Reviewer comment: I don’t think this is true. How would this reduce the risk of delivery?
+  Section: Prototype Positioning
+  Sentence/section referred to: We built this prototype to prove feasibility and reduce delivery risk. Discovery remains mandatory to validate workflows, templates, and migration realities. The prototype is not a substitute for stak...
+  Proposed replacement text: We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 44 ---
+  Comment #: 45
+  Label: [as]
+  Reviewer comment: What does this mean?
+  Section: Prototype Positioning
+  Sentence/section referred to: We built this prototype to prove feasibility and reduce delivery risk. Discovery remains mandatory to validate workflows, templates, and migration realities. The prototype is not a substitute for stak...
+  Proposed replacement text: We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 45 ---
+  Comment #: 46
+  Label: [at]
+  Reviewer comment: Why
+  Section: Prototype Positioning
+  Sentence/section referred to: We built this prototype to prove feasibility and reduce delivery risk. Discovery remains mandatory to validate workflows, templates, and migration realities. The prototype is not a substitute for stak...
+  Proposed replacement text: We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows...
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 46 ---
+  Comment #: 47
+  Label: [au]
+  Reviewer comment: This whole paragraph seems like mumbo-jumbo
+  Section: Prototype Positioning
+  Sentence/section referred to: We built this prototype to prove feasibility and reduce delivery risk. Discovery remains mandatory to validate workflows, templates, and migration realities. The prototype is not a substitute for stak...
+  Proposed replacement text: We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 47 ---
+  Comment #: 48
+  Label: [av]
+  Reviewer comment: Are you a limited company?
+  Section: Company Overview
+  Sentence/section referred to: Austin Wallace Tech is a British Columbia incorporated technology firm (Victoria, BC) delivering Solstice as a managed platform for sport sector reporting and information management.
+  Proposed replacement text: Austin Wallace Tech is a British Columbia limited company (Victoria, BC; incorporated 2025) delivering Solstice as a managed platform for sport sector reporting and information management.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 48 ---
+  Comment #: 49
+  Label: [aw]
+  Reviewer comment: Explain or remove
+  Section: Company Overview
+  Sentence/section referred to: We operate as a principal-led product team with contracted specialists for security, UX/accessibility, and independent testing. This model provides:
+  Proposed replacement text: We operate with a single accountable delivery lead and a small core product team, augmented by specialist advisors for security, UX/accessibility, and independent testing. This model provides:
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 49 ---
+  Comment #: 50
+  Label: [ax]
+  Reviewer comment: Is this a real phrase?
+  Section: Company Overview
+  Sentence/section referred to: A single accountable delivery lead ( no sales-to-delivery handoff)
+  Proposed replacement text: A single accountable delivery lead from proposal through delivery (no handoff between sales and implementation teams).
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 50 ---
+  Comment #: 51
+  Label: [ay]
+  Reviewer comment: Be more quantitative here
+  Section: Company Overview
+  Sentence/section referred to: A stable core engineering team
+  Proposed replacement text: A stable core delivery pod: 1 full-time principal (Austin Wallace) supported by 6 named contracted specialists committed to this engagement (UX/A11y, system navigator, technical advisor, security/risk...
+  Sureness (%): 95
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 51 ---
+  Comment #: 52
+  Label: [az]
+  Reviewer comment: explain a remove
+  Section: Company Overview
+  Sentence/section referred to: Elastic specialist capacity for compliance, security testing, and UX validation
+  Proposed replacement text: On-demand specialist capacity for compliance, security testing, and UX validation.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 52 ---
+  Comment #: 53
+  Label: [ba]
+  Reviewer comment: What kind of specialist?
+  Section: Company Overview
+  Sentence/section referred to: 1 principal + 6 contracted specialists for this engagement
+  Proposed replacement text: Team size: 1 principal (Project Lead/Solution Architect) supported by 6 specialist advisors (UX/accessibility, sport operations/system navigation, technical advisory, and security/compliance advisory)...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 53 ---
+  Comment #: 54
+  Label: [bb]
+  Reviewer comment: six hand selected experts
+  Section: Company Overview
+  Sentence/section referred to: 1 principal + 6 contracted specialists for this engagement
+  Proposed replacement text: Remove “hand selected” phrasing and specify roles: 1 principal supported by 6 specialist advisors (UX/accessibility, sport operations, technical advisory, and security/compliance).
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 54 ---
+  Comment #: 55
+  Label: [bc]
+  Reviewer comment: Do you mean the different Provincial sports bodies
+  Section: Delivery Pod
+  Sentence/section referred to: Connects team to PSO community needs during research and rollout
+  Proposed replacement text: Connects the delivery team to the Provincial Sport Organization (PSO) community’s needs during research, training, and rollout.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 55 ---
+  Comment #: 56
+  Label: [bd]
+  Reviewer comment: Sports Operations and Governance Expert
+  Section: Engagement Model
+  Sentence/section referred to: Soleil Heaney ( System Navigator )
+  Proposed replacement text: Soleil Heaney (Sport Operations & Governance Lead / System Navigator)
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 56 ---
+  Comment #: 57
+  Label: [be]
+  Reviewer comment: Explain
+  Section: Engagement Model
+  Sentence/section referred to: Ongoing community liaison
+  Proposed replacement text: Ongoing sector liaison: coordinates with PSOs and other sport organizations to validate workflows, templates, and change-management communications throughout the project.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 57 ---
+  Comment #: 58
+  Label: [bf]
+  Reviewer comment: Explain
+  Section: Engagement Model
+  Sentence/section referred to: Scheduled reviews at checkpoints
+  Proposed replacement text: Formal checkpoint reviews at key milestones (Discovery sign-off, UAT readiness, and Go-Live readiness).
+  Sureness (%): 70
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 58 ---
+  Comment #: 59
+  Label: [bg]
+  Reviewer comment: Do you provide notice?
+  Section: Service Management and Coverage
+  Sentence/section referred to: Scheduled maintenance windows, versioned releases, and change log reporting to viaSport
+  Proposed replacement text: Scheduled maintenance windows are communicated at least 7 days in advance and are planned during low-usage periods. Emergency maintenance (critical security/stability) may occur on shorter notice; via...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 59 ---
+  Comment #: 60
+  Label: [bh]
+  Reviewer comment: Explain
+  Section: Service Management and Coverage
+  Sentence/section referred to: Regular patching cadence, expedited response for critical vulnerabilities, quarterly security reviews
+  Proposed replacement text: Security patching is performed on a defined cadence: routine patching and dependency updates occur monthly during scheduled maintenance windows; critical security patches are applied within 2 business...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 60 ---
+  Comment #: 61
+  Label: [bi]
+  Reviewer comment: Is this a real term?
+  Section: Service Management and Coverage
+  Sentence/section referred to: Infrastructure as Code, documented runbooks, tested restore procedures, quarterly DR validation
+  Proposed replacement text: Infrastructure as code, operational procedures (runbooks), tested restore procedures, and quarterly disaster recovery validation.
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 61 ---
+  Comment #: 62
+  Label: [bj]
+  Reviewer comment: Clear in what way?
+  Section: Service Management and Coverage
+  Sentence/section referred to: Clear escalation path for Severity 1 incidents, including immediate triage and customer communications
+  Proposed replacement text: Defined escalation path for Severity 1 incidents: acknowledgement within 60 minutes, direct phone/text escalation to the delivery lead, and updates provided to viaSport at least every 60 minutes until...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 62 ---
+  Comment #: 63
+  Label: [bk]
+  Reviewer comment: See comments above
+  Section: What Makes This a Low-Risk Procurement Choice
+  Sentence/section referred to: viaSport is not purchasing a one-time "web project." viaSport is purchasing an outcome: a reliable platform that supports ongoing reporting cycles with predictable support, monitoring, and updates.
+  Proposed replacement text: viaSport is procuring a managed, subscription-based platform service (not a one-time website build) with defined service levels, ongoing support and monitoring, and scheduled enhancements.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 63 ---
+  Comment #: 64
+  Label: [bl]
+  Reviewer comment: Reword
+  Section: What Makes This a Low-Risk Procurement Choice
+  Sentence/section referred to: viaSport is not purchasing a one-time "web project." viaSport is purchasing an outcome: a reliable platform that supports ongoing reporting cycles with predictable support, monitoring, and updates.
+  Proposed replacement text: viaSport is procuring a managed, subscription-based platform service (not a one-time website build). The subscription includes defined service levels and ongoing support, monitoring, security maintena...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 64 ---
+  Comment #: 65
+  Label: [bm]
+  Reviewer comment: Is this a real phrase?
+  Section: Risk Mitigation Summary
+  Sentence/section referred to: Infrastructure as Code, operational documentation, delivery pod structure
+  Proposed replacement text: Infrastructure as code, operational documentation, and a dedicated delivery team structure.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 65 ---
+  Comment #: 66
+  Label: [bn]
+  Reviewer comment: The prototype demonstrates that 23 of …
+  Section: Risk Mitigation Summary
+  Sentence/section referred to: 23 of 25 requirements already built; principal-led with no handoffs
+  Proposed replacement text: The prototype demonstrates that 23 of 25 requirements are already built; delivery is led by a single accountable lead with minimal handoffs.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 66 ---
+  Comment #: 67
+  Label: [bo]
+  Reviewer comment: Of what?
+  Section: Risk Mitigation Summary
+  Sentence/section referred to: Defined SLAs, 24/7 monitoring , quarterly DR drills
+  Proposed replacement text: Defined SLA targets, continuous monitoring of uptime/performance/security events, and quarterly disaster recovery (DR) exercises.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 67 ---
+  Comment #: 68
+  Label: [bp]
+  Reviewer comment: Usually, you do exercises not drills
+  Section: Risk Mitigation Summary
+  Sentence/section referred to: Defined SLAs, 24/7 monitoring , quarterly DR drills
+  Proposed replacement text: Defined SLA targets, continuous monitoring of uptime/performance/security events, and quarterly disaster recovery (DR) exercises.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 68 ---
+  Comment #: 69
+  Label: [bq]
+  Reviewer comment: Is this a real term?
+  Section: Austin Wallace Tech, Selected Relevant Delivery Work
+  Sentence/section referred to: Problem: Process tracking data at game scale for decision support
+  Proposed replacement text: Problem: Process tracking data at game/event scale to support operational decision-making
+  Sureness (%): 70
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 69 ---
+  Comment #: 70
+  Label: [br]
+  Reviewer comment: Of?
+  Section: Austin Wallace Tech, Selected Relevant Delivery Work
+  Sentence/section referred to: Delivered: End-to-end data pipelines and dbt models supporting decision workflows
+  Proposed replacement text: Delivered: End-to-end data pipelines and dbt models powering analytics and reporting used in operational decision-making
+  Sureness (%): 75
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 70 ---
+  Comment #: 71
+  Label: [bs]
+  Reviewer comment: Give an example or 2
+  Section: Will Siddall, Technical Advisor
+  Sentence/section referred to: With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user...
+  Proposed replacement text: Add 1–2 concrete examples to Will’s bio (client + what was delivered + Will’s role), e.g., “Led delivery of [product/system] for [client] in [industry], including [architecture/ops/training], resultin...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: Yes
+  Question for you: Please provide 1–2 project examples (client + what it was + Will’s role/outcome) and confirm whether client names can be used.
+
+--- Row 71 ---
+  Comment #: 72
+  Label: [bt]
+  Reviewer comment: Remove
+  Section: Michael Casinha, Security and Infrastructure Advisor
+  Sentence/section referred to: A seasoned 30 year veteran in the technology space, developing early DevOps practices in the dotcom era of the internet. Working with American banking companies like Bank of America, airline industry ...
+  Proposed replacement text: Michael Casinha is a technology leader with 30 years of experience in DevOps, security, and infrastructure. He has supported teams in regulated and high-security environments—including financial servi...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 72 ---
+  Comment #: 73
+  Label: [bu]
+  Reviewer comment: You don’t need to save veteran if he has 30 years
+  Section: Michael Casinha, Security and Infrastructure Advisor
+  Sentence/section referred to: A seasoned 30 year veteran in the technology space, developing early DevOps practices in the dotcom era of the internet. Working with American banking companies like Bank of America, airline industry ...
+  Proposed replacement text: Michael Casinha is a technology leader with 30 years of experience in DevOps, security, and infrastructure. He has supported teams in regulated and high-security environments—including financial servi...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 73 ---
+  Comment #: 74
+  Label: [bv]
+  Reviewer comment: Is 90%
+  Section: Key Differentiators
+  Sentence/section referred to: A functional prototype already exists and is available for evaluation. It addresses the majority of System Requirements Addendum items today and has been load-tested at production scale with 20.1 mill...
+  Proposed replacement text: A functional prototype is available for evaluation and fully implements 23 of 25 (92%) System Requirements Addendum items; it has been load-tested at production scale with 20.1 million rows.
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 74 ---
+  Comment #: 75
+  Label: [bw]
+  Reviewer comment: Use everyone’s name or no one
+  Section: Key Differentiators
+  Sentence/section referred to: The team combines enterprise data engineering with direct sport sector operations experience. Soleil Heaney brings perspective as a PSO executive, ensuring the platform reflects how sport organization...
+  Proposed replacement text: The team combines enterprise data engineering and security with direct amateur sport sector operations experience, ensuring the platform reflects how sport organizations actually work.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 75 ---
+  Comment #: 76
+  Label: [bx]
+  Reviewer comment: The team the team consists of people that have the data engineering and security, but also includes a subject matter expert in the sports something something something
+  Section: Key Differentiators
+  Sentence/section referred to: The team combines enterprise data engineering with direct sport sector operations experience. Soleil Heaney brings perspective as a PSO executive, ensuring the platform reflects how sport organization...
+  Proposed replacement text: The team combines enterprise data engineering and security with direct amateur sport sector operations experience, ensuring the platform reflects how sport organizations actually work.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 76 ---
+  Comment #: 77
+  Label: [by]
+  Reviewer comment: See comments above
+  Section: Benefits viaSport
+  Sentence/section referred to: Reduced Risk: Evaluate a working system before committing.
+  Proposed replacement text: Evaluator Validation: Evaluators can review a working prototype prior to award to validate key workflows and requirements.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 77 ---
+  Comment #: 78
+  Label: [bz]
+  Reviewer comment: Be explicit. Sport sector community sports.
+  Section: Benefits viaSport
+  Sentence/section referred to: Sector Understanding: Experience leading amateur sport organizations, not just building software.
+  Proposed replacement text: Sector Understanding: Direct experience in the B.C. amateur sport sector (including PSOs and community sport organizations), not just software delivery.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 78 ---
+  Comment #: 79
+  Label: [ca]
+  Reviewer comment: Same comments below as I do above, I don’t really see anything except for the same repeating comments that I’ve made
+  Section: Benefits viaSport
+  Sentence/section referred to: Solution Overview
+  Proposed replacement text: Solution Overview: Reporting Portal + Data Warehouse + Migration + Analytics + Governance
+  Sureness (%): 70
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 79 ---
+  Comment #: 80
+  Label: [cb]
+  Reviewer comment: How?
+  Section: Tenancy Model
+  Sentence/section referred to: Every query is scoped to the user's organization.
+  Proposed replacement text: Every request is enforced server-side with role-based access control and organization-level scoping (organization_id filtering) so users only retrieve records they are authorized to access.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 80 ---
+  Comment #: 81
+  Label: [cc]
+  Reviewer comment: To? Another server?
+  Section: High Availability
+  Sentence/section referred to: Production uses Multi-AZ for automatic failover . Dev and perf use single-AZ for cost efficiency.
+  Proposed replacement text: Production uses a Multi‑AZ deployment so the platform can fail over automatically to a standby instance in a second Availability Zone within AWS Canada (Central). Dev and performance environments use ...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 81 ---
+  Comment #: 82
+  Label: [cd]
+  Reviewer comment: I assume the rest still needs work?
+  Section: UAT Approach
+  Sentence/section referred to: UAT Timeline
+  Proposed replacement text: UAT Timeline: UAT is planned as a 4-week phase in the 30-week project plan, culminating in a UAT sign-off milestone. See the Timeline and Milestones section for the full schedule.
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 82 ---
+  Comment #: 83
+  Label: [ce]
+  Reviewer comment: All parts of the doc are equally done (other than a UX part near the end, and anywhere that says explicit placeholder)
+  Section: UAT Approach
+  Sentence/section referred to: UAT Timeline
+  Proposed replacement text: UAT Timeline: UAT is planned as a 4-week phase in the 30-week project plan, culminating in a UAT sign-off milestone. See the Timeline and Milestones section for the full schedule.
+  Sureness (%): 80
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 83 ---
+  Comment #: 84
+  Label: [cf]
+  Reviewer comment: To make this bid more competitive this shouldn't be optional
+  Section: Escalation Path
+  Sentence/section referred to: Service Credits (Optional)
+  Proposed replacement text: Change heading to “Service Credits” (remove “(Optional)”). Replace the opening sentence with:
+“Service credits apply when the monthly availability target or response-time targets are missed. Credits a...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 84 ---
+  Comment #: 85
+  Label: [cg]
+  Reviewer comment: Tighten up the language here - suggest: Austin Wallace Tech (AWT) provides a pre-configured AI infrastructure within the Solstice platform, designed to enhance data quality and reporting efficiency wi...
+  Section: AI Enablement Foundation (Built)
+  Sentence/section referred to: The platform includes a production-ready AI foundation layer that enables rapid delivery of AI features during the engagement. This infrastructure is fully implemented:
+  Proposed replacement text: Austin Wallace Tech (AWT) provides a pre-configured AI infrastructure within the Solstice platform, designed to enhance data quality and reporting efficiency without compromising viaSport’s data resid...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 85 ---
+  Comment #: 86
+  Label: [ch]
+  Reviewer comment: Might make sense to add some language here to focus on technical governance, cost certainty and legislative compliance - suggest: The AI foundation is fully implemented in the current prototype and re...
+  Section: AI Enablement Foundation (Built)
+  Sentence/section referred to: Description
+  Proposed replacement text: AI features use AWS Bedrock hosted in AWS Canada (Central) (ca-central-1). We log per-request token usage, latency, and cost estimates by organization/user for auditability, and we can provide usage r...
+  Sureness (%): 90
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 86 ---
+  Comment #: 87
+  Label: [ci]
+  Reviewer comment: This is could be reworded to have a stronger governance angle - suggest: Responsible AI Governance All AI deployments follow a "Human-in-the-Loop" architecture, ensuring the technology supports—rather...
+  Section: Prioritization Approach
+  Sentence/section referred to: Responsible AI Approach
+  Proposed replacement text: Responsible AI Governance: All AI deployments follow documented governance controls including privacy reviews, transparency of AI use, human-in-the-loop approvals where appropriate, and bias monitorin...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 87 ---
+  Comment #: 88
+  Label: [cj]
+  Reviewer comment: Still unsure about this piece, it feels incongruous with the rest, and don't know exactly what to do about it.
+  Section: Pricing Philosophy
+  Sentence/section referred to: Project Plan, Timeline, and Delivery Schedule
+  Proposed replacement text: In Pricing Philosophy, replace this heading with a short pointer: “Project plan and timeline assumptions are described in the Timeline and Milestones section; pricing is based on that plan.”
+  Sureness (%): 70
+  Adjust?: Yes
+  Needs info?: No
+
+--- Row 88 ---
+  Comment #: 89
+  Label: [ck]
+  Reviewer comment: Possibe rewrite is here https://docs.google.com/document/d/18vbtNQaMY0mgQ6tOC6UYpEMy7eP9yAbHwQoOns0VV-g/edit?tab=t.0#heading=h.42p4ybv23zpp
+  Section: Pricing Philosophy
+  Sentence/section referred to: Project Plan, Timeline, and Delivery Schedule
+  Proposed replacement text: Replace the “Project Plan, Timeline, and Delivery Schedule” intro and phase table with the following (and align phase headings below to match):
+
+Project Plan and Transition Strategy
+Austin Wallace Tec...
+  Sureness (%): 85
+  Adjust?: Yes
+  Needs info?: No
+
+
+=== Sheet: Likely Future Comments ===
+Columns: ['Section', 'Sentence/section likely to be commented', 'Why a reviewer would likely comment']
+Rows: 36
+
+--- Row 0 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: User research, contextual inquiry, legacy system analysis
+  Why a reviewer would likely comment: Uses UX/IA jargon (“contextual inquiry”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 1 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: Card sorting, tree testing, navigation validation
+  Why a reviewer would likely comment: Uses UX/IA jargon (“card sorting”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 2 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: IA Approval
+  Why a reviewer would likely comment: Uses UX/IA jargon (“IA Approval”); may need a plain-language explanation or clearer deliverable framing.; Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 3 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: Design Freeze
+  Why a reviewer would likely comment: Uses UX/IA jargon (“Design Freeze”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 4 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: Usability testing, accessibility validation, AT user testing
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 5 ---
+  Section: Timeline and Milestones
+  Sentence/section likely to be commented: Project Start: TBD (contract award)
+  Why a reviewer would likely comment: Contains TBD/TBC; reviewers typically want concrete dates or explicit assumptions.
+
+--- Row 6 ---
+  Section: Why This Timeline
+  Sentence/section likely to be commented: Community-informed design with Soleil Heaney as system navigator connecting the team to sport sector needs
+  Why a reviewer would likely comment: Names individuals in operational content; reviewer previously flagged inconsistent naming—either list all key leads consistently or describe roles.
+
+--- Row 7 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Contextual inquiry sessions (12-15 participants)
+  Why a reviewer would likely comment: Uses UX/IA jargon (“contextual inquiry”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 8 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Card sorting studies (25-30 participants)
+  Why a reviewer would likely comment: Uses UX/IA jargon (“card sorting”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 9 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Tree testing with 2-3 navigation variants (25-30 participants)
+  Why a reviewer would likely comment: Uses UX/IA jargon (“tree testing”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 10 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: IA documentation and stakeholder review
+  Why a reviewer would likely comment: Uses UX/IA jargon (“IA documentation”); may need a plain-language explanation or clearer deliverable framing.; Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 11 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Milestone: Week 10 - IA Approval Gate
+  Why a reviewer would likely comment: Uses UX/IA jargon (“IA Approval”); may need a plain-language explanation or clearer deliverable framing.; Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 12 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Interactive Figma prototyping with working interactions
+  Why a reviewer would likely comment: Uses UX/IA jargon (“Figma”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 13 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Milestone: Week 18 - Design Freeze and UAT Ready
+  Why a reviewer would likely comment: Uses UX/IA jargon (“Design Freeze”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 14 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: System Usability Scale (SUS) measurement
+  Why a reviewer would likely comment: Uses UX/IA jargon (“System Usability Scale”); may need a plain-language explanation or clearer deliverable framing.; Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 15 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Assistive technology testing (3-5 AT users)
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 16 ---
+  Section: Phase Details
+  Sentence/section likely to be commented: Screen reader users (NVDA, JAWS)
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 17 ---
+  Section: Decision-Making
+  Sentence/section likely to be commented: Ruslan Hétu with viaSport input
+  Why a reviewer would likely comment: Names individuals in operational content; reviewer previously flagged inconsistent naming—either list all key leads consistently or describe roles.
+
+--- Row 18 ---
+  Section: Dependencies on viaSport
+  Sentence/section likely to be commented: SME availability
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 19 ---
+  Section: Assumptions
+  Sentence/section likely to be commented: No major scope changes after design freeze
+  Why a reviewer would likely comment: Uses UX/IA jargon (“Design Freeze”); may need a plain-language explanation or clearer deliverable framing.
+
+--- Row 20 ---
+  Section: Risk Register
+  Sentence/section likely to be commented: viaSport SME availability
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 21 ---
+  Section: Appendix A: Prototype Evaluation Access
+  Sentence/section likely to be commented: Demo URL: https://sin-uat.solstice.viasport.ca
+  Why a reviewer would likely comment: Contains a raw URL; reviewers may prefer it be delivered via the secure Evaluator Access Pack instead of in the main submission.
+
+--- Row 22 ---
+  Section: Environment Details
+  Sentence/section likely to be commented: Environment monitoring enabled (CloudTrail with CIS Benchmark alarms)
+  Why a reviewer would likely comment: Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 23 ---
+  Section: High-Level Architecture
+  Sentence/section likely to be commented: High-Level Architecture includes an ASCII diagram block using +--- box characters and many AWS service acronyms (CloudFront, Lambda, RDS, S3, SQS, Redis, EventBridge, CloudWatch, SES).
+  Why a reviewer would likely comment: ASCII diagrams can render poorly in PDF/print and may be hard for evaluators; consider replacing with a simple graphic or a plain-language architecture description; also acronym/technical-term dense.
+
+--- Row 24 ---
+  Section: Technology Stack
+  Sentence/section likely to be commented: React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS
+  Why a reviewer would likely comment: Long list of frameworks/libraries; reviewer may ask to focus on benefits and keep details concise (or move to appendix).
+
+--- Row 25 ---
+  Section: Technology Stack
+  Sentence/section likely to be commented: SST, AWS Lambda, CloudFront, ECS Fargate
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.
+
+--- Row 26 ---
+  Section: Appendix C: Performance Evidence
+  Sentence/section likely to be commented: Load testing was conducted in the sin-perf environment. Final validation runs will be completed before submission (TBD).
+  Why a reviewer would likely comment: Contains TBD/TBC; reviewers typically want concrete dates or explicit assumptions.
+
+--- Row 27 ---
+  Section: Shared Responsibility Model
+  Sentence/section likely to be commented: The security model follows the AWS shared responsibility approach: AWS secures the underlying cloud infrastructure, and we implement and operate the application controls, configuration, and monitoring...
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.
+
+--- Row 28 ---
+  Section: Encryption
+  Sentence/section likely to be commented: AES-256 via AWS KMS
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.
+
+--- Row 29 ---
+  Section: Audit Trail
+  Sentence/section likely to be commented: Retention policies and legal holds (durations TBD)
+  Why a reviewer would likely comment: Contains TBD/TBC; reviewers typically want concrete dates or explicit assumptions.
+
+--- Row 30 ---
+  Section: Compliance
+  Sentence/section likely to be commented: CloudTrail API audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes)
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.; Contains acronyms that should be spelled out on first use (or in the glossary).
+
+--- Row 31 ---
+  Section: Appendix I: Evidence Pack
+  Sentence/section likely to be commented: 01-prototype-dashboard.png
+  Why a reviewer would likely comment: Lists image filenames; reviewer may expect figure captions or embedded visuals instead.
+
+--- Row 32 ---
+  Section: Appendix I: Evidence Pack
+  Sentence/section likely to be commented: 02-audit-log-integrity.png
+  Why a reviewer would likely comment: Lists image filenames; reviewer may expect figure captions or embedded visuals instead.
+
+--- Row 33 ---
+  Section: Appendix I: Evidence Pack
+  Sentence/section likely to be commented: 03-import-wizard-validation.png
+  Why a reviewer would likely comment: Lists image filenames; reviewer may expect figure captions or embedded visuals instead.
+
+--- Row 34 ---
+  Section: Appendix J: OWASP Top 10:2025 Mapping
+  Sentence/section likely to be commented: A07: Authentication Failures - Weak MFA, credential stuffing, or session hijacking (directly impacts SEC-AGG-001).
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.
+
+--- Row 35 ---
+  Section: Appendix J: OWASP Top 10:2025 Mapping
+  Sentence/section likely to be commented: A09: Security Logging and Alerting Failures - Lack of real-time monitoring (directly impacts SEC-AGG-002 and SEC-AGG-004).
+  Why a reviewer would likely comment: Acronym/technical-term dense; reviewer may ask to spell out terms or simplify for non-technical evaluators.
+Shell cwd was reset to /Users/austin/dev/solstice

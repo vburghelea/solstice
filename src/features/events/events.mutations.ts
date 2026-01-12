@@ -1217,8 +1217,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         const { registration, membershipPurchase } = result;
 
         if (invitePayloads.length > 0) {
-          const { sendRegistrationGroupInviteEmail } =
-            await import("~/lib/email/sendgrid");
+          const { sendRegistrationGroupInviteEmail } = await import("~/lib/email/email");
           for (const invite of invitePayloads) {
             try {
               await sendRegistrationGroupInviteEmail({

@@ -2,8 +2,7 @@
 
 ## Workflow Summary
 
-The Solstice platform supports the full reporting lifecycle from PSO submission
-to viaSport oversight and analytics.
+The Solstice platform supports the full reporting lifecycle from PSO submission to viaSport oversight and analytics.
 
 1. PSOs submit data through forms, file uploads, or imports.
 2. Validation rules check required fields and formatting on submission.
@@ -13,9 +12,7 @@ to viaSport oversight and analytics.
 
 ## Multi-Tenant Model
 
-Each organization has isolated data and role-based permissions. viaSport admins
-can view cross-organization reporting and analytics, while PSOs only access
-their own records.
+Each organization has isolated data and role-based permissions. viaSport admins can view cross-organization reporting and analytics, while PSOs only access their own records.
 
 ## viaSport Administrator Capabilities
 
@@ -36,6 +33,6 @@ their own records.
 
 ## Migration Summary
 
-Legacy data is extracted, mapped, validated, and imported with an auditable
-trail and rollback support. See **Service Approach: Data Migration** for the
-detailed migration plan and cutover steps.
+Legacy data is extracted, mapped, validated, and imported with an auditable trail and rollback support. See **Service Approach: Data Migration** for the detailed migration plan and cutover steps.
+
+---

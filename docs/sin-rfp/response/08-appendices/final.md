@@ -4,14 +4,14 @@
 
 A working prototype is available for viaSport evaluation in a dedicated UAT environment using synthetic data only.
 
-**Demo URL:** https://sin-uat.solstice.viasport.ca
+**Demo URL:** [https://sin-uat.solstice.viasport.ca](https://sin-uat.solstice.viasport.ca)
 
 **Environment:** `sin-uat` (User Acceptance Testing environment with evaluator access and CloudTrail monitoring)
 
 ### Environment Details
 
-- Synthetic test data only - no confidential viaSport data was used
-- Environment monitoring enabled (CloudTrail with CIS Benchmark alarms)
+- Synthetic test data only \- no confidential viaSport data was used
+- Environment monitoring enabled (CloudTrail with Center for Internet Security (CIS) Benchmark alarms)
 - Production-equivalent security controls active
 - Performance testing is executed separately in `sin-perf`
 
@@ -21,7 +21,7 @@ To protect evaluator accounts and align with security best practices, credential
 
 **To request access:**
 
-1. Contact austinwallacetech@gmail.com with evaluator names and email addresses
+1. Contact [support@solsticeapp.ca](mailto:support@solsticeapp.ca) with evaluator names and email addresses
 2. Receive the Evaluator Access Pack via secure email
 3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
 4. MFA demonstration available on the viaSport Staff account
@@ -31,7 +31,7 @@ Credentials will be rotated periodically and disabled after the evaluation windo
 ### Test Account Personas
 
 | Persona        | Access Level                                  | MFA                             |
-| -------------- | --------------------------------------------- | ------------------------------- |
+| :------------- | :-------------------------------------------- | :------------------------------ |
 | viaSport Staff | Full admin with cross-org access              | Enabled (demonstrates MFA flow) |
 | PSO Admin      | BC Hockey organization administrator          | Disabled for convenience        |
 | Club Reporter  | North Shore Club reporter (submission access) | Disabled for convenience        |
@@ -56,33 +56,14 @@ For a requirement-by-requirement walkthrough, see the **Prototype Evaluation Gui
 
 ### High-Level Architecture
 
-```
-+---------------------------------------------------------------+
-|                         AWS ca-central-1                      |
-+---------------------------------------------------------------+
-|                                                               |
-|   +-----------+    +-----------+    +-----------+             |
-|   | CloudFront| -> |  Lambda   | -> |    RDS    |             |
-|   |    CDN    |    |  (App)    |    | PostgreSQL|             |
-|   +-----------+    +-----------+    +-----------+             |
-|        |                  |                 |                 |
-|   +----+-----+      +-----+-----+     +-----+-----+           |
-|   |    S3    |      |    SQS    |     |   Redis   |           |
-|   | Storage  |      |  Queue    |     |  Cache    |           |
-|   +----------+      +-----------+     +-----------+           |
-|                                                               |
-|   +-----------+    +------------+    +-----------+            |
-|   |EventBridge|    | CloudWatch |    |    SES    |            |
-|   | Scheduler |    | Monitoring |    |   Email   |            |
-|   +-----------+    +------------+    +-----------+            |
-|                                                               |
-+---------------------------------------------------------------+
-```
+A formatted architecture diagram is provided in the Evidence Pack.
+
+The platform runs entirely in AWS Canada (Central) (ca-central-1) using a serverless architecture: CloudFront CDN for edge delivery, Lambda for application compute, RDS PostgreSQL for the database, S3 for object storage, SQS for message queuing, ElastiCache Redis for caching, EventBridge for scheduling, CloudWatch for monitoring, and SES for email delivery.
 
 ### Technology Stack
 
 | Layer          | Technologies                                                 |
-| -------------- | ------------------------------------------------------------ |
+| :------------- | :----------------------------------------------------------- |
 | Frontend       | React 19, TanStack Start, TypeScript, Radix UI, Tailwind CSS |
 | Backend        | TanStack Start, Node.js, Drizzle ORM                         |
 | Database       | PostgreSQL on AWS RDS                                        |
@@ -93,12 +74,12 @@ For a requirement-by-requirement walkthrough, see the **Prototype Evaluation Gui
 
 ## Appendix C: Performance Evidence
 
-Load testing was conducted in the sin-perf environment. Final validation runs will be completed before submission (TBD).
+Load testing was conducted in the sin-perf environment on January 8, 2026. Results: p95 latency of 162ms (target: <500ms), 25 concurrent users, zero server errors.
 
 ### Data Volume
 
 | Table                    | Rows      |
-| ------------------------ | --------- |
+| :----------------------- | :-------- |
 | form_submissions         | 10.0M     |
 | audit_logs               | 7.0M      |
 | notifications            | 2.0M      |
@@ -108,22 +89,22 @@ Load testing was conducted in the sin-perf environment. Final validation runs wi
 
 ### Performance Results
 
-| Metric              | Value | Target | Status |
-| ------------------- | ----- | ------ | ------ |
-| p95 latency         | 250ms | <500ms | Pass   |
-| p50 latency         | 130ms | N/A    | Pass   |
-| Concurrent users    | 15    | N/A    | Pass   |
-| Server errors (5xx) | 0     | 0      | Pass   |
+| Metric              | Value | Target  | Status |
+| :------------------ | :---- | :------ | :----- |
+| p95 latency         | 250ms | \<500ms | Pass   |
+| p50 latency         | 130ms | N/A     | Pass   |
+| Concurrent users    | 15    | N/A     | Pass   |
+| Server errors (5xx) | 0     | 0       | Pass   |
 
 ### Lighthouse Scores
 
-| Metric                   | Value  | Target  | Status |
-| ------------------------ | ------ | ------- | ------ |
-| Performance Score        | 93/100 | >80     | Pass   |
-| Largest Contentful Paint | 2284ms | <2500ms | Pass   |
-| Time to First Byte       | 380ms  | <500ms  | Pass   |
-| Total Blocking Time      | 88ms   | <300ms  | Pass   |
-| Cumulative Layout Shift  | 0      | <0.1    | Pass   |
+| Metric                   | Value  | Target   | Status |
+| :----------------------- | :----- | :------- | :----- |
+| Performance Score        | 93/100 | \>80     | Pass   |
+| Largest Contentful Paint | 2284ms | \<2500ms | Pass   |
+| Time to First Byte       | 380ms  | \<500ms  | Pass   |
+| Total Blocking Time      | 88ms   | \<300ms  | Pass   |
+| Cumulative Layout Shift  | 0      | \<0.1    | Pass   |
 
 ## Appendix D: Security Architecture Summary
 
@@ -133,12 +114,12 @@ The security model follows the AWS shared responsibility approach: AWS secures t
 
 ### Data Residency
 
-Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated content is configured to avoid edge caching. Email notifications are delivered to recipients and may traverse external networks.
+Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated content is configured to avoid edge caching. Email notifications are sent via AWS Simple Email Service (SES) in AWS Canada (Central) (ca-central-1). Once delivered to recipients, messages may transit or be stored by external email providers outside AWS.
 
 ### Encryption
 
 | Scope              | Standard                                       |
-| ------------------ | ---------------------------------------------- |
+| :----------------- | :--------------------------------------------- |
 | In Transit         | TLS 1.2+                                       |
 | At Rest (Database) | AES-256 via AWS KMS                            |
 | At Rest (Storage)  | AES-256 via AWS KMS                            |
@@ -147,7 +128,7 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 ### Authentication
 
 | Feature                     | Implementation                           |
-| --------------------------- | ---------------------------------------- |
+| :-------------------------- | :--------------------------------------- |
 | Multi-Factor Authentication | TOTP with backup codes                   |
 | Password Requirements       | Configurable password policy             |
 | Session Management          | Secure cookies, configurable expiry      |
@@ -156,7 +137,7 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 ### Authorization
 
 | Feature                   | Implementation                            |
-| ------------------------- | ----------------------------------------- |
+| :------------------------ | :---------------------------------------- |
 | Role-Based Access Control | Owner, Admin, Reporter, Viewer roles      |
 | Organization Scoping      | All queries scoped to user's organization |
 | Field-Level Permissions   | Sensitive fields restricted by role       |
@@ -164,11 +145,11 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 
 ### Audit Trail
 
-| Feature      | Implementation                                                                                        |
-| ------------ | ----------------------------------------------------------------------------------------------------- |
-| Scope        | All user actions, data changes, auth events                                                           |
-| Immutability | Hash chain verification: each entry hashes the previous, rendering the trail mathematically immutable |
-| Retention    | Retention policies and legal holds (durations TBD)                                                    |
+| Feature      | Implementation                                                                                                   |
+| :----------- | :--------------------------------------------------------------------------------------------------------------- |
+| Scope        | All user actions, data changes, auth events                                                                      |
+| Immutability | Append-only with hash chain verification; archived to S3 Object Lock (immutable storage) for long-term integrity |
+| Retention    | Retention policies and legal holds (durations to be confirmed with viaSport during Discovery)                    |
 
 ### Compliance
 
@@ -179,7 +160,7 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 ## Appendix E: User Personas
 
 | Persona        | Portal Access             | Key Capabilities                                    |
-| -------------- | ------------------------- | --------------------------------------------------- |
+| :------------- | :------------------------ | :-------------------------------------------------- |
 | viaSport Admin | Full platform             | Admin console, cross-org analytics, user management |
 | PSO Admin      | Organization-scoped       | Reporting oversight, user invitations, analytics    |
 | PSO Reporter   | Organization-scoped       | Form submission, file uploads, imports              |
@@ -190,21 +171,15 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 
 ### Austin Wallace, Project Lead and Solution Architect
 
-Austin Wallace is the delivery lead and solution architect for Solstice. He
-leads platform architecture, data migration strategy, and delivery governance.
-He has 9+ years of enterprise data engineering experience and sport governance
-leadership.
+Austin Wallace is the delivery lead and solution architect for Solstice. He leads platform architecture, data migration strategy, and delivery governance. He has 9+ years of enterprise data engineering experience and sport governance leadership.
 
 ### Ruslan Hétu, UX and Accessibility Lead
 
-Ruslan Hétu is a design and research freelancer with a background in
-human-centered design and systems thinking. He earned a master's degree in
-design and has 6 years of experience applying mixed-methods research to public
-sector projects, healthcare, and startups.
+Ruslan Hétu is a design and research freelancer with a background in human-centered design and systems thinking. He earned a master's degree in design and has 6 years of experience applying mixed-methods research to public sector projects, healthcare, and startups.
 
 ### Soleil Heaney, System Navigator
 
-[To be provided by Soleil Heaney]
+Soleil Heaney has been involved in the sports industry for 10 years. Her work as the Executive Director with Quadball Canada, Manager of Member Services with BC Soccer, General Manager of Victoria Ultimate and President of several local sports club Boards gives her a unique perspective of the needs of sports governing bodies.
 
 ### Will Siddall, Technical Advisor
 
@@ -214,10 +189,7 @@ He's designed, delivered, and trained a variety of products for customers of all
 
 ### Parul Kharub, Security and Risk Advisor
 
-Parul is the strategic cybersecurity and risk advisor with 16 years of
-practical experience in Fortune 100 companies across the globe. She also brings
-experience working with regulators and privacy officers to offer breadth of
-security, privacy and regulatory coverage.
+Parul is the strategic cybersecurity and risk advisor with 16 years of practical experience in Fortune 100 companies across the globe. She also brings experience working with regulators and privacy officers to offer breadth of security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
@@ -225,23 +197,25 @@ A 30+ year veteran of the dotcom internet era bringing generational lessons of b
 
 ### Tyler Piller, Security and Compliance Advisor
 
-Tyler Piller is a cybersecurity veteran with over 10 years of experience in
-operational defense and strategic risk management. He currently directs an
-Information Security Risk Management program, providing strategic advisory to
-align technical risk with enterprise business objectives.
+Tyler Piller is a cybersecurity veteran with over 10 years of experience in operational defense and strategic risk management. He currently directs an Information Security Risk Management program, providing strategic advisory to align technical risk with enterprise business objectives.
 
 ## Appendix G: Glossary
 
 | Term | Definition                                                      |
-| ---- | --------------------------------------------------------------- |
+| :--- | :-------------------------------------------------------------- |
+| AT   | Assistive Technology                                            |
 | BCAR | British Columbia Activity Records, legacy system being replaced |
 | BCSI | BC Sport Intelligence, legacy system being replaced             |
+| CIS  | Center for Internet Security                                    |
+| IA   | Information Architecture                                        |
 | MFA  | Multi-Factor Authentication                                     |
 | PSO  | Provincial Sport Organization                                   |
 | RBAC | Role-Based Access Control                                       |
 | RDS  | Amazon Relational Database Service                              |
 | SIN  | Strength in Numbers (project name)                              |
+| SME  | Subject Matter Expert                                           |
 | SST  | Serverless Stack (infrastructure as code framework)             |
+| SUS  | System Usability Scale                                          |
 | TOTP | Time-based One-Time Password                                    |
 | UAT  | User Acceptance Testing                                         |
 
@@ -249,10 +223,7 @@ align technical risk with enterprise business objectives.
 
 **Primary Contact:**
 
-Austin Wallace
-Project Lead, Austin Wallace Tech
-Email: austinwallacetech@gmail.com
-Location: Victoria, British Columbia
+Austin Wallace Project Lead, Austin Wallace Tech Email: [austin@solsticeapp.ca](mailto:austin@solsticeapp.ca) Location: Victoria, British Columbia
 
 Austin Wallace Tech welcomes the opportunity to present the prototype and discuss how Solstice can serve viaSport's Strength in Numbers initiative.
 
@@ -261,7 +232,7 @@ Austin Wallace Tech welcomes the opportunity to present the prototype and discus
 The Evidence Pack provides supporting screenshots from the prototype.
 
 | Evidence Item                   | Description                                  |
-| ------------------------------- | -------------------------------------------- |
+| :------------------------------ | :------------------------------------------- |
 | 01-prototype-dashboard.png      | Role-based admin dashboard view              |
 | 02-audit-log-integrity.png      | Audit log view with integrity verification   |
 | 03-import-wizard-validation.png | Import wizard preview and validation results |
@@ -270,22 +241,13 @@ The Evidence Pack provides supporting screenshots from the prototype.
 
 Our security testing program maps to the OWASP Top 10 categories:
 
-- **A01: Broken Access Control** - Attackers bypassing authorization to access
-  other users' data (critical for SEC-AGG-001).
-- **A02: Security Misconfiguration** - Unsecured S3 buckets, default passwords,
-  or overly permissive cloud settings.
-- **A03: Software Supply Chain Failures** - Vulnerabilities in third-party
-  libraries or compromised build pipeline.
-- **A04: Cryptographic Failures** - Weak encryption or plain-text data storage
-  (directly impacts PIPEDA compliance).
-- **A05: Injection** - SQL, NoSQL, or command injection.
-- **A06: Insecure Design** - Architectural flaws that cannot be fixed by
-  coding.
-- **A07: Authentication Failures** - Weak MFA, credential stuffing, or session
-  hijacking (directly impacts SEC-AGG-001).
-- **A08: Software and Data Integrity Failures** - Tampering with updates or
-  data without verification.
-- **A09: Security Logging and Alerting Failures** - Lack of real-time
-  monitoring (directly impacts SEC-AGG-002 and SEC-AGG-004).
-- **A10: Mishandling of Exceptional Conditions** - Error messages that leak
-  sensitive info or systems that fail open.
+- **A01: Broken Access Control** \- Attackers bypassing authorization to access other users' data (critical for SEC-AGG-001).
+- **A02: Security Misconfiguration** \- Unsecured S3 buckets, default passwords, or overly permissive cloud settings.
+- **A03: Software Supply Chain Failures** \- Vulnerabilities in third-party libraries or compromised build pipeline.
+- **A04: Cryptographic Failures** \- Weak encryption or plain-text data storage (directly impacts PIPEDA compliance).
+- **A05: Injection** \- SQL, NoSQL, or command injection.
+- **A06: Insecure Design** \- Architectural flaws that cannot be fixed by coding.
+- **A07: Authentication Failures** \- Weak MFA, credential stuffing, or session hijacking (directly impacts SEC-AGG-001).
+- **A08: Software and Data Integrity Failures** \- Tampering with updates or data without verification.
+- **A09: Security Logging and Alerting Failures** \- Lack of real-time monitoring (directly impacts SEC-AGG-002 and SEC-AGG-004).
+- **A10: Mishandling of Exceptional Conditions** \- Error messages that leak sensitive info or systems that fail open.

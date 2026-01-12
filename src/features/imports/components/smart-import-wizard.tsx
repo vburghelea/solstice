@@ -506,6 +506,7 @@ export function SmartImportWizard() {
         setHasPendingEdits(false);
         setAutofixHistory([]);
 
+        const mimeType = selectedFile.type || "application/octet-stream";
         const { type, rows: parsedRows } = await parseImportFile(selectedFile);
         setImportFileType(type);
         setRows(parsedRows);
@@ -520,7 +521,7 @@ export function SmartImportWizard() {
           data: {
             organizationId: selectedOrganizationId,
             fileName: selectedFile.name,
-            mimeType: selectedFile.type || "application/octet-stream",
+            mimeType,
             sizeBytes: selectedFile.size,
           },
         });
@@ -533,7 +534,7 @@ export function SmartImportWizard() {
           method: "PUT",
           body: selectedFile,
           headers: {
-            "Content-Type": selectedFile.type || "application/octet-stream",
+            "Content-Type": mimeType,
           },
         });
 
@@ -544,6 +545,15 @@ export function SmartImportWizard() {
         setSourceFileKey(upload.storageKey);
         setSourceFileHash(fileHash);
       } catch (error) {
+        if (error instanceof TypeError && error.message === "Failed to fetch") {
+          // CORS/network issues block the S3 upload but local parsing still works
+          console.warn("Import wizard upload failed (likely CORS)", error);
+          setErrorMessage(
+            "Cloud storage upload is temporarily unavailable. You can still review mappings while this is resolved.",
+          );
+          return;
+        }
+
         setErrorMessage(error instanceof Error ? error.message : "Failed to parse file.");
       }
     };

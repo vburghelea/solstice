@@ -19,6 +19,13 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 import type { AuditLog } from "~/db/schema";
 import { exportAuditLogs, listAuditLogs, verifyAuditHashChain } from "../audit.queries";
 
@@ -123,14 +130,37 @@ export function AuditLogTable() {
           >
             {exportMutation.isPending ? "Exporting..." : "Export CSV"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => verifyMutation.mutate()}
-            disabled={verifyMutation.isPending}
-          >
-            {verifyMutation.isPending ? "Verifying..." : "Verify hash chain"}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => verifyMutation.mutate()}
+              disabled={verifyMutation.isPending}
+            >
+              {verifyMutation.isPending ? "Verifying..." : "Verify hash chain"}
+            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground p-1"
+                    aria-label="What is hash chain verification?"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    <strong>Hash chain verification</strong> ensures audit log integrity
+                    by checking that each entry's cryptographic hash links to the previous
+                    entry. This detects any tampering or unauthorized modifications to the
+                    audit trail.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
         {verifyResult ? (
           <div className="rounded-md border border-gray-200 p-3 text-xs">

@@ -3,7 +3,7 @@
 ## Compliance Summary
 
 | Req ID     | Title                                  | Status  | Built Today                                        | Remaining Scope                 |
-| ---------- | -------------------------------------- | ------- | -------------------------------------------------- | ------------------------------- |
+| :--------- | :------------------------------------- | :------ | :------------------------------------------------- | :------------------------------ |
 | RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging               | None                            |
 | RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema and access controls      | viaSport metadata configuration |
 | RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards       | None                            |
@@ -14,11 +14,11 @@
 
 **Requirement:**
 
-> The system shall validate submissions to ensure they are complete, clean, use the correct file types, and contain valid data fields such as dates and contact information.
+The system shall validate submissions to ensure they are complete, clean, use the correct file types, and contain valid data fields such as dates and contact information.
 
 **Acceptance Criteria:**
 
-> Submissions that fail validation are rejected with appropriate error messages.
+Submissions that fail validation are rejected with appropriate error messages.
 
 **How We Meet It:**
 
@@ -36,21 +36,19 @@
 
 - None. Fully implemented.
 
-**Approach:**
-Continue to refine validation rules during Discovery based on viaSport templates.
+**Approach:** Continue to refine validation rules during Discovery based on viaSport templates.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## RP-AGG-002: Reporting Information Management
 
 **Requirement:**
 
-> The system shall manage metadata related to reporting including but not limited to contribution agreements, NCCP, contact details, fiscal periods, organization profiles, and delegated access rights.
+The system shall manage metadata related to reporting including but not limited to contribution agreements, NCCP, contact details, fiscal periods, organization profiles, and delegated access rights.
 
 **Acceptance Criteria:**
 
-> Users can update relevant metadata and access reporting features accordingly.
+Users can update relevant metadata and access reporting features accordingly.
 
 **How We Meet It:**
 
@@ -72,21 +70,19 @@ Evidence is summarized in Section 1.3.
 
 - Data dictionary and field definitions for contribution agreements and NCCP.
 
-**Approach:**
-Configure metadata fields during Discovery and validate in UAT. See **System Requirements: Training and Onboarding (TO-AGG)** for change adoption.
+**Approach:** Configure metadata fields during Discovery and validate in UAT. See **System Requirements: Training and Onboarding (TO-AGG)** for change adoption.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## RP-AGG-003: Reporting Flow and Support
 
 **Requirement:**
 
-> The system shall support automated reporting reminders, allow users to track data resubmissions, and visualize submitted data through dashboards.
+The system shall support automated reporting reminders, allow users to track data resubmissions, and visualize submitted data through dashboards.
 
 **Acceptance Criteria:**
 
-> Users are reminded, track changes, and view data in a dashboard format.
+Users are reminded, track changes, and view data in a dashboard format.
 
 **How We Meet It:**
 
@@ -104,21 +100,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Reminder cadence and reporting dashboards will be tuned with viaSport during Discovery.
+**Approach:** Reminder cadence and reporting dashboards will be tuned with viaSport during Discovery.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## RP-AGG-004: Reporting Configuration and Collection
 
 **Requirement:**
 
-> The system shall allow system administrators to configure customizable reporting forms, define required fields, display files for users to read, edit, delete, and download.
+The system shall allow system administrators to configure customizable reporting forms, define required fields, display files for users to read, edit, delete, and download.
 
 **Acceptance Criteria:**
 
-> System admin can configure reporting information and forms.
+System admin can configure reporting information and forms.
 
 **How We Meet It:**
 
@@ -136,21 +130,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Continue to refine reporting form templates during Discovery.
+**Approach:** Continue to refine reporting form templates during Discovery.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## RP-AGG-005: Self-Service Analytics and Data Export
 
 **Requirement:**
 
-> Enable authorized users to build ad-hoc charts, pivot tables, and export raw or aggregated datasets in CSV, Excel, or JSON (optional) without developer intervention.
+Enable authorized users to build ad-hoc charts, pivot tables, and export raw or aggregated datasets in CSV, Excel, or JSON (optional) without developer intervention.
 
 **Acceptance Criteria:**
 
-> User builds a custom chart and exports underlying dataset to CSVs; export respects field-level access rules.
+User builds a custom chart and exports underlying dataset to CSVs; export respects field-level access rules.
 
 **How We Meet It:**
 
@@ -168,8 +160,8 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Continue to expand datasets and templates as viaSport priorities are defined.
+**Approach:** Continue to expand datasets and templates as viaSport priorities are defined.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
+
+---

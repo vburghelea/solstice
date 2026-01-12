@@ -2,11 +2,10 @@
 
 ## Cloud Provider Services
 
-The platform is built on Amazon Web Services in the ca-central-1 (Montreal)
-region. See Section 1.1 for data residency and privacy summary.
+The platform is built on Amazon Web Services in the ca-central-1 (Montreal) region. See Section 1.1 for data residency and privacy summary.
 
 | Service           | Purpose                                    |
-| ----------------- | ------------------------------------------ |
+| :---------------- | :----------------------------------------- |
 | CloudFront        | CDN for static assets and edge caching     |
 | Lambda            | Serverless application compute             |
 | RDS PostgreSQL    | Managed relational database                |
@@ -24,7 +23,7 @@ region. See Section 1.1 for data residency and privacy summary.
 ### Why AWS
 
 | Factor           | Rationale                      |
-| ---------------- | ------------------------------ |
+| :--------------- | :----------------------------- |
 | Canadian region  | Data residency compliance      |
 | Serverless-first | Reduced operational burden     |
 | Mature services  | Strong SLAs and documentation  |
@@ -53,44 +52,58 @@ Infrastructure is defined in TypeScript using SST. This provides:
 ### Environment Strategy
 
 | Environment | Purpose                 | Infrastructure Tier                                     |
-| ----------- | ----------------------- | ------------------------------------------------------- |
+| :---------- | :---------------------- | :------------------------------------------------------ |
 | sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                             |
 | sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ, CloudTrail with alarms    |
 | sin-uat     | User Acceptance Testing | t4g.medium, 100 GB, single-AZ, CloudTrail with alarms   |
 | sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups, CloudTrail |
 
-Each environment is isolated with its own database, storage, and credentials.
-The sin-uat environment is available for viaSport evaluator access, while
-performance testing is executed in sin-perf.
+Each environment is isolated with its own database, storage, and credentials. The sin-uat environment is available for viaSport evaluator access, while performance testing is executed in sin-perf.
 
 ### Development Workflow
 
-```
 Developer writes code
+
         |
+
         v
+
 Pre-commit checks (lint, type check, format)
+
         |
+
         v
+
 Automated tests
+
         |
+
         v
+
 Code review and merge
+
         |
+
         v
+
 Deploy to sin-dev (automatic)
+
         |
+
         v
+
 Deploy to sin-perf (manual, for load testing)
+
         |
+
         v
+
 Deploy to sin-prod (manual, after UAT sign-off)
-```
 
 ### Quality Gates
 
 | Gate          | Tooling           | Purpose                        |
-| ------------- | ----------------- | ------------------------------ |
+| :------------ | :---------------- | :----------------------------- |
 | Linting       | oxlint and ESLint | Code quality                   |
 | Type checking | TypeScript        | Compile-time validation        |
 | Formatting    | oxfmt             | Consistent style               |
@@ -101,9 +114,7 @@ Deploy to sin-prod (manual, after UAT sign-off)
 
 Deployments are executed with SST:
 
-```
-npx sst deploy --stage sin-prod
-```
+npx sst deploy \--stage sin-prod
 
 This builds the application, deploys infrastructure, and updates application services. Database schema changes are applied through versioned migrations when required.
 
@@ -118,7 +129,7 @@ This builds the application, deploys infrastructure, and updates application ser
 The platform supports configuration without code changes:
 
 | Customization         | Method                                        |
-| --------------------- | --------------------------------------------- |
+| :-------------------- | :-------------------------------------------- |
 | Branding              | Tenant configuration (logo, colors, name)     |
 | Forms                 | Form builder UI for custom data collection    |
 | Roles and permissions | Admin UI for role management                  |
@@ -138,3 +149,5 @@ Changes to production follow a defined process:
 7. Post-deployment verification
 
 Emergency changes follow an expedited process with retrospective documentation.
+
+---

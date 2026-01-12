@@ -1,46 +1,46 @@
 # Service Levels, Support, and Reliability
 
-viaSport is purchasing an outcome: a platform that performs reliably during reporting cycles, with clear operational ownership. This section defines the service level commitments included in the Platform Subscription + Managed Service.
+viaSport is procuring an SLA-backed managed service: a platform that performs reliably during reporting cycles, with clear operational ownership. This section defines the service level commitments included in the Platform Subscription + Managed Service.
 
 ## Availability and Uptime
 
 | Metric                        | Target                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------ |
+| :---------------------------- | :----------------------------------------------------------------------------- |
 | Monthly availability target   | 99.9% (excluding scheduled maintenance)                                        |
-| Scheduled maintenance windows | Communicated 72 hours in advance; typically during low-usage periods           |
+| Scheduled maintenance windows | Communicated 7 days in advance; typically during low-usage periods             |
 | Emergency maintenance         | Critical security or stability issues only; immediate notification to viaSport |
 
 Availability is measured as the percentage of time the production application is accessible and functional during each calendar month.
 
 ## Monitoring and Alerting
 
-| Capability                | Implementation                                                                                       |
-| ------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Application monitoring    | 24/7 automated monitoring of application health, response times, and error rates                     |
-| Infrastructure monitoring | AWS CloudWatch metrics for compute, database, storage, and network                                   |
-| Security monitoring       | CloudTrail audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes) |
-| Alerting                  | Automated alerts to service team for threshold breaches and anomalies                                |
-| Status communication      | Proactive notification to viaSport for incidents affecting service                                   |
+| Capability                | Implementation                                                                                                                      |
+| :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
+| Application monitoring    | 24/7 automated monitoring of application health, response times, and error rates                                                    |
+| Infrastructure monitoring | AWS CloudWatch metrics for compute, database, storage, and network                                                                  |
+| Security monitoring       | CloudTrail audit logging with Center for Internet Security (CIS) Benchmark alarms (root usage, IAM changes, security group changes) |
+| Alerting                  | Automated alerts to service team for threshold breaches and anomalies                                                               |
+| Status communication      | Proactive notification to viaSport for incidents affecting service                                                                  |
 
 ## Incident Response
 
 ### Severity Definitions
 
-| Severity         | Definition                                                                 | Examples                                                                        |
-| ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Sev 1 - Critical | System unavailable or major security incident; significant business impact | Production down, data breach, complete loss of core functionality               |
-| Sev 2 - High     | Major function impaired; workaround may exist but impacts productivity     | Reporting unavailable during deadline period, login failures for multiple users |
-| Sev 3 - Medium   | Issue affecting users but workaround available                             | Single feature not working, performance degradation, minor UI issues            |
-| Sev 4 - Low      | Minor issue or cosmetic defect; minimal business impact                    | Typo, minor styling issue, enhancement request                                  |
+| Severity          | Definition                                                                 | Examples                                                                        |
+| :---------------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| Sev 1 \- Critical | System unavailable or major security incident; significant business impact | Production down, data breach, complete loss of core functionality               |
+| Sev 2 \- High     | Major function impaired; workaround may exist but impacts productivity     | Reporting unavailable during deadline period, login failures for multiple users |
+| Sev 3 \- Medium   | Issue affecting users but workaround available                             | Single feature not working, performance degradation, minor UI issues            |
+| Sev 4 \- Low      | Minor issue or cosmetic defect; minimal business impact                    | Typo, minor styling issue, enhancement request                                  |
 
 ### Response and Resolution Targets
 
-| Severity         | First Response | Target Resolution | Escalation                            |
-| ---------------- | -------------- | ----------------- | ------------------------------------- |
-| Sev 1 - Critical | 4 hours        | Same business day | Immediate escalation to delivery lead |
-| Sev 2 - High     | 8 hours        | 2 business days   | Escalation if no progress in 24 hours |
-| Sev 3 - Medium   | 24 hours       | 5 business days   | Standard workflow                     |
-| Sev 4 - Low      | 48 hours       | 10 Business Days  | Standard workflow                     |
+| Severity         | First Response | Target Resolution | Escalation                                                                                   |
+| :--------------- | :------------- | :---------------- | :------------------------------------------------------------------------------------------- |
+| Sev 1 - Critical | 60 minutes     | Same business day | Immediate escalation to delivery lead; updates to viaSport every 60 minutes until mitigation |
+| Sev 2 \- High    | 8 hours        | 2 business days   | Escalation if no progress in 24 hours                                                        |
+| Sev 3 \- Medium  | 24 hours       | 5 business days   | Standard workflow                                                                            |
+| Sev 4 \- Low     | 48 hours       | 10 Business Days  | Standard workflow                                                                            |
 
 **Business hours:** Monday to Friday, 9:00 AM to 5:00 PM Pacific Time, excluding BC statutory holidays.
 
@@ -56,11 +56,11 @@ Availability is measured as the percentage of time the production application is
 
 ## Support Channels
 
-| Channel                             | Use Case                                    | Response                                             |
-| ----------------------------------- | ------------------------------------------- | ---------------------------------------------------- |
-| In-app support requests             | General questions, how-to, feature requests | Ticket created with unique ID; tracked to resolution |
-| Email (austinwallacetech@gmail.com) | Technical issues, bug reports, escalations  | Same ticketing workflow                              |
-| Emergency contact                   | Sev 1 incidents only                        | Direct phone/text to delivery lead                   |
+| Channel                                                         | Use Case                                    | Response                                             |
+| :-------------------------------------------------------------- | :------------------------------------------ | :--------------------------------------------------- |
+| In-app support requests                                         | General questions, how-to, feature requests | Ticket created with unique ID; tracked to resolution |
+| Email ([support@solsticeapp.ca](mailto:support@solsticeapp.ca)) | Technical issues, bug reports, escalations  | Same ticketing workflow                              |
+| Emergency contact                                               | Sev 1 incidents only                        | Direct phone/text to delivery lead                   |
 
 ### Support Workflow
 
@@ -77,7 +77,7 @@ viaSport receives monthly support reports covering ticket volume, response times
 ## Backup and Recovery
 
 | Parameter                      | Commitment                                    |
-| ------------------------------ | --------------------------------------------- |
+| :----------------------------- | :-------------------------------------------- |
 | Backup frequency               | Continuous (point-in-time recovery enabled)   |
 | Backup retention               | 35 days in production                         |
 | Recovery Point Objective (RPO) | 1 hour                                        |
@@ -92,9 +92,9 @@ Production environment uses Multi-AZ deployment for automatic failover. Database
 ## Security Operations
 
 | Activity                     | Cadence                                                       |
-| ---------------------------- | ------------------------------------------------------------- |
+| :--------------------------- | :------------------------------------------------------------ |
 | Security patching (routine)  | Monthly, during scheduled maintenance windows                 |
-| Security patching (critical) | Within 48 hours of vulnerability disclosure                   |
+| Security patching (critical) | Within 2 business days of vendor patch availability           |
 | Dependency updates           | Monthly review; immediate for security-related updates        |
 | Security reviews             | Quarterly review of access controls, configurations, and logs |
 | Penetration testing          | Available as optional add-on (see Commercial Model)           |
@@ -102,7 +102,7 @@ Production environment uses Multi-AZ deployment for automatic failover. Database
 ## Release Management
 
 | Aspect              | Approach                                                        |
-| ------------------- | --------------------------------------------------------------- |
+| :------------------ | :-------------------------------------------------------------- |
 | Release cadence     | Periodic releases based on roadmap; security patches as needed  |
 | Release notes       | Provided to viaSport before each release                        |
 | Staging validation  | All releases validated in staging environment before production |
@@ -114,7 +114,7 @@ Production environment uses Multi-AZ deployment for automatic failover. Database
 viaSport will receive regular operational reports:
 
 | Report              | Frequency | Contents                                                |
-| ------------------- | --------- | ------------------------------------------------------- |
+| :------------------ | :-------- | :------------------------------------------------------ |
 | Support summary     | Monthly   | Ticket volume, response times, resolution rates, trends |
 | Availability report | Monthly   | Uptime percentage, incidents, maintenance windows       |
 | Security summary    | Quarterly | Patching status, security reviews, any incidents        |
@@ -131,19 +131,19 @@ viaSport will receive regular operational reports:
 ### Escalation Path
 
 | Level   | Contact                        | Trigger                                        |
-| ------- | ------------------------------ | ---------------------------------------------- |
+| :------ | :----------------------------- | :--------------------------------------------- |
 | Level 1 | Support team                   | All tickets                                    |
 | Level 2 | Technical lead (Will Siddall)  | Sev 1-2 incidents, complex technical issues    |
 | Level 3 | Delivery lead (Austin Wallace) | Sev 1 incidents, escalations, service concerns |
 
-### Service Credits (Optional)
+### Service Credits
 
-If desired by viaSport, service credits can be included in the contract for availability below target:
+Service credits apply when the monthly availability target is missed. Credits are applied to the following quarter's invoice based on the schedule below:
 
 | Monthly Availability | Credit                      |
-| -------------------- | --------------------------- |
-| 99.0% - 99.9%        | 5% of monthly subscription  |
-| 95.0% - 99.0%        | 10% of monthly subscription |
+| :------------------- | :-------------------------- |
+| 99.0% \- 99.9%       | 5% of monthly subscription  |
+| 95.0% \- 99.0%       | 10% of monthly subscription |
 | Below 95.0%          | 25% of monthly subscription |
 
 Credits are applied to the following quarter's invoice upon viaSport request with documented evidence of downtime.
@@ -151,3 +151,5 @@ Credits are applied to the following quarter's invoice upon viaSport request wit
 ---
 
 _Full service level terms can be incorporated into a formal SLA schedule as part of the contract._
+
+---

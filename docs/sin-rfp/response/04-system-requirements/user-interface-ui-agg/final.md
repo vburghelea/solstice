@@ -3,7 +3,7 @@
 ## Compliance Summary
 
 | Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                 |
-| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------------- |
+| :--------- | :-------------------------------------- | :----- | :---------------------------------------- | :------------------------------ |
 | UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                            |
 | UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                            |
 | UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | None                            |
@@ -16,11 +16,11 @@
 
 **Requirement:**
 
-> The system shall support secure login/logout (MFA), individual and organizational account registration, account recovery, and system administrator account management with role-based access.
+The system shall support secure login/logout (MFA), individual and organizational account registration, account recovery, and system administrator account management with role-based access.
 
 **Acceptance Criteria:**
 
-> Users and system admin can perform account-related tasks securely.
+Users and system admin can perform account-related tasks securely.
 
 **How We Meet It:**
 
@@ -38,21 +38,19 @@
 
 - None. Fully implemented.
 
-**Approach:**
-Validate account flows during UAT and incorporate viaSport policy guidance.
+**Approach:** Validate account flows during UAT and incorporate viaSport policy guidance.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-002: Personalized Dashboard
 
 **Requirement:**
 
-> The system shall provide the capability to create personalized dashboard for each user role, summarizing relevant data, actions, and reporting progress.
+The system shall provide the capability to create personalized dashboard for each user role, summarizing relevant data, actions, and reporting progress.
 
 **Acceptance Criteria:**
 
-> Users can view personalized dashboards based on their roles.
+Users can view personalized dashboards based on their roles.
 
 **How We Meet It:**
 
@@ -70,21 +68,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Refine dashboard widgets based on viaSport priorities.
+**Approach:** Refine dashboard widgets based on viaSport priorities.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-003: Responsive and Inclusive Design
 
 **Requirement:**
 
-> The system shall provide a responsive interface across devices and include accessibility features such as screen reader compatibility, color contrast tools, and etc.
+The system shall provide a responsive interface across devices and include accessibility features such as screen reader compatibility, color contrast tools, and etc.
 
 **Acceptance Criteria:**
 
-> System is functional on all devices and meets accessibility compliance.
+System is functional on all devices and meets accessibility compliance.
 
 **How We Meet It:**
 
@@ -102,21 +98,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Continue to validate accessibility during UAT.
+**Approach:** Continue to validate accessibility during UAT.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-004: Task and Notification Management
 
 **Requirement:**
 
-> The system shall enable automated and customizable notification messages and task reminders that alert users of pending actions and updates, both on the platform and via email.
+The system shall enable automated and customizable notification messages and task reminders that alert users of pending actions and updates, both on the platform and via email.
 
 **Acceptance Criteria:**
 
-> Users receive timely and relevant notifications and reminders.
+Users receive timely and relevant notifications and reminders.
 
 **How We Meet It:**
 
@@ -134,21 +128,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Tune reminder cadence with viaSport during Discovery.
+**Approach:** Tune reminder cadence with viaSport during Discovery.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-005: Content Navigation and Interaction
 
 **Requirement:**
 
-> The system shall allow users to efficiently locate and interact with information using robust categorization, search and filtering capabilities.
+The system shall allow users to efficiently locate and interact with information using robust categorization, search and filtering capabilities.
 
 **Acceptance Criteria:**
 
-> Users can retrieve accurate results through search and filter functions.
+Users can retrieve accurate results through search and filter functions.
 
 **How We Meet It:**
 
@@ -166,21 +158,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Expand search datasets as viaSport priorities are defined.
+**Approach:** Expand search datasets as viaSport priorities are defined.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-006: User Support and Feedback Mechanism
 
 **Requirement:**
 
-> The system shall enable users to submit support inquiries and feedback and allow administrators to respond through a managed interface.
+The system shall enable users to submit support inquiries and feedback and allow administrators to respond through a managed interface.
 
 **Acceptance Criteria:**
 
-> Users can submit and receive responses to inquiries within the system.
+Users can submit and receive responses to inquiries within the system.
 
 **How We Meet It:**
 
@@ -199,21 +189,19 @@ Evidence is summarized in Section 1.3.
 
 - None. Fully implemented.
 
-**Approach:**
-Confirm SLA targets and escalation rules with viaSport.
+**Approach:** Confirm SLA targets and escalation rules with viaSport.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## UI-AGG-007: Consistent Visual Language and Branding
 
 **Requirement:**
 
-> The system shall maintain a consistent design style, color scheme, and branding across all modules.
+The system shall maintain a consistent design style, color scheme, and branding across all modules.
 
 **Acceptance Criteria:**
 
-> All UI components follow a standardized visual style.
+All UI components follow a standardized visual style.
 
 **How We Meet It:**
 
@@ -235,8 +223,8 @@ Evidence is summarized in Section 1.3.
 
 - Logo, color palette, and typography guidance.
 
-**Approach:**
-Apply viaSport branding during Discovery and validate in UAT.
+**Approach:** Apply viaSport branding during Discovery and validate in UAT.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
+
+---

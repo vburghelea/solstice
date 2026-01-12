@@ -1,0 +1,29 @@
+{
+  "output": {
+    "filePath": "outputs/repomix-sin-uat-evidence-capture.xml",
+    "style": "xml",
+    "headerText": "SIN UAT Evidence Capture - Review Plan and Recording Scripts",
+    "showLineNumbers": false
+  },
+  "include": [
+    "docs/sin-rfp/review-plans/final-evidence-review-plan-take-2.md",
+    "scripts/sin-uat-evidence-utils.ts",
+    "scripts/capture-sin-uat-auth-screenshots.ts",
+    "scripts/save-sin-uat-storage-state.ts",
+    "scripts/record-sin-uat-login-video.ts",
+    "scripts/record-sin-uat-sec-agg-001.ts",
+    "scripts/record-sin-uat-sec-agg-004.ts",
+    "scripts/record-sin-uat-dm-agg-001.ts",
+    "scripts/record-sin-uat-dm-agg-006.ts",
+    "scripts/record-sin-uat-rp-agg-003.ts",
+    "scripts/record-sin-uat-rp-agg-003-admin.ts",
+    "scripts/seed-sin-data.ts"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

@@ -162,8 +162,8 @@ export const getEmailService = async (): Promise<EmailService> => resolveEmailSe
 const getBrandEmailConfig = () => {
   const brand = getBrand();
   const fromEmail =
-    process.env["SENDGRID_FROM_EMAIL"] || brand.supportEmail || "noreply@solstice.app";
-  const fromName = process.env["SENDGRID_FROM_NAME"] || brand.name;
+    process.env["EMAIL_FROM_ADDRESS"] || brand.supportEmail || "info@solsticeapp.ca";
+  const fromName = process.env["EMAIL_FROM_NAME"] || brand.name;
   const supportEmail = brand.supportEmail || fromEmail;
   const supportName = brand.supportName || brand.name;
 

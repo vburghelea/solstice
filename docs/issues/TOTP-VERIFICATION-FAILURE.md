@@ -4,27 +4,66 @@
 
 ~~TOTP (Time-based One-Time Password) verification fails with "Invalid code" when using seeded MFA data, while backup code verification works correctly.~~
 
-**RESOLVED**: The issue was a mismatch between how the secret is stored vs. how to generate codes.
+**RESOLVED (2026-01-09)**: The issue was a mismatch between the stored secret and the secret used with otplib.
 
 ### Root Cause
 
-Better Auth stores the **raw secret string** (e.g., `<RAW_TOTP_SECRET>`) but
-authenticator apps expect the **base32 encoding of that string** (e.g.,
-`<BASE32_TOTP_SECRET>`).
+Better Auth stores a **raw ASCII string** and uses `TextEncoder().encode()` to convert it to bytes for HMAC. The `otplib.authenticator.generate()` function expects **base32-encoded input** and decodes it first.
+
+**Both methods work if you use the correct secret format for each:**
+
+| Method                    | Secret format        | Example for current secret                             |
+| ------------------------- | -------------------- | ------------------------------------------------------ |
+| `createOTP` (Better Auth) | Raw string from DB   | `solstice-test-totp-secret-32char`                     |
+| `otplib.authenticator`    | Base32 of raw string | `ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA` |
 
 ### Solution
 
-When generating TOTP codes for testing, use the base32-encoded version:
+**Option 1: Use Better Auth's createOTP (recommended)**
 
 ```bash
-# CORRECT - use base32-encoded secret
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
-
-# WRONG - raw secret produces different codes
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
+npx tsx -e "
+import { createOTP } from '@better-auth/utils/otp';
+(async () => {
+  const code = await createOTP('solstice-test-totp-secret-32char', { period: 30, digits: 6 }).totp();
+  console.log(code);
+})();
+"
 ```
 
-`SIN_UI_TOTP_SECRET` is stored in SST secrets (sin-dev).
+**Option 2: Use otplib with base32-encoded secret**
+
+```bash
+npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA'));"
+```
+
+Both produce identical codes because:
+
+- Better Auth: `TextEncoder.encode('solstice-test-totp-secret-32char')` → UTF-8 bytes
+- otplib: `base32Decode('ONXWY43UN...')` → same bytes (ASCII = UTF-8)
+
+**Current test secret (raw):** `solstice-test-totp-secret-32char`
+**Current test secret (base32):** `ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA`
+**SST secret name:** `SIN_UI_TOTP_SECRET` (stores the raw string)
+
+---
+
+## What Went Wrong (2026-01-09)
+
+The sin-uat seeding failed because:
+
+1. `SIN_UI_TOTP_SECRET` was set to `FRJX4VSFMF7DWPJV` (a base32 string)
+2. This was stored directly in the database
+3. The otplib command used `SIN_UI_TOTP_SECRET` directly (not base32-encoded)
+4. Result: otplib decoded `FRJX4VSFMF7DWPJV` to different bytes than Better Auth's UTF-8 encoding
+
+**The old hardcoded setup actually worked:**
+
+- DB stored: `JBSWY3DPEHPK3PXP`
+- otplib used: `JJBFGV2ZGNCFARKIKBFTGUCYKA` (base32 of `JBSWY3DPEHPK3PXP`)
+- These produced matching codes!
+
+The issue was that when the secret was changed to use an environment variable, the base32 encoding step was lost from the otplib command.
 
 ---
 

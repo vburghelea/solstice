@@ -7,25 +7,25 @@ Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal
 Solstice is proposed as a **term subscription with managed service**, structured to reduce ongoing procurement overhead and operational risk:
 
 - **3-year base term**, with two optional 1-year extensions at viaSport's discretion
-- **Implementation/Standup** to complete viaSport configuration, migration, UAT, and rollout
-- **Platform Subscription + Managed Service** covering hosting, monitoring, security patching, support, ongoing product updates, and 200 hours/year of enhancement capacity
+- **One-time Implementation** to complete viaSport configuration, data migration, User Acceptance Testing (UAT), and rollout
+- **Platform Subscription \+ Managed Service** covering hosting, monitoring, security patching, support, ongoing product updates, and 200 hours/year of enhancement capacity
 
-This "batteries included" model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+This integrated, single-vendor delivery and operations model enables viaSport to procure implementation and ongoing managed service under one agreement, avoiding separate annual procurements for hosting and support and ensuring clear accountability through a single Service Level Agreement (SLA).
 
 ## Response Overview
 
-| Section                                                        | Summary                                                                                   |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.                |
-| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.                     |
-| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training.         |
-| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                           |
-| **Service Levels, Support, and Reliability**                   | SLAs, monitoring, incident response, and operational commitments.                         |
-| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                               |
-| **Commercial Model and Pricing**                               | Term subscription pricing (3+1+1), standup fee, included services, and options.           |
-| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.               |
-| **Prototype Evaluation Guide**                                 | Prototype access and a 15-minute validation path tied to requirement IDs.                 |
-| **Appendices**                                                 | Performance, security, service levels, exit/portability options, and supporting evidence. |
+| Section                                                        | Summary                                                                                         |
+| :------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| **Vendor Fit to viaSport's Needs**                             | Team structure, delivery model, and security posture tailored to viaSport.                      |
+| **Solution Overview**                                          | Workflow summary, admin and PSO capabilities, and migration overview.                           |
+| **Service Approach: Data Submission and Reporting Web Portal** | Methodology for the full service approach, from data submission through training.               |
+| **System Requirements Compliance Crosswalk**                   | Requirement-by-requirement status with built and partial items.                                 |
+| **Service Levels, Support, and Reliability**                   | SLAs, monitoring, incident response, and operational commitments.                               |
+| **Capabilities and Experience**                                | Relevant delivery history and case studies.                                                     |
+| **Commercial Model and Pricing**                               | Term subscription pricing (3+1+1), one-time implementation fee, included services, and options. |
+| **Project Plan, Timeline, and Delivery Schedule**              | 30-week plan targeting Fall 2026 with UX research, milestones, and cutover.                     |
+| **Prototype Evaluation Guide**                                 | Prototype access and a 15-minute validation path tied to requirement IDs.                       |
+| **Appendices**                                                 | Performance, security, service levels, exit/portability options, and supporting evidence.       |
 
 ## Standard Assumptions and Security Posture
 
@@ -33,18 +33,11 @@ The statements below apply across this response unless noted.
 
 ### 1.1 Data Residency and Privacy Summary
 
-Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit
-archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated
-content is configured to avoid edge caching. Email notifications are delivered
-to recipients and may traverse external networks.
+Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archives) are hosted in AWS Canada (Central) (ca-central-1). Authenticated content is configured to avoid edge caching. Email notifications are sent via AWS Simple Email Service (SES) in AWS Canada (Central) (ca-central-1). Once delivered to recipients, messages may transit or be stored by external email providers outside AWS.
 
 ### 1.2 Security Model Summary
 
-The security model follows the AWS shared responsibility approach: AWS secures
-the underlying cloud infrastructure, and we implement and operate the
-application controls, configuration, and monitoring required for viaSport's use
-case. The platform implements MFA, role-based access control, organization
-scoping, and an immutable audit log with tamper-evident hashing.
+The security model follows the AWS shared responsibility approach: AWS secures the underlying cloud infrastructure, and we implement and operate the application controls, configuration, and monitoring required for viaSport's use case. The platform implements MFA, role-based access control, organization scoping, and an immutable audit log with tamper-evident hashing.
 
 **Encryption layers:**
 
@@ -52,77 +45,53 @@ scoping, and an immutable audit log with tamper-evident hashing.
 - **In transit:** TLS 1.2+ for all API endpoints and database connections
 - **Processing controls:** PostgreSQL column-level encryption for highly sensitive fields (e.g., TOTP secrets)
 
-Security evidence is summarized in **Appendix D:
-Security Architecture Summary**. AWS compliance reports (SOC, ISO) are available
-via AWS Artifact upon request.
+Security evidence is summarized in **Appendix D: Security Architecture Summary**. AWS compliance reports (SOC, ISO) are available via AWS Artifact upon request.
 
 ### 1.3 Prototype and Data Provenance Summary
 
-A working prototype is available for evaluation in the sin-uat environment. No
-viaSport confidential data was used. Performance testing is run in sin-perf
-using synthetic data designed to match the scale characteristics described in
-the RFP. Performance and accessibility evidence is summarized in **Appendix C:
-Performance Evidence**. Demo access is provided via a secure Evaluator Access Pack
-(see **Appendix A**), and a 15-minute validation path is provided in the **Prototype
-Evaluation Guide**.
+A working prototype is available for evaluation in the sin-uat environment. No viaSport confidential data was used. Performance testing is run in sin-perf using synthetic data designed to match the scale characteristics described in the RFP. Performance and accessibility evidence is summarized in **Appendix C: Performance Evidence**. Demo access is provided via a secure Evaluator Access Pack (see **Appendix A**), and a 15-minute validation path is provided in the **Prototype Evaluation Guide**.
 
 ## At a Glance
 
-| Dimension        | Status                                                                                                     |
-| ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| Prototype        | Working system available for evaluation (See Section 1.3)                                                  |
-| Requirements     | 23 of 25 built today; 2 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**) |
-| Data Used        | See Section 1.3                                                                                            |
-| Performance      | 20.1M rows, sub-250ms p95 latency                                                                          |
-| Security         | See Section 1.2                                                                                            |
-| Timeline         | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan**)                  |
-| Commercial Model | 3-year base term + two optional 1-year extensions (3+1+1)                                                  |
-| Total Cost       | 3-year: **$1.2M** / 5-year: **$1.6M** (standup + subscription)                                             |
+| Dimension        | Status                                                                                                         |
+| :--------------- | :------------------------------------------------------------------------------------------------------------- |
+| Prototype        | Working system available for evaluation (See Section 1.3)                                                      |
+| Requirements     | 23 of 25 built today; 2 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**)     |
+| Data Used        | See Section 1.3                                                                                                |
+| Performance      | 20.1M rows, p95 latency 162ms (target: <500ms)                                                                 |
+| Security         | See Section 1.2                                                                                                |
+| Timeline         | 30 weeks targeting Fall 2026 launch, including a 6-week discovery and UX research phase (See **Project Plan**) |
+| Commercial Model | 3-year base term \+ two optional 1-year extensions (3+1+1)                                                     |
+| Total Cost       | 3-year: **$1.2M** / 5-year: **$1.6M** (implementation + subscription)                                          |
 
 ## Key Highlights
 
-**De-risked Delivery**
-A working prototype is available for evaluation. This reduces delivery risk and
-allows evaluators to validate requirements directly. Access details are in
-**Appendix A: Prototype Evaluation Access**. The **Prototype Evaluation Guide** provides a
-15-minute validation path tied to requirement IDs. See Section 1.3 for the
-standard prototype and data provenance summary.
+**Working Prototype for Evaluator Validation** Evaluators can log into a working prototype to validate key workflows and requirements prior to award. Access details are in **Appendix A: Prototype Evaluation Access**. The **Prototype Evaluation Guide** provides a 15-minute, requirement-linked walkthrough. See Section 1.3 for the prototype environment and data provenance summary.
 
-**Requirements Coverage**
-The prototype covers the majority of the System Requirements Addendum today. Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery approach. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
+**Requirements Coverage (January 2026 Prototype)** The prototype fully implements 23 of 25 (92%) System Requirements Addendum items. Two requirements are partially implemented (8%), with remaining scope documented including dependencies on viaSport inputs. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
 
-**Security and Residency**
-See Section 1.1 for data residency and privacy, and Section 1.2 for the
-security model summary and evidence references.
+**Security and Residency** See Section 1.1 for data residency and privacy, and Section 1.2 for the security model summary and evidence references.
 
-**Managed Service Model**
-viaSport is purchasing an outcome: a reliable platform with clear service levels,
-operational ownership, and included enhancement capacity. The subscription includes
-monitoring, support, security patching, DR drills, and 200 hours/year for ongoing
-improvements. See **Commercial Model and Pricing** for details.
+**Managed Service Model** viaSport is procuring an SLA-backed managed service covering uptime, support response targets, and reliability, with Austin Wallace Tech responsible for day-to-day operations. The subscription includes availability/performance/security monitoring, ticket-based support and incident response, security patching, quarterly disaster recovery (DR) exercises, and 200 hours/year for ongoing enhancements. See **Commercial Model and Pricing** for details.
 
-**Delivery Timeline**
-The proposed 30-week timeline targets Fall 2026 launch with comprehensive UX research and community engagement. The timeline enables proper user research with viaSport staff and PSO representatives, UAT with accessibility validation, and phased rollout. The core platform is already built, so the additional time focuses on getting the user experience right rather than building new features.
+**Delivery Timeline** The proposed 30-week timeline targets Fall 2026 launch with comprehensive UX research and community engagement. The timeline enables proper user research with viaSport staff and PSO representatives, UAT with accessibility validation, and phased rollout’s. The core platform is already built, so the additional time focuses on getting the user experience right rather than building new features.
 
 ## Proposed Team
 
 | Role                              | Name                                        |
-| --------------------------------- | ------------------------------------------- |
+| :-------------------------------- | :------------------------------------------ |
 | Project Lead / Solution Architect | Austin Wallace                              |
 | UX and Accessibility Lead         | Ruslan Hétu                                 |
 | System Navigator                  | Soleil Heaney                               |
 | Technical Advisor                 | Will Siddall                                |
 | Security Advisory                 | Parul Kharub, Michael Casinha, Tyler Piller |
 
-Austin Wallace and Ruslan Hétu lead delivery together throughout the project.
-Soleil Heaney serves as system navigator, connecting the team to PSO community
-needs during research and rollout. Details on each team member are in
-**Vendor Fit to viaSport's Needs**.
+Austin Wallace and Ruslan Hétu lead delivery together throughout the project. Soleil Heaney serves as system navigator, connecting the team to PSO community needs during research and rollout. Details on each team member are in **Vendor Fit to viaSport's Needs**.
 
 ## Evaluator Navigation Map
 
 | RFP Evaluation Criterion            | Our Response Section                                                                                                 | Notes                                       |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| :---------------------------------- | :------------------------------------------------------------------------------------------------------------------- | :------------------------------------------ |
 | Vendor Fit to viaSport's Needs      | **Vendor Fit to viaSport's Needs**                                                                                   | Company profile, team, differentiators      |
 | Solution Overview                   | **Solution Overview**                                                                                                | Non-technical workflow summary              |
 | Service Approach and Responsiveness | **Service Approach: Data Submission and Reporting Web Portal** through **Service Approach: Training and Onboarding** | Methodology for each scope item             |
@@ -134,3 +103,5 @@ needs during research and rollout. Details on each team member are in
 | Prototype Validation                | **Prototype Evaluation Guide** and **Appendices**                                                                    | Demo access, performance/security summaries |
 
 Austin Wallace Tech welcomes the opportunity to present the prototype and review the approach with viaSport's evaluation team.
+
+---

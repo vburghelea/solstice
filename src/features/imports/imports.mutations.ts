@@ -685,11 +685,12 @@ export const createImportUpload = createServerFn({ method: "POST" })
     const bucket = await getArtifactsBucketName();
     const client = await getS3Client();
 
+    // Do not sign ContentType/ContentLength to avoid signature mismatches when the
+    // browser infers a different MIME type than the one provided. Unsigned headers
+    // keep the presigned URL resilient across browsers and file types.
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: storageKey,
-      ContentType: data.mimeType,
-      ContentLength: data.sizeBytes,
     });
 
     const uploadUrl = await getSignedUrl(client, command, { expiresIn: 900 });

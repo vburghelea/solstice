@@ -288,6 +288,20 @@ export default $config({
       },
     });
 
+    const sinArtifactAllowedOrigins = Array.from(
+      new Set([
+        "http://localhost:5173",
+        "http://localhost:3001",
+        "http://localhost:8888",
+        "http://localhost:5174",
+        ...(customDomainName ? [`https://${customDomainName}`] : []),
+        // Explicit SIN stage domains to avoid missing CORS origins in uat/prod
+        "https://sindev.solsticeapp.ca",
+        "https://sinuat.solsticeapp.ca",
+        "https://sin.solsticeapp.ca",
+      ]),
+    );
+
     // DSAR exports bucket with Object Lock for compliance retention
     // Object Lock provides WORM (Write Once Read Many) protection for DSAR exports
     // per ADR D0.13 (14-day DSAR retention).
@@ -298,12 +312,7 @@ export default $config({
         {
           allowedHeaders: ["*"],
           allowedMethods: ["GET", "PUT", "HEAD"],
-          allowedOrigins: [
-            "http://localhost:5173",
-            "http://localhost:3001",
-            "http://localhost:8888",
-            "http://localhost:5174",
-          ],
+          allowedOrigins: sinArtifactAllowedOrigins,
           maxAge: "1 day",
         },
       ],
@@ -421,7 +430,7 @@ export default $config({
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://connect.squareup.com https://pci-connect.squareup.com",
+      "connect-src 'self' https://connect.squareup.com https://pci-connect.squareup.com https://*.s3.ca-central-1.amazonaws.com",
       "frame-ancestors 'none'",
       "base-uri 'none'",
       "form-action 'self'",

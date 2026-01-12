@@ -47,6 +47,11 @@ export const user = pgTable("user", {
   twoFactorEnabled: boolean("two_factor_enabled")
     .$defaultFn(() => false)
     .notNull(),
+
+  // Passkey prompt dismissal (permanent, syncs across devices)
+  passkeyPromptDismissed: boolean("passkey_prompt_dismissed")
+    .$defaultFn(() => false)
+    .notNull(),
 });
 
 export const session = pgTable("session", {

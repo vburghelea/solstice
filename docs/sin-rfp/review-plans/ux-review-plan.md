@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan outlines a systematic approach to reviewing the UX and design of the Solstice application using Playwright MCP tools, covering both **sin-dev (viaSport)** and **qc-dev (Quadball Canada)** tenants.
+This plan outlines a systematic approach to reviewing the UX and design of the Solstice application using Playwright MCP tools, covering both **sin-austin (viaSport)** and **qc-austin (Quadball Canada)** tenants.
 
 ### Review Goals
 
@@ -17,7 +17,7 @@ This plan outlines a systematic approach to reviewing the UX and design of the S
 
 ### Entry Criteria
 
-- sin-dev and qc-dev are reachable and stable
+- sin-austin and qc-austin are reachable and stable
 - Seed data exists for forms, reporting tasks, and imports
 - Test users available for standard + admin roles
 - Clean browser profile available for first-load checks
@@ -79,7 +79,7 @@ This plan outlines a systematic approach to reviewing the UX and design of the S
 - `/dashboard/settings` - User settings
 - `/onboarding` - Profile completion
 
-Note: If qc-dev uses a different tenant prefix, swap `/dashboard/sin/` for
+Note: If qc-austin uses a different tenant prefix, swap `/dashboard/sin/` for
 `/dashboard/qc/` (or the tenant-specific path).
 
 ---
@@ -93,7 +93,7 @@ Note: If qc-dev uses a different tenant prefix, swap `/dashboard/sin/` for
 curl -s http://localhost:5173/api/health
 
 # If not, start SST dev mode
-AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono
+AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono
 ```
 
 ### Test Accounts & Data Setup
@@ -129,7 +129,7 @@ For each route:
 1. Navigate to /auth/login
 2. Fill form with admin@example.com / testpassword123
 3. Generate TOTP: npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
-   (stored in SST secrets, sin-dev: `SIN_UI_TOTP_SECRET`)
+   (stored in SST secrets, sin-austin: `SIN_UI_TOTP_SECRET`)
 4. Enter authenticator code
 5. Verify access to admin routes
 ```
@@ -312,32 +312,32 @@ From route-tree-implementation-review.md:
 
 ### Dual-Tenant Testing Strategy
 
-**sin-dev (viaSport):**
+**sin-austin (viaSport):**
 
 ```bash
-AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono
+AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono
 # Base URL: http://localhost:5173
 ```
 
-**qc-dev (Quadball Canada):**
+**qc-austin (Quadball Canada):**
 
 ```bash
-AWS_PROFILE=techdev npx sst dev --stage qc-dev --mode mono
+AWS_PROFILE=techdev npx sst dev --stage qc-austin --mode mono
 # Base URL: http://localhost:5173
 ```
 
 ### Review Execution Plan
 
-**Round 1: sin-dev (viaSport)**
+**Round 1: sin-austin (viaSport)**
 
-1. Start SST dev for sin-dev
+1. Start SST dev for sin-austin
 2. Review all routes systematically
 3. Document findings with screenshots
 4. Note tenant-specific branding
 
-**Round 2: qc-dev (Quadball Canada)**
+**Round 2: qc-austin (Quadball Canada)**
 
-1. Switch to qc-dev stage
+1. Switch to qc-austin stage
 2. Re-review same routes
 3. Compare tenant consistency
 4. Note QC-specific differences
@@ -387,7 +387,7 @@ Create `docs/sin-rfp/ux-review-findings.md` with this structure:
 # UX Review Findings - Solstice
 
 **Review Date:** 2025-12-27
-**Environments:** sin-dev (viaSport), qc-dev (Quadball Canada)
+**Environments:** sin-austin (viaSport), qc-austin (Quadball Canada)
 **Reviewer:** Claude + Austin
 
 ## Executive Summary
@@ -453,11 +453,11 @@ Create `docs/sin-rfp/ux-review-findings.md` with this structure:
 
 ### Phase 1: Setup & Authentication (Both Tenants)
 
-1. Start sin-dev, verify health endpoint
+1. Start sin-austin, verify health endpoint
 2. Review `/auth/login` and `/auth/signup`
 3. Login as standard user, capture dashboard
 4. Login as admin with MFA, capture admin routes
-5. Repeat for qc-dev
+5. Repeat for qc-austin
 
 ### Phase 2: User Portal Deep Dive
 

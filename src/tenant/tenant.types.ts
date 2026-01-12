@@ -52,6 +52,8 @@ export type BrandConfig = {
   marketingUrl?: string;
   supportEmail?: string;
   supportName?: string;
+  privacyEmail?: string;
+  infoEmail?: string;
   logoVariant?: "qc" | "viasport" | "default";
   themeColor?: string;
 };

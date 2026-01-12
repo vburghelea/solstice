@@ -21,7 +21,7 @@ vi.mock("~/features/membership/membership.finalize", () => ({
   finalizeMembershipPurchase: finalizeMembershipPurchaseMock,
 }));
 
-vi.mock("~/lib/email/sendgrid", () => ({
+vi.mock("~/lib/email/email", () => ({
   sendMembershipPurchaseReceipt: sendMembershipPurchaseReceiptMock,
   getEmailService: getEmailServiceMock,
 }));

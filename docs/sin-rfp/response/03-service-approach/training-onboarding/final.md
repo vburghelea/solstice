@@ -5,7 +5,7 @@
 Training is tailored to distinct user groups with different responsibilities.
 
 | Audience                | Role                                       | Training Focus                                |
-| ----------------------- | ------------------------------------------ | --------------------------------------------- |
+| :---------------------- | :----------------------------------------- | :-------------------------------------------- |
 | viaSport Administrators | Platform oversight, analytics, PSO support | Admin tools, cross-org reporting, governance  |
 | PSO Reporters           | Data submission, compliance                | Form completion, file uploads, deadlines      |
 | Data Stewards           | Data quality, imports                      | Validation, error resolution, bulk operations |
@@ -13,7 +13,7 @@ Training is tailored to distinct user groups with different responsibilities.
 ### Training Delivery Model
 
 | Method                     | Audience                    | Format                                |
-| -------------------------- | --------------------------- | ------------------------------------- |
+| :------------------------- | :-------------------------- | :------------------------------------ |
 | In-app guided walkthroughs | All users                   | Interactive tours inside the platform |
 | Live training sessions     | viaSport admins, PSO admins | Video workshops and Q and A           |
 | Train-the-trainer          | viaSport staff              | Enable viaSport to support PSOs       |
@@ -22,7 +22,7 @@ Training is tailored to distinct user groups with different responsibilities.
 ### Training Phases
 
 | Phase                   | Timing      | Participants       | Content                                    |
-| ----------------------- | ----------- | ------------------ | ------------------------------------------ |
+| :---------------------- | :---------- | :----------------- | :----------------------------------------- |
 | viaSport Admin Training | Weeks 27-28 | viaSport staff     | Full platform capabilities and admin tools |
 | Soft Launch Training    | Week 29     | Pilot cohort PSOs  | Core workflows with intensive support      |
 | PSO Rollout Training    | Week 30     | PSO administrators | Core workflows and reporting               |
@@ -37,7 +37,7 @@ Cohort sizing and scheduling will be confirmed with viaSport during Planning (TB
 ### In-App Training Features
 
 | Feature             | Description                               |
-| ------------------- | ----------------------------------------- |
+| :------------------ | :---------------------------------------- |
 | Guided walkthroughs | Step-by-step tutorials for common tasks   |
 | Onboarding tour     | First-time user walkthrough of key areas  |
 | Progress tracking   | Per-user tracking of completed tutorials  |
@@ -48,7 +48,7 @@ Cohort sizing and scheduling will be confirmed with viaSport during Planning (TB
 The help center provides searchable guides and FAQs by role:
 
 | Content Type           | Examples                                               |
-| ---------------------- | ------------------------------------------------------ |
+| :--------------------- | :----------------------------------------------------- |
 | Getting started guides | Account setup, first login, dashboard overview         |
 | How-to articles        | Submit a form, upload a file, export data              |
 | FAQ                    | Common questions organized by category                 |
@@ -59,7 +59,7 @@ The help center provides searchable guides and FAQs by role:
 Templates are centrally managed and available in context:
 
 | Template Type       | Purpose                                      |
-| ------------------- | -------------------------------------------- |
+| :------------------ | :------------------------------------------- |
 | Import templates    | CSV and Excel templates with correct headers |
 | Form templates      | Example submissions and expected formats     |
 | Reporting templates | Sample reporting configurations and exports  |
@@ -67,7 +67,7 @@ Templates are centrally managed and available in context:
 ### Documentation Formats
 
 | Format             | Use Case                              |
-| ------------------ | ------------------------------------- |
+| :----------------- | :------------------------------------ |
 | In-app interactive | Primary delivery, always current      |
 | PDF guides         | Offline reference                     |
 | Video tutorials    | Visual learners and complex workflows |
@@ -79,7 +79,7 @@ Sample training materials will be reviewed with viaSport during Planning (TBD).
 ### Support Tiers
 
 | Tier   | Channel                 | Scope                           | Response                            |
-| ------ | ----------------------- | ------------------------------- | ----------------------------------- |
+| :----- | :---------------------- | :------------------------------ | :---------------------------------- |
 | Tier 1 | In-app support requests | General questions, how-to       | 24 hours                            |
 | Tier 2 | Email                   | Technical issues, bug reports   | 24 hours standard, 4 hours critical |
 | Tier 3 | Direct escalation       | Critical issues, system outages | 4 hours                             |
@@ -87,7 +87,7 @@ Sample training materials will be reviewed with viaSport during Planning (TBD).
 ### Support Hours
 
 | Coverage        | Hours                                                 |
-| --------------- | ----------------------------------------------------- |
+| :-------------- | :---------------------------------------------------- |
 | Standard        | Business hours, Pacific Time (Mon to Fri, 9am to 5pm) |
 | Critical issues | Business hours with monitoring alerts                 |
 
@@ -95,34 +95,49 @@ Sample training materials will be reviewed with viaSport during Planning (TBD).
 
 ### Ticket Workflow
 
-```
 User submits request
+
         |
+
         v
+
 Ticket created with unique ID
+
         |
+
         v
+
 Support team reviews and assigns
+
         |
+
         v
+
 Response provided (in-app and email)
+
         |
+
         v
+
 User can reply or mark resolved
+
         |
+
         v
+
 Ticket closed
-```
 
 ### Response Commitments
 
 | Priority | First Response | Target Resolution |
-| -------- | -------------- | ----------------- |
+| :------- | :------------- | :---------------- |
 | Critical | 4 hours        | Same business day |
 | High     | 8 hours        | 2 business days   |
 | Standard | 24 hours       | 5 business days   |
-| Low      | 48 hours       | Best effort       |
+| Low      | 48 hours       | 10 Business Days  |
 
-Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
+Priority levels map to Severity 1–4 as defined in **Service Levels, Support, and Reliability**. Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
 
 viaSport receives monthly support reports covering ticket volume, response times, and trends.
+
+---

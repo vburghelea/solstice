@@ -1,0 +1,33 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "outputs/bi-set-local-patterns.xml",
+    "style": "xml",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": true,
+    "topFilesLength": 20
+  },
+  "include": [
+    "src/features/bi/governance/set-local.ts",
+    "src/features/bi/governance/sql-workbench-gate.ts",
+    "src/features/bi/governance/query-guardrails.ts",
+    "src/features/bi/governance/org-scoping.ts",
+    "src/features/bi/governance/index.ts",
+    "src/features/bi/bi.sql-executor.ts",
+    "src/features/bi/bi.queries.ts",
+    "src/features/bi/__tests__/sql-executor.test.ts",
+    "src/features/bi/governance/__tests__/sql-workbench-gate.test.ts",
+    "src/features/bi/governance/__tests__/query-guardrails.test.ts",
+    "src/features/bi/governance/__tests__/org-scoping.test.ts",
+    "src/features/bi/docs/CHECKLIST-sql-workbench-gate.md",
+    "src/features/bi/docs/sql-workbench-evidence.sql",
+    "docs/sin-rfp/review-plans/final-evidence-review-plan.md",
+    "docs/tickets/ci-security-findings-2026-01-08.md"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": ["**/__fixtures__/**"]
+  }
+}

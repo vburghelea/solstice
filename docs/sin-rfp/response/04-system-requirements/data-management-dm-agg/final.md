@@ -3,7 +3,7 @@
 ## Compliance Summary
 
 | Req ID     | Title                                 | Status  | Built Today                                                        | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | ------------------------------------------------------------------ | ---------------------------------------- |
+| :--------- | :------------------------------------ | :------ | :----------------------------------------------------------------- | :--------------------------------------- |
 | DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions |
 | DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging                       | External integrations and mapping rules  |
 | DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement              |
@@ -15,11 +15,11 @@
 
 **Requirement:**
 
-> The system shall enable customizable form building, support flexible data entry through variable formats (forms, file uploads), with capabilities for real-time submission tracking, editing, and historical data migration.
+The system shall enable customizable form building, support flexible data entry through variable formats (forms, file uploads), with capabilities for real-time submission tracking, editing, and historical data migration.
 
 **Acceptance Criteria:**
 
-> Users and System Admin can successfully submit, track, and edit data.
+Users and System Admin can successfully submit, track, and edit data.
 
 **How We Meet It:**
 
@@ -42,21 +42,19 @@
 
 - Final form templates and data dictionary.
 
-**Approach:**
-Template and field definitions will be finalized during Discovery. See **Service Approach: Data Submission and Reporting Web Portal** for UX approach.
+**Approach:** Template and field definitions will be finalized during Discovery. See **Service Approach: Data Submission and Reporting Web Portal** for UX approach.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## DM-AGG-002: Data Processing and Integration
 
 **Requirement:**
 
-> The system shall enable standardization of data formatting, logging of transformation processes, and integration with external platforms through API (optional), and data import/export mechanisms.
+The system shall enable standardization of data formatting, logging of transformation processes, and integration with external platforms through API (optional), and data import/export mechanisms.
 
 **Acceptance Criteria:**
 
-> Incoming data is processed uniformly, logged for traceability, and exchanged with external platforms.
+Incoming data is processed uniformly, logged for traceability, and exchanged with external platforms.
 
 **How We Meet It:**
 
@@ -79,21 +77,19 @@ Evidence is summarized in Section 1.3.
 
 - Integration targets, API access, and data exchange requirements.
 
-**Approach:**
-Define integration scope during Discovery, then implement connectors and validation. See **Service Approach: Data Migration** for methodology.
+**Approach:** Define integration scope during Discovery, then implement connectors and validation. See **Service Approach: Data Migration** for methodology.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## DM-AGG-003: Data Governance and Access Control
 
 **Requirement:**
 
-> The system shall enforce role-based access to data and provide administrators with secure database access, along with data cataloging and indexing capabilities for discoverability.
+The system shall enforce role-based access to data and provide administrators with secure database access, along with data cataloging and indexing capabilities for discoverability.
 
 **Acceptance Criteria:**
 
-> Users can only access data based on permission.
+Users can only access data based on permission.
 
 **How We Meet It:**
 
@@ -121,21 +117,19 @@ During discovery, we will confirm the proportion of structured submission data v
 
 - Preferred catalog taxonomy and indexing priorities.
 
-**Approach:**
-Refine catalog categories during Discovery. See **Service Approach: Platform Design and Customization** for governance approach.
+**Approach:** Refine catalog categories during Discovery. See **Service Approach: Platform Design and Customization** for governance approach.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## DM-AGG-004: Data Quality and Integrity
 
 **Requirement:**
 
-> The system shall ensure relational integrity and continuously monitor data quality using validation rules and automated checks.
+The system shall ensure relational integrity and continuously monitor data quality using validation rules and automated checks.
 
 **Acceptance Criteria:**
 
-> Submitted data meets validation rules.
+Submitted data meets validation rules.
 
 **How We Meet It:**
 
@@ -158,21 +152,19 @@ Evidence is summarized in Section 1.3.
 
 - Data quality threshold preferences and escalation contacts.
 
-**Approach:**
-Configure thresholds during Discovery and validate in UAT. See **Service Approach: Testing and Quality Assurance**.
+**Approach:** Configure thresholds during Discovery and validate in UAT. See **Service Approach: Testing and Quality Assurance**.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## DM-AGG-005: Data Storage and Retention
 
 **Requirement:**
 
-> The system shall support regular backups, disaster recovery mechanisms, data archiving, and secure cloud hosting aligned with retention policies.
+The system shall support regular backups, disaster recovery mechanisms, data archiving, and secure cloud hosting aligned with retention policies.
 
 **Acceptance Criteria:**
 
-> Data is backed up, archived as scheduled, and securely hosted in the cloud.
+Data is backed up, archived as scheduled, and securely hosted in the cloud.
 
 **How We Meet It:**
 
@@ -194,21 +186,19 @@ Evidence is summarized in Section 1.3.
 
 - Confirm retention durations and DR schedule.
 
-**Approach:**
-Run final DR and retention validation in sin-perf or sin-prod. See **Service Approach: Data Warehousing**.
+**Approach:** Run final DR and retention validation in sin-perf or sin-prod. See **Service Approach: Data Warehousing**.
 
-**Evidence:**
-Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Security Architecture Summary).
+**Evidence:** Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Security Architecture Summary).
 
 ## DM-AGG-006: Legacy Data Migration and Bulk Import
 
 **Requirement:**
 
-> The system shall provide tooling and configurable mapping templates to import historical data from CSV/Excel, legacy databases, or APIs, including validation, error-handling, and rollback.
+The system shall provide tooling and configurable mapping templates to import historical data from CSV/Excel, legacy databases, or APIs, including validation, error-handling, and rollback.
 
 **Acceptance Criteria:**
 
-> Administrators can map legacy fields to system fields, preview results, and execute import; import logs stored for audit.
+Administrators can map legacy fields to system fields, preview results, and execute import; import logs stored for audit.
 
 **How We Meet It:**
 
@@ -238,10 +228,10 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 - Legacy export access and schema documentation.
 - SME review for mapping templates.
 
-**Approach:**
-Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
+**Approach:** Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
 
 **Demo Path:** Dashboard → Admin → Imports (Smart wizard with autofix demo)
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
+
+---

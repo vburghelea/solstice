@@ -12,26 +12,43 @@ import {
 } from "~/components/ui/dialog";
 import { PasskeyIcon } from "~/components/ui/icons";
 import { auth } from "~/lib/auth-client";
-import { getCurrentUserPasskeyCount } from "../auth.queries";
+import { dismissPasskeyPrompt, getCurrentUserPasskeyPromptStatus } from "../auth.queries";
 
-const PASSKEY_PROMPT_DISMISSED_KEY = "passkey-prompt-dismissed";
-const PASSKEY_PROMPT_DISMISS_DURATION_DAYS = 30;
+type PasskeyPromptStatus = Awaited<ReturnType<typeof getCurrentUserPasskeyPromptStatus>>;
 
-function getPasskeyPromptDismissed(): boolean {
+const LEGACY_PASSKEY_PROMPT_DISMISSED_KEY = "passkey-prompt-dismissed";
+const PASSKEY_PROMPT_SNOOZED_KEY = "passkey-prompt-snoozed";
+const PASSKEY_PROMPT_SNOOZE_DURATION_HOURS = 24;
+
+function getPasskeyPromptSnoozed(): boolean {
   if (typeof window === "undefined") return true;
-  const dismissed = localStorage.getItem(PASSKEY_PROMPT_DISMISSED_KEY);
-  if (!dismissed) return false;
+  const snoozed = localStorage.getItem(PASSKEY_PROMPT_SNOOZED_KEY);
+  if (!snoozed) return false;
 
-  const dismissedAt = Number.parseInt(dismissed, 10);
-  const daysSinceDismissed = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24);
+  const snoozedAt = Number.parseInt(snoozed, 10);
+  const hoursSinceSnoozed = (Date.now() - snoozedAt) / (1000 * 60 * 60);
 
-  // Re-prompt after 30 days
-  return daysSinceDismissed < PASSKEY_PROMPT_DISMISS_DURATION_DAYS;
+  return hoursSinceSnoozed < PASSKEY_PROMPT_SNOOZE_DURATION_HOURS;
 }
 
-function setPasskeyPromptDismissed(): void {
+function getLegacyPasskeyPromptDismissed(): boolean {
+  if (typeof window === "undefined") return false;
+  return Boolean(localStorage.getItem(LEGACY_PASSKEY_PROMPT_DISMISSED_KEY));
+}
+
+function clearLegacyPasskeyPromptDismissed(): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(PASSKEY_PROMPT_DISMISSED_KEY, Date.now().toString());
+  localStorage.removeItem(LEGACY_PASSKEY_PROMPT_DISMISSED_KEY);
+}
+
+function setPasskeyPromptSnoozed(): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PASSKEY_PROMPT_SNOOZED_KEY, Date.now().toString());
+}
+
+function clearPasskeyPromptSnooze(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(PASSKEY_PROMPT_SNOOZED_KEY);
 }
 
 type PasskeyPromptProps = {
@@ -53,24 +70,35 @@ export function PasskeyPrompt({ forceShow }: PasskeyPromptProps) {
     setPasskeySupported(Boolean(window.PublicKeyCredential));
   }, []);
 
-  const { data: passkeyData, isLoading } = useQuery({
-    queryKey: ["user-passkey-count"],
-    queryFn: () => getCurrentUserPasskeyCount(),
+  const { data: passkeyPromptStatus, isLoading } = useQuery({
+    queryKey: ["passkey-prompt-status"],
+    queryFn: () => getCurrentUserPasskeyPromptStatus(),
     staleTime: 60_000,
   });
 
   useEffect(() => {
     if (isLoading || !passkeySupported) return;
 
-    const hasNoPasskeys = passkeyData?.count === 0;
-    const notDismissed = !getPasskeyPromptDismissed();
+    const hasNoPasskeys = passkeyPromptStatus?.count === 0;
+    const snoozed = getPasskeyPromptSnoozed();
+    const dismissed = passkeyPromptStatus?.dismissed ?? false;
+    const legacyDismissed = getLegacyPasskeyPromptDismissed();
+    const twoFactorEnabled = passkeyPromptStatus?.twoFactorEnabled ?? false;
 
-    if ((forceShow || (hasNoPasskeys && notDismissed)) && passkeySupported) {
+    if (
+      (forceShow ||
+        (hasNoPasskeys &&
+          !dismissed &&
+          !legacyDismissed &&
+          !snoozed &&
+          !twoFactorEnabled)) &&
+      passkeySupported
+    ) {
       // Small delay to not interrupt login flow
       const timer = setTimeout(() => setOpen(true), 1500);
       return () => clearTimeout(timer);
     }
-  }, [passkeyData, isLoading, forceShow, passkeySupported]);
+  }, [passkeyPromptStatus, isLoading, forceShow, passkeySupported]);
 
   const addPasskeyMutation = useMutation({
     mutationFn: async () => {
@@ -91,9 +119,45 @@ export function PasskeyPrompt({ forceShow }: PasskeyPromptProps) {
     },
   });
 
-  const handleDismiss = (dontShowAgain: boolean) => {
+  const {
+    mutate: dismissPasskeyPromptMutate,
+    mutateAsync: dismissPasskeyPromptMutateAsync,
+    isPending: isDismissPending,
+  } = useMutation({
+    mutationFn: async () => dismissPasskeyPrompt(),
+    onSuccess: () => {
+      queryClient.setQueryData<PasskeyPromptStatus>(
+        ["passkey-prompt-status"],
+        (prev) => ({
+          count: prev?.count ?? 0,
+          dismissed: true,
+          twoFactorEnabled: prev?.twoFactorEnabled ?? false,
+        }),
+      );
+      clearPasskeyPromptSnooze();
+    },
+    onError: (error) => {
+      toast.error((error as Error).message || "Failed to dismiss passkey prompt");
+    },
+  });
+
+  useEffect(() => {
+    if (passkeyPromptStatus?.dismissed) {
+      clearLegacyPasskeyPromptDismissed();
+      return;
+    }
+
+    if (!passkeyPromptStatus?.dismissed && getLegacyPasskeyPromptDismissed()) {
+      dismissPasskeyPromptMutate();
+      clearLegacyPasskeyPromptDismissed();
+    }
+  }, [passkeyPromptStatus, dismissPasskeyPromptMutate]);
+
+  const handleDismiss = async (dontShowAgain: boolean) => {
     if (dontShowAgain) {
-      setPasskeyPromptDismissed();
+      await dismissPasskeyPromptMutateAsync();
+    } else {
+      setPasskeyPromptSnoozed();
     }
     setOpen(false);
   };
@@ -196,7 +260,7 @@ export function PasskeyPrompt({ forceShow }: PasskeyPromptProps) {
           <Button
             className="w-full"
             onClick={() => addPasskeyMutation.mutate()}
-            disabled={addPasskeyMutation.isPending}
+            disabled={addPasskeyMutation.isPending || isDismissPending}
           >
             {addPasskeyMutation.isPending ? (
               <>
@@ -230,7 +294,7 @@ export function PasskeyPrompt({ forceShow }: PasskeyPromptProps) {
               variant="ghost"
               className="flex-1"
               onClick={() => handleDismiss(false)}
-              disabled={addPasskeyMutation.isPending}
+              disabled={addPasskeyMutation.isPending || isDismissPending}
             >
               Not now
             </Button>
@@ -238,7 +302,7 @@ export function PasskeyPrompt({ forceShow }: PasskeyPromptProps) {
               variant="ghost"
               className="flex-1 text-muted-foreground"
               onClick={() => handleDismiss(true)}
-              disabled={addPasskeyMutation.isPending}
+              disabled={addPasskeyMutation.isPending || isDismissPending}
             >
               Don't show again
             </Button>

@@ -449,7 +449,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
       // Send confirmation email
       if (membershipWasCreated && confirmedMembership) {
         try {
-          const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+          const { sendMembershipPurchaseReceipt } = await import("~/lib/email/email");
 
           await sendMembershipPurchaseReceipt({
             to: {

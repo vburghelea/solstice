@@ -176,11 +176,17 @@ export const checkPasskeysByEmail = createServerFn({ method: "POST" })
   });
 
 /**
- * Get the current user's passkey count.
- * Used for post-login passkey creation prompts.
+ * Get passkey prompt status for the current user.
+ * Includes passkey count, permanent dismissal, and MFA enrollment flag.
  */
-export const getCurrentUserPasskeyCount = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ count: number }> => {
+export const getCurrentUserPasskeyPromptStatus = createServerFn({
+  method: "GET",
+}).handler(
+  async (): Promise<{
+    count: number;
+    dismissed: boolean;
+    twoFactorEnabled: boolean;
+  }> => {
     const [{ getDb }, { getSessionFromHeaders }, { getRequest }, { eq, count }] =
       await Promise.all([
         import("~/db/server-helpers"),
@@ -192,17 +198,62 @@ export const getCurrentUserPasskeyCount = createServerFn({ method: "GET" }).hand
     const session = await getSessionFromHeaders(headers);
 
     if (!session?.user) {
-      return { count: 0 };
+      return { count: 0, dismissed: false, twoFactorEnabled: false };
     }
 
-    const { passkey } = await import("~/db/schema");
+    const { passkey, user } = await import("~/db/schema");
     const db = await getDb();
 
-    const [result] = await db
-      .select({ count: count() })
-      .from(passkey)
-      .where(eq(passkey.userId, session.user.id));
+    const [passkeyCount, userRow] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(passkey)
+        .where(eq(passkey.userId, session.user.id)),
+      db
+        .select({
+          dismissed: user.passkeyPromptDismissed,
+          twoFactorEnabled: user.twoFactorEnabled,
+        })
+        .from(user)
+        .where(eq(user.id, session.user.id)),
+    ]);
 
-    return { count: result?.count ?? 0 };
+    return {
+      count: passkeyCount?.[0]?.count ?? 0,
+      dismissed: userRow?.[0]?.dismissed ?? false,
+      twoFactorEnabled: userRow?.[0]?.twoFactorEnabled ?? false,
+    };
+  },
+);
+
+/**
+ * Permanently dismiss the passkey enrollment prompt for the current user.
+ * This persists across devices since it's stored in the database.
+ */
+export const dismissPasskeyPrompt = createServerFn({ method: "POST" }).handler(
+  async (): Promise<{ success: boolean }> => {
+    const [{ getDb }, { getSessionFromHeaders }, { getRequest }, { eq }] =
+      await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/session"),
+        import("@tanstack/react-start/server"),
+        import("drizzle-orm"),
+      ]);
+    const { headers } = getRequest();
+    const session = await getSessionFromHeaders(headers);
+
+    if (!session?.user) {
+      return { success: false };
+    }
+
+    const { user } = await import("~/db/schema");
+    const db = await getDb();
+
+    await db
+      .update(user)
+      .set({ passkeyPromptDismissed: true })
+      .where(eq(user.id, session.user.id));
+
+    return { success: true };
   },
 );

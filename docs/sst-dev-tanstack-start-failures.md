@@ -84,7 +84,7 @@
 
 ### Expected outcome after refactor
 
-- `AWS_PROFILE=techdev npx sst dev --stage qc-dev` (or `sin-dev`) should no longer fail during
+- `AWS_PROFILE=techdev npx sst dev --stage qc-austin` (or `sin-austin`) should no longer fail during
   cron/lambda bundling.
 - Vite dev should stop emitting `tanstack-start-injected-head-scripts:v`
   resolution errors.
@@ -92,8 +92,8 @@
 ### Validation plan
 
 - Re-run:
-  - `AWS_PROFILE=techdev npx sst dev --stage qc-dev`
-  - `AWS_PROFILE=techdev npx sst dev --stage sin-dev`
+  - `AWS_PROFILE=techdev npx sst dev --stage qc-austin`
+  - `AWS_PROFILE=techdev npx sst dev --stage sin-austin`
   - `pnpm dev`
 - After code changes, run:
   - `pnpm lint`

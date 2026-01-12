@@ -1,0 +1,25 @@
+Hello Adam and Joe,
+
+Thank you for the clarification on timing and budget. I understand the desire to let the RFP process inform investment decisions, it makes sense given the solution-dependent nature of costs.
+
+The Fall 2026 operational target for core functionality is helpful context. I'll structure my proposal around that timeline with a phased approach through 2027 for additional capabilities.
+
+With the Friday deadline approaching, I have a few technical questions below. I recognize some may not be easily answered on short notice, where that's the case, I'll clearly state our assumptions in the submission.
+
+Legacy Migration (BCAR/BCSI)
+1. What export methods are available for BCAR and BCSI (database access, API, built-in exports, etc.)?
+2. Are you able to share any existing data dictionary or schema documents, or even better, redacted data samples?
+3. Do BCAR/BCSI contain attachments that must be migrated?
+
+RP-AGG-002 (Aggregation & Metadata)
+4. What is the expected metadata set at launch (e.g., contribution agreements, NCCP fields, fiscal periods, org profiles, delegated access, contacts)?
+5. Are any fields validated against authoritative sources (e.g., NCCP registry), or will the new system be the system of record?
+
+Identity & Access
+6. Is single sign-on required at launch? If yes, which identity provider(s) and protocol (SAML/OIDC)?
+
+No need to rush, any answers you can provide will sharpen the proposal, and I'll document assumptions for the rest.
+
+Thanks again for your help,
+Austin Wallace
+(604) 603-8668

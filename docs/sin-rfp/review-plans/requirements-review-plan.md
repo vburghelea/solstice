@@ -12,7 +12,7 @@ This plan outlines a methodology for systematically reviewing implemented capabi
 
 ### Parameters
 
-- **Environment:** sin-dev (viaSport) only
+- **Environment:** sin-austin (viaSport) only
 - **Depth:** Acceptance criteria verification (not edge case testing)
 - **Evidence:** Screenshots, code references, test coverage
 
@@ -23,7 +23,7 @@ This plan outlines a methodology for systematically reviewing implemented capabi
 ### Entry Criteria
 
 - Requirements addendum and coverage matrix are up to date and agreed
-- sin-dev has seeded data and test users for required roles
+- sin-austin has seeded data and test users for required roles
 - Reviewers have access (standard + admin) and MFA configured
 - Evidence storage location is ready (screenshots, logs, notes)
 
@@ -112,7 +112,7 @@ For each requirement:
    - Read key source files to understand implementation
 
 3. VERIFY FUNCTIONALITY
-   - Use Playwright MCP to test the feature in sin-dev
+   - Use Playwright MCP to test the feature in sin-austin
    - Walk through the acceptance criteria manually
    - Document any gaps or deviations
 
@@ -452,7 +452,7 @@ Document scope for Stream M requirements:
 
 ### Playwright MCP Testing
 
-- Navigate to each feature in sin-dev
+- Navigate to each feature in sin-austin
 - Execute acceptance criteria steps
 - Capture screenshots as evidence
 - Check console for errors
@@ -503,7 +503,7 @@ Document scope for Stream M requirements:
 # Requirements Verification Report - SIN RFP
 
 **Date:** YYYY-MM-DD
-**Environment:** sin-dev
+**Environment:** sin-austin
 **Reviewer:** [name]
 
 ## Executive Summary

@@ -9,7 +9,7 @@ Migration follows a phased approach that reduces risk and validates data at each
 ### Migration Phases
 
 | Phase                      | Duration    | Activities                                                          | Exit Criteria              |
-| -------------------------- | ----------- | ------------------------------------------------------------------- | -------------------------- |
+| :------------------------- | :---------- | :------------------------------------------------------------------ | :------------------------- |
 | Discovery                  | Weeks 1-6   | Obtain sample exports, document legacy schemas, assess data quality | Schema mapping approved    |
 | Mapping and Transformation | Weeks 7-10  | Build mapping templates, define validation rules, test with samples | Templates validated        |
 | Pilot Migration            | Weeks 11-14 | Migrate subset (one PSO), validate accuracy, refine mappings        | Pilot data verified        |
@@ -61,7 +61,7 @@ Import jobs and audit logs provide traceability for each migration run. Retentio
 Migration success is verified through reconciliation:
 
 | Check                 | Method                                            |
-| --------------------- | ------------------------------------------------- |
+| :-------------------- | :------------------------------------------------ |
 | Row counts            | Source count matches target count                 |
 | Checksums             | Hash comparison of key fields                     |
 | Spot checks           | Manual verification of sample records by viaSport |
@@ -70,7 +70,7 @@ Migration success is verified through reconciliation:
 ## Data Quality Targets and Defect Workflow
 
 | Metric                 | Target                           |
-| ---------------------- | -------------------------------- |
+| :--------------------- | :------------------------------- |
 | Successful import rate | 99%+ of records                  |
 | Validation pass rate   | 95%+ on first attempt            |
 | Duplicate detection    | 100% of exact duplicates flagged |
@@ -110,7 +110,7 @@ A successful migration includes technical data movement and a managed transition
 ### Cutover Approach (Recommended)
 
 | Step                  | Description                                                 | Outcome                                              |
-| --------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| :-------------------- | :---------------------------------------------------------- | :--------------------------------------------------- |
 | Pilot org migration   | Migrate one PSO end-to-end, validate workflow and reporting | Validated templates, mappings, and training approach |
 | Migration waves       | Migrate remaining orgs in planned cohorts                   | Manageable support load, reduced risk                |
 | Data freeze window    | Short read-only or limited update window on legacy systems  | Prevents last-minute divergence                      |
@@ -129,3 +129,5 @@ A successful migration includes technical data movement and a managed transition
 
 - Document expected downtime (if any) during final cutover.
 - If parallel run is required, define duration and responsibilities (who submits where, what is source of truth).
+
+---

@@ -3,7 +3,7 @@
 ## Compliance Summary
 
 | Req ID     | Title                            | Status | Built Today                           | Remaining Scope                  |
-| ---------- | -------------------------------- | ------ | ------------------------------------- | -------------------------------- |
+| :--------- | :------------------------------- | :----- | :------------------------------------ | :------------------------------- |
 | TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates content       |
 | TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD)       |
 | TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement with viaSport |
@@ -12,11 +12,11 @@
 
 **Requirement:**
 
-> The system shall provide a centralized templates tab and offer contextual template access directly from each data entry item to guide users through required formats.
+The system shall provide a centralized templates tab and offer contextual template access directly from each data entry item to guide users through required formats.
 
 **Acceptance Criteria:**
 
-> Users can easily locate and access the correct template when needed.
+Users can easily locate and access the correct template when needed.
 
 **How We Meet It:**
 
@@ -39,21 +39,19 @@
 
 - Template content and formatting requirements.
 
-**Approach:**
-Collect templates during Discovery and load into the hub prior to UAT.
+**Approach:** Collect templates during Discovery and load into the hub prior to UAT.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## TO-AGG-002: Guided Learning and Walkthroughs
 
 **Requirement:**
 
-> The system shall offer onboarding and data upload tutorials to help users navigate key processes, especially during their first-time use.
+The system shall offer onboarding and data upload tutorials to help users navigate key processes, especially during their first-time use.
 
 **Acceptance Criteria:**
 
-> Users can complete tasks independently with support from walkthroughs.
+Users can complete tasks independently with support from walkthroughs.
 
 **How We Meet It:**
 
@@ -72,21 +70,19 @@ Evidence is summarized in Section 1.3.
 
 - Final content review with viaSport stakeholders (TBD).
 
-**Approach:**
-Refine tutorial copy and steps during Discovery and UAT.
+**Approach:** Refine tutorial copy and steps during Discovery and UAT.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
 
 ## TO-AGG-003: Reference Materials and Support
 
 **Requirement:**
 
-> The system shall provide categorized guides and a frequently asked questions (FAQ) section to help users resolve issues and understand system functionality.
+The system shall provide categorized guides and a frequently asked questions (FAQ) section to help users resolve issues and understand system functionality.
 
 **Acceptance Criteria:**
 
-> Users can find accurate answers and instructional material without needing direct support.
+Users can find accurate answers and instructional material without needing direct support.
 
 **How We Meet It:**
 
@@ -104,8 +100,8 @@ Evidence is summarized in Section 1.3.
 
 - Content refinement based on viaSport terminology (TBD).
 
-**Approach:**
-Review help content during Discovery and incorporate viaSport feedback.
+**Approach:** Review help content during Discovery and incorporate viaSport feedback.
 
-**Evidence:**
-Evidence is summarized in Section 1.3.
+**Evidence:** Evidence is summarized in Section 1.3.
+
+---

@@ -1,8 +1,18 @@
 # Runbook: Standing Up a New Environment
 
 **Purpose:** Step-by-step guide for deploying and configuring a new environment (e.g., sin-uat, qc-perf)
-**Last Updated:** 2026-01-07
-**Lessons Learned From:** sin-uat setup issues documented in `docs/worklog-sin-uat-db-connection.md`
+**Last Updated:** 2026-01-09
+**Lessons Learned From:** sin-uat setup issues (2026-01-07, 2026-01-09)
+
+---
+
+## TL;DR: When Database/Tunnel Operations Fail
+
+If `sst tunnel` connects but database operations fail with "server closed connection unexpectedly" or similar:
+
+1. **Check if tunnel IP is stale** (see [Stale Bastion IP Recovery](#stale-bastion-ip-recovery) below)
+2. **Use SSM workaround** if tunnel is broken (see [SSM Port Forwarding Workaround](#ssm-port-forwarding-workaround))
+3. **Verify correct stage** - `sst shell` may return wrong DATABASE_URL due to stage linking bug
 
 ---
 
@@ -204,15 +214,29 @@ Expected for SIN environments:
 3. When MFA prompt appears, generate TOTP:
 
 ```bash
-npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''));"
+# IMPORTANT: Better Auth uses raw string secrets, NOT base32-encoded
+npx tsx -e "
+import { createOTP } from '@better-auth/utils/otp';
+(async () => {
+  const secret = process.env.SIN_UI_TOTP_SECRET ?? 'solstice-test-totp-secret-32char';
+  const code = await createOTP(secret, { period: 30, digits: 6 }).totp();
+  console.log(code);
+})();
+"
 ```
 
-4. Enter the 6-digit code
+4. Enter the 6-digit code immediately (codes expire every 30 seconds)
 5. Verify navigation to dashboard with Admin Console visible
 
 **If MFA fails (200 with empty body, no navigation):**
 
 - Re-run seed with `BETTER_AUTH_SECRET` set (see Phase 3.2)
+
+**If MFA fails with "Invalid authentication code":**
+
+- Ensure you're using Better Auth's `createOTP` (not `otplib.authenticator`)
+- Better Auth stores **raw strings** as TOTP secrets, not base32-encoded
+- Generate a fresh code and enter within 30 seconds
 
 ### 4.3 Verify Admin Access
 
@@ -238,26 +262,195 @@ After MFA login as `viasport-staff@example.com`, verify sidebar shows:
 
 ### TOTP Secret for Testing
 
-- Set `SIN_UI_TOTP_SECRET` in your environment (base32-encoded).
-- Stored in SST secrets (sin-dev): `SIN_UI_TOTP_SECRET`.
+**Current test secrets:**
+
+- **Raw string (stored in DB):** `solstice-test-totp-secret-32char`
+- **Base32 encoded (for otplib):** `ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA`
+- **SST secret name:** `SIN_UI_TOTP_SECRET` (stores the raw string)
+
+**To generate a TOTP code (either method works):**
+
+```bash
+# Option 1: Better Auth's createOTP (recommended)
+npx tsx -e "
+import { createOTP } from '@better-auth/utils/otp';
+(async () => {
+  const code = await createOTP('solstice-test-totp-secret-32char', { period: 30, digits: 6 }).totp();
+  console.log(code);
+})();
+"
+
+# Option 2: otplib with base32-encoded secret
+npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA'));"
+```
+
+**How it works:** Better Auth stores raw ASCII strings and uses UTF-8 encoding for HMAC. otplib expects base32 input and decodes it first. Both produce the same HMAC key bytes (since ASCII = UTF-8), so both methods generate identical codes.
 
 ### Common Issues
 
-| Issue                             | Cause                                  | Fix                          |
-| --------------------------------- | -------------------------------------- | ---------------------------- |
-| Tunnel connection refused         | Stale bastion IP                       | `sst deploy --stage <stage>` |
-| MFA returns 200 but no navigation | Missing BETTER_AUTH_SECRET during seed | Re-seed with both env vars   |
-| Wrong DATABASE_URL from SST shell | SST shell bug with stage linking       | Pass DATABASE_URL explicitly |
-| Multiple tunnel conflicts         | Two tunnels running                    | Kill all, run only one       |
-| Login page downloads as file      | Session cookie from different stage    | Clear browser cookies        |
+| Issue                              | Cause                                  | Fix                                                  |
+| ---------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| Tunnel connection refused          | Stale bastion IP                       | `sst deploy --stage <stage>`                         |
+| MFA returns 200 but no navigation  | Missing BETTER_AUTH_SECRET during seed | Re-seed with both env vars                           |
+| Wrong DATABASE_URL from SST shell  | SST shell bug with stage linking       | Pass DATABASE_URL explicitly                         |
+| Multiple tunnel conflicts          | Two tunnels running                    | Kill all, run only one                               |
+| Login page downloads as file       | Session cookie from different stage    | Clear browser cookies                                |
+| TOTP "Invalid authentication code" | Wrong secret format for the method     | Use raw string with createOTP, or base32 with otplib |
 
 ---
 
 ## Environment URLs
 
-| Stage   | CloudFront URL                | Bastion IP  |
-| ------- | ----------------------------- | ----------- |
-| sin-dev | d21gh6khf5uj9x.cloudfront.net | 3.99.23.199 |
-| sin-uat | d2c0wrkbra0j3p.cloudfront.net | 3.99.82.171 |
+| Stage   | CloudFront URL                | Custom Domain         |
+| ------- | ----------------------------- | --------------------- |
+| sin-dev | d21gh6khf5uj9x.cloudfront.net | sindev.solsticeapp.ca |
+| sin-uat | (varies after redeploy)       | sinuat.solsticeapp.ca |
 
 _Update this table when adding new environments_
+
+---
+
+## Stale Bastion IP Recovery
+
+### Why This Happens
+
+SST's tunnel configuration is:
+
+1. **Generated once** when the VPC component is first created
+2. **Encrypted and stored** in Pulumi state as the `_tunnel` output
+3. **NOT regenerated** when NAT instances are replaced
+
+When infrastructure changes cause NAT instance replacement (new public IP), the encrypted tunnel config becomes stale. This has happened multiple times with sin-uat.
+
+### Symptoms
+
+- `sst tunnel` starts and shows an IP address
+- Database connections fail with "server closed the connection unexpectedly"
+- The tunnel IP doesn't match any running EC2 instance
+
+### Diagnosis
+
+```bash
+# 1. Note the IP shown when tunnel starts (e.g., "▤  99.79.69.136")
+
+# 2. List actual NAT instance IPs for the stage
+AWS_PROFILE=techdev aws ec2 describe-instances --region ca-central-1 \
+  --filters "Name=tag:sst:stage,Values=<stage>" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].{Name:Tags[?Key==`Name`].Value|[0],PublicIP:PublicIpAddress}' \
+  --output table
+
+# 3. If tunnel IP is NOT in the list, it's stale
+```
+
+### Known Triggers
+
+| Trigger                          | Description                                  |
+| -------------------------------- | -------------------------------------------- |
+| Full redeploy after `sst remove` | Creates new VPC/NAT instances with new IPs   |
+| SST version upgrades             | May trigger resource recreation              |
+| Infrastructure drift             | AWS may replace instances during maintenance |
+| Manual VPC changes               | Any change that replaces NAT instances       |
+
+### Recovery Options
+
+**Option 1: SSM Port Forwarding (Recommended - Works Immediately)**
+
+See [SSM Port Forwarding Workaround](#ssm-port-forwarding-workaround) below.
+
+**Option 2: Force Tunnel Regeneration**
+
+This sometimes works, but not always:
+
+```bash
+# Kill existing tunnels
+pkill -f "sst" && sudo pkill -f "/opt/sst/tunnel"
+
+# Redeploy (may regenerate tunnel config)
+AWS_PROFILE=techdev npx sst deploy --stage <stage>
+
+# Try tunnel again
+AWS_PROFILE=techdev npx sst tunnel --stage <stage>
+```
+
+If the tunnel IP is still wrong after redeploy, use SSM workaround.
+
+---
+
+## SSM Port Forwarding Workaround
+
+When the SST tunnel has a stale bastion IP, use AWS SSM Session Manager to create a port forward directly through a NAT instance.
+
+### Prerequisites
+
+- AWS CLI v2 with Session Manager plugin installed
+- NAT instance must be running (check with `aws ec2 describe-instances`)
+
+### Steps
+
+**1. Get the NAT instance ID for your stage:**
+
+```bash
+AWS_PROFILE=techdev aws ec2 describe-instances --region ca-central-1 \
+  --filters "Name=tag:sst:stage,Values=<stage>" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].InstanceId' --output text
+```
+
+**2. Get the RDS proxy hostname:**
+
+```bash
+AWS_PROFILE=techdev npx sst shell --stage <stage> -- printenv | grep SST_RESOURCE_Database
+# Extract the "host" field from the JSON output
+```
+
+**3. Start SSM port forwarding:**
+
+```bash
+AWS_PROFILE=techdev aws ssm start-session \
+  --region ca-central-1 \
+  --target <nat-instance-id> \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["<rds-proxy-hostname>"],"portNumber":["5432"],"localPortNumber":["15432"]}'
+```
+
+**4. Connect via localhost:**
+
+```bash
+# Test connection
+PGPASSWORD="<password>" psql -h localhost -p 15432 -U postgres -d solstice -c "\dt"
+
+# Push schema
+DATABASE_URL="postgresql://postgres:<password>@localhost:15432/solstice?sslmode=require" \
+  npx drizzle-kit push --force
+
+# Run seed (remember BETTER_AUTH_SECRET for MFA!)
+DATABASE_URL="postgresql://postgres:<password>@localhost:15432/solstice?sslmode=require" \
+BETTER_AUTH_SECRET="<secret>" \
+SIN_UI_TOTP_SECRET="<totp-secret>" \
+  npx tsx scripts/seed-sin-data.ts --force
+```
+
+### Example (sin-uat, 2026-01-09)
+
+```bash
+# NAT instance
+i-08c93cd0f3e081958
+
+# RDS proxy
+solstice-sin-uat-databaseproxy-bcwkkanv.proxy-cx20ui4g0b7v.ca-central-1.rds.amazonaws.com
+
+# Full command
+AWS_PROFILE=techdev aws ssm start-session \
+  --region ca-central-1 \
+  --target i-08c93cd0f3e081958 \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["solstice-sin-uat-databaseproxy-bcwkkanv.proxy-cx20ui4g0b7v.ca-central-1.rds.amazonaws.com"],"portNumber":["5432"],"localPortNumber":["15432"]}'
+```
+
+---
+
+## Preventing Future Issues
+
+1. **After any deployment that may recreate VPC resources**, verify the tunnel works before walking away
+2. **Document the current NAT instance IPs** in this runbook when setting up new environments
+3. **Consider filing an SST issue** - the `_tunnel` encrypted config should be regenerated when NAT IPs change
+4. **Keep SSM as a backup** - it bypasses the tunnel entirely and always works

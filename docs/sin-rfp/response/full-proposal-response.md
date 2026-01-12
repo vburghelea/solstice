@@ -1,16 +1,19 @@
 # Executive Summary
 
-Austin Wallace Tech responds to viaSport British Columbia's Request for Proposal for the Strength in Numbers Project. We built a working prototype that aligns to the System Requirements Addendum and demonstrates delivery feasibility before contract award.
+Austin Wallace Tech submits this response to viaSport's Strength in Numbers RFP, proposing **Solstice**: a secure reporting and analytics platform delivered as a **term subscription with managed service**.
 
-## What viaSport is Buying
+**Delivery risk is reduced before award:** we built a working prototype aligned to the System Requirements Addendum and provide a 15-minute evaluation path mapped to requirement IDs. The prototype currently satisfies **23 of 25 requirements**, with **2 partial items** pending viaSport inputs (legacy integration scope and reporting metadata configuration).
 
-Solstice is proposed as a **term subscription with managed service**, structured to reduce ongoing procurement overhead and operational risk:
+**Security and residency:** Primary data stores (database, object storage, backups, audit archives) are hosted in **AWS Canada (Central)**. Solstice implements **MFA**, **role-based access control**, organization-scoped isolation, and an **immutable tamper-evident audit log**.
 
-- **3-year base term**, with two optional 1-year extensions at viaSport's discretion
-- **Implementation/Standup** to complete viaSport configuration, migration, UAT, and rollout
-- **Platform Subscription + Managed Service** covering hosting, monitoring, security patching, support, ongoing product updates, and 200 hours/year of enhancement capacity
+**Commercial model:** viaSport receives implementation and ongoing operations in one award:
 
-This "batteries included" model means viaSport procures implementation and operations in a single award, avoiding annual re-procurement of managed services.
+- **Implementation/Standup (one-time): $600,000** — discovery, configuration, migration, UAT, training, go-live/hypercare
+- **Platform Subscription + Managed Service: $200,000/year** — hosting, monitoring, patching, support SLAs, product updates, and **200 hours/year of enhancements**
+- Contract term: **3-year base** with **two optional 1-year extensions (3+1+1)**
+- Total cost: **$1.2M (3-year)** / **$1.6M (5-year)** (standup + subscription)
+
+**Delivery timeline:** 30 weeks from award to launch (targeting Fall 2026), emphasizing UX research, template/metadata configuration, migration validation, accessibility testing, and phased rollout—because core platform capabilities are already built.
 
 ## Response Overview
 
@@ -44,8 +47,15 @@ The security model follows the AWS shared responsibility approach: AWS secures
 the underlying cloud infrastructure, and we implement and operate the
 application controls, configuration, and monitoring required for viaSport's use
 case. The platform implements MFA, role-based access control, organization
-scoping, encryption in transit and at rest, and an immutable audit log with
-tamper-evident hashing. Security evidence is summarized in **Appendix D:
+scoping, and an immutable audit log with tamper-evident hashing.
+
+**Encryption layers:**
+
+- **At rest:** AES-256 via AWS KMS for RDS, S3, and backups
+- **In transit:** TLS 1.2+ for all API endpoints and database connections
+- **Processing controls:** PostgreSQL column-level encryption for highly sensitive fields (e.g., TOTP secrets)
+
+Security evidence is summarized in **Appendix D:
 Security Architecture Summary**. AWS compliance reports (SOC, ISO) are available
 via AWS Artifact upon request.
 
@@ -59,14 +69,25 @@ Performance Evidence**. Demo access is provided via a secure Evaluator Access Pa
 (see **Appendix A**), and a 15-minute validation path is provided in the **Prototype
 Evaluation Guide**.
 
+### 1.4 viaSport Clarifications Received
+
+Based on clarifications provided by viaSport (Adam Benson and Joe Zhang) in response to vendor questions:
+
+- **Legacy export methods (BCAR/BCSI):** viaSport can provide database access and/or exports to CSV/Excel.
+- **Legacy documentation/data samples:** A data dictionary/schema or redacted samples are not available at this time.
+- **Legacy attachments:** Migrating attachments from BCAR/BCSI is not a requirement for this project.
+- **Reporting metadata at launch (RP-AGG-002):** The launch metadata set will be a combination of contribution agreement fields, NCCP fields, fiscal periods, organization profiles, delegated access, and contacts, to be confirmed with viaSport's implementation partner during Discovery.
+- **Authoritative validation:** The new system will be the system of record; fields are not expected to be validated against external authoritative registries at launch.
+- **SSO:** viaSport would like the capability of SSO. viaSport uses Microsoft 365, and because users will come from many organizations, the solution should consider Microsoft / Google / Apple sign-in options, as well as passwordless approaches where appropriate.
+
 ## At a Glance
 
 | Dimension        | Status                                                                                                     |
 | ---------------- | ---------------------------------------------------------------------------------------------------------- |
 | Prototype        | Working system available for evaluation (See Section 1.3)                                                  |
-| Requirements     | 22 of 25 built today; 3 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**) |
+| Requirements     | 23 of 25 built today; 2 partial pending viaSport inputs (See **System Requirements Compliance Crosswalk**) |
 | Data Used        | See Section 1.3                                                                                            |
-| Performance      | 20.1M rows, sub-250ms p95 latency                                                                          |
+| Performance      | 20.0M rows, 163ms p95 latency (validated January 2026)                                                     |
 | Security         | See Section 1.2                                                                                            |
 | Timeline         | 30 weeks targeting Fall 2026 launch with comprehensive UX research (See **Project Plan**)                  |
 | Commercial Model | 3-year base term + two optional 1-year extensions (3+1+1)                                                  |
@@ -82,7 +103,7 @@ allows evaluators to validate requirements directly. Access details are in
 standard prototype and data provenance summary.
 
 **Requirements Coverage**
-The prototype covers the majority of the System Requirements Addendum today. Three requirements remain partial and are explicitly scoped with viaSport dependencies and delivery approach. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
+The prototype covers the majority of the System Requirements Addendum today. Two requirements remain partial and are explicitly scoped with viaSport dependencies and delivery approach. The **System Requirements Compliance Crosswalk** provides the requirement-by-requirement view.
 
 **Security and Residency**
 See Section 1.1 for data residency and privacy, and Section 1.2 for the
@@ -150,7 +171,8 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## What Is Production-Ready Today
 
-- Authentication with TOTP MFA and backup codes
+- Authentication with TOTP MFA, backup codes, and passkeys (WebAuthn)
+- Google OAuth for social login
 - Role-based access control (owner, admin, reporter, viewer)
 - Organization-scoped data isolation
 - Tamper-evident audit log with hash chain verification
@@ -165,18 +187,22 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 
 ## What Will Be Finalized With viaSport
 
-| Item                                                    | Timing                | Dependency                 |
-| ------------------------------------------------------- | --------------------- | -------------------------- |
-| BCAR and BCSI extraction method                         | Discovery (Weeks 1-6) | Legacy system access       |
-| Form templates and reporting metadata                   | Discovery (Weeks 1-6) | viaSport data dictionary   |
-| Branding (logo, colors)                                 | Design (Week 11)      | Brand assets from viaSport |
-| Program-specific fields (NCCP, contribution agreements) | Design (Weeks 11-18)  | viaSport SME input         |
+| Item                                                                                                                                         | Timing                | Dependency                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ---------------------------------------------- |
+| BCAR/BCSI extraction approach (database access and/or CSV/Excel exports)                                                                     | Discovery (Weeks 1-6) | Legacy system access coordination              |
+| Legacy Field Inventory and Mapping Workbook                                                                                                  | Discovery (Weeks 1-6) | Exports + SME review (no dictionary available) |
+| Form templates + reporting metadata (combination of contribution agreements, NCCP, fiscal periods, org profiles, delegated access, contacts) | Discovery (Weeks 1-6) | viaSport + implementation partner confirmation |
+| Branding (logo, colors)                                                                                                                      | Design (Week 11)      | Brand assets from viaSport                     |
+| Program-specific fields                                                                                                                      | Design (Weeks 11-18)  | viaSport SME input                             |
+| SSO provider configuration (Microsoft/Google/Apple)                                                                                          | Discovery (Weeks 1-6) | viaSport identity architecture                 |
+
+**Attachments:** Migrating BCAR/BCSI attachments is not required per viaSport clarification. Solstice supports attachments for new submissions going forward.
 
 ## Demo Access
 
-Demo credentials are listed in **Appendix A: Prototype Evaluation Access** to reduce reviewer friction.
+Demo credentials are provided via a secure Evaluator Access Pack (see **Appendix A: Prototype Evaluation Access**).
 
-**Contact:** austinwallacetech@gmail.com
+**Contact:** support@solsticeapp.ca
 
 **Environment:** sin-uat (User Acceptance Testing environment with evaluator
 access and CloudTrail monitoring). Performance testing is run in sin-perf.
@@ -214,7 +240,7 @@ Some elements are placeholders and will be replaced with viaSport-approved conte
 | ------------------------------- | ----------- | --------------------------------------------------------------------- |
 | Form building                   | DM-AGG-001  | Dashboard -> Forms -> Create Form                                     |
 | File uploads                    | DM-AGG-001  | Form Builder -> Add File Field -> Submit                              |
-| Import and rollback             | DM-AGG-006  | Dashboard -> Imports -> New Import                                    |
+| Import and rollback             | DM-AGG-006  | Dashboard -> Admin -> Imports -> New Import (Smart wizard)            |
 | Submission tracking             | RP-AGG-003  | Dashboard -> Reporting                                                |
 | Self-service analytics          | RP-AGG-005  | Analytics -> New Query -> Pivot                                       |
 | Export with access control      | RP-AGG-005  | Pivot -> Export -> Verify scoping                                     |
@@ -248,13 +274,15 @@ We operate as a principal-led product team with contracted specialists for secur
 - A stable core engineering team
 - Elastic specialist capacity for compliance, security testing, and UX validation
 
-| Attribute          | Details                                      |
-| ------------------ | -------------------------------------------- |
-| Headquarters       | Victoria, British Columbia                   |
-| Operating model    | Product team + managed service               |
-| Delivery structure | Core delivery pod + specialist partners      |
-| Hosting region     | AWS Canada (Central) for primary data stores |
-| Primary focus      | Sport sector information management systems  |
+| Attribute          | Details                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| Headquarters       | Victoria, British Columbia                                 |
+| Incorporated       | 2025 (BC Limited Company, BN 748709839BC0001)              |
+| Team size          | 1 principal + 6 contracted specialists for this engagement |
+| Operating model    | Product team + managed service                             |
+| Delivery structure | Core delivery pod + specialist partners                    |
+| Hosting region     | AWS Canada (Central) for primary data stores               |
+| Primary focus      | Sport sector information management systems                |
 
 ## Operating Model
 
@@ -310,8 +338,8 @@ Solstice is positioned like an enterprise platform engagement:
 | ----------------- | ------------------------------------------------------------------------- |
 | Vendor dependency | Source code escrow, data portability, documented runbooks                 |
 | Key person risk   | Infrastructure as Code, operational documentation, delivery pod structure |
-| Technology risk   | Working prototype validated at scale (20.1M rows, sub-250ms p95)          |
-| Delivery risk     | 22 of 25 requirements already built; principal-led with no handoffs       |
+| Technology risk   | Working prototype validated at scale (20.1M rows, ≤250ms p95)             |
+| Delivery risk     | 23 of 25 requirements already built; principal-led with no handoffs       |
 | Operational risk  | Defined SLAs, 24/7 monitoring, quarterly DR drills                        |
 
 ## Relevant Delivery Portfolio
@@ -356,7 +384,7 @@ Advisory partners provide expertise and review at defined checkpoints.
 
 ### Will Siddall, Technical Advisor
 
-[To be provided by Will Siddall - 2-3 sentences on relevant technical experience]
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX). He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments.
 
 ### Parul Kharub, Security and Risk Advisor
 
@@ -364,7 +392,7 @@ Strategic cybersecurity and risk advisor with 16 years of experience in Fortune 
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha - 2-3 sentences on relevant infrastructure and security experience]
+A seasoned 30 year veteran in the technology space, developing early DevOps practices in the dotcom era of the internet. Working with American banking companies like Bank of America, airline industry with Boeing and cutting edge quantum computing at 1Qbit. The one consistent thread with all the large and small enterprises is applying best practices in DevOps, encompassing agile, secure and consistent deployment practices into securely built and cloud environments in a consistent method.
 
 ### Tyler Piller, Security and Compliance Advisor
 
@@ -404,10 +432,9 @@ The team combines enterprise data engineering with direct sport sector
 operations experience. Soleil Heaney brings perspective as a PSO executive,
 ensuring the platform reflects how sport organizations actually work.
 
-**4. British Columbia Based**
+**4. Primarily BC-Based, Canadian Delivery**
 
-The core team is based in British Columbia and remaining roles are expected to
-be BC based.
+Austin Wallace Tech is headquartered in Victoria, BC. Delivery is led from BC, with Canadian distributed specialists (including UX/accessibility) supporting research, design, and validation. We are available for in-person sessions in BC as needed.
 
 **5. Canadian Data Residency**
 
@@ -492,149 +519,6 @@ their own records.
 Legacy data is extracted, mapped, validated, and imported with an auditable
 trail and rollback support. See **Service Approach: Data Migration** for the
 detailed migration plan and cutover steps.
-
----
-
-# Service Approach: Platform Design and Customization
-
-## Cloud Provider Services
-
-The platform is built on Amazon Web Services in the ca-central-1 (Montreal)
-region. See Section 1.1 for data residency and privacy summary.
-
-| Service           | Purpose                                    |
-| ----------------- | ------------------------------------------ |
-| CloudFront        | CDN for static assets and edge caching     |
-| Lambda            | Serverless application compute             |
-| RDS PostgreSQL    | Managed relational database                |
-| ElastiCache Redis | Rate limiting, caching, permissions        |
-| S3                | Object storage for documents and imports   |
-| SQS               | Message queues for notifications           |
-| ECS Fargate       | Batch import processing                    |
-| SES               | Transactional email delivery               |
-| EventBridge       | Scheduled jobs for retention and reminders |
-| CloudWatch        | Metrics, logs, alarms                      |
-| CloudTrail        | API audit logging                          |
-| Secrets Manager   | Credential storage (SST-managed)           |
-| KMS               | Encryption key management                  |
-
-### Why AWS
-
-| Factor           | Rationale                      |
-| ---------------- | ------------------------------ |
-| Canadian region  | Data residency compliance      |
-| Serverless-first | Reduced operational burden     |
-| Mature services  | Strong SLAs and documentation  |
-| SST integration  | Infrastructure as code for AWS |
-
-### Why Serverless
-
-Serverless provides:
-
-1. No server management or patching
-2. Automatic scaling during peak reporting periods
-3. Pay-per-use cost efficiency
-4. High availability across availability zones
-
-### Infrastructure as Code
-
-Infrastructure is defined in TypeScript using SST. This provides:
-
-- Reproducible environments
-- Version control for infrastructure changes
-- Disaster recovery from code
-- Environment parity across dev, perf, and prod
-
-## Development and Customization Process
-
-### Environment Strategy
-
-| Environment | Purpose                 | Infrastructure Tier                                     |
-| ----------- | ----------------------- | ------------------------------------------------------- |
-| sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                             |
-| sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ, CloudTrail with alarms    |
-| sin-uat     | User Acceptance Testing | t4g.medium, 100 GB, single-AZ, CloudTrail with alarms   |
-| sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups, CloudTrail |
-
-Each environment is isolated with its own database, storage, and credentials.
-The sin-uat environment is available for viaSport evaluator access, while
-performance testing is executed in sin-perf.
-
-### Development Workflow
-
-```
-Developer writes code
-        |
-        v
-Pre-commit checks (lint, type check, format)
-        |
-        v
-Automated tests
-        |
-        v
-Code review and merge
-        |
-        v
-Deploy to sin-dev (automatic)
-        |
-        v
-Deploy to sin-perf (manual, for load testing)
-        |
-        v
-Deploy to sin-prod (manual, after UAT sign-off)
-```
-
-### Quality Gates
-
-| Gate          | Tooling           | Purpose                        |
-| ------------- | ----------------- | ------------------------------ |
-| Linting       | oxlint and ESLint | Code quality                   |
-| Type checking | TypeScript        | Compile-time validation        |
-| Formatting    | oxfmt             | Consistent style               |
-| Unit tests    | Vitest            | Component and function testing |
-| E2E tests     | Playwright        | Full user flow testing         |
-
-### Deployment Process
-
-Deployments are executed with SST:
-
-```
-npx sst deploy --stage sin-prod
-```
-
-This builds the application, deploys infrastructure, and updates application services. Database schema changes are applied through versioned migrations when required.
-
-### Rollback
-
-- Previous Lambda versions remain available for quick rollback.
-- Database migrations include rollback plans when needed.
-- SST maintains deployment history for audit and recovery.
-
-### Customization Capabilities
-
-The platform supports configuration without code changes:
-
-| Customization         | Method                                        |
-| --------------------- | --------------------------------------------- |
-| Branding              | Tenant configuration (logo, colors, name)     |
-| Forms                 | Form builder UI for custom data collection    |
-| Roles and permissions | Admin UI for role management                  |
-| Notifications         | Configurable templates and reminder schedules |
-| Retention policies    | Admin-configurable retention periods          |
-
-### Change Management
-
-Changes to production follow a defined process:
-
-1. Change request submitted
-2. Impact assessment (scope, risk, timeline)
-3. Development and testing in sin-dev
-4. Performance validation in sin-perf
-5. UAT sign-off
-6. Deployment to sin-prod
-7. Post-deployment verification
-
-Emergency changes follow an expedited process with retrospective documentation.
 
 ---
 
@@ -789,12 +673,13 @@ The platform uses a multi-tenant architecture with strict organization scoping:
 
 ### Regulatory Alignment
 
-| Requirement         | Implementation                                                      |
-| ------------------- | ------------------------------------------------------------------- |
-| PIPEDA alignment    | Canadian data residency, encryption, access controls, audit logging |
-| Data minimization   | Configurable retention policies and legal holds                     |
-| Right to access     | Data export workflows with audit trail                              |
-| Breach notification | Audit logging and anomaly detection                                 |
+| Requirement         | Implementation                                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| PIPEDA alignment    | Canadian data residency, TLS 1.2+ encryption in transit, encryption at rest, access controls, audit logging |
+| Transport security  | All APIs served over HTTPS (TLS 1.2+); no unencrypted endpoints                                             |
+| Data minimization   | Configurable retention policies and legal holds                                                             |
+| Right to access     | Data export workflows with audit trail                                                                      |
+| Breach notification | Audit logging and anomaly detection                                                                         |
 
 AWS maintains a Data Processing Addendum that covers all services used by the platform, including SES for email delivery: https://d1.awsstatic.com/legal/aws-dpa/aws-dpa.pdf
 
@@ -856,6 +741,8 @@ viaSport's scale of 20M historical rows with 1M rows per year is well within Pos
 
 PostgreSQL provides real-time analytics and simplified operations while keeping data resident in Canada.
 
+If viaSport later requires a dedicated warehouse for sector-wide benchmarking or very large-scale analytics (250M+ rows), the platform can replicate curated datasets into AWS Redshift without changing the submission system.
+
 ---
 
 # Service Approach: Data Migration
@@ -868,20 +755,21 @@ Migration follows a phased approach that reduces risk and validates data at each
 
 ### Migration Phases
 
-| Phase                      | Duration    | Activities                                                          | Exit Criteria              |
-| -------------------------- | ----------- | ------------------------------------------------------------------- | -------------------------- |
-| Discovery                  | Weeks 1-6   | Obtain sample exports, document legacy schemas, assess data quality | Schema mapping approved    |
-| Mapping and Transformation | Weeks 7-10  | Build mapping templates, define validation rules, test with samples | Templates validated        |
-| Pilot Migration            | Weeks 11-14 | Migrate subset (one PSO), validate accuracy, refine mappings        | Pilot data verified        |
-| Full Migration             | Weeks 15-18 | Migrate organizations, users, submissions, documents                | Reconciliation checks pass |
-| Validation and Cutover     | Weeks 19-22 | Full reconciliation, UAT on migrated data                           | Sign-off received          |
+| Phase                      | Duration    | Activities                                                                                                               | Exit Criteria              |
+| -------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| Discovery                  | Weeks 1-6   | Obtain sample exports, document legacy schemas, assess data quality, produce Legacy Field Inventory and Mapping Workbook | Schema mapping approved    |
+| Mapping and Transformation | Weeks 7-10  | Build mapping templates, define validation rules, test with samples                                                      | Templates validated        |
+| Pilot Migration            | Weeks 11-14 | Migrate subset (one PSO), validate accuracy, refine mappings                                                             | Pilot data verified        |
+| Full Migration             | Weeks 15-18 | Migrate organizations, users, submissions, documents                                                                     | Reconciliation checks pass |
+| Validation and Cutover     | Weeks 19-22 | Full reconciliation, UAT on migrated data                                                                                | Sign-off received          |
 
 ### Migration Sequence
 
 1. Organizations and hierarchies
 2. Users and role assignments
-3. Historical submissions
-4. Documents and attachments
+3. Historical submissions (structured records)
+
+**Note:** Attachments migration is not required per viaSport clarification. Existing attachments will remain in legacy systems. Solstice supports attachments for new submissions going forward.
 
 ### Mapping Process
 
@@ -956,10 +844,12 @@ Large imports run in two lanes:
 
 Migration execution requires:
 
-1. Legacy system access (export capability or direct database access)
-2. Schema documentation for BCAR and BCSI
-3. Data dictionary and field mapping approval
-4. SME availability for validation and sign-off
+1. Database access and/or CSV/Excel exports for BCAR and BCSI (confirmed available per viaSport clarification)
+2. SME availability to confirm field meanings and mapping decisions
+3. Confirmation of launch metadata set with viaSport's implementation partner
+4. UAT sign-off on pilot migration results
+
+**Note:** A BCAR/BCSI data dictionary is not available at this time. We will produce a **Legacy Field Inventory and Mapping Workbook** during Discovery (Weeks 1-6) from exports and SME review, then validate with pilot org migration.
 
 Import tooling is ready today. Extraction approach will be finalized during Discovery based on legacy system capabilities. See **System Requirements Compliance Crosswalk** (DM-AGG-006) for detailed compliance mapping.
 
@@ -989,6 +879,149 @@ A successful migration includes technical data movement and a managed transition
 
 - Document expected downtime (if any) during final cutover.
 - If parallel run is required, define duration and responsibilities (who submits where, what is source of truth).
+
+---
+
+# Service Approach: Platform Design and Customization
+
+## Cloud Provider Services
+
+The platform is built on Amazon Web Services in the ca-central-1 (Montreal)
+region. See Section 1.1 for data residency and privacy summary.
+
+| Service           | Purpose                                    |
+| ----------------- | ------------------------------------------ |
+| CloudFront        | CDN for static assets and edge caching     |
+| Lambda            | Serverless application compute             |
+| RDS PostgreSQL    | Managed relational database                |
+| ElastiCache Redis | Rate limiting, caching, permissions        |
+| S3                | Object storage for documents and imports   |
+| SQS               | Message queues for notifications           |
+| ECS Fargate       | Batch import processing                    |
+| SES               | Transactional email delivery               |
+| EventBridge       | Scheduled jobs for retention and reminders |
+| CloudWatch        | Metrics, logs, alarms                      |
+| CloudTrail        | API audit logging                          |
+| Secrets Manager   | Credential storage (SST-managed)           |
+| KMS               | Encryption key management                  |
+
+### Why AWS
+
+| Factor           | Rationale                      |
+| ---------------- | ------------------------------ |
+| Canadian region  | Data residency compliance      |
+| Serverless-first | Reduced operational burden     |
+| Mature services  | Strong SLAs and documentation  |
+| SST integration  | Infrastructure as code for AWS |
+
+### Why Serverless
+
+Serverless provides:
+
+1. No server management or patching
+2. Automatic scaling during peak reporting periods
+3. Pay-per-use cost efficiency
+4. High availability across availability zones
+
+### Infrastructure as Code
+
+Infrastructure is defined in TypeScript using SST. This provides:
+
+- Reproducible environments
+- Version control for infrastructure changes
+- Disaster recovery from code
+- Environment parity across dev, perf, and prod
+
+## Development and Customization Process
+
+### Environment Strategy
+
+| Environment | Purpose                 | Infrastructure Tier                                     |
+| ----------- | ----------------------- | ------------------------------------------------------- |
+| sin-dev     | Development and testing | t4g.micro, 50 GB, single-AZ                             |
+| sin-perf    | Performance testing     | t4g.large, 200 GB, single-AZ, CloudTrail with alarms    |
+| sin-uat     | User Acceptance Testing | t4g.medium, 100 GB, single-AZ, CloudTrail with alarms   |
+| sin-prod    | Production              | t4g.large, 200 GB, Multi-AZ, 35-day backups, CloudTrail |
+
+Each environment is isolated with its own database, storage, and credentials.
+The sin-uat environment is available for viaSport evaluator access, while
+performance testing is executed in sin-perf.
+
+### Development Workflow
+
+```
+Developer writes code
+        |
+        v
+Pre-commit checks (lint, type check, format)
+        |
+        v
+Automated tests
+        |
+        v
+Code review and merge
+        |
+        v
+Deploy to sin-dev (automatic)
+        |
+        v
+Deploy to sin-perf (manual, for load testing)
+        |
+        v
+Deploy to sin-prod (manual, after UAT sign-off)
+```
+
+### Quality Gates
+
+| Gate          | Tooling           | Purpose                        |
+| ------------- | ----------------- | ------------------------------ |
+| Linting       | oxlint and ESLint | Code quality                   |
+| Type checking | TypeScript        | Compile-time validation        |
+| Formatting    | oxfmt             | Consistent style               |
+| Unit tests    | Vitest            | Component and function testing |
+| E2E tests     | Playwright        | Full user flow testing         |
+
+### Deployment Process
+
+Deployments are executed with SST:
+
+```
+npx sst deploy --stage sin-prod
+```
+
+This builds the application, deploys infrastructure, and updates application services. Database schema changes are applied through versioned migrations when required.
+
+### Rollback
+
+- Previous Lambda versions remain available for quick rollback.
+- Database migrations include rollback plans when needed.
+- SST maintains deployment history for audit and recovery.
+
+### Customization Capabilities
+
+The platform supports configuration without code changes:
+
+| Customization         | Method                                        |
+| --------------------- | --------------------------------------------- |
+| Branding              | Tenant configuration (logo, colors, name)     |
+| Forms                 | Form builder UI for custom data collection    |
+| Roles and permissions | Admin UI for role management                  |
+| Notifications         | Configurable templates and reminder schedules |
+| Retention policies    | Admin-configurable retention periods          |
+
+### Change Management
+
+Changes to production follow a defined process:
+
+1. Change request submitted
+2. Impact assessment (scope, risk, timeline)
+3. Development and testing in sin-dev
+4. Performance validation in sin-perf
+5. UAT sign-off
+6. Deployment to sin-prod
+7. Post-deployment verification
+
+Emergency changes follow an expedited process with retrospective documentation.
 
 ---
 
@@ -1243,9 +1276,9 @@ Ticket closed
 | Critical | 4 hours        | Same business day |
 | High     | 8 hours        | 2 business days   |
 | Standard | 24 hours       | 5 business days   |
-| Low      | 48 hours       | Best effort       |
+| Low      | 48 hours       | 10 Business Days  |
 
-Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
+Priority levels map to Severity 1–4 as defined in **Service Levels, Support, and Reliability**. Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
 
 viaSport receives monthly support reports covering ticket volume, response times, and trends.
 
@@ -1275,6 +1308,8 @@ Availability is measured as the percentage of time the production application is
 | Alerting                  | Automated alerts to service team for threshold breaches and anomalies                                |
 | Status communication      | Proactive notification to viaSport for incidents affecting service                                   |
 
+**Note:** Monitoring is 24/7 automated. Response commitments apply during business hours (Monday-Friday, 9 AM - 5 PM Pacific). After-hours Sev 1 response is available with the 24/7 Support add-on.
+
 ## Incident Response
 
 ### Severity Definitions
@@ -1293,7 +1328,7 @@ Availability is measured as the percentage of time the production application is
 | Sev 1 - Critical | 4 hours        | Same business day | Immediate escalation to delivery lead |
 | Sev 2 - High     | 8 hours        | 2 business days   | Escalation if no progress in 24 hours |
 | Sev 3 - Medium   | 24 hours       | 5 business days   | Standard workflow                     |
-| Sev 4 - Low      | 48 hours       | Best effort       | Standard workflow                     |
+| Sev 4 - Low      | 48 hours       | 10 Business Days  | Standard workflow                     |
 
 **Business hours:** Monday to Friday, 9:00 AM to 5:00 PM Pacific Time, excluding BC statutory holidays.
 
@@ -1303,17 +1338,20 @@ Availability is measured as the percentage of time the production application is
 
 24/7 response coverage is available as an optional add-on ($30,000-$50,000/year). This provides:
 
-- After-hours monitoring with on-call response
-- Sev 1 response target reduced to 2 hours
+- After-hours monitoring **with on-call response**
+- Sev 1 response target reduced to **2 hours (any time)**
+- Sev 2 after-hours coverage
 - Weekend and holiday coverage
+
+Without this add-on, after-hours alerts are logged and addressed at the start of the next business day.
 
 ## Support Channels
 
-| Channel                             | Use Case                                    | Response                                             |
-| ----------------------------------- | ------------------------------------------- | ---------------------------------------------------- |
-| In-app support requests             | General questions, how-to, feature requests | Ticket created with unique ID; tracked to resolution |
-| Email (austinwallacetech@gmail.com) | Technical issues, bug reports, escalations  | Same ticketing workflow                              |
-| Emergency contact                   | Sev 1 incidents only                        | Direct phone/text to delivery lead                   |
+| Channel                        | Use Case                                    | Response                                             |
+| ------------------------------ | ------------------------------------------- | ---------------------------------------------------- |
+| In-app support requests        | General questions, how-to, feature requests | Ticket created with unique ID; tracked to resolution |
+| Email (support@solsticeapp.ca) | Technical issues, bug reports, escalations  | Same ticketing workflow                              |
+| Emergency contact              | Sev 1 incidents only                        | Direct phone/text to delivery lead                   |
 
 ### Support Workflow
 
@@ -1417,28 +1455,27 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | ----------- | -------------------------------------------------------- |
 | **Built**   | Functional in the prototype and available for evaluation |
 | **Partial** | Core functionality built, specific items remaining       |
-| **Depends** | Requires viaSport input to complete                      |
 
 ## Data Management (DM-AGG)
 
-| Req ID     | Title                                 | Status  | Built Today                                     | Remaining                               |
-| ---------- | ------------------------------------- | ------- | ----------------------------------------------- | --------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates                      |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations                   |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement             |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation, alerting with thresholds            | Threshold tuning with viaSport          |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | Final DR and retention validation (TBD) |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file imports, ECS batch worker   | Legacy extraction and mapping           |
+| Req ID     | Title                                 | Status  | Built Today                                     | Remaining                                                        |
+| ---------- | ------------------------------------- | ------- | ----------------------------------------------- | ---------------------------------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates                                               |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations                                            |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement                                      |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation, alerting with thresholds            | Threshold tuning with viaSport                                   |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement       | DR validated January 2026 (16 min RTO)                           |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with autofix, dynamic templates    | Legacy extraction using DB/CSV exports; attachments not required |
 
 ## Reporting (RP-AGG)
 
-| Req ID     | Title                                  | Status  | Built Today                                  | Remaining                       |
-| ---------- | -------------------------------------- | ------- | -------------------------------------------- | ------------------------------- |
-| RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging         | None                            |
-| RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema, delegated access  | viaSport metadata configuration |
-| RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards | None                            |
-| RP-AGG-004 | Reporting Configuration and Collection | Built   | Form builder, file management                | None                            |
-| RP-AGG-005 | Self-Service Analytics and Data Export | Built   | Native BI, pivots, charts, export            | None                            |
+| Req ID     | Title                                  | Status  | Built Today                                  | Remaining                                             |
+| ---------- | -------------------------------------- | ------- | -------------------------------------------- | ----------------------------------------------------- |
+| RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging         | None                                                  |
+| RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema, delegated access  | Finalize metadata set with partner (system of record) |
+| RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards | None                                                  |
+| RP-AGG-004 | Reporting Configuration and Collection | Built   | Form builder, file management                | None                                                  |
+| RP-AGG-005 | Self-Service Analytics and Data Export | Built   | Native BI, pivots, charts, export            | None                                                  |
 
 ## Security (SEC-AGG)
 
@@ -1473,14 +1510,14 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 
 | Category                | Total  | Built  | Partial |
 | ----------------------- | ------ | ------ | ------- |
-| Data Management         | 6      | 4      | 2       |
+| Data Management         | 6      | 5      | 1       |
 | Reporting               | 5      | 4      | 1       |
 | Security                | 4      | 4      | 0       |
 | Training and Onboarding | 3      | 3      | 0       |
 | User Interface          | 7      | 7      | 0       |
-| **Total**               | **25** | **22** | **3**   |
+| **Total**               | **25** | **23** | **2**   |
 
-Three requirements are partial due to integration and metadata dependencies that require viaSport input.
+Two requirements are partial due to integration and metadata dependencies that require viaSport input.
 
 ---
 
@@ -1488,14 +1525,14 @@ Three requirements are partial due to integration and metadata dependencies that
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                         | Remaining Scope                          |
-| ---------- | ------------------------------------- | ------- | --------------------------------------------------- | ---------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking     | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging        | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                     | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds  | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement           | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Partial | Import wizard, file field imports, ECS batch worker | Legacy extraction scope and mapping      |
+| Req ID     | Title                                 | Status  | Built Today                                                        | Remaining Scope                          |
+| ---------- | ------------------------------------- | ------- | ------------------------------------------------------------------ | ---------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions |
+| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging                       | External integrations and mapping rules  |
+| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement              |
+| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds                 | Threshold tuning with viaSport           |
+| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement                          | DR validated January 2026 (16 min RTO)   |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with error categorization, autofix, dynamic templates | Legacy extraction using DB/CSV exports   |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -1674,11 +1711,11 @@ Evidence is summarized in Section 1.3.
 
 **Remaining Scope:**
 
-- Final production DR drill and retention validation before submission (TBD).
+- DR drill and retention validation completed January 2026 (RTO: 16 min, RPO: 0 min).
 
 **viaSport Dependencies:**
 
-- Confirm retention durations and DR schedule.
+- Confirm final retention durations during Discovery.
 
 **Approach:**
 Run final DR and retention validation in sin-perf or sin-prod. See **Service Approach: Data Warehousing**.
@@ -1698,30 +1735,41 @@ Evidence is summarized in Appendix C (Performance Evidence) and Appendix D (Secu
 
 **How We Meet It:**
 
-- Import wizard supports CSV and Excel uploads with mapping templates.
-- Validation preview highlights errors before commit.
+- Smart import wizard supports CSV and Excel uploads with intelligent error handling.
+- Pattern detection identifies column type mismatches and suggests fixes.
+- One-click autofix for common issues with confidence scoring.
 - Import jobs are auditable and reversible within the rollback window.
 
 **Built Today:**
 
-- Import wizard with upload, mapping, preview, and commit flow.
-- File field import pipeline supporting JSON file payloads with validation (fileName, mimeType, sizeBytes, storageKey).
-- Mapping template library and reusable mappings.
-- Rollback support using import job ID and 7-day rollback window.
-- Batch processing lane with ECS Fargate worker (verified deployed in sin-dev).
+- **Intelligent Error Categorization:** Errors grouped by root cause (structural, data quality, completeness, referential) instead of row-by-row display
+- **Pattern Detection:** 13 pattern detectors (email, date formats, phone, currency, postal codes, UUID, etc.) automatically identify column type mismatches
+- **Autofix with Confidence Scoring:** One-click fixes for column swaps, date format conversion, boolean normalization; dynamic confidence based on pattern match ratio, header hints, and sample size
+- **In-App Correction:** Inline cell editing with real-time validation, eliminating re-upload for minor fixes
+- **Dynamic Templates:** Generate XLSX/CSV templates from any form definition with field descriptions, example values, and Excel data validation dropdowns
+- **Virtualized Preview:** TanStack Virtual for 10k+ row previews without performance degradation
+- **Admin Template Management:** Template CRUD, version tracking, import history with rollback
+- **Batch Processing:** ECS Fargate worker for large file processing (verified deployed in sin-dev)
 
 **Remaining Scope:**
 
-- Legacy extraction and BCAR or BCSI mapping rules.
-- Additional migration pipelines for organization and user records (TBD).
+- Legacy extraction using database access and/or CSV/Excel exports; mapping rules confirmed in Discovery.
+- Attachments migration not required per viaSport clarification; existing attachments remain in legacy systems.
+- Additional migration pipelines for organization and user records (pending viaSport legacy access).
 
 **viaSport Dependencies:**
 
-- Legacy export access and schema documentation.
-- SME review for mapping templates.
+- Database access and/or CSV/Excel exports for BCAR and BCSI (confirmed available).
+- SME availability to confirm field meanings and mapping decisions.
+- Confirmation of launch metadata set with viaSport's implementation partner.
+- UAT sign-off on pilot migration results.
+
+**Legacy Field Inventory (Deliverable):** Because viaSport has indicated that a BCAR/BCSI data dictionary or redacted samples are not available at this time, we will produce a Legacy Field Inventory and Mapping Workbook during Discovery. This workbook documents source tables/exports, field definitions inferred from exports and stakeholder review, transformation rules, validation requirements, and the approved target mapping to Solstice forms and reporting metadata.
 
 **Approach:**
 Finalize extraction approach during Discovery, then execute pilot and phased migration. See **Service Approach: Data Migration**.
+
+**Demo Path:** Dashboard → Admin → Imports (Smart wizard with autofix demo)
 
 **Evidence:**
 Evidence is summarized in Section 1.3.
@@ -1732,13 +1780,13 @@ Evidence is summarized in Section 1.3.
 
 ## Compliance Summary
 
-| Req ID     | Title                                  | Status  | Built Today                                        | Remaining Scope                 |
-| ---------- | -------------------------------------- | ------- | -------------------------------------------------- | ------------------------------- |
-| RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging               | None                            |
-| RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema and access controls      | viaSport metadata configuration |
-| RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards       | None                            |
-| RP-AGG-004 | Reporting Configuration and Collection | Built   | Form builder, file management, admin configuration | None                            |
-| RP-AGG-005 | Self-Service Analytics and Data Export | Built   | Native BI, pivots, charts, CSV and Excel export    | None                            |
+| Req ID     | Title                                  | Status  | Built Today                                        | Remaining Scope                                       |
+| ---------- | -------------------------------------- | ------- | -------------------------------------------------- | ----------------------------------------------------- |
+| RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging               | None                                                  |
+| RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema, delegated access        | Finalize metadata set with partner (system of record) |
+| RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards       | None                                                  |
+| RP-AGG-004 | Reporting Configuration and Collection | Built   | Form builder, file management, admin configuration | None                                                  |
+| RP-AGG-005 | Self-Service Analytics and Data Export | Built   | Native BI, pivots, charts, CSV and Excel export    | None                                                  |
 
 ## RP-AGG-001: Data Validation and Submission Rules
 
@@ -1784,23 +1832,29 @@ Evidence is summarized in Section 1.3.
 
 **How We Meet It:**
 
-- Reporting metadata schema includes fiscal periods, contribution agreements, and NCCP fields.
-- Organization profiles and delegated access are managed through roles and invites.
-- Reporting tasks and submissions are tied to organizations and cycles.
+viaSport confirmed that the initial reporting metadata set will be established in coordination with its implementation partner and is expected to include a combination of contribution agreement fields, NCCP fields, fiscal periods, organization profiles, delegated access, and contact information.
+
+viaSport also confirmed that the new system will be the system of record; fields are not expected to require validation against external authoritative sources (e.g., NCCP registry) at launch.
+
+**Implementation Approach:**
+
+Solstice includes a reporting metadata schema and administrative configuration tooling. During Discovery we will finalize the launch field set and labels, configure validation rules where required (format/requiredness), and validate the workflow in UAT with viaSport and PSO representatives.
 
 **Built Today:**
 
 - Reporting metadata schema and update endpoints.
 - Organization profile and role management with delegated access.
 - Reporting cycles and tasks with due dates and reminders.
+- Admin configuration UI for metadata fields and labels.
 
 **Remaining Scope:**
 
-- viaSport metadata configuration and UI refinement for specific fields (TBD).
+- Finalize viaSport launch metadata set with implementation partner; configure fields and UI labels (system of record; no external authoritative validation required at launch).
 
 **viaSport Dependencies:**
 
-- Data dictionary and field definitions for contribution agreements and NCCP.
+- Implementation partner coordination for metadata set confirmation.
+- SME input for field labels and validation rules.
 
 **Approach:**
 Configure metadata fields during Discovery and validate in UAT. See **System Requirements: Training and Onboarding (TO-AGG)** for change adoption.
@@ -1915,12 +1969,12 @@ references.
 
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                                     | Remaining Scope |
-| ----------- | --------------------------------- | ------ | --------------------------------------------------------------- | --------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission                          | None            |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None            |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None            |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                             | None            |
+| Req ID      | Title                             | Status | Built Today                                                     | Remaining Scope                     |
+| ----------- | --------------------------------- | ------ | --------------------------------------------------------------- | ----------------------------------- |
+| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, passkeys, org scoping, Google OAuth                  | SSO configuration (Microsoft/Apple) |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None                                |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None                                |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                             | None                                |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -1942,14 +1996,26 @@ references.
 
 **Built Today:**
 
-- MFA enrollment and recovery flows.
+- MFA enrollment and recovery flows (TOTP and backup codes).
+- Passkeys (WebAuthn) with identifier-first flow, post-login enrollment prompts, and device management (95.81% browser coverage).
+- Google OAuth for social login.
 - Server-side password policy enforcement (validated: weak passwords blocked with inline errors).
 - Role-based permissions and org membership enforcement.
 - User invitation and join request workflows.
 
+**Planned Capability (Discovery Phase):**
+
+viaSport indicated a desire for SSO capability and noted that viaSport uses Microsoft 365. Because users will come from many organizations, Solstice will support a phased identity approach:
+
+- **viaSport staff:** Enable organizational SSO using viaSport's Microsoft 365 identity (protocol confirmed during Discovery).
+- **PSO users:** Support secure sign-in options suitable for diverse organizations, including Microsoft, Google, and Apple sign-in, while enforcing organization membership and RBAC server-side.
+- **MFA/step-up security:** Authentication will meet SEC-AGG-001 requirements through a combination of identity provider controls and platform-level step-up authentication for sensitive actions (administration, exports).
+
+Initial SSO scope will prioritize viaSport staff sign-in; expanding additional sign-in providers for external orgs will be confirmed during Discovery and delivered through the included enhancement capacity and/or a scoped change request if required.
+
 **Remaining Scope:**
 
-- None. Fully implemented.
+- Multi-provider SSO configuration (Microsoft/Apple) to be finalized during Discovery based on viaSport identity architecture.
 
 **Approach:**
 Continue to validate flows during UAT. See **Service Approach: Testing and Quality Assurance**.
@@ -2046,7 +2112,7 @@ Evidence is summarized in Section 1.2.
 **How We Meet It:**
 
 - Audit log records user actions, auth events, and admin changes.
-- Hash chain verification detects tampering: each log entry hashes the previous entry, rendering the audit trail mathematically immutable and preventing even database administrators from silently altering history.
+- Hash chain verification detects tampering: each log entry hashes the previous entry, creating a tamper-evident trail. Archived logs are stored with S3 Object Lock (immutable storage) for long-term integrity.
 - Admins can filter and export logs.
 
 **Built Today:**
@@ -2186,15 +2252,15 @@ Evidence is summarized in Section 1.3.
 
 ## Compliance Summary
 
-| Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                 |
-| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------------- |
-| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                            |
-| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                            |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | None                            |
-| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications     | None                            |
-| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                            |
-| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support with priority, SLA, notifications | None                            |
-| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding         | viaSport branding configuration |
+| Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                     |
+| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ----------------------------------- |
+| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, passkeys, recovery, RBAC      | SSO configuration (Microsoft/Apple) |
+| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                                |
+| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | None                                |
+| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications     | None                                |
+| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                                |
+| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support with priority, SLA, notifications | None                                |
+| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding         | viaSport branding configuration     |
 
 ## UI-AGG-001: User Access and Account Control
 
@@ -2214,13 +2280,24 @@ Evidence is summarized in Section 1.3.
 
 **Built Today:**
 
-- MFA enrollment and recovery flows.
+- MFA enrollment and recovery flows (TOTP and backup codes).
+- Passkeys (WebAuthn) with identifier-first login flow and device management.
+- Google OAuth for social login.
 - Organization invite and join request workflows.
 - Admin settings panel for user access management.
 
+**Planned Capability (Discovery Phase):**
+
+viaSport expressed interest in SSO capability for viaSport staff (Microsoft 365) and flexible sign-in options for PSO users from diverse organizations. Solstice will support a phased identity approach:
+
+- **Current:** Email/password with strong password policy, Google OAuth, TOTP MFA, passkeys
+- **Planned:** Microsoft OAuth (Azure AD) for viaSport staff and PSO users, Apple OAuth for PSO users
+
+Multi-provider OAuth will be configured during Discovery based on viaSport's identity architecture. Better Auth supports multiple OAuth providers through configuration.
+
 **Remaining Scope:**
 
-- None. Fully implemented.
+- SSO provider configuration (Microsoft/Apple) to be finalized during Discovery.
 
 **Approach:**
 Validate account flows during UAT and incorporate viaSport policy guidance.
@@ -2437,12 +2514,12 @@ Austin Wallace Tech brings experience delivering information systems in sports a
 
 The most relevant evidence is the Solstice prototype itself, built for viaSport requirements.
 
-| Metric                | Value                                                |
-| --------------------- | ---------------------------------------------------- |
-| Requirements coverage | Majority of System Requirements Addendum implemented |
-| Load testing          | 20.1 million rows, sub-250ms p95 latency             |
-| Server errors         | Zero under concurrent load                           |
-| Codebase size         | 97,000+ lines of TypeScript (app plus tests)         |
+| Metric                | Value                                                         |
+| --------------------- | ------------------------------------------------------------- |
+| Requirements coverage | Majority of System Requirements Addendum implemented          |
+| Load testing          | 20.0 million rows, 163ms p95 latency (validated January 2026) |
+| Server errors         | Zero under concurrent load                                    |
+| Codebase size         | 97,000+ lines of TypeScript (app plus tests)                  |
 
 ## Delivery and Advisory Team
 
@@ -2484,10 +2561,10 @@ Continuity is supported by:
 
 ### Sport Sector Experience
 
-| Organization                        | Relationship              | Scope                                                                           |
-| ----------------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
-| International Quidditch Association | Chair, Board of Directors | Led governance, data, and technology strategy for 30+ national governing bodies |
-| Volunteer Media Organization        | CEO                       | Managed operations for a 70-person volunteer organization                       |
+| Organization                                      | Relationship              | Scope                                                                           |
+| ------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
+| International Quadball Association (formerly IQA) | Chair, Board of Directors | Led governance, data, and technology strategy for 30+ national governing bodies |
+| Volunteer Media Organization                      | CEO                       | Managed operations for a 70-person volunteer organization                       |
 
 ### Public and Enterprise Experience
 
@@ -2518,7 +2595,7 @@ and demonstrate performance at scale.
 
 **Results:**
 
-- 20.1M rows tested, sub-250ms p95 latency
+- 20.1M rows tested, ≤250ms p95 latency
 - Zero server errors under concurrent load
 - Prototype available for evaluator validation
 
@@ -2645,6 +2722,21 @@ Austin Wallace Tech proposes Solstice as a **3-year base term subscription** wit
 
 ## What is Included
 
+### Cost Element Breakdown
+
+| Cost Element                               | Included In  | Notes                                         |
+| ------------------------------------------ | ------------ | --------------------------------------------- |
+| Discovery + UX research                    | Standup      | Interviews, IA testing, prototypes            |
+| Configuration (forms, templates, metadata) | Standup      | viaSport-specific setup                       |
+| Migration implementation                   | Standup      | Mapping templates, pilot + phased waves       |
+| Training materials + sessions              | Standup      | Cohorts finalized with viaSport               |
+| UAT support + hypercare                    | Standup      | Defect remediation, go-live support           |
+| Hosting + monitoring                       | Subscription | AWS infrastructure, logging, on-call response |
+| Security patching + dependency updates     | Subscription | Monthly + expedited for critical vulns        |
+| Support channels                           | Subscription | In-app + email with SLA-based response        |
+| DR drills + backups                        | Subscription | Quarterly validation, 35-day retention        |
+| Enhancement hours (200/year)               | Subscription | Feature requests, configuration changes       |
+
 ### Implementation / Standup
 
 - Discovery and requirements confirmation against the prototype
@@ -2676,6 +2768,18 @@ Additional work beyond the included hours is available at **$175/hour** with pri
 4. Mutual agreement documented
 5. Work proceeds after sign-off
 
+### What Counts Against Enhancement Hours
+
+| Included                                           | Not Included                                     |
+| -------------------------------------------------- | ------------------------------------------------ |
+| Configuration changes (forms, templates, fields)   | Net-new integrations (APIs, SSO providers)       |
+| Minor feature requests (UI tweaks, report formats) | Major re-architecture or new modules             |
+| Reporting template adjustments                     | Large-scale data migrations beyond initial scope |
+| Bug fixes beyond defect warranty period            | Third-party penetration testing coordination     |
+| Training content updates                           | 24/7 support coverage (separate add-on)          |
+
+**Tracking:** viaSport receives a monthly enhancement hours report showing work completed, hours consumed, and remaining balance. Work is logged against a shared backlog with viaSport approval required before hours are committed.
+
 ## Payment Schedule
 
 | Milestone        | Percentage | Amount   | Trigger                          |
@@ -2686,12 +2790,26 @@ Additional work beyond the included hours is available at **$175/hour** with pri
 
 Annual subscriptions are billed quarterly in advance ($50,000 per quarter).
 
+**Subscription Commencement:** Subscription fees commence at production go-live and are billed quarterly in advance.
+
 ## Factors That Do Not Trigger Price Adjustments
 
 - Normal data volume growth within PostgreSQL capacity
 - Standard security updates and patches
 - Configuration changes within existing features
 - Work within the included 200 enhancement hours
+
+## Factors That May Trigger Cost Adjustments
+
+The following scope changes may require adjustment to pricing or timeline:
+
+- Net-new integrations or real-time API requirements beyond agreed scope
+- Mandatory SSO integration at launch (depends on IdP and coordination effort)
+- Material increase in migration scope (attachment volume, additional legacy systems)
+- 24/7 response coverage (optional add-on, already priced below)
+- Third-party penetration testing (optional add-on, already priced below)
+
+Any scope changes will be handled through the change control process described above, with transparent impact assessment before proceeding.
 
 ## Renewal and Price Protection
 
@@ -2712,6 +2830,15 @@ To reduce vendor risk, viaSport may select from the following continuity options
 | Source code escrow                  | Source code deposited with escrow agent, released upon defined trigger conditions (insolvency, failure to support, etc.) | Optional                    |
 | Perpetual license to customizations | At end of contract, viaSport receives perpetual license to viaSport-specific configuration and customizations            | Optional                    |
 | Transition support                  | Support for transition to a replacement system if viaSport chooses not to renew                                          | Available at standard rates |
+
+**Export Timeline:** Within 15 business days of a written request, Austin Wallace Tech will provide:
+
+- Full database export (PostgreSQL dump or CSV/JSON)
+- Schema documentation
+- Operational runbooks
+- API documentation for any custom integrations
+
+This applies during the contract term or upon termination.
 
 Details on escrow and perpetual license options are provided in the Exit and Portability Appendix.
 
@@ -2740,7 +2867,7 @@ The Solstice platform includes an operations portal used by Quadball Canada. Thi
 Pricing is based on the value delivered, not on hourly billing. The existing prototype represents Austin Wallace Tech's investment in building a platform for the sport sector. viaSport benefits from:
 
 - A working system available for evaluation before contract award
-- Reduced delivery risk (22 of 25 requirements already built)
+- Reduced delivery risk (23 of 25 requirements already built)
 - Principal-led delivery with no organizational layers
 - A managed service model with clear service levels and included enhancement capacity
 
@@ -2970,7 +3097,7 @@ To protect evaluator accounts and align with security best practices, credential
 
 **To request access:**
 
-1. Contact austinwallacetech@gmail.com with evaluator names and email addresses
+1. Contact support@solsticeapp.ca with evaluator names and email addresses
 2. Receive the Evaluator Access Pack via secure email
 3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
 4. MFA demonstration available on the viaSport Staff account
@@ -3042,37 +3169,45 @@ For a requirement-by-requirement walkthrough, see the **Prototype Evaluation Gui
 
 ## Appendix C: Performance Evidence
 
-Load testing was conducted in the sin-perf environment. Final validation runs will be completed before submission (TBD).
+Load testing was conducted in the sin-perf environment on 2026-01-08 with production-equivalent infrastructure (db.t4g.large, 7.6 GB database).
 
 ### Data Volume
 
-| Table                    | Rows      |
-| ------------------------ | --------- |
-| form_submissions         | 10.0M     |
-| audit_logs               | 7.0M      |
-| notifications            | 2.0M      |
-| bi_query_log             | 1.0M      |
-| form_submission_versions | 0.1M      |
-| **Total**                | **20.1M** |
+| Table            | Rows      |
+| ---------------- | --------- |
+| audit_logs       | 10.0M     |
+| form_submissions | 8.0M      |
+| notifications    | 2.0M      |
+| **Total**        | **20.0M** |
 
-### Performance Results
+### Load Test Results (k6, 25 VUs)
 
-| Metric              | Value | Target | Status |
-| ------------------- | ----- | ------ | ------ |
-| p95 latency         | 250ms | <500ms | Pass   |
-| p50 latency         | 130ms | N/A    | Pass   |
-| Concurrent users    | 15    | N/A    | Pass   |
-| Server errors (5xx) | 0     | 0      | Pass   |
+| Metric              | Value      | Target | Status |
+| ------------------- | ---------- | ------ | ------ |
+| p95 latency         | 163ms      | <500ms | Pass   |
+| p50 latency         | 98ms       | N/A    | Pass   |
+| Throughput          | 12.3 req/s | N/A    | Pass   |
+| Server errors (5xx) | 0          | 0      | Pass   |
 
-### Lighthouse Scores
+### Lighthouse Scores (CloudFront Production Path)
 
-| Metric                   | Value  | Target  | Status |
-| ------------------------ | ------ | ------- | ------ |
-| Performance Score        | 93/100 | >80     | Pass   |
-| Largest Contentful Paint | 2284ms | <2500ms | Pass   |
-| Time to First Byte       | 380ms  | <500ms  | Pass   |
-| Total Blocking Time      | 88ms   | <300ms  | Pass   |
-| Cumulative Layout Shift  | 0      | <0.1    | Pass   |
+| Metric                   | Value   | Target  | Status |
+| ------------------------ | ------- | ------- | ------ |
+| Performance Score        | 90/100  | >80     | Pass   |
+| First Contentful Paint   | 1000ms  | <2000ms | Pass   |
+| Largest Contentful Paint | 1000ms  | <2500ms | Pass   |
+| Time to Interactive      | 1100ms  | N/A     | Pass   |
+| Cumulative Layout Shift  | 0       | <0.1    | Pass   |
+| Accessibility            | 100/100 | N/A     | Pass   |
+
+### DR Drill Results (2026-01-08)
+
+| Metric | Achieved | Target  |
+| ------ | -------- | ------- |
+| RTO    | 16 min   | 4 hours |
+| RPO    | 0 min    | 1 hour  |
+
+Full evidence available in `docs/sin-rfp/review-plans/evidence/`.
 
 ## Appendix D: Security Architecture Summary
 
@@ -3113,11 +3248,11 @@ Primary data stores (RDS PostgreSQL, S3 object storage, backups, and audit archi
 
 ### Audit Trail
 
-| Feature      | Implementation                                                                                        |
-| ------------ | ----------------------------------------------------------------------------------------------------- |
-| Scope        | All user actions, data changes, auth events                                                           |
-| Immutability | Hash chain verification: each entry hashes the previous, rendering the trail mathematically immutable |
-| Retention    | Retention policies and legal holds (durations TBD)                                                    |
+| Feature      | Implementation                                                                                                   |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Scope        | All user actions, data changes, auth events                                                                      |
+| Immutability | Append-only with hash chain verification; archived to S3 Object Lock (immutable storage) for long-term integrity |
+| Retention    | Retention policies and legal holds (durations TBD)                                                               |
 
 ### Compliance
 
@@ -3157,7 +3292,9 @@ sector projects, healthcare, and startups.
 
 ### Will Siddall, Technical Advisor
 
-[To be provided by Will Siddall]
+With 15+ years of development and business consulting experience across many industries, Will is ensuring a stable product can be delivered to customers with a focus on customer collaboration and user experience (UX).
+
+He's designed, delivered, and trained a variety of products for customers of all types and sizes, with most of his experience developing and delivering products to air-gapped environments. Industries he's supported in the past include mining, VFX, hydrography and ocean exploration, oil and gas, civil engineering and cadastral/bathymetric surveys.
 
 ### Parul Kharub, Security and Risk Advisor
 
@@ -3168,7 +3305,7 @@ security, privacy and regulatory coverage.
 
 ### Michael Casinha, Security and Infrastructure Advisor
 
-[To be provided by Michael Casinha]
+A 30+ year veteran of the dotcom internet era bringing generational lessons of best practices to an agile era of cloud development. Having worked with American Finance, Aviation and Canadian quantum computing startups. All relying on consistent, secure, repeatable development practices learned over years of successful achievements and hard lessons learned.
 
 ### Tyler Piller, Security and Compliance Advisor
 
@@ -3198,7 +3335,7 @@ align technical risk with enterprise business objectives.
 
 Austin Wallace
 Project Lead, Austin Wallace Tech
-Email: austinwallacetech@gmail.com
+Email: austin@solsticeapp.ca
 Location: Victoria, British Columbia
 
 Austin Wallace Tech welcomes the opportunity to present the prototype and discuss how Solstice can serve viaSport's Strength in Numbers initiative.
@@ -3236,3 +3373,18 @@ Our security testing program maps to the OWASP Top 10 categories:
   monitoring (directly impacts SEC-AGG-002 and SEC-AGG-004).
 - **A10: Mishandling of Exceptional Conditions** - Error messages that leak
   sensitive info or systems that fail open.
+
+## Appendix K: Vendor Questions and viaSport Responses
+
+Prior to submission, Austin Wallace Tech submitted clarifying questions to viaSport. The following responses were received from Adam Benson and Joe Zhang on 2026-01-08.
+
+| Topic            | Question                           | viaSport Response                         | How Solstice Addresses It                                                     |
+| ---------------- | ---------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| BCAR/BCSI export | What export methods exist?         | DB access, CSV/Excel exports              | Supports both extraction paths; import mapping + rollback                     |
+| Data dictionary  | Any schemas/samples?               | Not at this time                          | Produce field inventory + mapping workbook in Discovery                       |
+| Attachments      | Must attachments migrate?          | Not required                              | Attachments supported going forward; historical out of scope                  |
+| Metadata         | What set at launch?                | Combination, confirm with partner         | Configurable schema + admin UI; finalize in Discovery                         |
+| Validation       | External authoritative validation? | New system is system of record            | Validate formats/required fields; optional integrations later                 |
+| SSO              | Required at launch?                | Capability desired; M365; multi-org users | Phased identity approach; prioritize viaSport SSO + flexible external sign-in |
+
+These clarifications informed the migration scope, metadata configuration approach, and identity strategy documented in this proposal.

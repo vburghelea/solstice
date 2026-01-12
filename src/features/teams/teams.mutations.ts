@@ -332,7 +332,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       .returning();
 
     // Send invitation email in the background; failure shouldn't block flow
-    const { sendTeamInvitationEmail } = await import("~/lib/email/sendgrid");
+    const { sendTeamInvitationEmail } = await import("~/lib/email/email");
     if (targetUser?.email) {
       try {
         const [teamInfo] = await db

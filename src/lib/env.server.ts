@@ -84,10 +84,9 @@ export const env = createEnv({
     SQUARE_WEBHOOK_URL: z.url().optional(),
     SUPPORT_EMAIL: z.email().optional(),
 
-    // SendGrid Email Integration
-    SENDGRID_API_KEY: z.string().optional(),
-    SENDGRID_FROM_EMAIL: z.email().optional(),
-    SENDGRID_FROM_NAME: z.string().optional(),
+    // Email (SES)
+    EMAIL_FROM_ADDRESS: z.email().optional(),
+    EMAIL_FROM_NAME: z.string().optional(),
 
     // AI Providers
     OPENAI_API_KEY: z.string().optional(),

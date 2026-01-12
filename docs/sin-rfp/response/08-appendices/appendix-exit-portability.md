@@ -181,4 +181,4 @@ Specific terms for data ownership, portability, escrow, and transition support c
 
 ---
 
-_For questions about exit and portability options, contact: austinwallacetech@gmail.com_
+_For questions about exit and portability options, contact: austin@solsticeapp.ca_

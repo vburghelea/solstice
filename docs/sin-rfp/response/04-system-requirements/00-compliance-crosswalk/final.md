@@ -5,7 +5,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Status Legend
 
 | Status      | Meaning                                                  |
-| ----------- | -------------------------------------------------------- |
+| :---------- | :------------------------------------------------------- |
 | **Built**   | Functional in the prototype and available for evaluation |
 | **Partial** | Core functionality built, specific items remaining       |
 | **Depends** | Requires viaSport input to complete                      |
@@ -13,7 +13,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Data Management (DM-AGG)
 
 | Req ID     | Title                                 | Status  | Built Today                                     | Remaining                               |
-| ---------- | ------------------------------------- | ------- | ----------------------------------------------- | --------------------------------------- |
+| :--------- | :------------------------------------ | :------ | :---------------------------------------------- | :-------------------------------------- |
 | DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking | viaSport templates                      |
 | DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging    | External integrations                   |
 | DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                 | Catalog taxonomy refinement             |
@@ -24,7 +24,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Reporting (RP-AGG)
 
 | Req ID     | Title                                  | Status  | Built Today                                  | Remaining                       |
-| ---------- | -------------------------------------- | ------- | -------------------------------------------- | ------------------------------- |
+| :--------- | :------------------------------------- | :------ | :------------------------------------------- | :------------------------------ |
 | RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging         | None                            |
 | RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema, delegated access  | viaSport metadata configuration |
 | RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards | None                            |
@@ -34,7 +34,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Security (SEC-AGG)
 
 | Req ID      | Title                             | Status | Built Today                                                     | Remaining |
-| ----------- | --------------------------------- | ------ | --------------------------------------------------------------- | --------- |
+| :---------- | :-------------------------------- | :----- | :-------------------------------------------------------------- | :-------- |
 | SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, password policy, org scoping                         | None      |
 | SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None      |
 | SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None      |
@@ -43,7 +43,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Training and Onboarding (TO-AGG)
 
 | Req ID     | Title                            | Status | Built Today                           | Remaining                  |
-| ---------- | -------------------------------- | ------ | ------------------------------------- | -------------------------- |
+| :--------- | :------------------------------- | :----- | :------------------------------------ | :------------------------- |
 | TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates         |
 | TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD) |
 | TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement         |
@@ -51,7 +51,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## User Interface (UI-AGG)
 
 | Req ID     | Title                                   | Status | Built Today                               | Remaining                |
-| ---------- | --------------------------------------- | ------ | ----------------------------------------- | ------------------------ |
+| :--------- | :-------------------------------------- | :----- | :---------------------------------------- | :----------------------- |
 | UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                     |
 | UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                     |
 | UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI, accessibility scans        | None                     |
@@ -63,7 +63,7 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 ## Summary
 
 | Category                | Total  | Built  | Partial |
-| ----------------------- | ------ | ------ | ------- |
+| :---------------------- | :----- | :----- | :------ |
 | Data Management         | 6      | 5      | 1       |
 | Reporting               | 5      | 4      | 1       |
 | Security                | 4      | 4      | 0       |
@@ -72,3 +72,5 @@ This table summarizes compliance status for all 25 requirements. Detailed implem
 | **Total**               | **25** | **23** | **2**   |
 
 Two requirements are partial due to integration and metadata dependencies that require viaSport input.
+
+---

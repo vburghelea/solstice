@@ -188,8 +188,7 @@ async function finalizeCheckoutFromWebhook({
 
         if (member?.email) {
           try {
-            const { sendMembershipPurchaseReceipt } =
-              await import("~/lib/email/sendgrid");
+            const { sendMembershipPurchaseReceipt } = await import("~/lib/email/email");
 
             await sendMembershipPurchaseReceipt({
               to: {
@@ -408,10 +407,10 @@ async function handleRefundEvent({
   }
 
   try {
-    const { getEmailService } = await import("~/lib/email/sendgrid");
+    const { getEmailService } = await import("~/lib/email/email");
     const emailService = await getEmailService();
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+    const fromEmail = process.env["EMAIL_FROM_ADDRESS"] || "info@solsticeapp.ca";
+    const fromName = process.env["EMAIL_FROM_NAME"] || "Solstice";
 
     await emailService.send({
       to: { email: supportEmail },

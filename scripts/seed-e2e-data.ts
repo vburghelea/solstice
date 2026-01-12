@@ -14,6 +14,7 @@ import {
   eventAnnouncements,
   eventRegistrations,
   events,
+  membershipPaymentSessions,
   memberships,
   membershipTypes,
   roles,
@@ -72,6 +73,9 @@ async function seed() {
     // For now, delete all teams to ensure clean state
     // In production, you'd want to be more selective
     await db.delete(teams);
+
+    console.log("Clearing membership payment sessions...");
+    await db.delete(membershipPaymentSessions);
 
     console.log("Clearing memberships...");
     await db.delete(memberships);
@@ -345,7 +349,7 @@ async function seed() {
       {
         id: "admin-global-role",
         userId: adminUserId,
-        roleId: "platform-admin",
+        roleId: "super-admin",
         assignedBy: adminUserId,
         notes: "Seeded global admin access",
       },

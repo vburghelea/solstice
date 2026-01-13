@@ -13,7 +13,12 @@ const isAwsLambdaRuntime =
   process.env["AWS_EXECUTION_ENV"]?.includes("AWS_Lambda") === true;
 const isViteRuntime = typeof import.meta.env !== "undefined";
 
-if (!isAwsLambdaRuntime && !isViteRuntime) {
+// Avoid loading .env when SST bindings are present to prevent mixing stages
+const hasSstBindings =
+  process.env["SST_SKIP_LOCAL"] === "true" ||
+  Object.keys(process.env).some((key) => key.startsWith("SST_RESOURCE_"));
+
+if (!isAwsLambdaRuntime && !isViteRuntime && !hasSstBindings) {
   dotenv.config();
 }
 

@@ -24,6 +24,7 @@ export default tseslint.config(
       "coverage/**",
       "**/*.gen.ts",
       "node_modules/**",
+      "vendor/**",
     ],
   },
   {

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-High-Fidelity Data Flow Diagram
+High-Fidelity Data Flow Diagram v3
 Following the Systematic Clarity design philosophy
+Updated to include Redis caching, DLQ, and ECS Fargate batch processing
 """
 
 from PIL import Image, ImageDraw, ImageFont
 import math
 
 WIDTH = 2400
-HEIGHT = 1600
+HEIGHT = 1700  # Compact layout for 4 flows
 MARGIN = 80
+EXPORT_SCALE = 2
 
 COLORS = {
     'background': '#FAFBFC',
@@ -21,6 +23,8 @@ COLORS = {
     'reporting_bg': '#ECFDF5',
     'notification': '#8B5CF6',
     'notification_bg': '#F5F3FF',
+    'batch': '#F97316',  # Orange for batch import
+    'batch_bg': '#FFF7ED',
 
     # Component colors
     'user': '#1E293B',
@@ -35,6 +39,12 @@ COLORS = {
     'security_bg': '#FDF2F8',
     'audit': '#EF4444',
     'audit_bg': '#FEF2F2',
+    'cache': '#06B6D4',  # Cyan for Redis
+    'cache_bg': '#ECFEFF',
+    'storage': '#6366F1',  # Indigo for S3
+    'storage_bg': '#EEF2FF',
+    'dlq': '#DC2626',  # Red for DLQ
+    'dlq_bg': '#FEF2F2',
 
     # Text
     'text_primary': '#1E293B',
@@ -62,7 +72,7 @@ def load_fonts():
         fonts['step'] = ImageFont.truetype(f"{FONT_DIR}/IBMPlexMono-Bold.ttf", 14)
     except Exception as e:
         print(f"Font error: {e}")
-        for key in fonts.keys():
+        for key in ['title', 'subtitle', 'section', 'flow', 'service', 'service_detail', 'label', 'badge', 'legend', 'step']:
             fonts[key] = ImageFont.load_default()
     return fonts
 
@@ -133,68 +143,75 @@ def create_dataflow_diagram():
     fonts = load_fonts()
 
     # Title
-    draw.text((MARGIN, 30), "Data Flow Diagrams", font=fonts['title'], fill=COLORS['text_primary'])
-    draw.text((MARGIN, 72), "User Submission · Reporting · Notifications", font=fonts['subtitle'], fill=COLORS['text_secondary'])
+    draw.text((MARGIN, 30), "Data Flow Diagrams v3", font=fonts['title'], fill=COLORS['text_primary'])
+    draw.text((MARGIN, 72), "User Submission · Reporting · Notifications · Batch Import", font=fonts['subtitle'], fill=COLORS['text_secondary'])
 
-    # ========== Flow 1: User Submission ==========
+    # ========== Flow 1: User Submission (with Redis) ==========
     flow1_x = MARGIN
     flow1_y = 130
     flow1_w = 2240
-    flow1_h = 320
+    flow1_h = 280
 
     draw_rounded_rect(draw, [flow1_x, flow1_y, flow1_x + flow1_w, flow1_y + flow1_h],
                       12, fill=COLORS['submission_bg'], outline=COLORS['submission'], width=2)
 
     # Flow title badge
     badge_w = 180
-    badge_h = 28
     draw_rounded_rect(draw, [flow1_x + 20, flow1_y - 14, flow1_x + 20 + badge_w, flow1_y + 14], 6, fill=COLORS['submission'])
     draw.text((flow1_x + 35, flow1_y - 8), "USER SUBMISSION", font=fonts['badge'], fill='#FFFFFF')
 
     # Step 1: Browser
-    s1_x = flow1_x + 60
-    s1_y = flow1_y + 80
-    draw_step_number(draw, s1_x - 20, s1_y + 30, 1, COLORS['submission'], fonts)
-    draw_service_box(draw, s1_x, s1_y, 140, 60, "Browser", "Form entry", COLORS['user'], COLORS['user_bg'], fonts)
+    s1_x = flow1_x + 50
+    s1_y = flow1_y + 60
+    draw_step_number(draw, s1_x - 15, s1_y + 25, 1, COLORS['submission'], fonts)
+    draw_service_box(draw, s1_x, s1_y, 120, 50, "Browser", "Form entry", COLORS['user'], COLORS['user_bg'], fonts)
 
     # Step 2: API
-    s2_x = s1_x + 220
-    draw_step_number(draw, s2_x - 20, s1_y + 30, 2, COLORS['submission'], fonts)
-    draw_service_box(draw, s2_x, s1_y, 140, 60, "API", "Lambda handler", COLORS['app'], COLORS['app_bg'], fonts)
+    s2_x = s1_x + 170
+    draw_step_number(draw, s2_x - 15, s1_y + 25, 2, COLORS['submission'], fonts)
+    draw_service_box(draw, s2_x, s1_y, 120, 50, "API Lambda", "Handler", COLORS['app'], COLORS['app_bg'], fonts)
 
     # Step 3: Validation
-    s3_x = s2_x + 220
-    draw_step_number(draw, s3_x - 20, s1_y + 30, 3, COLORS['submission'], fonts)
-    draw_service_box(draw, s3_x, s1_y, 180, 60, "Validation", "Schema + business rules", COLORS['app'], COLORS['app_bg'], fonts)
+    s3_x = s2_x + 170
+    draw_step_number(draw, s3_x - 15, s1_y + 25, 3, COLORS['submission'], fonts)
+    draw_service_box(draw, s3_x, s1_y, 140, 50, "Validation", "Schema + rules", COLORS['app'], COLORS['app_bg'], fonts)
 
-    # Step 4: Database
-    s4_x = s3_x + 260
-    draw_step_number(draw, s4_x - 20, s1_y + 30, 4, COLORS['submission'], fonts)
-    draw_database_icon(draw, s4_x + 50, s1_y + 35, 70, 80, COLORS['data'], COLORS['data_bg'])
-    draw.text((s4_x + 10, s1_y + 90), "PostgreSQL", font=fonts['service'], fill=COLORS['text_primary'])
+    # Step 4: Redis (NEW)
+    s4_x = s3_x + 190
+    draw_step_number(draw, s4_x - 15, s1_y + 25, 4, COLORS['submission'], fonts)
+    draw_service_box(draw, s4_x, s1_y, 130, 50, "Redis", "Rate limit check", COLORS['cache'], COLORS['cache_bg'], fonts)
 
-    # Step 5: Audit Log
+    # Step 5: Database
     s5_x = s4_x + 180
-    draw_step_number(draw, s5_x - 20, s1_y + 30, 5, COLORS['submission'], fonts)
-    draw_service_box(draw, s5_x, s1_y, 160, 60, "Audit Log", "Hash chain entry", COLORS['audit'], COLORS['audit_bg'], fonts)
+    draw_step_number(draw, s5_x - 15, s1_y + 25, 5, COLORS['submission'], fonts)
+    draw_database_icon(draw, s5_x + 40, s1_y + 30, 55, 65, COLORS['data'], COLORS['data_bg'])
+    draw.text((s5_x + 5, s1_y + 70), "PostgreSQL", font=fonts['service_detail'], fill=COLORS['text_primary'])
+
+    # Step 6: Audit Log + S3 Archive
+    s6_x = s5_x + 130
+    draw_step_number(draw, s6_x - 15, s1_y + 25, 6, COLORS['submission'], fonts)
+    draw_service_box(draw, s6_x, s1_y - 15, 130, 45, "Audit Log", "Hash chain", COLORS['audit'], COLORS['audit_bg'], fonts)
+    draw_service_box(draw, s6_x, s1_y + 40, 130, 45, "S3 Archive", "WORM storage", COLORS['storage'], COLORS['storage_bg'], fonts)
 
     # Arrows for flow 1
-    draw_arrow(draw, (s1_x + 140, s1_y + 30), (s2_x, s1_y + 30), COLORS['submission'], 2)
-    draw_arrow(draw, (s2_x + 140, s1_y + 30), (s3_x, s1_y + 30), COLORS['submission'], 2)
-    draw_arrow(draw, (s3_x + 180, s1_y + 30), (s4_x + 10, s1_y + 30), COLORS['submission'], 2)
-    draw_arrow(draw, (s4_x + 95, s1_y + 30), (s5_x, s1_y + 30), COLORS['submission'], 2)
+    draw_arrow(draw, (s1_x + 120, s1_y + 25), (s2_x, s1_y + 25), COLORS['submission'], 2)
+    draw_arrow(draw, (s2_x + 120, s1_y + 25), (s3_x, s1_y + 25), COLORS['submission'], 2)
+    draw_arrow(draw, (s3_x + 140, s1_y + 25), (s4_x, s1_y + 25), COLORS['submission'], 2)
+    draw_arrow(draw, (s4_x + 130, s1_y + 25), (s5_x + 10, s1_y + 25), COLORS['submission'], 2)
+    draw_arrow(draw, (s5_x + 75, s1_y + 10), (s6_x, s1_y + 10), COLORS['submission'], 2)
+    draw_arrow(draw, (s5_x + 75, s1_y + 50), (s6_x, s1_y + 60), COLORS['submission'], 2)
 
     # Flow description
-    draw.text((flow1_x + 40, flow1_y + 200), "Form data validated against schema → Stored with version history → Immutable audit record created",
+    draw.text((flow1_x + 40, flow1_y + 170), "Form data validated → Rate limit checked via Redis → Stored with version history → Audit record in DB + S3 archive",
               font=fonts['service_detail'], fill=COLORS['text_secondary'])
-    draw.text((flow1_x + 40, flow1_y + 225), "Every submission triggers: validation rules, organization scoping check, audit log entry with hash chain verification",
+    draw.text((flow1_x + 40, flow1_y + 190), "Every submission: validation rules, org scoping check, hash chain audit log entry, S3 WORM archive for compliance",
               font=fonts['service_detail'], fill=COLORS['text_muted'])
 
-    # ========== Flow 2: Reporting ==========
+    # ========== Flow 2: Reporting (with Redis cache) ==========
     flow2_x = MARGIN
-    flow2_y = 500
+    flow2_y = 460
     flow2_w = 2240
-    flow2_h = 320
+    flow2_h = 280
 
     draw_rounded_rect(draw, [flow2_x, flow2_y, flow2_x + flow2_w, flow2_y + flow2_h],
                       12, fill=COLORS['reporting_bg'], outline=COLORS['reporting'], width=2)
@@ -203,47 +220,53 @@ def create_dataflow_diagram():
     draw.text((flow2_x + 50, flow2_y - 8), "REPORTING FLOW", font=fonts['badge'], fill='#FFFFFF')
 
     # Step 1: Report Builder
-    r1_x = flow2_x + 60
-    r1_y = flow2_y + 80
-    draw_step_number(draw, r1_x - 20, r1_y + 30, 1, COLORS['reporting'], fonts)
-    draw_service_box(draw, r1_x, r1_y, 150, 60, "Report Builder", "UI interface", COLORS['user'], COLORS['user_bg'], fonts)
+    r1_x = flow2_x + 50
+    r1_y = flow2_y + 60
+    draw_step_number(draw, r1_x - 15, r1_y + 25, 1, COLORS['reporting'], fonts)
+    draw_service_box(draw, r1_x, r1_y, 130, 50, "Report Builder", "UI interface", COLORS['user'], COLORS['user_bg'], fonts)
 
     # Step 2: Query API
-    r2_x = r1_x + 230
-    draw_step_number(draw, r2_x - 20, r1_y + 30, 2, COLORS['reporting'], fonts)
-    draw_service_box(draw, r2_x, r1_y, 140, 60, "Query API", "Request handler", COLORS['app'], COLORS['app_bg'], fonts)
+    r2_x = r1_x + 180
+    draw_step_number(draw, r2_x - 15, r1_y + 25, 2, COLORS['reporting'], fonts)
+    draw_service_box(draw, r2_x, r1_y, 130, 50, "Query API", "Handler", COLORS['app'], COLORS['app_bg'], fonts)
 
     # Step 3: Access Control
-    r3_x = r2_x + 220
-    draw_step_number(draw, r3_x - 20, r1_y + 30, 3, COLORS['reporting'], fonts)
-    draw_service_box(draw, r3_x, r1_y, 170, 60, "Access Control", "RBAC + org scope", COLORS['security'], COLORS['security_bg'], fonts)
+    r3_x = r2_x + 180
+    draw_step_number(draw, r3_x - 15, r1_y + 25, 3, COLORS['reporting'], fonts)
+    draw_service_box(draw, r3_x, r1_y, 150, 50, "Access Control", "RBAC + org scope", COLORS['security'], COLORS['security_bg'], fonts)
 
-    # Step 4: Aggregation
-    r4_x = r3_x + 250
-    draw_step_number(draw, r4_x - 20, r1_y + 30, 4, COLORS['reporting'], fonts)
-    draw_service_box(draw, r4_x, r1_y, 160, 60, "Aggregation", "Compute engine", COLORS['app'], COLORS['app_bg'], fonts)
+    # Step 4: Redis Cache Check (NEW)
+    r4_x = r3_x + 200
+    draw_step_number(draw, r4_x - 15, r1_y + 25, 4, COLORS['reporting'], fonts)
+    draw_service_box(draw, r4_x, r1_y, 130, 50, "Redis Cache", "Query cache", COLORS['cache'], COLORS['cache_bg'], fonts)
 
-    # Step 5: Export
-    r5_x = r4_x + 240
-    draw_step_number(draw, r5_x - 20, r1_y + 30, 5, COLORS['reporting'], fonts)
-    draw_service_box(draw, r5_x, r1_y, 140, 60, "Export", "CSV / PDF", COLORS['data'], COLORS['data_bg'], fonts)
+    # Step 5: Aggregation
+    r5_x = r4_x + 180
+    draw_step_number(draw, r5_x - 15, r1_y + 25, 5, COLORS['reporting'], fonts)
+    draw_service_box(draw, r5_x, r1_y, 140, 50, "Aggregation", "Compute engine", COLORS['app'], COLORS['app_bg'], fonts)
+
+    # Step 6: Export
+    r6_x = r5_x + 190
+    draw_step_number(draw, r6_x - 15, r1_y + 25, 6, COLORS['reporting'], fonts)
+    draw_service_box(draw, r6_x, r1_y, 120, 50, "Export", "CSV / PDF", COLORS['data'], COLORS['data_bg'], fonts)
 
     # Arrows for flow 2
-    draw_arrow(draw, (r1_x + 150, r1_y + 30), (r2_x, r1_y + 30), COLORS['reporting'], 2)
-    draw_arrow(draw, (r2_x + 140, r1_y + 30), (r3_x, r1_y + 30), COLORS['reporting'], 2)
-    draw_arrow(draw, (r3_x + 170, r1_y + 30), (r4_x, r1_y + 30), COLORS['reporting'], 2)
-    draw_arrow(draw, (r4_x + 160, r1_y + 30), (r5_x, r1_y + 30), COLORS['reporting'], 2)
+    draw_arrow(draw, (r1_x + 130, r1_y + 25), (r2_x, r1_y + 25), COLORS['reporting'], 2)
+    draw_arrow(draw, (r2_x + 130, r1_y + 25), (r3_x, r1_y + 25), COLORS['reporting'], 2)
+    draw_arrow(draw, (r3_x + 150, r1_y + 25), (r4_x, r1_y + 25), COLORS['reporting'], 2)
+    draw_arrow(draw, (r4_x + 130, r1_y + 25), (r5_x, r1_y + 25), COLORS['reporting'], 2)
+    draw_arrow(draw, (r5_x + 140, r1_y + 25), (r6_x, r1_y + 25), COLORS['reporting'], 2)
 
-    draw.text((flow2_x + 40, flow2_y + 200), "Report requests filtered by user's organization scope → Data aggregated server-side → Exported in requested format",
+    draw.text((flow2_x + 40, flow2_y + 170), "Report requests filtered by org scope → Redis cache checked → Data aggregated server-side → Exported in format",
               font=fonts['service_detail'], fill=COLORS['text_secondary'])
-    draw.text((flow2_x + 40, flow2_y + 225), "All queries automatically scoped to user's accessible organizations · Sensitive fields masked based on role",
+    draw.text((flow2_x + 40, flow2_y + 190), "All queries auto-scoped to user's orgs · Frequent queries cached in Redis · Sensitive fields masked by role",
               font=fonts['service_detail'], fill=COLORS['text_muted'])
 
-    # ========== Flow 3: Notifications ==========
+    # ========== Flow 3: Notifications (with DLQ) ==========
     flow3_x = MARGIN
-    flow3_y = 870
+    flow3_y = 790
     flow3_w = 2240
-    flow3_h = 320
+    flow3_h = 300
 
     draw_rounded_rect(draw, [flow3_x, flow3_y, flow3_x + flow3_w, flow3_y + flow3_h],
                       12, fill=COLORS['notification_bg'], outline=COLORS['notification'], width=2)
@@ -252,75 +275,164 @@ def create_dataflow_diagram():
     draw.text((flow3_x + 35, flow3_y - 8), "NOTIFICATION FLOW", font=fonts['badge'], fill='#FFFFFF')
 
     # Step 1: Domain Event
-    n1_x = flow3_x + 60
-    n1_y = flow3_y + 80
-    draw_step_number(draw, n1_x - 20, n1_y + 30, 1, COLORS['notification'], fonts)
-    draw_service_box(draw, n1_x, n1_y, 150, 60, "Domain Event", "Trigger action", COLORS['app'], COLORS['app_bg'], fonts)
+    n1_x = flow3_x + 50
+    n1_y = flow3_y + 70
+    draw_step_number(draw, n1_x - 15, n1_y + 25, 1, COLORS['notification'], fonts)
+    draw_service_box(draw, n1_x, n1_y, 130, 50, "Domain Event", "Trigger action", COLORS['app'], COLORS['app_bg'], fonts)
 
     # Step 2: SQS Queue
-    n2_x = n1_x + 230
-    draw_step_number(draw, n2_x - 20, n1_y + 30, 2, COLORS['notification'], fonts)
-    draw_service_box(draw, n2_x, n1_y, 140, 60, "SQS Queue", "Message buffer", COLORS['async'], COLORS['async_bg'], fonts)
+    n2_x = n1_x + 180
+    draw_step_number(draw, n2_x - 15, n1_y + 25, 2, COLORS['notification'], fonts)
+    draw_service_box(draw, n2_x, n1_y, 130, 50, "SQS Queue", "Message buffer", COLORS['async'], COLORS['async_bg'], fonts)
 
     # Step 3: Worker
-    n3_x = n2_x + 220
-    draw_step_number(draw, n3_x - 20, n1_y + 30, 3, COLORS['notification'], fonts)
-    draw_service_box(draw, n3_x, n1_y, 160, 60, "Worker Lambda", "Process job", COLORS['app'], COLORS['app_bg'], fonts)
+    n3_x = n2_x + 180
+    draw_step_number(draw, n3_x - 15, n1_y + 25, 3, COLORS['notification'], fonts)
+    draw_service_box(draw, n3_x, n1_y, 140, 50, "Worker Lambda", "Process job", COLORS['app'], COLORS['app_bg'], fonts)
 
     # Step 4a: Email (SES)
-    n4a_x = n3_x + 250
-    n4a_y = n1_y - 30
-    draw_step_number(draw, n4a_x - 20, n4a_y + 30, 4, COLORS['notification'], fonts)
-    draw_service_box(draw, n4a_x, n4a_y, 140, 55, "SES Email", "External delivery", COLORS['async'], COLORS['async_bg'], fonts)
+    n4a_x = n3_x + 200
+    n4a_y = n1_y - 25
+    draw_step_number(draw, n4a_x - 15, n4a_y + 25, 4, COLORS['notification'], fonts)
+    draw_service_box(draw, n4a_x, n4a_y, 120, 45, "SES Email", "External", COLORS['async'], COLORS['async_bg'], fonts)
 
     # Step 4b: In-App
-    n4b_x = n3_x + 250
-    n4b_y = n1_y + 50
-    draw_service_box(draw, n4b_x, n4b_y, 140, 55, "In-App", "Dashboard alerts", COLORS['async'], COLORS['async_bg'], fonts)
+    n4b_x = n3_x + 200
+    n4b_y = n1_y + 35
+    draw_service_box(draw, n4b_x, n4b_y, 120, 45, "In-App", "Dashboard", COLORS['async'], COLORS['async_bg'], fonts)
+
+    # DLQ (NEW)
+    dlq_x = n2_x + 40
+    dlq_y = n1_y + 90
+    draw_service_box(draw, dlq_x, dlq_y, 150, 50, "SQS DLQ", "Failed messages", COLORS['dlq'], COLORS['dlq_bg'], fonts)
+    draw.text((dlq_x, dlq_y + 55), "Max 3 retries", font=fonts['label'], fill=COLORS['text_muted'])
 
     # Arrows for flow 3
-    draw_arrow(draw, (n1_x + 150, n1_y + 30), (n2_x, n1_y + 30), COLORS['notification'], 2)
-    draw_arrow(draw, (n2_x + 140, n1_y + 30), (n3_x, n1_y + 30), COLORS['notification'], 2)
-    draw_arrow(draw, (n3_x + 160, n1_y + 15), (n4a_x, n4a_y + 27), COLORS['notification'], 2)
-    draw_arrow(draw, (n3_x + 160, n1_y + 45), (n4b_x, n4b_y + 27), COLORS['notification'], 2)
+    draw_arrow(draw, (n1_x + 130, n1_y + 25), (n2_x, n1_y + 25), COLORS['notification'], 2)
+    draw_arrow(draw, (n2_x + 130, n1_y + 25), (n3_x, n1_y + 25), COLORS['notification'], 2)
+    draw_arrow(draw, (n3_x + 140, n1_y + 10), (n4a_x, n4a_y + 22), COLORS['notification'], 2)
+    draw_arrow(draw, (n3_x + 140, n1_y + 40), (n4b_x, n4b_y + 22), COLORS['notification'], 2)
+    # Arrow to DLQ
+    draw_arrow(draw, (n2_x + 65, n1_y + 50), (dlq_x + 75, dlq_y), COLORS['dlq'], 2)
 
-    draw.text((flow3_x + 40, flow3_y + 200), "Domain events queued asynchronously → Workers process with retry logic → Delivered via email and/or in-app notifications",
+    draw.text((flow3_x + 40, flow3_y + 200), "Domain events queued → Workers process with retry → Delivered via email and/or in-app · Failed messages go to DLQ",
               font=fonts['service_detail'], fill=COLORS['text_secondary'])
-    draw.text((flow3_x + 40, flow3_y + 225), "Decoupled architecture ensures main request path is never blocked · Failed notifications automatically retried",
+    draw.text((flow3_x + 40, flow3_y + 220), "Decoupled architecture ensures main request path is never blocked · Max 3 retries before DLQ · Alerts on DLQ depth",
+              font=fonts['service_detail'], fill=COLORS['text_muted'])
+
+    # ========== Flow 4: Batch Import (NEW - ECS Fargate) ==========
+    flow4_x = MARGIN
+    flow4_y = 1140
+    flow4_w = 2240
+    flow4_h = 330
+
+    draw_rounded_rect(draw, [flow4_x, flow4_y, flow4_x + flow4_w, flow4_y + flow4_h],
+                      12, fill=COLORS['batch_bg'], outline=COLORS['batch'], width=2)
+
+    badge_w_batch = 180
+    draw_rounded_rect(draw, [flow4_x + 20, flow4_y - 14, flow4_x + 20 + badge_w_batch, flow4_y + 14], 6, fill=COLORS['batch'])
+    draw.text((flow4_x + 50, flow4_y - 8), "BATCH IMPORT", font=fonts['badge'], fill='#FFFFFF')
+
+    # NEW badge
+    draw_rounded_rect(draw, [flow4_x + 210, flow4_y - 14, flow4_x + 260, flow4_y + 14], 6, fill='#22C55E')
+    draw.text((flow4_x + 222, flow4_y - 8), "NEW", font=fonts['badge'], fill='#FFFFFF')
+
+    # Step 1: CSV Upload
+    b1_x = flow4_x + 50
+    b1_y = flow4_y + 70
+    draw_step_number(draw, b1_x - 15, b1_y + 25, 1, COLORS['batch'], fonts)
+    draw_service_box(draw, b1_x, b1_y, 120, 50, "CSV Upload", "User file", COLORS['user'], COLORS['user_bg'], fonts)
+
+    # Step 2: S3 Artifacts
+    b2_x = b1_x + 170
+    draw_step_number(draw, b2_x - 15, b1_y + 25, 2, COLORS['batch'], fonts)
+    draw_service_box(draw, b2_x, b1_y, 130, 50, "S3 Artifacts", "Object Lock", COLORS['storage'], COLORS['storage_bg'], fonts)
+
+    # Step 3: Lambda Trigger
+    b3_x = b2_x + 180
+    draw_step_number(draw, b3_x - 15, b1_y + 25, 3, COLORS['batch'], fonts)
+    draw_service_box(draw, b3_x, b1_y, 130, 50, "Lambda", "S3 trigger", COLORS['app'], COLORS['app_bg'], fonts)
+
+    # Step 4: ECS Fargate
+    b4_x = b3_x + 180
+    draw_step_number(draw, b4_x - 15, b1_y + 25, 4, COLORS['batch'], fonts)
+    draw_service_box(draw, b4_x, b1_y, 150, 50, "ECS Fargate", "Batch task", COLORS['batch'], COLORS['batch_bg'], fonts)
+    draw.text((b4_x, b1_y + 55), "2 vCPU, 4GB RAM", font=fonts['label'], fill=COLORS['text_muted'])
+
+    # Step 5: Validation
+    b5_x = b4_x + 200
+    draw_step_number(draw, b5_x - 15, b1_y + 25, 5, COLORS['batch'], fonts)
+    draw_service_box(draw, b5_x, b1_y, 130, 50, "Validation", "Row-by-row", COLORS['app'], COLORS['app_bg'], fonts)
+
+    # Step 6: PostgreSQL
+    b6_x = b5_x + 180
+    draw_step_number(draw, b6_x - 15, b1_y + 25, 6, COLORS['batch'], fonts)
+    draw_database_icon(draw, b6_x + 40, b1_y + 30, 55, 65, COLORS['data'], COLORS['data_bg'])
+    draw.text((b6_x + 5, b1_y + 70), "PostgreSQL", font=fonts['service_detail'], fill=COLORS['text_primary'])
+
+    # Step 7: Audit + Notification
+    b7_x = b6_x + 120
+    draw_step_number(draw, b7_x - 15, b1_y + 25, 7, COLORS['batch'], fonts)
+    draw_service_box(draw, b7_x, b1_y - 15, 110, 40, "Audit Log", "Batch entry", COLORS['audit'], COLORS['audit_bg'], fonts)
+    draw_service_box(draw, b7_x, b1_y + 35, 110, 40, "Notification", "Complete", COLORS['async'], COLORS['async_bg'], fonts)
+
+    # Arrows for flow 4
+    draw_arrow(draw, (b1_x + 120, b1_y + 25), (b2_x, b1_y + 25), COLORS['batch'], 2)
+    draw_arrow(draw, (b2_x + 130, b1_y + 25), (b3_x, b1_y + 25), COLORS['batch'], 2)
+    draw_arrow(draw, (b3_x + 130, b1_y + 25), (b4_x, b1_y + 25), COLORS['batch'], 2)
+    draw_arrow(draw, (b4_x + 150, b1_y + 25), (b5_x, b1_y + 25), COLORS['batch'], 2)
+    draw_arrow(draw, (b5_x + 130, b1_y + 25), (b6_x + 10, b1_y + 25), COLORS['batch'], 2)
+    draw_arrow(draw, (b6_x + 75, b1_y + 10), (b7_x, b1_y + 5), COLORS['batch'], 2)
+    draw_arrow(draw, (b6_x + 75, b1_y + 45), (b7_x, b1_y + 55), COLORS['batch'], 2)
+
+    draw.text((flow4_x + 40, flow4_y + 200), "CSV uploaded to S3 → Lambda triggers ECS Fargate task → Row validation with rollback → Bulk insert → Audit + notification",
+              font=fonts['service_detail'], fill=COLORS['text_secondary'])
+    draw.text((flow4_x + 40, flow4_y + 220), "Large imports (1M+ rows) run in ECS Fargate (2 vCPU, 4GB) · Progress tracking · Automatic rollback on validation failure",
               font=fonts['service_detail'], fill=COLORS['text_muted'])
 
     # ========== Legend ==========
-    legend_x = MARGIN + 1800
-    legend_y = 130
-    legend_w = 420
-    legend_h = 300
+    legend_x = MARGIN
+    legend_y = 1520
+    legend_w = 2240
+    legend_h = 120
 
     draw_rounded_rect(draw, [legend_x, legend_y, legend_x + legend_w, legend_y + legend_h], 10, fill='#FFFFFF', outline=COLORS['line'], width=1)
-    draw.text((legend_x + 20, legend_y + 16), "Component Types", font=fonts['section'], fill=COLORS['text_primary'])
+    draw.text((legend_x + 20, legend_y + 14), "Component Types", font=fonts['section'], fill=COLORS['text_primary'])
 
     legend_items = [
         ("User Interface", COLORS['user'], COLORS['user_bg']),
         ("Application Logic", COLORS['app'], COLORS['app_bg']),
         ("Data Storage", COLORS['data'], COLORS['data_bg']),
+        ("Cache (Redis)", COLORS['cache'], COLORS['cache_bg']),
         ("Async Processing", COLORS['async'], COLORS['async_bg']),
         ("Security Controls", COLORS['security'], COLORS['security_bg']),
         ("Audit Trail", COLORS['audit'], COLORS['audit_bg']),
+        ("Object Storage (S3)", COLORS['storage'], COLORS['storage_bg']),
+        ("Dead Letter Queue", COLORS['dlq'], COLORS['dlq_bg']),
+        ("Batch Processing", COLORS['batch'], COLORS['batch_bg']),
     ]
 
+    # Two rows of legend items
+    items_per_row = 5
     for i, (label, color, bg) in enumerate(legend_items):
-        ly = legend_y + 50 + i * 38
-        draw_rounded_rect(draw, [legend_x + 20, ly, legend_x + 60, ly + 26], 4, fill=bg, outline=color, width=2)
-        draw.text((legend_x + 75, ly + 5), label, font=fonts['legend'], fill=COLORS['text_primary'])
+        row = i // items_per_row
+        col = i % items_per_row
+        lx = legend_x + 20 + col * 440
+        ly = legend_y + 45 + row * 35
+        draw_rounded_rect(draw, [lx, ly, lx + 35, ly + 22], 4, fill=bg, outline=color, width=2)
+        draw.text((lx + 45, ly + 3), label, font=fonts['legend'], fill=COLORS['text_primary'])
 
     # ========== Footer ==========
     footer_y = HEIGHT - 40
-    draw.text((MARGIN, footer_y), "Solstice Platform · Data Flow Architecture", font=fonts['label'], fill=COLORS['text_muted'])
-    draw.text((WIDTH - 400, footer_y), "Async processing · Audit trail · Access control", font=fonts['label'], fill=COLORS['text_muted'])
+    draw.text((MARGIN, footer_y), "Solstice Platform · Data Flow Architecture v3", font=fonts['label'], fill=COLORS['text_muted'])
+    draw.text((WIDTH - 500, footer_y), "Redis caching · ECS Fargate batch · DLQ · S3 WORM archive", font=fonts['label'], fill=COLORS['text_muted'])
 
     return img
 
 if __name__ == "__main__":
     img = create_dataflow_diagram()
-    output_path = "/Users/austin/dev/solstice/docs/sin-rfp/response/08-appendices/diagrams/data-flow-diagram-v2.png"
-    img.save(output_path, "PNG", dpi=(300, 300))
+    output_path = "/Users/austin/dev/solstice/docs/sin-rfp/response/08-appendices/diagrams/data-flow-diagram-v3.png"
+    if EXPORT_SCALE != 1:
+        img = img.resize((WIDTH * EXPORT_SCALE, HEIGHT * EXPORT_SCALE), Image.LANCZOS)
+    img.save(output_path, "PNG", dpi=(300 * EXPORT_SCALE, 300 * EXPORT_SCALE))
     print(f"Saved: {output_path}")

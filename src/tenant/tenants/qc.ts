@@ -37,6 +37,7 @@ export const qcTenant: TenantConfig = {
     sin_forms: false,
     sin_imports: false,
     sin_analytics: false,
+    sin_nl_query: false,
     sin_analytics_sql_workbench: false,
     sin_ai: false,
     sin_templates: true,

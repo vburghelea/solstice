@@ -32,7 +32,7 @@ Austin Wallace Tech proposes Solstice as a **3-year base term subscription** wit
 | Hosting \+ monitoring                      | Subscription   | AWS infrastructure, logging, on-call response |
 | Security patching \+ dependency updates    | Subscription   | Monthly \+ expedited for critical vulns       |
 | Support channels                           | Subscription   | In-app \+ email with SLA-based response       |
-| DR drills \+ backups                       | Subscription   | Quarterly validation, 35-day retention        |
+| DR exercises \+ backups                    | Subscription   | Quarterly validation, 35-day retention        |
 | Enhancement hours (200/year)               | Subscription   | Feature requests, configuration changes       |
 
 ### One-time Implementation
@@ -49,7 +49,7 @@ Austin Wallace Tech proposes Solstice as a **3-year base term subscription** wit
 - Canadian-hosted production infrastructure and routine operations
 - Monitoring, alerting, and incident response coordination
 - Security patching and dependency updates
-- Routine backups and quarterly DR validation drills (results reported to viaSport)
+- Routine backups and quarterly DR exercises (results reported to viaSport)
 - Support channels (in-app and email) with severity-based response targets
 - Ongoing product updates and non-custom feature improvements
 - **200 hours per year** for enhancements, minor feature requests, and configuration changes
@@ -129,7 +129,7 @@ Independent penetration testing by a qualified third-party security firm. Can be
 
 **Estimated:** $30,000 to $50,000 per year additional
 
-Adds after-hours monitoring and response outside business hours, with Sev 1 response time reduced to 2 hours.
+Adds after-hours monitoring and response outside business hours. After-hours Sev 1 response target: 2 hours (with 24/7 add-on).
 
 ### Operations Portal (Events and Team Management)
 
@@ -139,13 +139,9 @@ The Solstice platform includes an operations portal used by Quadball Canada. Thi
 
 ## Pricing Philosophy
 
-Pricing is based on the value delivered, not on hourly billing. The existing prototype represents Austin Wallace Tech's investment in building a platform for the sport sector. viaSport benefits from:
+Pricing is based on the 30-week delivery plan described in **Project Plan, Timeline, and Delivery Schedule**.
 
-- A working system available for evaluation before contract award
-- Reduced delivery risk (23 of 25 requirements already built)
-- Principal-led delivery with no organizational layers
-- A managed service model with clear service levels and included enhancement capacity
-
-The prototype and principal-led delivery model reduce overhead and accelerate implementation compared to traditional project structures or enterprise platform integrations.
+- The **one-time implementation** covers discovery, viaSport configuration, migration execution and reconciliation, UAT support, training, rollout, and go-live/hypercare to operationalize the existing baseline.
+- The **annual subscription + managed service** covers hosting, monitoring, support, security patching, backups/DR validation, ongoing product updates, and 200 hours/year of enhancement capacity.
 
 ---

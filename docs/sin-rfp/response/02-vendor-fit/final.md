@@ -57,7 +57,7 @@ viaSport is procuring an SLA-backed managed service: a platform that performs re
 | Continuity            | Infrastructure as code (environment configuration stored as code for reproducibility and disaster recovery), documented runbooks, tested restore procedures, quarterly disaster recovery validation         |
 | Escalation            | Defined escalation path for Severity 1 incidents: acknowledgement within 60 minutes, direct phone/text escalation to delivery lead, updates provided to viaSport at least every 60 minutes until mitigation |
 
-## What Makes This a Low-Risk Procurement Choice
+## Why This Procurement is Straightforward to Evaluate
 
 viaSport is not purchasing a one-time "web project." viaSport is procuring a managed, subscription-based platform service. The subscription includes defined service levels, ongoing support and monitoring, security maintenance, and scheduled enhancements.
 
@@ -68,15 +68,15 @@ Solstice is positioned like an enterprise platform engagement:
 - viaSport retains **full access to its data** with export/portability options at any time
 - Continuity and exit risk can be mitigated through **escrow and transition options** (see Exit & Portability Appendix)
 
-### Risk Mitigation Summary
+### Procurement Certainty Summary
 
-| Risk              | Mitigation                                                                                                                                  |
-| :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| Vendor dependency | Source code escrow, data portability, documented runbooks                                                                                   |
-| Key person risk   | Infrastructure as code, operational documentation, and a dedicated delivery team structure                                                  |
-| Technology risk   | Working prototype validated at scale (20.1M rows, ≤250ms p95)                                                                               |
-| Delivery risk     | The prototype demonstrates that 23 of 25 requirements are already built; delivery is led by a single accountable lead with minimal handoffs |
-| Operational risk  | Defined SLA targets, continuous monitoring of uptime/performance/security events, and quarterly disaster recovery exercises                 |
+| Concern                    | How We Address It                                                                                                                                            |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vendor dependency          | Source code escrow, data portability, documented runbooks                                                                                                    |
+| Key person continuity      | Infrastructure as code, operational documentation, and a dedicated delivery team structure                                                                   |
+| Technology readiness       | Working evaluation environment validated at scale (20M rows, p95 162ms, 25 concurrent users)                                                                 |
+| Implementation readiness   | The evaluation environment demonstrates that all 25 requirements are already implemented; delivery is led by a single accountable lead with minimal handoffs |
+| Operational accountability | Defined SLA targets, continuous monitoring of uptime/performance/security events, and quarterly disaster recovery exercises                                  |
 
 ## Relevant Delivery Portfolio
 
@@ -151,9 +151,9 @@ Austin Wallace Tech proposes the Solstice platform, a purpose-built, reliable, a
 
 ### Key Differentiators
 
-**1\. Working Prototype, Not a Proposal**
+**1\. Working Baseline, Not a Proposal**
 
-A functional prototype is available for evaluation and fully implements 23 of 25 (92%) System Requirements Addendum items. It has been load-tested at production scale with 20.1 million rows.
+A working baseline is available for evaluation. Most implementations begin with foundational development. Solstice begins with a working baseline aligned to the requirement set, allowing the project timeline to focus on adoption-critical work. It has been load-tested at production scale with 20 million rows.
 
 **2\. Principal-Led Delivery**
 
@@ -189,7 +189,7 @@ Our approach aligns with OWASP application security practices, including the OWA
 
 ### Benefits viaSport
 
-- **Evaluator Validation:** Evaluators can review a working prototype prior to award to validate key workflows and requirements.
+- **Evaluator Validation:** Evaluators can review a working baseline prior to award to validate key workflows and requirements.
 - **Predictable Costs:** Term subscription with included enhancement hours.
 - **Direct Accountability:** Principal-led delivery with no organizational layers.
 - **Sector Understanding:** Direct experience in the B.C. amateur sport sector (including PSOs and community sport organizations), not just software delivery.

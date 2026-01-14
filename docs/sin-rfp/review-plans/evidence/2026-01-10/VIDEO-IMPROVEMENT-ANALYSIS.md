@@ -2,6 +2,10 @@
 
 Evaluation of each RFP evidence video with opportunities to make them more impressive.
 
+**Seeding note:** Apply data changes through `scripts/seed-sin-data.ts` (IDs in `IDS`, Phase 7+ seeds) instead of raw SQL snippets; see `VIDEO-EXCELLENCE-PLAN.md` for the canonical seed instructions.
+
+**2026-01-12 update:** The seed script now clears and reseeds `auditLogs` every run, guaranteeing the SEC-AGG-004 dataset (PII + step-up + hash chain). Recording scripts still need expansion for DM-AGG-001, DM-AGG-006, and RP-AGG-003 to reach the target flows.
+
 ---
 
 ## SEC-AGG-001 - Auth & MFA Login (49 frames, 24.5s)
@@ -40,6 +44,8 @@ Evaluation of each RFP evidence video with opportunities to make them more impre
 6. Passkey section → register new passkey (10s)
 7. Active sessions → show devices (5s)
 8. Security activity log (5s)
+
+**Remediation Plan:** [SEC-AGG-001-remediation-plan.md](./SEC-AGG-001-remediation-plan.md)
 
 ---
 
@@ -95,6 +101,8 @@ VALUES
   -- ... 20+ more entries
 ```
 
+**Remediation Plan:** [SEC-AGG-004-remediation-plan.md](./SEC-AGG-004-remediation-plan.md)
+
 ---
 
 ## RP-AGG-003 - Reporting Workflow (20 frames, 10s)
@@ -148,6 +156,10 @@ VALUES
 - **Script**: Complete rewrite to show full workflow
 - **Data**: Ensure forms exist for assignment
 - **Code**: None (features exist)
+
+**Remediation Plan:** [RP-AGG-003-remediation-plan.md](./RP-AGG-003-remediation-plan.md)
+
+**2026-01-12 Review Update:** Video is NOT blank (previous report incorrect). Contains 20 frames of partial workflow - cycle name typed but not created, task form visible but not submitted, 70% duplicate frames. Rating: 3/10. Critical issues: incomplete cycle creation, no task assignment, no user perspective, no admin approval. See remediation plan.
 
 ---
 
@@ -212,6 +224,8 @@ WHERE org.type = 'pso';
 -- Creates ~10 submissions with varied statuses
 ```
 
+**Remediation Plan:** [RP-AGG-005-remediation-plan.md](./RP-AGG-005-remediation-plan.md)
+
 ---
 
 ## DM-AGG-001 - Form Submission (35 frames, 17.5s)
@@ -269,6 +283,10 @@ WHERE org.type = 'pso';
 - **Script**: Complete rewrite
 - **Data**: Sample PDF file for upload
 - **Code**: None (features exist)
+
+**Remediation Plan:** [DM-AGG-001-remediation-plan.md](./DM-AGG-001-remediation-plan.md)
+
+**2026-01-12 Review Update:** Re-analyzed 57 frames from FINAL video. Video now shows **successful** form submission flow with all fields filled, PDF upload, and submission history update. Minor polish items identified but **NO RE-RECORDING NEEDED** - video is production-ready.
 
 ---
 
@@ -338,6 +356,10 @@ total_registered,male_participants,female_participants,youth_under_18,adults_18_
 450,220,230,280,170,8  # duplicate
 ```
 
+**Remediation Plan:** [DM-AGG-006-remediation-plan.md](./DM-AGG-006-remediation-plan.md)
+
+**2026-01-12 Review Update:** Analyzed 107 frames from FINAL video. Rating: **4/10**. Critical issues: (1) Video ends with imports stuck on "pending" status - never shows completion, (2) "50 rows imported" count never displayed, (3) Excessive static content in mapping phase (15 seconds unchanged). Script fixes required to wait for import completion and navigate to show imported submissions.
+
 ---
 
 ## Summary: Priority Ranking
@@ -367,3 +389,301 @@ total_registered,male_participants,female_participants,youth_under_18,adults_18_
 
 1. **DM-AGG-001**: Show form creation → assignment → submission → review
 2. **RP-AGG-003**: Show cycle creation → task assignment → user completion → status update
+
+---
+
+## Final Video Frame Analysis (2026-01-12)
+
+All 6 videos re-encoded with H.264/AAC for QuickTime compatibility.
+
+### 1. DM-AGG-001 - Form Submission (57 frames, ~29s)
+
+| Frame | Timestamp  | What Changed                                            |
+| ----- | ---------- | ------------------------------------------------------- |
+| 1     | 0s         | Blank/loading screen                                    |
+| 2-3   | 0.5-1.5s   | Login page with email input                             |
+| 4     | 2s         | Email populated (viasport-staff@example.com)            |
+| 5-6   | 2.5-3s     | Password field appears                                  |
+| 7-9   | 3.5-4.5s   | Password typed, "Logging in..." state                   |
+| 10-11 | 5-5.5s     | MFA screen appears                                      |
+| 12-15 | 6-7.5s     | TOTP code entered and verified                          |
+| 20    | 10s        | Redirect in progress                                    |
+| 25    | 12.5s      | Admin Console loads                                     |
+| 30    | 15s        | Form builder with Facility Usage Survey                 |
+| 35    | 17.5s      | Form configuration page                                 |
+| 40    | 20s        | Form submission preview                                 |
+| 45    | 22.5s      | Form filled (Richmond Olympic Oval, 2010/06/15, 42 hrs) |
+| 50    | 25s        | Submission history visible                              |
+| 55-57 | 27.5-28.5s | Final state                                             |
+
+---
+
+### 2. DM-AGG-006 - Import Wizard (107 frames, ~54s)
+
+| Frame   | Timestamp  | What Changed                                             |
+| ------- | ---------- | -------------------------------------------------------- |
+| 1       | 0s         | Blank screen                                             |
+| 2-10    | 0.5-5s     | Login page                                               |
+| 11      | 5.5s       | Password field, "Logging in..."                          |
+| 12-14   | 6-7s       | MFA prompt with code "047457"                            |
+| 15-19   | 7.5-9.5s   | Dashboard/org selection                                  |
+| 20      | 10s        | Admin Console loads                                      |
+| 21-27   | 10.5-13.5s | Import Admin page, org selected                          |
+| 28      | 14s        | Form dropdown: "Annual Statistics Report"                |
+| 29-39   | 14.5-19.5s | File upload interface                                    |
+| 40      | 20s        | CSV file selected (import-demo-annual-stats-errors.csv)  |
+| 41-43   | 20.5-21.5s | Upload complete, Map tab active                          |
+| 44-87   | 22-43.5s   | Field mapping auto-detected                              |
+| 88      | 44s        | Data preview with sample data                            |
+| 89-95   | 44.5-47.5s | Validation preview (4 rows, 12 errors), checkbox checked |
+| 96      | 48s        | "Importing..." state                                     |
+| 97-100  | 48.5-50s   | Import completing                                        |
+| 101-107 | 50.5-53.5s | Import history with 2 pending imports                    |
+
+---
+
+### 3. RP-AGG-003 - Reporting Workflow (20 frames, ~10s)
+
+| Frame | Timestamp | What Changed                                             |
+| ----- | --------- | -------------------------------------------------------- |
+| 1-4   | 0-2s      | Admin Console - Reporting page, "Create reporting cycle" |
+| 5-7   | 2.5-3.5s  | Scrolled to "Assign reporting task" section              |
+| 8-9   | 4-4.5s    | Task assignment form and submissions table               |
+| 10    | 5s        | Scrolled back to top                                     |
+| 11-12 | 5.5-6s    | Cycle name entered: "Q2 2026 Quarterly"                  |
+| 13    | 6.5s      | Page scrolled down                                       |
+| 14-20 | 7-10s     | Task assignment form and submissions table (stable)      |
+
+---
+
+### 4. RP-AGG-005 - Analytics Export (53 frames, ~27s)
+
+| Frame | Timestamp  | What Changed                                                |
+| ----- | ---------- | ----------------------------------------------------------- |
+| 1-3   | 0-1.5s     | Analytics pivot builder loaded, Organizations dataset       |
+| 4-5   | 2-2.5s     | Layout transition (sidebar collapses)                       |
+| 6-10  | 3-5s       | Sidebar re-expands                                          |
+| 11-35 | 5.5-17.5s  | Pivot builder (minor layout shifts)                         |
+| 36-40 | 18-20s     | Query execution view with export buttons (CSV, Excel, JSON) |
+| 41-45 | 20.5-22.5s | Query results - Preview table loads with org data           |
+| 46-50 | 23-25s     | Data table fully rendered                                   |
+| 51-53 | 25.5-26.5s | Final state - complete analytics view                       |
+
+---
+
+### 5. SEC-AGG-001 - Auth & MFA Login (49 frames, ~25s)
+
+| Frame | Timestamp  | What Changed                               |
+| ----- | ---------- | ------------------------------------------ |
+| 1-3   | 0-1.5s     | Login page with email field                |
+| 4-5   | 2-2.5s     | Email entered (viasport-staff@example.com) |
+| 6     | 3s         | Password field appears                     |
+| 7-8   | 3.5-4s     | Password populated                         |
+| 9-10  | 4.5-5s     | "Logging in..." state                      |
+| 11-12 | 5.5-6s     | Loading continues                          |
+| 13-17 | 6.5-8.5s   | MFA prompt with code "123456"              |
+| 18    | 9s         | Code changed to "887829"                   |
+| 19-20 | 9.5-10s    | "Verifying..." state                       |
+| 21    | 10.5s      | Auth succeeds, org selection modal         |
+| 22-25 | 11-12.5s   | Organization selector loading/ready        |
+| 26    | 13s        | SIN Portal dashboard loads                 |
+| 27-29 | 13.5-14.5s | Dashboard fully rendered                   |
+| 30-49 | 15-24.5s   | Account Settings - Password & MFA sections |
+
+---
+
+### 6. SEC-AGG-004 - Audit Trail Verification (50 frames, ~25s)
+
+| Frame | Timestamp | What Changed                                          |
+| ----- | --------- | ----------------------------------------------------- |
+| 1-10  | 0-5s      | Audit Log page - "No audit entries yet"               |
+| 11-25 | 5-12.5s   | AUTH and SECURITY entries appear (2 rows)             |
+| 26-32 | 12.5-16s  | Filter dropdown opened (AUTH, DATA, EXPORT, SECURITY) |
+| 33-40 | 16-20s    | Filter applied, EXPORT actions shown                  |
+| 41-48 | 20-24s    | "Hash chain verified successfully" message appears    |
+| 49-50 | 24-25s    | Final state with verification message                 |
+
+---
+
+## Video Frame Analysis (2026-01-12 T120 Recordings)
+
+Re-recorded all 6 videos. Detailed frame-by-frame analysis follows.
+
+### Critical Issues Summary
+
+| Video          | Frames | Duration | Status        | Critical Issues                                                     |
+| -------------- | ------ | -------- | ------------- | ------------------------------------------------------------------- |
+| **RP-AGG-003** | 14     | ~7s      | **FAILED**    | ALL FRAMES BLANK - script crashed                                   |
+| SEC-AGG-004    | 77     | ~38s     | **NEEDS FIX** | Hash chain FAILS ("invalid for 60 entries"), no PII/step-up badges  |
+| DM-AGG-001     | 46     | ~23s     | **NEEDS FIX** | Submit never clicked, form resets without confirmation              |
+| RP-AGG-005     | 39     | ~19s     | **NEEDS FIX** | Export not clicked, no step-up auth shown                           |
+| SEC-AGG-001    | 39     | ~19s     | **NEEDS FIX** | No MFA Enabled badge (shows "Enable MFA"), no passkeys, no sessions |
+| DM-AGG-006     | 106    | ~53s     | **NEEDS FIX** | All imports "pending", no completion shown                          |
+
+---
+
+### 1. RP-AGG-003 - Reporting Workflow (14 frames, ~7s) - **CRITICAL FAILURE**
+
+**ALL 14 FRAMES ARE BLANK (pure white)** - The script completely failed.
+
+| Frame | Timestamp | Content            | Issue                   |
+| ----- | --------- | ------------------ | ----------------------- |
+| 1-14  | 0-7s      | Blank white screen | **NO CONTENT CAPTURED** |
+
+**Root Cause Investigation Needed:**
+
+- Script may have crashed before navigation
+- Browser may have failed to launch
+- Auth may have failed silently
+- Page may not have loaded before video capture started
+
+**Required:** Debug `record-sin-uat-rp-agg-003.ts`, add error handling, re-record.
+
+---
+
+### 2. SEC-AGG-004 - Audit Trail (77 frames, ~38s)
+
+| Frame | Timestamp | Content                                 | Issue                            |
+| ----- | --------- | --------------------------------------- | -------------------------------- |
+| 1-4   | 0-2s      | Blank/loading                           | Initial load delay               |
+| 10-17 | 5-8s      | "No audit entries yet"                  | **EMPTY STATE**                  |
+| 18-21 | 9-12s     | DATA, SECURITY entries appear           | Only 2 entries                   |
+| 22-30 | 12-18s    | EXPORT filter applied                   |                                  |
+| 31-41 | 18-25s    | **"Hash chain invalid for 60 entries"** | **RED ERROR - HASH CHAIN FAILS** |
+| 43-61 | 26-38s    | Same EXPORT entries                     | **STATIC (19 frames)**           |
+| 63-77 | 39-48s    | AUTH filter, date range applied         |                                  |
+
+**Critical Issues:**
+
+1. **Hash chain verification FAILS** - Shows "invalid for 60 entries" in red
+2. **No PII badges visible** - Key security feature not shown
+3. **No Step-up badges visible** - Key security feature not shown
+4. **No CSV export demonstrated** - Export buttons visible but not clicked
+5. **No entry detail panel shown** - Never clicked an entry
+6. **Empty state shown for 4+ seconds** - Should pre-load data
+
+**Required Fixes:**
+
+1. Fix hash chain data in seed script (ensure valid prevHash chain)
+2. Add metadata `{ includesPii: true, stepUpAuthUsed: true }` to EXPORT entries
+3. Update script to click Export CSV, show detail panel
+
+---
+
+### 3. DM-AGG-001 - Form Submission (46 frames, ~23s)
+
+| Frame | Timestamp  | Content                              | Issue                              |
+| ----- | ---------- | ------------------------------------ | ---------------------------------- |
+| 1-3   | 0-1.5s     | Blank                                | Initial load                       |
+| 4-12  | 2-6s       | Form builder, publishing             | "Publishing..." state              |
+| 13-17 | 6.5-8.5s   | Org selection                        | Navigation                         |
+| 18-24 | 9-12s      | Form opened, filling data            | Richmond Olympic Oval, date, hours |
+| 25-29 | 12.5-14.5s | Submission history (2 entries)       | Shows prior submissions            |
+| 30-42 | 15-21s     | **Form reset, "No submissions yet"** | **SUBMISSION LOST**                |
+| 43-46 | 21.5-23s   | Templates page                       | Final navigation                   |
+
+**Critical Issues:**
+
+1. **Submit button NEVER clicked** - Form filled but submission not triggered
+2. **Form resets without confirmation** - Goes from filled form to empty state
+3. **"No submissions yet" shown** - Contradicts earlier history (frames 25-29)
+4. **No Published badge visible** - Form status unclear
+5. **No success toast shown** - No submission confirmation
+6. **Admin approval view missing** - Required by ideal flow
+
+**Required Fixes:**
+
+1. Actually click Submit button after filling form
+2. Wait for success toast before continuing
+3. Show submission in history after submit
+4. Navigate to admin to show approval workflow
+
+---
+
+### 4. DM-AGG-006 - Import Wizard (106 frames, ~53s)
+
+| Frame  | Timestamp | Content                         | Issue                          |
+| ------ | --------- | ------------------------------- | ------------------------------ |
+| 1-3    | 0-1.5s    | Blank                           | Initial load                   |
+| 15-27  | 7.5-13.5s | Import Admin, org/form selected | viaSport BC, Annual Statistics |
+| 40-43  | 20-21.5s  | CSV uploaded, mapping           | error CSV loaded               |
+| 60-74  | 30-37s    | Validation: "Total errors: 12"  | Shows errors but not details   |
+| 75-94  | 37.5-47s  | "Importing..." → data preview   |                                |
+| 95-106 | 47.5-53s  | Import history: 2 "pending"     | **NEVER SHOWS "COMPLETED"**    |
+
+**Critical Issues:**
+
+1. **No template download shown** - Skipped step 3 of ideal flow
+2. **Validation errors not detailed** - Shows "12 errors" but no specifics
+3. **Import status stuck on "pending"** - Never progresses to "Completed"
+4. **No "50 rows imported" confirmation** - Results not shown
+5. **Form submissions not verified** - Doesn't navigate to show imported data
+
+**Required Fixes:**
+
+1. Add template download step
+2. Wait for import to complete (poll status)
+3. Navigate to Form Submissions to verify imported data
+4. Show individual submission detail
+
+---
+
+### 5. SEC-AGG-001 - Auth & MFA Login (39 frames, ~19s)
+
+| Frame | Timestamp  | Content                                              | Issue                      |
+| ----- | ---------- | ---------------------------------------------------- | -------------------------- |
+| 1-2   | 0-1s       | Blank                                                | Initial load               |
+| 3-8   | 1.5-4s     | Login, email entry                                   | viasport-staff@example.com |
+| 9-14  | 4.5-7s     | Password, "Logging in..."                            |                            |
+| 15-20 | 7.5-10s    | MFA challenge, code entry                            | TOTP 420698                |
+| 21-24 | 10.5-12s   | Org selection, dashboard                             |                            |
+| 25-30 | 12.5-15s   | Dashboard with onboarding modal                      | **STATIC (6 frames, >5s)** |
+| 31-39 | 15.5-19.5s | Settings - MFA section shows **"Enable MFA"** button | **MFA NOT ENABLED**        |
+
+**Critical Issues:**
+
+1. **MFA Enabled badge NOT visible** - Settings shows "Enable MFA" button instead of "Enabled" badge
+2. **"No passkeys yet" message** - No registered passkeys shown
+3. **Active Sessions section MISSING** - Not shown at all
+4. **Onboarding modal shown for 6 frames** - Too long on same content
+5. **No passkey registration flow** - Required by ideal flow
+6. **No session revocation demo** - Required by ideal flow
+
+**Root Cause:** The seeded user `viasport-staff@example.com` appears to NOT have MFA enabled on this environment, or the MFA status isn't being detected properly.
+
+**Required Fixes:**
+
+1. Verify user has MFA enabled in database
+2. Dismiss onboarding modal faster
+3. Navigate to show Active Sessions
+4. Consider showing passkey registration
+
+---
+
+### 6. RP-AGG-005 - Analytics Export (39 frames, ~19s)
+
+| Frame | Timestamp  | Content                                  | Issue                    |
+| ----- | ---------- | ---------------------------------------- | ------------------------ |
+| 1-8   | 0-4s       | Org selection, dashboard                 | Navigation               |
+| 9-11  | 4.5-5.5s   | Analytics Explore, Organizations dataset |                          |
+| 12-20 | 6-10s      | Dataset → Form Submissions, field drag   | "Submission ID" only     |
+| 21-31 | 10.5-15.5s | Bar chart rendered                       | Chart visible            |
+| 32-35 | 16-17.5s   | Save to Dashboard modal                  | Widget named, saving     |
+| 36-39 | 18-19.5s   | Dashboard with widget loading            | **WIDGET STILL LOADING** |
+
+**Critical Issues:**
+
+1. **Export CSV NOT clicked** - Buttons visible but never used
+2. **Step-up auth COMPLETELY ABSENT** - Key security feature not demonstrated
+3. **No TOTP code entry** - Should show MFA prompt for export
+4. **No export download confirmation** - No "Export complete" toast
+5. **Minimal pivot configuration** - Only "Submission ID" dragged, not org/status/count
+6. **Dashboard widget never fully loads** - Ends with spinner
+
+**Required Fixes:**
+
+1. Build proper pivot: Organization (rows), Status (columns), Count (measure)
+2. Click "Export CSV" button
+3. Complete step-up auth with TOTP
+4. Wait for download toast
+5. Wait for dashboard widget to fully render

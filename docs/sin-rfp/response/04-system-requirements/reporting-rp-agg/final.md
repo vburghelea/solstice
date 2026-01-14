@@ -2,13 +2,13 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                  | Status  | Built Today                                        | Remaining Scope                 |
-| :--------- | :------------------------------------- | :------ | :------------------------------------------------- | :------------------------------ |
-| RP-AGG-001 | Data Validation and Submission Rules   | Built   | Validation rules and error messaging               | None                            |
-| RP-AGG-002 | Reporting Information Management       | Partial | Reporting metadata schema and access controls      | viaSport metadata configuration |
-| RP-AGG-003 | Reporting Flow and Support             | Built   | Reminders, resubmission tracking, dashboards       | None                            |
-| RP-AGG-004 | Reporting Configuration and Collection | Built   | Form builder, file management, admin configuration | None                            |
-| RP-AGG-005 | Self-Service Analytics and Data Export | Built   | Native BI, pivots, charts, CSV and Excel export    | None                            |
+| Req ID     | Title                                  | Status                                       | Evaluation Environment (Jan 2026)                  | Finalization Scope              |
+| :--------- | :------------------------------------- | :------------------------------------------- | :------------------------------------------------- | :------------------------------ |
+| RP-AGG-001 | Data Validation and Submission Rules   | Implemented (Demoable Now)                   | Validation rules and error messaging               | None                            |
+| RP-AGG-002 | Reporting Information Management       | Implemented; Requires viaSport Configuration | Reporting metadata schema and access controls      | viaSport metadata configuration |
+| RP-AGG-003 | Reporting Flow and Support             | Implemented (Demoable Now)                   | Reminders, resubmission tracking, dashboards       | None                            |
+| RP-AGG-004 | Reporting Configuration and Collection | Implemented (Demoable Now)                   | Form builder, file management, admin configuration | None                            |
+| RP-AGG-005 | Self-Service Analytics and Data Export | Implemented (Demoable Now)                   | Native BI, pivots, charts, CSV and Excel export    | None                            |
 
 ## RP-AGG-001: Data Validation and Submission Rules
 
@@ -26,13 +26,13 @@ Submissions that fail validation are rejected with appropriate error messages.
 - File uploads are validated by MIME type and size.
 - Errors are shown inline with actionable messages.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Zod-based validation for forms and imports.
 - Server-side enforcement to prevent bypassing client checks.
 - File upload validation and safe storage keys.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -56,13 +56,13 @@ Users can update relevant metadata and access reporting features accordingly.
 - Organization profiles and delegated access are managed through roles and invites.
 - Reporting tasks and submissions are tied to organizations and cycles.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Reporting metadata schema and update endpoints.
 - Organization profile and role management with delegated access.
 - Reporting cycles and tasks with due dates and reminders.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - viaSport metadata configuration and UI refinement for specific fields (TBD).
 
@@ -90,13 +90,13 @@ Users are reminded, track changes, and view data in a dashboard format.
 - Reminder schedules generate in-app and email notifications.
 - Submission history records resubmissions and status changes.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Reporting dashboard with status and due dates.
 - Reminder schedules and notification delivery.
 - Submission history and resubmission tracking.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -120,13 +120,13 @@ System admin can configure reporting information and forms.
 - File uploads are visible with read, download, and delete controls.
 - Form versions preserve historical submissions.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Form builder and versioning for reporting forms.
 - File management for submissions with delete and download actions.
 - Admin reporting configuration tools.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -150,13 +150,13 @@ User builds a custom chart and exports underlying dataset to CSVs; export respec
 - Exports are available in CSV, Excel, and JSON.
 - Field-level access and step-up authentication protect sensitive data.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Pivot builder and charting with ECharts.
 - CSV, XLSX, and JSON exports with audit logging.
 - Field-level access control and step-up authentication on export.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 

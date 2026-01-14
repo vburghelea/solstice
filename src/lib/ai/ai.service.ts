@@ -42,6 +42,29 @@ type AiStructuredRequest<TSchema extends SchemaInput> = AiTextRequest & {
   outputSchema: TSchema;
 };
 
+type EmbedInputType =
+  | "search_document"
+  | "search_query"
+  | "classification"
+  | "clustering";
+type EmbedVectorType = "float" | "int8" | "uint8" | "binary" | "ubinary";
+type EmbedOutputDimension = 256 | 512 | 1024 | 1536;
+type EmbedTruncate = "NONE" | "LEFT" | "RIGHT";
+
+type CohereEmbedRequest = {
+  input_type: EmbedInputType;
+  texts: string[];
+  embedding_types?: EmbedVectorType[];
+  output_dimension?: EmbedOutputDimension;
+  max_tokens?: number;
+  truncate?: EmbedTruncate;
+};
+
+type CohereEmbedResponse = {
+  embeddings?: number[][] | Partial<Record<EmbedVectorType, number[][]>>;
+  response_type?: string;
+};
+
 type TokenUsage = {
   promptTokens: number;
   completionTokens: number;
@@ -123,6 +146,23 @@ const runWithRetries = async <T>(
     }
   }
   throw lastError ?? new Error("AI request failed.");
+};
+
+const normalizeEmbeddingInputs = (input: string | string[]) =>
+  Array.isArray(input) ? input : [input];
+
+const extractEmbeddingVectors = (payload: CohereEmbedResponse): number[][] => {
+  const { embeddings } = payload;
+  if (Array.isArray(embeddings)) {
+    return embeddings;
+  }
+
+  if (embeddings && Array.isArray(embeddings.float)) {
+    return embeddings.float;
+  }
+
+  const fallback = embeddings ? Object.values(embeddings).find(Array.isArray) : [];
+  return (fallback as number[][] | undefined) ?? [];
 };
 
 const safeLogAiUsage = async (payload: Parameters<typeof logAiUsage>[0]) => {
@@ -386,6 +426,11 @@ export const runAiStructured = createServerOnlyFn(
 export const runAiEmbedding = createServerOnlyFn(
   async (input: {
     text: string | string[];
+    inputType?: EmbedInputType;
+    embeddingTypes?: EmbedVectorType[];
+    outputDimension?: EmbedOutputDimension;
+    maxTokens?: number;
+    truncate?: EmbedTruncate;
     userId?: string | null;
     organizationId?: string | null;
     requestId?: string | null;
@@ -398,49 +443,60 @@ export const runAiEmbedding = createServerOnlyFn(
     const start = Date.now();
     const metadata: JsonRecord = input.metadata ?? {};
 
-    const runEmbed = async () => {
+    const runEmbed = async (): Promise<number[][]> => {
       const { controller, timeout } = createTimeoutController(config.timeoutMs);
       try {
-        const response = await fetch(
-          `${config.baseUrl ?? "https://api.openai.com/v1"}/embeddings`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${config.apiKey}`,
-              ...(config.organization
-                ? { "OpenAI-Organization": config.organization }
-                : {}),
-            },
-            body: JSON.stringify({
-              model: config.model,
-              input: input.text,
-            }),
-            signal: controller.signal,
-          },
-        );
+        const { BedrockRuntimeClient, InvokeModelCommand } =
+          await import("@aws-sdk/client-bedrock-runtime");
 
-        const payload = (await response.json()) as {
-          data?: Array<{ embedding: number[] }>;
-          usage?: { prompt_tokens?: number; total_tokens?: number };
-          error?: { message?: string };
+        const client = new BedrockRuntimeClient({
+          region: config.region ?? "ca-central-1",
+        });
+
+        const request: CohereEmbedRequest = {
+          input_type: input.inputType ?? "search_document",
+          texts: normalizeEmbeddingInputs(input.text),
         };
 
-        if (!response.ok) {
-          throw new Error(payload.error?.message ?? "OpenAI embedding request failed.");
+        if (input.embeddingTypes?.length) {
+          request.embedding_types = input.embeddingTypes;
+        }
+        if (input.outputDimension) {
+          request.output_dimension = input.outputDimension;
+        }
+        if (input.maxTokens) {
+          request.max_tokens = input.maxTokens;
+        }
+        if (input.truncate) {
+          request.truncate = input.truncate;
         }
 
-        return {
-          embeddings: payload.data?.map((item) => item.embedding) ?? [],
-          usage: payload.usage,
-        };
+        const response = await client.send(
+          new InvokeModelCommand({
+            modelId: config.model,
+            contentType: "application/json",
+            accept: "application/json",
+            body: JSON.stringify(request),
+          }),
+          { abortSignal: controller.signal },
+        );
+
+        const body = new TextDecoder().decode(response.body);
+        const payload = JSON.parse(body) as CohereEmbedResponse;
+        const embeddings = extractEmbeddingVectors(payload);
+
+        if (embeddings.length === 0) {
+          throw new Error("Bedrock embedding response returned no vectors.");
+        }
+
+        return embeddings;
       } finally {
         clearTimeout(timeout);
       }
     };
 
     try {
-      const result = await runWithRetries(config.maxRetries, runEmbed);
+      const embeddings = await runWithRetries(config.maxRetries, runEmbed);
       const latencyMs = Date.now() - start;
 
       await safeLogAiUsage({
@@ -451,15 +507,15 @@ export const runAiEmbedding = createServerOnlyFn(
         organizationId: input.organizationId ?? null,
         userId: input.userId ?? null,
         requestId,
-        inputTokens: result.usage?.prompt_tokens ?? null,
-        totalTokens: result.usage?.total_tokens ?? null,
+        inputTokens: null,
+        totalTokens: null,
         latencyMs,
         metadata,
       });
 
       return {
-        embeddings: result.embeddings,
-        usage: result.usage,
+        embeddings,
+        usage: null,
         latencyMs,
       };
     } catch (error) {

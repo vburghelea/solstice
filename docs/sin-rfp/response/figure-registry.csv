@@ -1,0 +1,32 @@
+figure_id,requirement_id,caption,source_file_path,evaluator_path,video_id,used_in_sections,duration
+DM-1,DM-AGG-001,Form submission workflow,screenshots/DM-AGG-001/05-form-submission-success.png,Admin → Forms → [form] → Submit,V2,System Requirements: Data Management,
+DM-2,DM-AGG-002,Data processing integration,screenshots/DM-AGG-001/06-submission-history.png,Admin → Forms → Submissions,,System Requirements: Data Management,
+DM-3,DM-AGG-003,Access control configuration,screenshots/DM-AGG-001/01-form-builder-selected.png,Admin → Forms → Builder,,System Requirements: Data Management,
+DM-4,DM-AGG-004,Data validation feedback,screenshots/DM-AGG-001/05-submission-error.png,Submit form with invalid data,,System Requirements: Data Management,
+DM-5,DM-AGG-005,Data storage dashboard,screenshots/DM-AGG-001/08-submission-detail.png,Admin → Forms → Submissions → [submission],,System Requirements: Data Management,
+DM-6,DM-AGG-006,Import wizard flow,screenshots/DM-AGG-006/04-import-complete.png,Admin → Import → Upload CSV,V3,System Requirements: Data Management,
+RP-1,RP-AGG-001,Validation rules panel,screenshots/DM-AGG-006/01-validation-errors.png,Admin → Import → Upload invalid CSV,,System Requirements: Reporting,
+RP-2,RP-AGG-002,Reporting information management,screenshots/RP-AGG-003/03-user-reporting-view.png,Reporting → View report,,System Requirements: Reporting,
+RP-3,RP-AGG-003,Reporting workflow cycle,screenshots/RP-AGG-003/01-cycle-created.png,Admin → Reporting → Cycles,V4,System Requirements: Reporting,
+RP-4,RP-AGG-004,Reporting configuration,screenshots/RP-AGG-003/02-task-assignment-ui.png,Admin → Reporting → Tasks → Assign,,System Requirements: Reporting,
+RP-5,RP-AGG-005,Analytics and export,screenshots/RP-AGG-005/03-bar-chart.png,Analytics → Explore → Chart,V5,System Requirements: Reporting,
+SEC-1,SEC-AGG-001,MFA authentication flow,screenshots/SEC-AGG-001/01-mfa-enabled.png,Settings → Security → MFA,V1,System Requirements: Security,
+SEC-2,SEC-AGG-002,Monitoring dashboard,screenshots/SEC-AGG-001/03-active-sessions.png,Settings → Security → Sessions,,System Requirements: Security,
+SEC-3,SEC-AGG-003,Privacy compliance settings,screenshots/SEC-AGG-001/02-settings-page.png,Settings → Security,,System Requirements: Security,
+SEC-4,SEC-AGG-004,Audit trail verification,screenshots/SEC-AGG-004/04-hash-verified.png,Admin → Audit → Verify,V6,System Requirements: Security,
+TO-1,TO-AGG-001,Template support,screenshots/DM-AGG-001/02-form-preview-admin.png,Admin → Forms → Preview,,System Requirements: Training and Onboarding,
+TO-2,TO-AGG-002,Guided onboarding walkthrough,(finalization scope - see ticket),,,"System Requirements: Training and Onboarding",
+TO-3,TO-AGG-003,Help and support system,screenshots/RP-AGG-003/07-final-admin-view.png,Help → Support,,System Requirements: Training and Onboarding,
+UI-1,UI-AGG-001,User access control,screenshots/SEC-AGG-001/00-dashboard-post-login.png,Dashboard (post-login),,System Requirements: User Interface,
+UI-2,UI-AGG-002,Personalized dashboard,screenshots/DM-AGG-001/00-dashboard-post-login.png,Dashboard → Home,,System Requirements: User Interface,
+UI-3,UI-AGG-003,Responsive design,screenshots/RP-AGG-005/00-analytics-explore.png,Analytics (any viewport),,System Requirements: User Interface,
+UI-4,UI-AGG-004,Task notifications,screenshots/RP-AGG-003/05-admin-task-list.png,Reporting → Tasks → Notifications,,System Requirements: User Interface,
+UI-5,UI-AGG-005,Search and filter navigation,(finalization scope - use analytics filter),Analytics → Explore → Filter,,"System Requirements: User Interface",
+UI-6,UI-AGG-006,User support feedback,screenshots/RP-AGG-003/05-review-panel.png,Reporting → Review → Feedback,,System Requirements: User Interface,
+UI-7,UI-AGG-007,Consistent visual branding,screenshots/DM-AGG-001/00-dashboard-post-login.png,Any page (viaSport brand colors),,System Requirements: User Interface,
+V1,SEC-AGG-001,Authentication and MFA login flow,videos/SEC-AGG-001-auth-mfa-login-flow-FINAL.mp4,Login → MFA → Dashboard,V1,"Prototype Evaluation Guide, SEC-AGG-001",24.4s
+V2,DM-AGG-001,Form submission workflow,videos/DM-AGG-001-form-submission-flow-FINAL.mp4,Forms → Create → Submit,V2,"Prototype Evaluation Guide, DM-AGG-001",28.7s
+V3,DM-AGG-006,Data import wizard,videos/DM-AGG-006-import-wizard-flow-FINAL.mp4,Import → Upload → Map → Complete,V3,"Prototype Evaluation Guide, DM-AGG-006",53.6s
+V4,RP-AGG-003,Reporting workflow cycle,videos/RP-AGG-003-reporting-workflow-flow-FINAL.mp4,Reporting → Create Cycle → Assign,V4,"Prototype Evaluation Guide, RP-AGG-003",9.8s
+V5,RP-AGG-005,Analytics and export,videos/RP-AGG-005-analytics-export-flow-FINAL.mp4,Analytics → Build → Export,V5,"Prototype Evaluation Guide, RP-AGG-005",26.4s
+V6,SEC-AGG-004,Audit trail verification,videos/SEC-AGG-004-audit-verification-flow-FINAL.mp4,Audit → Filter → Verify → Export,V6,"Prototype Evaluation Guide, SEC-AGG-004",25.2s

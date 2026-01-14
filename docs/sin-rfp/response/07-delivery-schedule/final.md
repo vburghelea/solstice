@@ -2,7 +2,7 @@
 
 ## Timeline and Milestones
 
-Austin Wallace Tech proposes a 30-week implementation timeline targeting Fall 2026 launch. This timeline prioritizes comprehensive UX research and community engagement to ensure the platform truly meets user needs.
+Austin Wallace Tech proposes a 30-week implementation timeline targeting Fall 2026 launch. While the Solstice core platform is functional today, this timeline ensures the transition from legacy systems (BCAR/BCSI) to the new environment is seamless, compliant, and widely adopted by the PSO community.
 
 | Phase                         | Duration | Key Activities                                                                      | Milestone           |
 | :---------------------------- | :------- | :---------------------------------------------------------------------------------- | :------------------ |
@@ -23,11 +23,15 @@ Austin Wallace Tech proposes a 30-week implementation timeline targeting Fall 20
 
 ### Why This Timeline
 
-The timeline reflects our commitment to getting the user experience right. The core platform already covers the majority of system requirements, so the additional time focuses on:
+- **Privacy and Legislative Alignment:** Early weeks support viaSport's Privacy Impact Assessment (PIA) and security review processes, ensuring system configuration meets FOIPPA requirements
+- **Legacy Data Integrity:** Migrating ~20M rows requires rigorous mapping and validation to prevent data loss or corruption during the transition from BCAR/BCSI
+- **Community-Wide Adoption:** UX research and community liaison (led by our System Navigator) ensures the interface reflects actual PSO workflows, reducing post-launch support volume
+
+The timeline reflects our commitment to getting the user experience right. The baseline system already implements the requirement set, so project time focuses on:
 
 - **Proper user research** with viaSport staff and PSO representatives across British Columbia
 - **Community-informed design** with Soleil Heaney as system navigator connecting the team to sport sector needs
-- **Comprehensive UAT** including assistive technology user testing
+- **Accessibility validation** including assistive technology user testing
 - **Phased rollout** with pilot cohorts before full deployment
 
 | Phase                       | Status           | Remaining Work                        |
@@ -90,10 +94,13 @@ The timeline reflects our commitment to getting the user experience right. The c
 - Participant recruitment (10-12 users across roles)
 - Moderated usability testing sessions (60 min each)
 - System Usability Scale (SUS) measurement
-- Accessibility audit of prototype
-- Assistive Technology (AT) testing (3-5 AT users)
-  - Screen reader users (NVDA, JAWS)
-  - Keyboard-only users
+- Accessibility validation:
+  - Axe-core automated scans for WCAG 2.1 Level AA compliance
+  - Keyboard navigation testing (skip links, focus management, tab order)
+  - Assistive Technology (AT) testing with 3-5 users:
+    - Screen reader users (NVDA, VoiceOver)
+    - Keyboard-only users
+  - Alternative interaction mode validation (button vs drag in pivot builder)
 - Quantitative and qualitative analysis
 - Prioritized recommendations
 
@@ -193,6 +200,6 @@ viaSport will receive:
 
 ## Timeline Commitment
 
-This timeline reflects our assessment based on the existing prototype, the need for comprehensive user research, and assumed collaboration with the sport sector community. We will identify blockers early and communicate any required adjustments.
+The timeline is structured around quality gates (discovery sign-off, IA approval, UAT sign-off, launch readiness) rather than feature build completion. This reflects our assessment based on the existing baseline and the need for user research and collaboration with the sport sector community. We will identify blockers early and communicate any required adjustments.
 
 ---

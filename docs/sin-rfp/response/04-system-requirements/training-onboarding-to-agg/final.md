@@ -2,11 +2,11 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                            | Status | Built Today                           | Remaining Scope                  |
-| :--------- | :------------------------------- | :----- | :------------------------------------ | :------------------------------- |
-| TO-AGG-001 | Template Support and Integration | Built  | Template hub with preview, versioning | viaSport templates content       |
-| TO-AGG-002 | Guided Learning and Walkthroughs | Built  | Auto-launch tours, progress tracking  | Final content review (TBD)       |
-| TO-AGG-003 | Reference Materials and Support  | Built  | Role-scoped help, support with SLA    | Content refinement with viaSport |
+| Req ID     | Title                            | Status                                       | Evaluation Environment (Jan 2026)     | Finalization Scope               |
+| :--------- | :------------------------------- | :------------------------------------------- | :------------------------------------ | :------------------------------- |
+| TO-AGG-001 | Template Support and Integration | Implemented; Requires viaSport Configuration | Template hub with preview, versioning | viaSport templates content       |
+| TO-AGG-002 | Guided Learning and Walkthroughs | Implemented; Requires viaSport Configuration | Auto-launch tours, progress tracking  | Final content review (TBD)       |
+| TO-AGG-003 | Reference Materials and Support  | Implemented; Requires viaSport Configuration | Role-scoped help, support with SLA    | Content refinement with viaSport |
 
 ## TO-AGG-001: Template Support and Integration
 
@@ -24,14 +24,14 @@ Users can easily locate and access the correct template when needed.
 - Contextual links surface templates from forms, imports, and reporting.
 - Templates are tagged by context for search and filtering.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Templates hub UI with inline preview URLs and version grouping.
 - Admin panel to manage global and organization templates.
 - Contextual links on form detail pages with preview/download actions.
 - Template shortcuts surfaced on form, reporting, and import screens.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - viaSport specific templates and sample data (TBD).
 
@@ -59,14 +59,14 @@ Users can complete tasks independently with support from walkthroughs.
 - Tutorials cover onboarding and data upload workflows.
 - Progress tracking allows users to resume or restart.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Onboarding tour auto-launches after first organization selection when no prior progress exists.
 - Guided tours for onboarding and data upload with restart controls.
 - Tutorial panel with progress tracking and dismissal.
 - Contextual launch points on portal pages.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - Final content review with viaSport stakeholders (TBD).
 
@@ -90,13 +90,13 @@ Users can find accurate answers and instructional material without needing direc
 - FAQ entries surface common questions.
 - Search filters content by keyword.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Help center with searchable guides and FAQ.
 - Role-scoped content with audience badges visible to users.
 - In-app support requests with priority selection, SLA targets, and response notifications.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - Content refinement based on viaSport terminology (TBD).
 

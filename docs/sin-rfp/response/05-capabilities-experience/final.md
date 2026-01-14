@@ -8,12 +8,13 @@ Austin Wallace Tech brings experience delivering information systems in sports a
 
 The most relevant evidence is the Solstice prototype itself, built for viaSport requirements.
 
-| Metric                | Value                                                         |
-| :-------------------- | :------------------------------------------------------------ |
-| Requirements coverage | 23 of 25 (92%) System Requirements Addendum items implemented |
-| Load testing          | 20.1 million rows, p95 latency 162ms (target: <500ms)         |
-| Server errors         | Zero under concurrent load                                    |
-| Codebase size         | 97,000+ lines of TypeScript (app plus tests)                  |
+| Metric                | Value                                                                                                   |
+| :-------------------- | :------------------------------------------------------------------------------------------------------ |
+| Requirements coverage | 25 of 25 (100%) System Requirements Addendum items implemented                                          |
+| Load testing          | 20M rows, p95 162ms, 25 concurrent users, 0 server errors                                               |
+| Server errors         | Zero under concurrent load                                                                              |
+| Test coverage         | Automated test suite covering core workflows (login, submission, import, export, RBAC, audit integrity) |
+| Accessibility         | WCAG 2.1 Level AA compliance, Axe-core automated testing in CI, Lighthouse Accessibility 100/100        |
 
 ## Delivery and Advisory Team
 
@@ -41,6 +42,14 @@ The most relevant evidence is the Solstice prototype itself, built for viaSport 
 - Code review required for all changes
 - Security sign-off for auth and access control changes
 - Direct accountability to viaSport with no organizational layers
+
+### Accessibility Expertise
+
+Ruslan Hétu leads UX research and accessibility validation with 6 years of experience in inclusive design. The team's accessibility approach includes:
+
+- **Automated validation:** Axe-core accessibility tests run on every commit in CI
+- **Manual verification:** Keyboard navigation, screen reader compatibility, and focus management testing
+- **Inclusive design patterns:** Alternative interaction modes (button vs drag), data table alternatives for charts, form error summaries with field links
 
 ### Continuity of Services
 
@@ -88,7 +97,7 @@ Continuity is supported by:
 
 **Results:**
 
-- 20.1M rows tested, ≤250ms p95 latency
+- 20M rows tested, p95 162ms (25 concurrent users)
 - Zero server errors under concurrent load
 - Prototype available for evaluator validation
 
@@ -118,19 +127,19 @@ Austin Wallace Tech (AWT) provides a pre-configured AI infrastructure within the
 
 | Component                    | Description                                                                                                                            |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| AWS Bedrock integration      | Claude, Amazon Nova, and Cohere models via Bedrock in ca-central-1                                                                     |
+| AWS Bedrock integration      | Foundation models via AWS Bedrock in ca-central-1                                                                                      |
 | Central AI service           | Unified interface with retries, timeouts, and error handling                                                                           |
 | Prompt template registry     | Versioned prompts with audit trail and rollback capability                                                                             |
 | Structured output validation | Zod schema validation ensuring AI responses match expected formats                                                                     |
 | Usage logging and costs      | Per-request tracking of tokens, latency, cost estimates by org and user. Usage reports/exports available to viaSport for auditability. |
 | Quota enforcement            | Rate limiting and budget controls per tenant and user                                                                                  |
-| Embedding support            | Cohere and Amazon Titan embeddings for semantic search                                                                                 |
+| Embedding support            | Amazon Titan embeddings for semantic search                                                                                            |
 
 AI features use AWS Bedrock hosted in AWS Canada (Central) (ca-central-1). We log per-request token usage, latency, and cost estimates by organization/user for auditability, and we can provide usage reports/exports to viaSport. No AI provider outside Canada will be used without explicit written authorization from viaSport, and viaSport data will not be used for model fine-tuning/training without explicit written approval.
 
 ### AI Feature Candidates
 
-The following AI features are included in the contract scope. During Planning, we will conduct UX research with viaSport staff and PSO representatives to determine which features deliver the highest value and should be prioritized for implementation.
+The following AI feature candidates are available for prioritization with viaSport. AI features are optional modules enabled only with explicit governance decisions. During Discovery, we will conduct UX research with viaSport staff and PSO representatives to determine which features deliver the highest value.
 
 | Feature                  | Description                                                                                   | Target Users         | Value                                   |
 | :----------------------- | :-------------------------------------------------------------------------------------------- | :------------------- | :-------------------------------------- |
@@ -154,15 +163,15 @@ The foundation work is complete. We will implement the AI features that drive re
 
 ## Responsible AI Governance
 
-| Principle                | Implementation                                                                            |
-| :----------------------- | :---------------------------------------------------------------------------------------- |
-| Transparency             | All AI-generated content is clearly labeled; users see when AI assisted                   |
-| Human-in-the-loop        | AI outputs require human review before publishing or external sharing                     |
-| Privacy by design        | No PII in prompts; data aggregated or anonymized before AI processing                     |
-| No unauthorized training | viaSport data is never used for model training without explicit consent                   |
-| Bias mitigation          | Regular review of AI outputs for demographic or organizational bias                       |
-| Audit trail              | All AI requests logged with prompt version, user, timestamp, and response characteristics |
-| Data residency           | AWS Bedrock in ca-central-1 only; no non-Canadian AI providers without written consent    |
+| Principle                | Implementation                                                                                       |
+| :----------------------- | :--------------------------------------------------------------------------------------------------- |
+| Transparency             | All AI-generated content is clearly labeled; users see when AI assisted                              |
+| Human-in-the-loop        | AI outputs require human review before publishing or external sharing                                |
+| Privacy by design        | No PII in prompts; data aggregated or anonymized before AI processing                                |
+| No unauthorized training | viaSport data is never used for model training without explicit consent                              |
+| Bias mitigation          | Regular review of AI outputs for demographic or organizational bias                                  |
+| Audit trail              | All AI requests logged with prompt version, user, timestamp, and response characteristics            |
+| Data residency           | AWS Bedrock in ca-central-1 only; no non-Canadian AI providers without written consent from viaSport |
 
 ## Open Standards, APIs, and Open Source
 

@@ -342,6 +342,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
         account: schema.account,
         verification: schema.verification,
         twoFactor: schema.twoFactor,
+        passkey: schema.passkey,
       },
     }),
 

@@ -2,21 +2,20 @@
 
 ## Purpose
 
-This prototype exists to reduce delivery risk and demonstrate requirement alignment before contract award. viaSport can evaluate a working system, not just a proposal.
+This prototype (evaluation environment) exists to reduce procurement uncertainty by enabling requirement and workflow validation before contract award. viaSport can evaluate a working system, not just a proposal.
 
 ## Data Provenance
 
 **No viaSport confidential data was used.** Performance testing used synthetic data designed to match the scale characteristics described in the RFP:
 
-| Table            | Rows      | Purpose                                |
-| :--------------- | :-------- | :------------------------------------- |
-| form_submissions | 10.0M     | Simulates 10+ years of PSO submissions |
-| audit_logs       | 7.0M      | Realistic audit trail volume           |
-| notifications    | 2.0M      | Email and in-app notification history  |
-| bi_query_log     | 1.0M      | Analytics query patterns               |
-| **Total**        | **20.1M** | Matches RFP 20+ million rows context   |
+| Table            | Rows    | Purpose                                |
+| :--------------- | :------ | :------------------------------------- |
+| audit_logs       | 10.0M   | Realistic audit trail volume           |
+| form_submissions | 8.0M    | Simulates 10+ years of PSO submissions |
+| notifications    | 2.0M    | Email and in-app notification history  |
+| **Total**        | **20M** | Matches RFP 20+ million rows context   |
 
-## What Is Production-Ready Today
+## Implemented Baseline Capabilities
 
 - Authentication with TOTP MFA and backup codes
 - Role-based access control (owner, admin, reporter, viewer)
@@ -37,7 +36,7 @@ This prototype exists to reduce delivery risk and demonstrate requirement alignm
 | :------------------------------------------------------ | :-------------------- | :----------------------------------------- |
 | BCAR and BCSI extraction method                         | Discovery (Weeks 1-6) | Legacy system access                       |
 | Form templates and reporting metadata                   | Discovery (Weeks 1-6) | viaSport data dictionary                   |
-| Branding (logo, colors)                                 | Design (Week 11\)     | Brand assets from viaSport                 |
+| Branding (logo, colors)                                 | Design (Week 11)      | Brand assets from viaSport                 |
 | Program-specific fields (NCCP, contribution agreements) | Design (Weeks 11-18)  | viaSport Subject Matter Expert (SME) input |
 
 ## Demo Access
@@ -99,8 +98,17 @@ This optional walkthrough is provided to help evaluators validate key workflows 
 
 Where evidence is platform-level (for example AWS compliance reports), we provide supporting artifacts through AWS Artifact and standard AWS compliance documentation upon request.
 
-## Prototype Positioning
+## Platform Baseline Positioning
 
-We provided a working prototype so evaluators can validate core workflows and requirements now, reducing uncertainty before award. After award, we will still run a Discovery phase to confirm workflows, templates, data definitions, and migration rules with viaSport. The prototype accelerates delivery by starting from proven components, but it does not replace stakeholder alignment.
+Solstice is provided as a working baseline so viaSport can evaluate real workflows and requirement compliance before award. This reduces procurement uncertainty and accelerates delivery.
+
+This baseline does not replace discovery. Discovery remains required to confirm:
+
+- viaSport terminology, templates, reporting cycles, and governance rules
+- Legacy extraction constraints and migration mappings using real BCAR/BCSI data
+- Accessibility and usability validation with real users under real reporting conditions
+- Operational policies (retention durations, escalation contacts, support workflows)
+
+What changes because the baseline exists: discovery and UAT start from functioning software, enabling faster alignment, better feedback, and fewer surprises during rollout. Project effort is intentionally spent on adoption, reliability, and migration accuracy—rather than rebuilding foundational features.
 
 ---

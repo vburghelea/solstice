@@ -17,12 +17,79 @@ const DEFAULT_USER_PROMPT =
   "Period: {{period}}\n\n" +
   "Return two short paragraphs and 3-5 bullet highlights.";
 
+const NL_QUERY_SYSTEM_PROMPT = `You are a data query assistant for a sports
+organization management platform called Solstice.
+
+Given a user's natural language question about sports data, interpret their
+intent and produce a structured query specification.
+
+Available metrics:
+{{metrics}}
+
+Available dimensions:
+{{dimensions}}
+
+Rules:
+1. Always set datasetId using the dataset id shown in brackets in the lists
+2. Only use metrics and dimensions from the lists above - never invent new ones
+3. Keep metrics/dimensions within the chosen dataset
+4. Set confidence (0.0-1.0) based on how clearly the question maps to available data
+5. If the question is ambiguous or unclear, set confidence below 0.7
+6. Provide a clear explanation of what the query will calculate
+7. Prefer simpler interpretations when multiple are valid
+8. For time-based questions, use the timeRange field with appropriate presets`;
+
+const NL_QUERY_USER_PROMPT = `User question: "{{question}}"
+
+Interpret this question and return a structured query intent.`;
+
+type PromptPreset = {
+  key: string;
+  name: string;
+  description: string;
+  audiences: string[];
+  systemPrompt: string;
+  userPrompt: string;
+  model: string;
+  temperature?: number;
+  maxTokens?: number;
+};
+
+const PROMPT_PRESETS: Record<string, PromptPreset> = {
+  "report-summary": {
+    key: "report-summary",
+    name: "Report Summary",
+    description: "Summarize report metrics into a narrative with highlights.",
+    audiences: ["board", "operations"],
+    systemPrompt: DEFAULT_SYSTEM_PROMPT,
+    userPrompt: DEFAULT_USER_PROMPT,
+    model: "claude-opus",
+  },
+  "nl-data-query": {
+    key: "nl-data-query",
+    name: "Natural Language Data Query",
+    description: "Interpret natural language into structured BI query intents.",
+    audiences: ["analytics", "reporting"],
+    systemPrompt: NL_QUERY_SYSTEM_PROMPT,
+    userPrompt: NL_QUERY_USER_PROMPT,
+    model: "claude-opus",
+    temperature: 0.3,
+    maxTokens: 1000,
+  },
+};
+
 const parseCommaList = (value?: string) => {
   if (!value) return [];
   return value
     .split(",")
     .map((item) => item.trim())
     .filter((item) => item.length > 0);
+};
+
+const parseNumber = (value?: string) => {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 };
 
 const getConnectionString = (): string => {
@@ -48,20 +115,23 @@ const getConnectionString = (): string => {
 };
 
 const buildTemplateInput = () => {
-  const key = process.env["AI_PROMPT_KEY"] ?? "report-summary";
-  const name = process.env["AI_PROMPT_NAME"] ?? "Report Summary";
-  const description =
-    process.env["AI_PROMPT_DESCRIPTION"] ??
-    "Summarize report metrics into a narrative with highlights.";
-  const audiences =
-    parseCommaList(process.env["AI_PROMPT_AUDIENCES"]).length > 0
-      ? parseCommaList(process.env["AI_PROMPT_AUDIENCES"])
-      : ["board", "operations"];
+  const presetKey =
+    process.env["AI_PROMPT_PRESET"] ?? process.env["AI_PROMPT_KEY"] ?? "report-summary";
+  const preset = PROMPT_PRESETS[presetKey] ?? PROMPT_PRESETS["report-summary"];
+
+  const key = process.env["AI_PROMPT_KEY"] ?? preset.key;
+  const name = process.env["AI_PROMPT_NAME"] ?? preset.name;
+  const description = process.env["AI_PROMPT_DESCRIPTION"] ?? preset.description;
+  const audiencesFromEnv = parseCommaList(process.env["AI_PROMPT_AUDIENCES"]);
+  const audiences = audiencesFromEnv.length > 0 ? audiencesFromEnv : preset.audiences;
   const organizationId = process.env["AI_PROMPT_ORG_ID"] ?? null;
-  const systemPrompt = process.env["AI_PROMPT_SYSTEM_PROMPT"] ?? DEFAULT_SYSTEM_PROMPT;
-  const userPrompt = process.env["AI_PROMPT_USER_PROMPT"] ?? DEFAULT_USER_PROMPT;
+  const systemPrompt = process.env["AI_PROMPT_SYSTEM_PROMPT"] ?? preset.systemPrompt;
+  const userPrompt = process.env["AI_PROMPT_USER_PROMPT"] ?? preset.userPrompt;
   const model =
-    process.env["AI_PROMPT_MODEL"] ?? process.env["AI_TEXT_MODEL"] ?? "gpt-4o";
+    process.env["AI_PROMPT_MODEL"] ?? process.env["AI_TEXT_MODEL"] ?? preset.model;
+  const temperature =
+    parseNumber(process.env["AI_PROMPT_TEMPERATURE"]) ?? preset.temperature;
+  const maxTokens = parseNumber(process.env["AI_PROMPT_MAX_TOKENS"]) ?? preset.maxTokens;
   const createdBy = process.env["AI_PROMPT_CREATED_BY"] ?? null;
   const notes = process.env["AI_PROMPT_VERSION_NOTES"] ?? "Seeded via seed-ai-prompts.ts";
 
@@ -81,6 +151,8 @@ const buildTemplateInput = () => {
     systemPrompt,
     userPrompt,
     model,
+    temperature,
+    maxTokens,
     createdBy,
     notes,
     variables,
@@ -125,6 +197,8 @@ const seedPrompt = async (
       systemPrompt: input.systemPrompt,
       userPrompt: input.userPrompt,
       model: input.model,
+      ...(input.temperature != null ? { temperature: input.temperature } : {}),
+      ...(input.maxTokens != null ? { maxTokens: input.maxTokens } : {}),
       variables: input.variables,
       notes: input.notes,
       createdBy: input.createdBy,

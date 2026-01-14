@@ -5,21 +5,19 @@ import type { AiModelDefaults, AiProvider, AiQuotaConfig } from "./ai.types";
 
 type AiProviderConfig = {
   provider: AiProvider;
-  apiKey: string;
-  baseUrl?: string;
-  organization?: string;
+  region?: string;
   timeoutMs: number;
   maxRetries: number;
 };
 
 const DEFAULT_TEXT_MODELS: Record<AiProvider, string> = {
-  openai: "gpt-4o",
-  anthropic: "claude-sonnet-4-5",
+  bedrock: "claude-opus",
 };
 
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_DAILY_WINDOW_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_EMBED_MODEL = "cohere.embed-v4:0";
 
 const DEFAULT_QUOTAS: Record<TenantKey, AiQuotaConfig> = {
   qc: {
@@ -36,18 +34,11 @@ const DEFAULT_QUOTAS: Record<TenantKey, AiQuotaConfig> = {
   },
 };
 
-const resolveProvider = (): AiProvider => {
-  if (env.AI_TEXT_PROVIDER) return env.AI_TEXT_PROVIDER;
-  if (env.OPENAI_API_KEY) return "openai";
-  if (env.ANTHROPIC_API_KEY) return "anthropic";
-  return "openai";
-};
-
 const resolveTextModel = (provider: AiProvider, model?: string) =>
   model ?? DEFAULT_TEXT_MODELS[provider];
 
 export const getAiTextDefaults = (): AiModelDefaults => {
-  const provider = resolveProvider();
+  const provider: AiProvider = "bedrock";
   const defaults: AiModelDefaults = {
     provider,
     model: resolveTextModel(provider, env.AI_TEXT_MODEL),
@@ -67,78 +58,25 @@ export const getAiTextDefaults = (): AiModelDefaults => {
 };
 
 export const getAiTextProviderConfig = (): AiProviderConfig => {
-  const defaults = getAiTextDefaults();
   const timeoutMs = env.AI_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS;
   const maxRetries = env.AI_MAX_RETRIES ?? DEFAULT_MAX_RETRIES;
 
-  if (defaults.provider === "openai") {
-    const apiKey = env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OPENAI_API_KEY is required for OpenAI provider.");
-    }
-    const config: AiProviderConfig = {
-      provider: "openai",
-      apiKey,
-      timeoutMs,
-      maxRetries,
-    };
-
-    if (env.OPENAI_BASE_URL) {
-      config.baseUrl = env.OPENAI_BASE_URL;
-    }
-    if (env.OPENAI_ORG_ID) {
-      config.organization = env.OPENAI_ORG_ID;
-    }
-
-    return config;
-  }
-
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY is required for Anthropic provider.");
-  }
-
-  const config: AiProviderConfig = {
-    provider: "anthropic",
-    apiKey,
+  return {
+    provider: "bedrock",
+    region: env.AWS_REGION ?? "ca-central-1",
     timeoutMs,
     maxRetries,
   };
-
-  if (env.ANTHROPIC_BASE_URL) {
-    config.baseUrl = env.ANTHROPIC_BASE_URL;
-  }
-
-  return config;
 };
 
 export const getAiEmbedConfig = (): AiProviderConfig & { model: string } => {
-  const provider = env.AI_EMBED_PROVIDER ?? resolveProvider();
-  if (provider !== "openai") {
-    throw new Error("Only OpenAI embeddings are supported right now.");
-  }
-
-  const apiKey = env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is required for embeddings.");
-  }
-
-  const config: AiProviderConfig & { model: string } = {
-    provider: "openai",
-    apiKey,
+  return {
+    provider: "bedrock",
+    region: env.AWS_REGION ?? "ca-central-1",
     timeoutMs: env.AI_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS,
     maxRetries: env.AI_MAX_RETRIES ?? DEFAULT_MAX_RETRIES,
-    model: env.AI_EMBED_MODEL ?? "text-embedding-3-large",
+    model: env.AI_EMBED_MODEL ?? DEFAULT_EMBED_MODEL,
   };
-
-  if (env.OPENAI_BASE_URL) {
-    config.baseUrl = env.OPENAI_BASE_URL;
-  }
-  if (env.OPENAI_ORG_ID) {
-    config.organization = env.OPENAI_ORG_ID;
-  }
-
-  return config;
 };
 
 export const getAiQuotaConfig = (): AiQuotaConfig => {

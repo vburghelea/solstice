@@ -58,6 +58,9 @@ export type {
   WidgetType,
 } from "./bi.schemas";
 
+export { queryIntentSchema } from "./nl-query/nl-query.schemas";
+export type { QueryIntent } from "./nl-query/nl-query.schemas";
+
 // =============================================================================
 // Types (complex/internal types)
 // =============================================================================
@@ -108,6 +111,12 @@ export {
   updateDashboard,
   updateWidget,
 } from "./bi.mutations";
+
+// =============================================================================
+// Server Functions - NL Query
+// =============================================================================
+
+export { executeNlQuery, interpretNlQuery } from "./nl-query/nl-query.mutations";
 
 // =============================================================================
 // Engine (internal - exported for testing)

@@ -41,22 +41,22 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand Colors - Quadball Canada */
-  --color-brand-red: #d82929;
-  --color-brand-red-dark: #b92323;
-  --color-brand-dark: #1a1a1a;
-  --color-brand-light: #ffffff;
+  /* Brand Colors - use CSS variable references for tenant theming */
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
 
-  /* Admin Theme Colors */
-  --color-admin-primary: #0c7ff2;
-  --color-admin-secondary: #f0f2f5;
-  --color-admin-text-primary: #111418;
-  --color-admin-text-secondary: #60758a;
-  --color-admin-border: #dbe0e6;
-  --color-admin-status-active-bg: #dcfce7;
-  --color-admin-status-active-text: #166534;
-  --color-admin-status-inactive-bg: #fee2e2;
-  --color-admin-status-inactive-text: #991b1b;
+  /* Admin Theme Colors - use CSS variable references for tenant theming */
+  --color-admin-primary: var(--admin-primary);
+  --color-admin-secondary: var(--admin-secondary);
+  --color-admin-text-primary: var(--admin-text-primary);
+  --color-admin-text-secondary: var(--admin-text-secondary);
+  --color-admin-border: var(--admin-border);
+  --color-admin-status-active-bg: var(--admin-status-active-bg);
+  --color-admin-status-active-text: var(--admin-status-active-text);
+  --color-admin-status-inactive-bg: var(--admin-status-inactive-bg);
+  --color-admin-status-inactive-text: var(--admin-status-inactive-text);
 
   /* Font Family */
   --font-family-sans: "Plus Jakarta Sans", "Noto Sans", system-ui, sans-serif;
@@ -64,6 +64,24 @@
 
 :root {
   --radius: 0.625rem;
+
+  /* Brand Colors - Quadball Canada defaults */
+  --brand-red: #d82929;
+  --brand-red-dark: #b92323;
+  --brand-dark: #1a1a1a;
+  --brand-light: #ffffff;
+
+  /* Admin Theme Colors - defaults */
+  --admin-primary: #0c7ff2;
+  --admin-secondary: #f0f2f5;
+  --admin-text-primary: #111418;
+  --admin-text-secondary: #60758a;
+  --admin-border: #dbe0e6;
+  --admin-status-active-bg: #dcfce7;
+  --admin-status-active-text: #166534;
+  --admin-status-inactive-bg: #fee2e2;
+  --admin-status-inactive-text: #991b1b;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -98,11 +116,33 @@
 }
 
 [data-tenant="viasport"] {
-  --color-brand-red: #1b5fad;
-  --color-brand-red-dark: #164e8d;
-  --color-admin-primary: #1b5fad;
-  --color-admin-secondary: #e6eef8;
-  --color-admin-text-secondary: #506a82;
+  /* Brand Primary - Dark Teal */
+  --brand-red: #003b4d;
+  --brand-red-dark: #002633;
+
+  /* Admin Theme - Teal */
+  --admin-primary: #00675b;
+  --admin-secondary: #f8fafb;
+  --admin-text-primary: #1a2b32;
+  --admin-text-secondary: #4a5d66;
+  --admin-border: #e2e8eb;
+
+  /* Status Colors - viaSport greens */
+  --admin-status-active-bg: #e8f7f1;
+  --admin-status-active-text: #00675b;
+  /* Keep inactive red for clarity */
+}
+
+/* viaSport Navigation - Intentional Accent Pattern */
+[data-tenant="viasport"] .nav-item:hover {
+  background-color: rgba(0, 59, 77, 0.05);
+}
+
+[data-tenant="viasport"] .nav-item-active {
+  background-color: rgba(0, 59, 77, 0.05);
+  border-left: 4px solid #003b4d;
+  color: #003b4d;
+  padding-left: 12px; /* Compensate for border to maintain alignment */
 }
 
 .dark {

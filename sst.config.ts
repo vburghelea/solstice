@@ -680,6 +680,12 @@ export default $config({
         importBatchTask,
         ...Object.values(secrets),
       ],
+      permissions: [
+        {
+          actions: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+          resources: ["arn:aws:bedrock:ca-central-1::foundation-model/*"],
+        },
+      ],
       vpc,
       environment: {
         // Runtime environment detection

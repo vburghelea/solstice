@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import type { FormDefinition } from "~/features/forms/forms.schemas";
 import { sanitizePayload, validateFormPayload } from "~/features/forms/forms.utils";
 import { buildImportFieldLookup, parseImportRow } from "~/features/imports/imports.utils";
@@ -45,6 +45,28 @@ const requireOrgAccess = async (userId: string, organizationId: string) => {
   const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
   return requireOrganizationAccess({ userId, organizationId });
 };
+
+type ImportTaskResource = {
+  cluster: string;
+  taskDefinition: string;
+  subnets: string[];
+  securityGroups: string[];
+  assignPublicIp: boolean;
+  containers: string[];
+};
+
+const getImportTask = createServerOnlyFn(
+  async (): Promise<ImportTaskResource | undefined> => {
+    try {
+      const { Resource } = await import("sst");
+      if (!Resource) return undefined;
+      const resources = Resource as unknown as Record<string, unknown>;
+      return resources["SinImportBatchTask"] as ImportTaskResource | undefined;
+    } catch {
+      return undefined;
+    }
+  },
+);
 
 export const createImportJob = createServerFn({ method: "POST" })
   .inputValidator(zod$(createImportJobSchema))
@@ -969,19 +991,7 @@ export const runBatchImport = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await assertFeatureEnabled("sin_admin_imports");
     const actorUserId = await requireSessionUserId();
-    const { Resource } = await import("sst");
-
-    type ImportTaskResource = {
-      cluster: string;
-      taskDefinition: string;
-      subnets: string[];
-      securityGroups: string[];
-      assignPublicIp: boolean;
-      containers: string[];
-    };
-
-    const resources = Resource as unknown as Record<string, unknown>;
-    const importTask = resources["SinImportBatchTask"] as ImportTaskResource | undefined;
+    const importTask = await getImportTask();
 
     if (!importTask?.taskDefinition) {
       const { runBatchImportJob } = await import("~/lib/imports/batch-runner");

@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Playwright MCP**: Use for UI verification; see "Playwright MCP" section at end
 - **SST Console**: https://console.sst.dev/ausjndsfakjdnfakjdsfnak/solstice - View resources, deployments, logs
 - **New Environment Setup**: See `docs/runbooks/new-environment-setup.md` for standing up new stages
+- **Local Development**: See `docs/runbooks/local-development-setup.md` for running SST dev with database connectivity
 - **Database/Tunnel Failures**: When `sst tunnel` or database operations fail, check `docs/runbooks/new-environment-setup.md` for stale bastion IP diagnosis and SSM workaround
 - **Server Functions**: Always use `.inputValidator(schema.parse)` with Zod schemas
 - **Imports**: Avoid `@tanstack/react-start/server` in client code; use dynamic imports or `serverOnly()`
@@ -40,8 +41,9 @@ For creating AI context bundles, see `repomix-configs/README.md`. Pre-configured
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173)
-- `npx sst dev --stage qc-austin` - Start SST dev mode with live Lambda (QC)
-- `npx sst dev --stage sin-austin` - Start SST dev mode with live Lambda (viaSport)
+- `AWS_PROFILE=techdev npx sst dev --stage qc-austin` - Start SST dev mode with live Lambda (QC)
+- `AWS_PROFILE=techdev npx sst dev --stage sin-austin` - Start SST dev mode with live Lambda (viaSport)
+  - **Note**: SST dev requires additional setup (SSM tunnel, `.env` config). See `docs/runbooks/local-development-setup.md`
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run oxlint (fast, ~30ms)
@@ -171,8 +173,8 @@ Required SST secrets:
    - OAuth credentials must be valid (not placeholders) for routes to work
 
 3. **Development Servers**:
-   - `AWS_PROFILE=techdev npx sst dev --stage qc-austin --mode mono` - SST dev mode (QC)
-   - `AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono` - SST dev mode (viaSport)
+   - `AWS_PROFILE=techdev npx sst dev --stage qc-austin` - SST dev mode for local development (QC)
+   - `AWS_PROFILE=techdev npx sst dev --stage sin-austin` - SST dev mode for local development (viaSport)
 
 ### Database Connections
 
@@ -348,6 +350,24 @@ There are three seed/reset scripts with different purposes:
 
    Without `BETTER_AUTH_SECRET`, TOTP secrets are stored unencrypted and verification returns 200 with empty body (no navigation). See `docs/runbooks/new-environment-setup.md` for the full process.
 
+   **For artifact uploads (PDFs, templates, demo files):**
+
+   Add `SIN_ARTIFACTS_BUCKET` to upload file attachments. Without it, the seed completes but skips uploads.
+
+   ```bash
+   # Get bucket name
+   AWS_PROFILE=techdev npx sst shell --stage <stage> -- printenv | grep -i bucket
+
+   # Known buckets:
+   # sin-dev: solstice-sin-dev-sinartifactsbucket-smhmnosc
+   # sin-uat: solstice-sin-uat-sinartifactsbucket-bcxwdzvt
+
+   # Full seed with artifacts
+   DATABASE_URL="..." BETTER_AUTH_SECRET="..." SIN_ARTIFACTS_BUCKET="..." AWS_PROFILE=techdev npx tsx scripts/seed-sin-data.ts --force
+   ```
+
+   See `docs/runbooks/new-environment-setup.md#finding-s3-bucket-names` for details.
+
 4. **`scripts/hard-reset-dev.ts`** - Hard reset for dev databases
    - **Truncates all tables including audit logs** (guarded)
    - Requires `SIN_ALLOW_DEV_RESET=true`
@@ -368,6 +388,53 @@ AWS_PROFILE=techdev npx sst dev --stage sin-austin --mode mono
 # In another terminal, push schema through SST shell
 AWS_PROFILE=techdev npx sst shell --stage sin-austin -- npx drizzle-kit push --force
 ```
+
+#### Clearing Rate Limits
+
+Rate limits are stored in Redis (with in-memory Lambda fallback). Auth rate limit: **5 requests per 15-minute window** per IP.
+
+**To clear rate limits for a user/IP:**
+
+1. Start SSM port forwarding to Redis:
+
+   ```bash
+   # Get NAT instance ID
+   AWS_PROFILE=techdev aws ec2 describe-instances --region ca-central-1 \
+     --filters "Name=tag:sst:stage,Values=<stage>" "Name=instance-state-name,Values=running" \
+     --query 'Reservations[*].Instances[*].InstanceId' --output text
+
+   # Get Redis host
+   AWS_PROFILE=techdev npx sst shell --stage <stage> -- printenv | grep SST_RESOURCE_Redis
+
+   # Start port forward (replace <nat-instance-id> and <redis-host>)
+   AWS_PROFILE=techdev aws ssm start-session \
+     --region ca-central-1 \
+     --target <nat-instance-id> \
+     --document-name AWS-StartPortForwardingSessionToRemoteHost \
+     --parameters '{"host":["<redis-host>"],"portNumber":["6379"],"localPortNumber":["16379"]}'
+   ```
+
+2. Clear rate limit keys:
+   ```bash
+   npx tsx -e "
+   import { createClient } from 'redis';
+   const redis = createClient({
+     url: 'rediss://default:<redis-password>@localhost:16379',
+     socket: { tls: true, rejectUnauthorized: false }
+   });
+   await redis.connect();
+   const keys = await redis.keys('*rate*');
+   console.log('Rate limit keys:', keys);
+   for (const key of keys) { await redis.del(key); console.log('Deleted:', key); }
+   await redis.quit();
+   "
+   ```
+
+**Known Redis hosts:**
+| Stage | Redis Host |
+|---------|------------|
+| sin-dev | master.solstice-sin-dev-rediscluster-rrewcofo.wxtnyu.cac1.cache.amazonaws.com |
+| sin-uat | master.solstice-sin-uat-rediscluster-havkewbm.wxtnyu.cac1.cache.amazonaws.com |
 
 ### Security Features
 
@@ -723,7 +790,7 @@ viaSport will eventually use their own domain; `solsticeapp.ca` serves as the in
 Use Playwright to verify UI changes on localhost:5173.
 
 1. Check if dev server is running: `curl -s http://localhost:5173/api/health`
-   - If not running, start with `AWS_PROFILE=techdev npx sst dev --stage qc-austin --mode mono`
+   - If not running, start with `AWS_PROFILE=techdev npx sst dev --stage qc-austin` (QC) or `--stage sin-austin` (viaSport)
 2. If browser already in use, close first: `mcp__playwright__browser_close`
 3. Always verify UI behavior with MCP before writing/updating E2E tests
 
@@ -740,59 +807,30 @@ Use Playwright to verify UI changes on localhost:5173.
   }
   ```
 
-### Test Users and Access Rights (sin-dev)
+### Test Users and Access Rights (sin-dev, sin-uat)
 
 **IMPORTANT:** Platform roles and organization roles are separate. A user can be a "Platform Admin" but still have no access to org-scoped features like Analytics unless they also have an organization membership.
 
-| User                         | Password        | Platform Role  | Org Membership                 | MFA | Can Access                         |
-| ---------------------------- | --------------- | -------------- | ------------------------------ | --- | ---------------------------------- |
-| `admin@example.com`          | testpassword123 | Solstice Admin | **None**                       | Yes | Platform admin pages only          |
-| `viasport-staff@example.com` | testpassword123 | viaSport Admin | viaSport BC: **owner**         | Yes | **Everything** including Analytics |
-| `pso-admin@example.com`      | testpassword123 | None           | BC Hockey: **admin**           | No  | BC Hockey org features, Analytics  |
-| `club-reporter@example.com`  | testpassword123 | None           | North Shore Club: **reporter** | No  | Club reporting, Analytics          |
-| `member@example.com`         | testpassword123 | None           | Vancouver Minor: **viewer**    | No  | View-only access, NO Analytics     |
+| User                      | Password        | Platform Role  | Org Membership                 | Can Access                         |
+| ------------------------- | --------------- | -------------- | ------------------------------ | ---------------------------------- |
+| `global-admin@demo.com`   | demopassword123 | Solstice Admin | **None**                       | Platform admin pages only          |
+| `viasport-staff@demo.com` | demopassword123 | viaSport Admin | viaSport BC: **owner**         | **Everything** including Analytics |
+| `pso-admin@demo.com`      | demopassword123 | None           | BC Hockey: **admin**           | BC Hockey org features, Analytics  |
+| `club-reporter@demo.com`  | demopassword123 | None           | North Shore Club: **reporter** | Club reporting, Analytics          |
+| `member@demo.com`         | demopassword123 | None           | Vancouver Minor: **viewer**    | View-only access, NO Analytics     |
 
-**For testing Analytics/BI features, use `viasport-staff@example.com`** (has both platform admin and org owner roles).
+**For testing Analytics/BI features, use `viasport-staff@demo.com`** (has both platform admin and org owner roles).
 
-### MFA Authentication for Agents
+### MFA Configuration
 
-When using Playwright MCP to test MFA-protected flows (e.g., admin pages on sin-dev), use **TOTP codes** instead of backup codes. TOTP codes regenerate every 30 seconds and are reusable.
+**MFA is disabled on all demo accounts** for evaluator convenience and simpler agent testing. Users can enable MFA themselves via Settings > Security.
 
-**Users with MFA enabled:**
+To test MFA flows:
 
-- `admin@example.com` / `testpassword123` (Platform Admin - but NO org membership)
-- `viasport-staff@example.com` / `testpassword123` (Platform Admin + viaSport BC owner - **use this for full access**)
-
-**TOTP Secret:** `SIN_UI_TOTP_SECRET` stores the **raw string** in SST secrets.
-
-- **Raw string (for createOTP):** `solstice-test-totp-secret-32char`
-- **Base32 encoded (for otplib):** `ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA`
-
-**Login Flow:**
-
-1. Navigate to `/auth/login`
-2. Enter email and password
-3. Click Login → 2FA prompt appears
-4. Select "Authenticator code" tab (NOT backup code)
-5. Generate a fresh TOTP code (either method works):
-
-   ```bash
-   # Option 1: Better Auth's createOTP (recommended)
-   npx tsx -e "
-   import { createOTP } from '@better-auth/utils/otp';
-   (async () => {
-     const code = await createOTP('solstice-test-totp-secret-32char', { period: 30, digits: 6 }).totp();
-     console.log(code);
-   })();
-   "
-
-   # Option 2: otplib with base32-encoded secret
-   npx tsx -e "import { authenticator } from 'otplib'; console.log(authenticator.generate('ONXWY43UNFRWKLLUMVZXILLUN52HALLTMVRXEZLUFUZTEY3IMFZA'));"
-   ```
-
-6. Enter the 6-digit code and click "Verify code"
-
-**Important:** TOTP codes are time-based (~30 second validity). Generate a fresh code immediately before entering it. If verification fails, generate a new code and retry.
+1. Log in to any demo account
+2. Navigate to Settings > Security
+3. Enable MFA and scan the QR code with an authenticator app
+4. Future logins will require a 6-digit TOTP code
 
 ## Additional Resources
 

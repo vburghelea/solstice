@@ -1,0 +1,15 @@
+{
+  "cookies": [
+    {
+      "name": "__Secure-solstice.two_factor",
+      "value": "2fa-SNs_qvHLMo2Xj7gpOl1h.Ra0hYtI62X7CD9X4XxkaPvsfqMMYJeute8W7sP1wJeE%3D",
+      "domain": "sinuat.solsticeapp.ca",
+      "path": "/",
+      "expires": 1768221742.54876,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

@@ -6,12 +6,12 @@ See Section 1.2 for the shared responsibility summary and AWS Artifact reference
 
 ## Compliance Summary
 
-| Req ID      | Title                             | Status | Built Today                                                     | Remaining Scope |
-| :---------- | :-------------------------------- | :----- | :-------------------------------------------------------------- | :-------------- |
-| SEC-AGG-001 | Authentication and Access Control | Built  | MFA, RBAC, org scoping, user admission                          | None            |
-| SEC-AGG-002 | Monitoring and Threat Detection   | Built  | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None            |
-| SEC-AGG-003 | Privacy and Regulatory Compliance | Built  | Encryption, Canadian hosting, retention controls                | None            |
-| SEC-AGG-004 | Audit Trail and Data Lineage      | Built  | Immutable audit log with hash chain                             | None            |
+| Req ID      | Title                             | Status                     | Evaluation Environment (Jan 2026)                               | Finalization Scope |
+| :---------- | :-------------------------------- | :------------------------- | :-------------------------------------------------------------- | :----------------- |
+| SEC-AGG-001 | Authentication and Access Control | Implemented (Demoable Now) | MFA, RBAC, org scoping, user admission                          | None               |
+| SEC-AGG-002 | Monitoring and Threat Detection   | Implemented (Demoable Now) | AWS WAF, rate limiting, pre-auth lockout, CloudTrail CIS alarms | None               |
+| SEC-AGG-003 | Privacy and Regulatory Compliance | Implemented (Demoable Now) | Encryption, Canadian hosting, retention controls                | None               |
+| SEC-AGG-004 | Audit Trail and Data Lineage      | Implemented (Demoable Now) | Immutable audit log with hash chain                             | None               |
 
 ## SEC-AGG-001: Authentication and Access Control
 
@@ -31,14 +31,14 @@ Users log in securely; only authorized individuals gain access based on role and
 - RBAC and organization scoping are enforced in the API layer.
 - Organization owners and admins manage invites and join requests.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - MFA enrollment and recovery flows.
 - Server-side password policy enforcement (validated: weak passwords blocked with inline errors).
 - Role-based permissions and org membership enforcement.
 - User invitation and join request workflows.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -69,18 +69,18 @@ Security anomalies are flagged, logged, and result in appropriate account safegu
 
 **Network Isolation Option:** For environments requiring enhanced network isolation, AWS WAF can be configured with IP-based allow lists to restrict access to authorized networks. The current configuration uses rate limiting and managed rule sets; IP allow lists can be added per viaSport's security policy.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Pre-auth lockout gating blocks sign-in for locked users before authentication.
 - Rate limiting with Redis-backed sliding window algorithm (5 requests/15 min for auth, in-memory fallback).
 - Login failure thresholds: 5 failures in 15 minutes triggers 30-minute account lockout.
-- AWS WAF WebACL deployed on CloudFront with managed rules (CRS, SQLi, Known Bad Inputs) and edge rate limiting.
+- AWS WAF WebACL deployed on CloudFront with AWS Managed Rule Groups (Common Rule Set, SQLi, Known Bad Inputs) and edge rate limiting.
 - Security event logging to `security_events` table with CloudWatch metrics.
 - CloudTrail audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes, VPC changes, unauthorized API calls).
 - CloudWatch alarms for anomalous request patterns and error rate spikes.
 - Admin notifications for login anomalies and account lockouts.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -111,7 +111,7 @@ The platform is designed to be compliant with PIPA (Personal Information Protect
 
 **Privacy Officer:** Austin Wallace (Delivery Lead) is designated as Privacy Officer responsible for PIPA/PIPEDA compliance. The Privacy Officer has access to all information related to personal data processing and will coordinate with viaSport on privacy impact assessments, data handling procedures, and incident response.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Canadian hosting region (ca-central-1) for all primary data stores (see Section 1.1).
 - AES-256 encryption via AWS KMS for RDS and S3 (encryption at rest).
@@ -120,7 +120,7 @@ The platform is designed to be compliant with PIPA (Personal Information Protect
 - Retention enforcement and legal hold tooling.
 - CloudTrail API audit logging with CIS Benchmark alarms (root usage, IAM changes, security group changes).
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -144,13 +144,13 @@ Auditors can filter logs by user or record ID and export results; tamper-evident
 - Hash chain verification detects tampering: each log entry hashes the previous entry, creating a tamper-evident trail. Archived logs are stored with S3 Object Lock (immutable storage) for long-term integrity.
 - Admins can filter and export logs.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Append-only audit log with hash chain verification.
 - Export and filter UI for audit logs.
 - Audit log archives stored in S3 Deep Archive.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 

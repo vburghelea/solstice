@@ -4,7 +4,7 @@
 
 ### Hosting Solution
 
-The platform is hosted entirely on Amazon Web Services in a serverless architecture that reduces infrastructure overhead.
+Primary data storage and compute run in AWS Canada (Central) (ca-central-1) in a serverless architecture that reduces infrastructure overhead. CloudFront is used for static delivery with authenticated content configured to avoid edge caching.
 
 | Component        | AWS Service       | Purpose                                    |
 | :--------------- | :---------------- | :----------------------------------------- |
@@ -79,12 +79,12 @@ No additional sub-processors are used.
 
 ### Recovery Objectives
 
-| Metric                         | Target              | Evidence                               |
-| :----------------------------- | :------------------ | :------------------------------------- |
-| Recovery Point Objective (RPO) | 1 hour (production) | Final production drill TBD             |
-| Recovery Time Objective (RTO)  | 4 hours             | sin-dev drill completed, final run TBD |
+| Metric                         | Target              | Evidence                                |
+| :----------------------------- | :------------------ | :-------------------------------------- |
+| Recovery Point Objective (RPO) | 1 hour (production) | DR exercise 2026-01-08: 0 min achieved  |
+| Recovery Time Objective (RTO)  | 4 hours             | DR exercise 2026-01-08: 16 min achieved |
 
-Evidence for the latest DR drill is summarized in Section 1.3.
+DR exercise type: RDS Point-in-Time Recovery (PITR). No data loss observed. Evidence for the latest DR exercise is summarized in Section 1.3 and Appendix C.
 
 ### High Availability
 
@@ -102,7 +102,7 @@ Encryption evidence is summarized in Section 1.2.
 
 ### Audit Log Retention and Archival
 
-Audit logs are immutable and archived to S3 Deep Archive based on retention policy configuration. Retention durations and archive schedules will be finalized with viaSport (TBD). Legal holds are supported to prevent deletion.
+Audit logs are immutable and archived to S3 Deep Archive based on retention policy configuration. Retention durations and archive schedules will be confirmed with viaSport during Discovery. Legal holds are supported to prevent deletion.
 
 ### Why PostgreSQL (Not a Columnar Warehouse)
 

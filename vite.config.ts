@@ -32,8 +32,9 @@ export default defineConfig(({ mode }) => {
   // Ensure .env variables are loaded into process.env for server-side code
   const env = loadEnv(mode, process.cwd(), "");
   // Merge loaded env into process.env
+  // Also replace empty strings (SST dev mode passes empty strings for unresolved secrets)
   for (const [key, val] of Object.entries(env)) {
-    if (!(key in process.env)) process.env[key] = val;
+    if (!(key in process.env) || process.env[key] === "") process.env[key] = val;
   }
 
   const tenantKey = env["TENANT_KEY"] || env["VITE_TENANT_KEY"] || "qc";

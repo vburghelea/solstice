@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  real,
   jsonb,
   pgEnum,
   pgTable,
@@ -158,5 +159,29 @@ export const biQueryLog = pgTable("bi_query_log", {
   executionTimeMs: integer("execution_time_ms"),
   previousLogId: uuid("previous_log_id"),
   checksum: text("checksum"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const biNlQueryLog = pgTable("bi_nl_query_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
+  organizationId: uuid("organization_id").references(() => organizations.id),
+  datasetId: text("dataset_id"),
+  question: text("question"),
+  intent: jsonb("intent").$type<JsonRecord>(),
+  confidence: real("confidence"),
+  approved: boolean("approved").notNull().default(false),
+  stage: text("stage").notNull(),
+  provider: text("provider"),
+  model: text("model"),
+  latencyMs: integer("latency_ms"),
+  executionTimeMs: integer("execution_time_ms"),
+  rowsReturned: integer("rows_returned"),
+  queryHash: text("query_hash").notNull(),
+  previousLogId: uuid("previous_log_id"),
+  checksum: text("checksum"),
+  errorMessage: text("error_message"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

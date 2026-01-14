@@ -12,7 +12,7 @@ export const viasportTenant: TenantConfig = {
     supportEmail: "support@viasport.ca",
     supportName: "viaSport BC Team",
     logoVariant: "viasport",
-    themeColor: "#1b5fad",
+    themeColor: "#003B4D",
   },
   features: {
     qc_portal: false,
@@ -37,6 +37,7 @@ export const viasportTenant: TenantConfig = {
     sin_forms: true,
     sin_imports: true,
     sin_analytics: true,
+    sin_nl_query: true,
     sin_analytics_sql_workbench: true,
     sin_ai: true,
     sin_templates: true,

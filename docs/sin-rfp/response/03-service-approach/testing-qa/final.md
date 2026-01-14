@@ -8,6 +8,7 @@
 | :------------------- | :-------------------------------------------------------- | :--------------------------------------- | :--------------------------------------------- |
 | Unit and Integration | Vitest \+ Testing Library                                 | Component and function testing           | Every commit                                   |
 | End-to-End           | Playwright                                                | Full user flow testing                   | Every commit                                   |
+| Accessibility        | Axe-core + Playwright                                     | WCAG 2.1 AA compliance validation        | Every commit                                   |
 | Property-Based       | fast-check                                                | Access control and audit integrity       | Every commit                                   |
 | Performance          | Lighthouse, k6                                            | Load testing and Core Web Vitals         | Pre-release and before major reporting periods |
 | Security (Automated) | SAST \+ SCA (for example CodeQL/Semgrep, Dependabot/Snyk) | Find code and dependency vulnerabilities | Every commit                                   |
@@ -19,21 +20,34 @@ Automated tests run in CI and gate merges where applicable. Coverage focuses on 
 
 ### Performance Testing
 
-Performance testing is conducted in sin-perf with production-scale data. Final validation runs will be executed before submission (TBD).
+Performance testing was conducted in sin-perf with production-scale data on 2026-01-08.
 
-| Metric              | Value             | Target           | Status   |
-| :------------------ | :---------------- | :--------------- | :------- |
-| Data volume         | 20.1 million rows | Production scale | Achieved |
-| p95 latency         | 250ms             | \<500ms          | Pass     |
-| p50 latency         | 130ms             | N/A              | Pass     |
-| Concurrent users    | 15                | N/A              | Pass     |
-| Server errors (5xx) | 0                 | 0                | Pass     |
+| Metric              | Value      | Target           | Status   |
+| :------------------ | :--------- | :--------------- | :------- |
+| Data volume         | 20M rows   | Production scale | Achieved |
+| p95 latency         | 162ms      | \<500ms          | Pass     |
+| p50 latency         | 98ms       | N/A              | Pass     |
+| Concurrent users    | 25         | N/A              | Pass     |
+| Throughput          | 12.3 req/s | N/A              | Pass     |
+| Server errors (5xx) | 0          | 0                | Pass     |
 
-Evidence is summarized in Section 1.3 (final run TBD).
+Evidence is summarized in Section 1.3 and Appendix C.
 
 ### Core Web Vitals
 
-Lighthouse results from the prototype are recorded as noted in Section 1.3. Final Lighthouse runs will be completed before submission (TBD).
+Lighthouse results from sin-perf are recorded in Section 1.3 and Appendix C. Scores: Performance 90/100, FCP 1.0s, LCP 1.0s, TTI 1.1s, CLS 0, Accessibility 100/100.
+
+### Accessibility Testing
+
+Automated accessibility testing validates WCAG 2.1 Level AA compliance:
+
+| Test Type                   | Tooling               | Coverage                                      |
+| :-------------------------- | :-------------------- | :-------------------------------------------- |
+| Automated scans             | Axe-core + Playwright | Auth flows, dashboard, forms, analytics       |
+| Keyboard navigation         | Playwright            | Skip links, focus management, tab order       |
+| Screen reader compatibility | Manual verification   | Live regions, ARIA labels, semantic structure |
+
+Accessibility tests run in CI alongside functional tests, preventing regressions from reaching production.
 
 ### Security Testing
 

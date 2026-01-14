@@ -14,12 +14,24 @@ const isAwsLambdaRuntime =
 const isViteRuntime = typeof import.meta.env !== "undefined";
 
 // Avoid loading .env when SST bindings are present to prevent mixing stages
+// EXCEPTION: SST dev mode may pass empty strings for secrets, so we need fallback loading
 const hasSstBindings =
   process.env["SST_SKIP_LOCAL"] === "true" ||
   Object.keys(process.env).some((key) => key.startsWith("SST_RESOURCE_"));
 
-if (!isAwsLambdaRuntime && !isViteRuntime && !hasSstBindings) {
-  dotenv.config();
+// Check if critical secrets are missing (SST dev passes empty strings)
+const criticalSecretsMissing =
+  !process.env["BETTER_AUTH_SECRET"] || !process.env["DATABASE_URL"];
+
+// In Vite SSR mode, import.meta.env is defined but we still need .env loading for server secrets
+// Only skip dotenv in actual Lambda runtime or when SST bindings have valid values
+const shouldLoadDotenv =
+  !isAwsLambdaRuntime && (!hasSstBindings || criticalSecretsMissing);
+
+if (shouldLoadDotenv) {
+  // Load .env with override to replace empty strings from SST dev mode
+  // This is safe because we only do this when critical secrets are missing
+  dotenv.config({ override: criticalSecretsMissing });
 }
 
 import { createEnv } from "@t3-oss/env-core";
@@ -93,15 +105,8 @@ export const env = createEnv({
     EMAIL_FROM_ADDRESS: z.email().optional(),
     EMAIL_FROM_NAME: z.string().optional(),
 
-    // AI Providers
-    OPENAI_API_KEY: z.string().optional(),
-    OPENAI_ORG_ID: z.string().optional(),
-    OPENAI_BASE_URL: z.url().optional(),
-    ANTHROPIC_API_KEY: z.string().optional(),
-    ANTHROPIC_BASE_URL: z.url().optional(),
-    AI_TEXT_PROVIDER: z.enum(["openai", "anthropic"]).optional(),
+    // AI (Bedrock)
     AI_TEXT_MODEL: z.string().optional(),
-    AI_EMBED_PROVIDER: z.enum(["openai", "anthropic"]).optional(),
     AI_EMBED_MODEL: z.string().optional(),
     AI_MAX_RETRIES: z.coerce.number().int().min(0).optional(),
     AI_TIMEOUT_MS: z.coerce.number().int().min(0).optional(),
@@ -129,6 +134,7 @@ export const env = createEnv({
 
     // SST/AWS Lambda
     SST_STAGE: z.string().optional(),
+    AWS_REGION: z.string().optional(),
     AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
     AWS_EXECUTION_ENV: z.string().optional(),
     SIN_ARTIFACTS_BUCKET: z.string().optional(),

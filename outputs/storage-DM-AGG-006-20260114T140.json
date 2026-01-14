@@ -1,0 +1,35 @@
+{
+  "cookies": [
+    {
+      "name": "__Secure-solstice.session_token",
+      "value": "OEbk4nZMSzm5n7e8EjaQFqZK1EAuwWZU.i7N0QuRO%2B2YEIOpI9bV730eWJ3mO1OxtTwjQ17kW3jk%3D",
+      "domain": "sinuat.solsticeapp.ca",
+      "path": "/",
+      "expires": 1768428142.762401,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "active_org_id",
+      "value": "a0000000-0000-4000-8001-000000000001",
+      "domain": "sinuat.solsticeapp.ca",
+      "path": "/",
+      "expires": 1770991346.077908,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://sinuat.solsticeapp.ca",
+      "localStorage": [
+        {
+          "name": "active_org_id",
+          "value": "a0000000-0000-4000-8001-000000000001"
+        }
+      ]
+    }
+  ]
+}

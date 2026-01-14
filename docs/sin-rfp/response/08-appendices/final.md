@@ -24,18 +24,28 @@ To protect evaluator accounts and align with security best practices, credential
 1. Contact [support@solsticeapp.ca](mailto:support@solsticeapp.ca) with evaluator names and email addresses
 2. Receive the Evaluator Access Pack via secure email
 3. Credentials include accounts for multiple personas (viaSport Staff, PSO Admin, Club Reporter, Viewer)
-4. MFA demonstration available on the viaSport Staff account
 
 Credentials will be rotated periodically and disabled after the evaluation window closes.
 
 ### Test Account Personas
 
-| Persona        | Access Level                                  | MFA                             |
-| :------------- | :-------------------------------------------- | :------------------------------ |
-| viaSport Staff | Full admin with cross-org access              | Enabled (demonstrates MFA flow) |
-| PSO Admin      | BC Hockey organization administrator          | Disabled for convenience        |
-| Club Reporter  | North Shore Club reporter (submission access) | Disabled for convenience        |
-| Viewer         | Read-only access to assigned organization     | Disabled for convenience        |
+| Persona        | Access Level                                  |
+| :------------- | :-------------------------------------------- |
+| viaSport Staff | Full admin with cross-org access              |
+| PSO Admin      | BC Hockey organization administrator          |
+| Club Reporter  | North Shore Club reporter (submission access) |
+| Viewer         | Read-only access to assigned organization     |
+
+### Multi-Factor Authentication (MFA)
+
+MFA is disabled on all demo accounts for evaluator convenience. To evaluate the MFA enrollment and authentication flow:
+
+1. Log in to any demo account
+2. Navigate to **Settings > Security**
+3. Click **Enable MFA** and scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)
+4. Future logins will require a 6-digit code from your authenticator
+
+This demonstrates SEC-AGG-001 compliance (authentication and access control).
 
 ### Suggested Evaluation Walkthrough
 
@@ -78,33 +88,41 @@ Load testing was conducted in the sin-perf environment on January 8, 2026. Resul
 
 ### Data Volume
 
-| Table                    | Rows      |
-| :----------------------- | :-------- |
-| form_submissions         | 10.0M     |
-| audit_logs               | 7.0M      |
-| notifications            | 2.0M      |
-| bi_query_log             | 1.0M      |
-| form_submission_versions | 0.1M      |
-| **Total**                | **20.1M** |
+| Table            | Rows    |
+| :--------------- | :------ |
+| audit_logs       | 10.0M   |
+| form_submissions | 8.0M    |
+| notifications    | 2.0M    |
+| **Total**        | **20M** |
 
 ### Performance Results
 
-| Metric              | Value | Target  | Status |
-| :------------------ | :---- | :------ | :----- |
-| p95 latency         | 250ms | \<500ms | Pass   |
-| p50 latency         | 130ms | N/A     | Pass   |
-| Concurrent users    | 15    | N/A     | Pass   |
-| Server errors (5xx) | 0     | 0       | Pass   |
+| Metric              | Value      | Target  | Status |
+| :------------------ | :--------- | :------ | :----- |
+| p95 latency         | 162ms      | \<500ms | Pass   |
+| p50 latency         | 98ms       | N/A     | Pass   |
+| Concurrent users    | 25         | N/A     | Pass   |
+| Throughput          | 12.3 req/s | N/A     | Pass   |
+| Server errors (5xx) | 0          | 0       | Pass   |
 
 ### Lighthouse Scores
 
-| Metric                   | Value  | Target   | Status |
-| :----------------------- | :----- | :------- | :----- |
-| Performance Score        | 93/100 | \>80     | Pass   |
-| Largest Contentful Paint | 2284ms | \<2500ms | Pass   |
-| Time to First Byte       | 380ms  | \<500ms  | Pass   |
-| Total Blocking Time      | 88ms   | \<300ms  | Pass   |
-| Cumulative Layout Shift  | 0      | \<0.1    | Pass   |
+| Metric                   | Value   | Target | Status |
+| :----------------------- | :------ | :----- | :----- |
+| Performance Score        | 90/100  | \>80   | Pass   |
+| First Contentful Paint   | 1.0s    | \<1.8s | Pass   |
+| Largest Contentful Paint | 1.0s    | \<2.5s | Pass   |
+| Time to Interactive      | 1.1s    | \<3.8s | Pass   |
+| Cumulative Layout Shift  | 0       | \<0.1  | Pass   |
+| Accessibility Score      | 100/100 | \>90   | Pass   |
+
+### DR Exercise Results (2026-01-08)
+
+| Metric                         | Target   | Achieved | Status |
+| :----------------------------- | :------- | :------- | :----- |
+| Recovery Point Objective (RPO) | 1 hour   | 0 min    | Pass   |
+| Recovery Time Objective (RTO)  | 4 hours  | 16 min   | Pass   |
+| Records validated              | 20M rows | 20M rows | Pass   |
 
 ## Appendix D: Security Architecture Summary
 
@@ -201,23 +219,23 @@ Tyler Piller is a cybersecurity veteran with over 10 years of experience in oper
 
 ## Appendix G: Glossary
 
-| Term | Definition                                                      |
-| :--- | :-------------------------------------------------------------- |
-| AT   | Assistive Technology                                            |
-| BCAR | British Columbia Activity Records, legacy system being replaced |
-| BCSI | BC Sport Intelligence, legacy system being replaced             |
-| CIS  | Center for Internet Security                                    |
-| IA   | Information Architecture                                        |
-| MFA  | Multi-Factor Authentication                                     |
-| PSO  | Provincial Sport Organization                                   |
-| RBAC | Role-Based Access Control                                       |
-| RDS  | Amazon Relational Database Service                              |
-| SIN  | Strength in Numbers (project name)                              |
-| SME  | Subject Matter Expert                                           |
-| SST  | Serverless Stack (infrastructure as code framework)             |
-| SUS  | System Usability Scale                                          |
-| TOTP | Time-based One-Time Password                                    |
-| UAT  | User Acceptance Testing                                         |
+| Term | Definition                                                |
+| :--- | :-------------------------------------------------------- |
+| AT   | Assistive Technology                                      |
+| BCAR | BC Activity Reporter, legacy system being replaced        |
+| BCSI | BC Sport Information System, legacy system being replaced |
+| CIS  | Center for Internet Security                              |
+| IA   | Information Architecture                                  |
+| MFA  | Multi-Factor Authentication                               |
+| PSO  | Provincial Sport Organization                             |
+| RBAC | Role-Based Access Control                                 |
+| RDS  | Amazon Relational Database Service                        |
+| SIN  | Strength in Numbers (project name)                        |
+| SME  | Subject Matter Expert                                     |
+| SST  | Serverless Stack (infrastructure as code framework)       |
+| SUS  | System Usability Scale                                    |
+| TOTP | Time-based One-Time Password                              |
+| UAT  | User Acceptance Testing                                   |
 
 ## Appendix H: Contact Information
 

@@ -267,7 +267,7 @@ export const logAuditEntry = createServerOnlyFn(async (input: AuditEntryInput) =
     await tx.execute(sql`SELECT pg_advisory_xact_lock(${AUDIT_CHAIN_LOCK_ID})`);
 
     const [previous] = await tx
-      .select({ entryHash: auditLogs.entryHash })
+      .select({ entryHash: auditLogs.entryHash, createdAt: auditLogs.createdAt })
       .from(auditLogs)
       .orderBy(desc(auditLogs.createdAt), desc(auditLogs.id))
       .limit(1);
@@ -282,11 +282,15 @@ export const logAuditEntry = createServerOnlyFn(async (input: AuditEntryInput) =
       occurredAtValue instanceof Date
         ? occurredAtValue
         : new Date(occurredAtValue as string | number);
+    const resolvedOccurredAt =
+      previous?.createdAt && occurredAt <= previous.createdAt
+        ? new Date(previous.createdAt.getTime() + 1)
+        : occurredAt;
 
     const id = randomUUID();
     const payload = {
       id,
-      occurredAt,
+      occurredAt: resolvedOccurredAt,
       action: input.action,
       actionCategory: input.actionCategory ?? inferCategory(input.action),
       actorUserId: input.actorUserId ?? null,
@@ -306,8 +310,8 @@ export const logAuditEntry = createServerOnlyFn(async (input: AuditEntryInput) =
 
     await tx.insert(auditLogs).values({
       id,
-      occurredAt,
-      createdAt: occurredAt,
+      occurredAt: resolvedOccurredAt,
+      createdAt: resolvedOccurredAt,
       actorUserId: payload.actorUserId,
       actorOrgId: payload.actorOrgId,
       actorIp: payload.actorIp ?? undefined,
@@ -408,8 +412,14 @@ export type AuditHashRow = {
 };
 
 export const verifyAuditHashChainRows = async (rows: AuditHashRow[]) => {
-  const invalidIds: string[] = [];
-  let previousHash: string | null = null;
+  if (rows.length === 0) {
+    return { valid: true, invalidIds: [] };
+  }
+
+  const invalidIds = new Set<string>();
+  const visited = new Set<string>();
+  const rowsByPrevHash = new Map<string | null, AuditHashRow[]>();
+  const rowsByEntryHash = new Map<string, AuditHashRow>();
 
   const buildPayload = (
     row: AuditHashRow,
@@ -434,26 +444,88 @@ export const verifyAuditHashChainRows = async (rows: AuditHashRow[]) => {
   });
 
   for (const row of rows) {
-    const payload = buildPayload(row, previousHash, {
-      includeId: true,
-      includeOccurredAt: true,
-    });
-    let expectedHash = await hashValue(payload);
-
-    if (row.prevHash !== previousHash || row.entryHash !== expectedHash) {
-      const legacyPayload = buildPayload(row, previousHash, {
-        includeId: false,
-        includeOccurredAt: false,
-      });
-      expectedHash = await hashValue(legacyPayload);
+    if (rowsByEntryHash.has(row.entryHash)) {
+      invalidIds.add(row.id);
+      continue;
     }
 
-    if (row.prevHash !== previousHash || row.entryHash !== expectedHash) {
-      invalidIds.push(row.id);
-    }
-
-    previousHash = row.entryHash;
+    rowsByEntryHash.set(row.entryHash, row);
+    const key = row.prevHash ?? null;
+    const bucket = rowsByPrevHash.get(key) ?? [];
+    bucket.push(row);
+    rowsByPrevHash.set(key, bucket);
   }
 
-  return { valid: invalidIds.length === 0, invalidIds };
+  const roots = rowsByPrevHash.get(null) ?? [];
+  if (roots.length !== 1) {
+    for (const root of roots) {
+      invalidIds.add(root.id);
+    }
+  }
+
+  if (roots.length !== 1) {
+    for (const row of rows) {
+      invalidIds.add(row.id);
+    }
+    return { valid: invalidIds.size === 0, invalidIds: Array.from(invalidIds) };
+  }
+
+  let previousHash: string | null = null;
+  let current: AuditHashRow | undefined = roots[0];
+
+  while (current) {
+    if (visited.has(current.id)) {
+      invalidIds.add(current.id);
+      break;
+    }
+
+    visited.add(current.id);
+
+    if (current.prevHash !== previousHash) {
+      invalidIds.add(current.id);
+    } else {
+      const payload = buildPayload(current, previousHash, {
+        includeId: true,
+        includeOccurredAt: true,
+      });
+      let expectedHash = await hashValue(payload);
+
+      if (current.entryHash !== expectedHash) {
+        const legacyPayload = buildPayload(current, previousHash, {
+          includeId: false,
+          includeOccurredAt: false,
+        });
+        expectedHash = await hashValue(legacyPayload);
+      }
+
+      if (current.entryHash !== expectedHash) {
+        invalidIds.add(current.id);
+      }
+    }
+
+    const nextRows: AuditHashRow[] = rowsByPrevHash.get(current.entryHash) ?? [];
+    if (nextRows.length === 0) {
+      break;
+    }
+
+    if (nextRows.length > 1) {
+      for (const row of nextRows) {
+        invalidIds.add(row.id);
+      }
+      break;
+    }
+
+    previousHash = current.entryHash;
+    current = nextRows[0];
+  }
+
+  if (visited.size !== rowsByEntryHash.size) {
+    for (const row of rows) {
+      if (!visited.has(row.id)) {
+        invalidIds.add(row.id);
+      }
+    }
+  }
+
+  return { valid: invalidIds.size === 0, invalidIds: Array.from(invalidIds) };
 };

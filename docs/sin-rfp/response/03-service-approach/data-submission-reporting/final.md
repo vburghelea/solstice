@@ -26,7 +26,14 @@ The interface adapts to desktop, tablet, and mobile viewports. Core workflows re
 
 ### Accessibility
 
-The interface is built on Radix UI primitives and shadcn/ui components, which provide keyboard navigation and ARIA defaults. Accessibility evidence is summarized in Section 1.3.
+The interface is built on Radix UI primitives and shadcn/ui components, which provide keyboard navigation and ARIA defaults. Beyond these foundations, we have implemented:
+
+- **Form accessibility:** Error messages are announced to screen readers via live regions. A form error summary component auto-focuses on validation failure and provides clickable links to each error field.
+- **Keyboard navigation:** Command palette (Cmd/Ctrl+K) provides keyboard-first navigation. All form controls, buttons, and interactive elements are reachable via Tab.
+- **Alternative interaction modes:** The Pivot Builder offers a button-based mode for users who cannot use drag-and-drop, allowing field addition and reordering via accessible buttons.
+- **Chart accessibility:** Analytics charts include a "View data table" toggle that reveals a properly structured HTML table for screen reader users. A High Contrast color scheme option ensures 3:1+ minimum contrast for data visualization.
+
+Accessibility evidence is summarized in Section 1.3.
 
 ### UX Refinement Process
 
@@ -85,16 +92,17 @@ Detailed functional compliance for forms, submissions, and reporting lives in **
 
 ### Performance Evidence
 
-Lighthouse and load tests were run in the prototype environment. Final validation runs will be completed before submission (TBD).
+Lighthouse and load tests were conducted in the sin-perf environment on 2026-01-08.
 
-| Metric                   | Score or Value | Target   | Status |
-| :----------------------- | :------------- | :------- | :----- |
-| Performance Score        | 93/100         | \>80     | Pass   |
-| Largest Contentful Paint | 2284ms         | \<2500ms | Pass   |
-| Time to First Byte       | 380ms          | \<500ms  | Pass   |
-| Total Blocking Time      | 88ms           | \<300ms  | Pass   |
-| Cumulative Layout Shift  | 0              | \<0.1    | Pass   |
+| Metric                   | Score or Value | Target | Status |
+| :----------------------- | :------------- | :----- | :----- |
+| Performance Score        | 90/100         | \>80   | Pass   |
+| First Contentful Paint   | 1.0s           | \<1.8s | Pass   |
+| Largest Contentful Paint | 1.0s           | \<2.5s | Pass   |
+| Time to Interactive      | 1.1s           | \<3.8s | Pass   |
+| Cumulative Layout Shift  | 0              | \<0.1  | Pass   |
+| Accessibility Score      | 100/100        | \>90   | Pass   |
 
-See Section 1.3 for performance evidence and planned final runs.
+See Section 1.3 and Appendix C for performance evidence.
 
 ---

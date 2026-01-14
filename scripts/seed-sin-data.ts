@@ -9,7 +9,7 @@
  *
  * Run with: npx tsx scripts/seed-sin-data.ts
  *
- * Test users created (all with password: testpassword123):
+ * Test users created (all with password: demopassword123):
  * - admin@example.com - Platform admin (Solstice Admin)
  * - viasport-staff@example.com - viaSport staff (viaSport Admin)
  * - pso-admin@example.com - PSO administrator
@@ -18,7 +18,7 @@
  */
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
+import { hashPassword } from "better-auth/crypto";
 import { createHash, createHmac } from "crypto";
 import dotenv from "dotenv";
 import { like, sql } from "drizzle-orm";
@@ -81,29 +81,11 @@ import {
 } from "../src/db/schema";
 
 // ============================================================================
-// MFA CONFIGURATION FOR TESTING
+// MFA CONFIGURATION
 // ============================================================================
-// Provide a base32-encoded TOTP secret via SIN_UI_TOTP_SECRET so seeded
-// accounts can be validated in local/test environments.
+// MFA is DISABLED by default for all demo accounts to reduce friction for
+// evaluators. Users can enable MFA themselves via Settings > Security.
 // ============================================================================
-
-const mfaSecret = process.env["SIN_UI_TOTP_SECRET"];
-if (!mfaSecret) {
-  throw new Error("SIN_UI_TOTP_SECRET is required to seed MFA test users.");
-}
-const FAKE_MFA_SECRET = mfaSecret;
-const FAKE_BACKUP_CODES = [
-  "backup-testcode1",
-  "backup-testcode2",
-  "backup-testcode3",
-  "backup-testcode4",
-  "backup-testcode5",
-  "backup-testcode6",
-  "backup-testcode7",
-  "backup-testcode8",
-  "backup-testcode9",
-  "backup-testcode10",
-];
 
 // Load environment variables (don't override SST-provided vars)
 // When running via SST shell, DATABASE_URL is already set correctly
@@ -345,18 +327,6 @@ const IDS = {
   auditLogId2: "a0000000-0000-4000-8035-000000000002",
 } as const;
 
-/**
- * Encrypt backup codes using Better Auth's symmetric encryption
- * This matches how Better Auth stores backup codes in the twoFactor table
- */
-async function encryptBackupCodes(codes: string[], secretKey: string): Promise<string> {
-  const encrypted = await symmetricEncrypt({
-    data: JSON.stringify(codes),
-    key: secretKey,
-  });
-  return encrypted;
-}
-
 const stableStringify = (value: unknown): string => {
   if (value === null || value === undefined) {
     return JSON.stringify(value);
@@ -515,6 +485,30 @@ async function seed() {
     console.log("   ✓ Cleaned existing data\n");
 
     // ========================================
+    // PHASE 1.5: Ensure bi_readonly PostgreSQL role exists
+    // ========================================
+    // This role is required for Analytics/NL Query features.
+    // It restricts query execution to SELECT-only for security.
+    console.log("Phase 1.5: Ensuring bi_readonly PostgreSQL role exists...");
+    await db.execute(sql`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'bi_readonly') THEN
+          CREATE ROLE bi_readonly NOLOGIN;
+          RAISE NOTICE 'Created bi_readonly role';
+        END IF;
+      END
+      $$;
+    `);
+    await db.execute(sql`GRANT SELECT ON ALL TABLES IN SCHEMA public TO bi_readonly`);
+    await db.execute(sql`GRANT USAGE ON SCHEMA public TO bi_readonly`);
+    await db.execute(sql`GRANT bi_readonly TO postgres`);
+    await db.execute(
+      sql`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO bi_readonly`,
+    );
+    console.log("   ✓ bi_readonly role configured\n");
+
+    // ========================================
     // PHASE 2: Create roles
     // ========================================
     console.log("Phase 2: Creating roles...");
@@ -571,48 +565,55 @@ async function seed() {
     // ========================================
     console.log("Phase 3: Creating test users...");
 
-    const hashedPassword = await hashPassword("testpassword123");
+    // Demo credentials - all accounts use demopassword123
+    const adminPassword = await hashPassword("demopassword123");
+    const standardPassword = await hashPassword("demopassword123");
 
     const testUsers = [
       {
         id: IDS.platformAdminId,
-        email: "admin@example.com",
-        name: "Platform Admin",
+        email: "global-admin@demo.com",
+        name: "Global Admin",
         roleId: "solstice-admin",
+        password: adminPassword,
       },
       {
         id: IDS.viasportStaffId,
-        email: "viasport-staff@example.com",
+        email: "viasport-staff@demo.com",
         name: "viaSport Staff Member",
         roleId: "viasport-admin",
+        password: standardPassword,
       },
       {
         id: IDS.psoAdminId,
-        email: "pso-admin@example.com",
+        email: "pso-admin@demo.com",
         name: "PSO Administrator",
         roleId: null, // Assigned via org membership
+        password: standardPassword,
       },
       {
         id: IDS.clubReporterId,
-        email: "club-reporter@example.com",
+        email: "club-reporter@demo.com",
         name: "Club Data Reporter",
         roleId: null, // Assigned via org membership
+        password: standardPassword,
       },
       {
         id: IDS.memberId,
-        email: "member@example.com",
+        email: "member@demo.com",
         name: "Regular Member",
         roleId: null,
         profileComplete: false,
+        password: standardPassword,
       },
     ];
 
     for (const userData of testUsers) {
-      const isGlobalAdmin =
-        userData.roleId === "solstice-admin" || userData.roleId === "viasport-admin";
-
       const now = new Date();
       const profileComplete = userData.profileComplete ?? true;
+
+      // MFA is disabled for all demo accounts to reduce friction for evaluators.
+      // Users can enable MFA themselves via Settings > Security.
       await db
         .insert(user)
         .values({
@@ -624,7 +625,8 @@ async function seed() {
           profileVersion: 1,
           createdAt: now,
           updatedAt: now,
-          mfaRequired: isGlobalAdmin,
+          mfaRequired: false,
+          twoFactorEnabled: false,
         })
         .onConflictDoUpdate({
           target: user.id,
@@ -634,7 +636,8 @@ async function seed() {
             emailVerified: true,
             profileComplete,
             profileVersion: 1,
-            mfaRequired: isGlobalAdmin,
+            mfaRequired: false,
+            twoFactorEnabled: false,
             updatedAt: now,
           },
         });
@@ -646,7 +649,7 @@ async function seed() {
           userId: userData.id,
           providerId: "credential",
           accountId: userData.email,
-          password: hashedPassword,
+          password: userData.password,
           createdAt: now,
           updatedAt: now,
         })
@@ -654,7 +657,7 @@ async function seed() {
           target: account.id,
           set: {
             accountId: userData.email,
-            password: hashedPassword,
+            password: userData.password,
             updatedAt: now,
           },
         });
@@ -669,52 +672,7 @@ async function seed() {
         });
       }
 
-      // Enroll MFA for global admins (fake MFA for testing)
-      if (isGlobalAdmin) {
-        // Encrypt backup codes and TOTP secret if auth secret is available
-        let encryptedBackupCodes = JSON.stringify(FAKE_BACKUP_CODES); // Fallback: store as JSON
-        let encryptedTotpSecret = FAKE_MFA_SECRET; // Fallback: store raw (will fail verification)
-        if (authSecret) {
-          try {
-            encryptedBackupCodes = await encryptBackupCodes(
-              FAKE_BACKUP_CODES,
-              authSecret,
-            );
-            // Encrypt the TOTP secret the same way Better Auth does
-            encryptedTotpSecret = await symmetricEncrypt({
-              data: FAKE_MFA_SECRET,
-              key: authSecret,
-            });
-          } catch (err) {
-            console.warn(`   ⚠️  Could not encrypt MFA secrets: ${err}`);
-          }
-        }
-
-        await db
-          .insert(twoFactor)
-          .values({
-            id: `${userData.id}-2fa`,
-            userId: userData.id,
-            secret: encryptedTotpSecret,
-            backupCodes: encryptedBackupCodes,
-          })
-          .onConflictDoUpdate({
-            target: twoFactor.id,
-            set: {
-              secret: encryptedTotpSecret,
-              backupCodes: encryptedBackupCodes,
-            },
-          });
-
-        // Update user to mark as 2FA enabled
-        await db.execute(
-          sql`UPDATE "user" SET two_factor_enabled = TRUE, mfa_enrolled_at = NOW() WHERE id = ${userData.id}`,
-        );
-
-        console.log(`   ✓ Created user: ${userData.email} (with MFA enrolled)`);
-      } else {
-        console.log(`   ✓ Created user: ${userData.email}`);
-      }
+      console.log(`   ✓ Created user: ${userData.email}`);
     }
     console.log("");
 
@@ -3244,25 +3202,22 @@ async function seed() {
     // ========================================
     console.log("=".repeat(60));
     console.log("✅ viaSport SIN test data seeded successfully!\n");
-    console.log("Test Users (password: testpassword123):");
-    console.log("  • admin@example.com - Platform Admin (MFA enrolled)");
-    console.log("  • viasport-staff@example.com - viaSport Staff (MFA enrolled)");
-    console.log("  • pso-admin@example.com - PSO Administrator");
-    console.log("  • club-reporter@example.com - Club Reporter");
-    console.log("  • member@example.com - Regular Member\n");
+    console.log("Test Users (MFA disabled for convenience):");
+    console.log("  • global-admin@demo.com - Global Admin (password: demopassword123)");
+    console.log(
+      "  • viasport-staff@demo.com - viaSport Staff (password: demopassword123)",
+    );
+    console.log("  • pso-admin@demo.com - PSO Administrator (password: demopassword123)");
+    console.log("  • club-reporter@demo.com - Club Reporter (password: demopassword123)");
+    console.log("  • member@demo.com - Regular Member (password: demopassword123)\n");
     console.log(
       "Organizations created: 10 (1 governing body, 3 PSOs, 2 leagues, 4 clubs)",
     );
     console.log("Forms created: 7 (6 published, 1 draft)");
     console.log("Reporting cycles: 4 (2 active, 1 closed, 1 upcoming)\n");
     console.log("-".repeat(60));
-    console.log("🔐 FAKE MFA FOR TESTING (admin users only):");
-    console.log("   TOTP Secret: use SIN_UI_TOTP_SECRET from your environment");
-    console.log(
-      "   → Generate codes: npx tsx -e \"import { authenticator } from 'otplib'; console.log(authenticator.generate(process.env.SIN_UI_TOTP_SECRET ?? ''))\"",
-    );
-    console.log("\n   Backup Codes (use with 'Use backup code' option):");
-    console.log("   → backup-testcode1 through backup-testcode10");
+    console.log("🔐 MFA: Disabled by default for all demo accounts.");
+    console.log("   Users can enable MFA via Settings > Security.");
     console.log("-".repeat(60));
     console.log("=".repeat(60));
   } catch (error) {

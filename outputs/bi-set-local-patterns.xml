@@ -1,0 +1,3763 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+The content has been processed where line numbers have been added.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: src/features/bi/governance/set-local.ts, src/features/bi/governance/sql-workbench-gate.ts, src/features/bi/governance/query-guardrails.ts, src/features/bi/governance/org-scoping.ts, src/features/bi/governance/index.ts, src/features/bi/bi.sql-executor.ts, src/features/bi/bi.queries.ts, src/features/bi/__tests__/sql-executor.test.ts, src/features/bi/governance/__tests__/sql-workbench-gate.test.ts, src/features/bi/governance/__tests__/query-guardrails.test.ts, src/features/bi/governance/__tests__/org-scoping.test.ts, src/features/bi/docs/CHECKLIST-sql-workbench-gate.md, src/features/bi/docs/sql-workbench-evidence.sql, docs/sin-rfp/review-plans/final-evidence-review-plan.md, docs/tickets/ci-security-findings-2026-01-08.md
+- Files matching these patterns are excluded: **/__fixtures__/**
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Line numbers have been added to the beginning of each line
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+docs/
+  sin-rfp/
+    review-plans/
+      final-evidence-review-plan.md
+  tickets/
+    ci-security-findings-2026-01-08.md
+src/
+  features/
+    bi/
+      __tests__/
+        sql-executor.test.ts
+      docs/
+        CHECKLIST-sql-workbench-gate.md
+        sql-workbench-evidence.sql
+      governance/
+        __tests__/
+          org-scoping.test.ts
+          query-guardrails.test.ts
+          sql-workbench-gate.test.ts
+        index.ts
+        org-scoping.ts
+        query-guardrails.ts
+        set-local.ts
+        sql-workbench-gate.ts
+      bi.queries.ts
+      bi.sql-executor.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="docs/sin-rfp/review-plans/final-evidence-review-plan.md">
+  1: # Final Evidence Review Plan - Top 6 Requirements
+  2: 
+  3: This plan captures step-by-step evidence for the six most impressive requirements
+  4: in the compliance crosswalk. It uses a hybrid capture approach:
+  5: 
+  6: - Screenshots via MCP for every step (audit-friendly).
+  7: - Short Playwright videos for the "hero" flows (stakeholder-friendly).
+  8: 
+  9: ## Scope (Top 6 Requirements)
+ 10: 
+ 11: 1. RP-AGG-005 - Self-Service Analytics and Data Export
+ 12: 2. SEC-AGG-004 - Audit Trail and Data Lineage
+ 13: 3. SEC-AGG-001 - Authentication and Access Control
+ 14: 4. DM-AGG-001 - Data Collection and Submission
+ 15: 5. DM-AGG-006 - Legacy Data Migration and Bulk Import
+ 16: 6. RP-AGG-003 - Reporting Flow and Support
+ 17: 
+ 18: ## Evidence Output
+ 19: 
+ 20: Store evidence under:
+ 21: 
+ 22: ```
+ 23: docs/sin-rfp/review-plans/evidence/2026-01-08/
+ 24:   screenshots/
+ 25:   videos/
+ 26: ```
+ 27: 
+ 28: Naming:
+ 29: 
+ 30: - Screenshots: `<REQID>-<feature>-<step>-YYYYMMDD-HHMM.png`
+ 31: - Videos: `<REQID>-<feature>-flow-YYYYMMDD-HHMM.mp4`
+ 32: 
+ 33: ## Preflight Checklist
+ 34: 
+ 35: 1. Start sin-dev (local): `AWS_PROFILE=techdev npx sst dev --stage sin-dev --mode mono`
+ 36: 2. Confirm health: `curl -s http://localhost:5173/api/health`
+ 37: 3. Ensure `SIN_UI_TOTP_SECRET` is set for MFA.
+ 38: 4. Use `viasport-staff@example.com / testpassword123` for full access.
+ 39: 5. Use a clean browser profile (no cached sessions).
+ 40: 
+ 41: ## Data Verification (DB Check)
+ 42: 
+ 43: Requires SST tunnel to connect to sin-dev RDS:
+ 44: 
+ 45: ```
+ 46: AWS_PROFILE=techdev npx sst tunnel --stage sin-dev
+ 47: ```
+ 48: 
+ 49: Then in another terminal:
+ 50: 
+ 51: ```
+ 52: AWS_PROFILE=techdev npx sst shell --stage sin-dev -- printenv | rg SST_RESOURCE_Database
+ 53: ```
+ 54: 
+ 55: Use the printed credentials to connect with psql and verify:
+ 56: 
+ 57: ```
+ 58: -- Adjust table names if needed after `\dt`
+ 59: \dt
+ 60: select count(*) from organizations;
+ 61: select count(*) from forms;
+ 62: select count(*) from form_submissions;
+ 63: select count(*) from reporting_cycles;
+ 64: select count(*) from reporting_tasks;
+ 65: select count(*) from reporting_submissions;
+ 66: select count(*) from reporting_submission_history;
+ 67: select count(*) from import_jobs;
+ 68: select count(*) from import_templates;
+ 69: select count(*) from import_mapping_templates;
+ 70: select count(*) from templates;
+ 71: select count(*) from notification_templates;
+ 72: select count(*) from bi_dashboards;
+ 73: select count(*) from bi_query_log;
+ 74: select count(*) from audit_logs;
+ 75: 
+ 76: -- Verify import template exists for evidence
+ 77: select id, name, form_id from import_templates
+ 78: where name ilike '%Facility%';
+ 79: 
+ 80: -- Verify reporting notification templates exist
+ 81: select id, key, category from notification_templates
+ 82: where category = 'reporting';
+ 83: ```
+ 84: 
+ 85: ## Seeding Requirements (if data is missing)
+ 86: 
+ 87: Preferred seed for sin-dev:
+ 88: 
+ 89: ```
+ 90: DATABASE_URL="postgresql://..." \
+ 91: BETTER_AUTH_SECRET="..." \
+ 92: npx tsx scripts/seed-sin-data.ts --force
+ 93: ```
+ 94: 
+ 95: If a specific dataset is missing (forms, orgs, reporting tasks), create it
+ 96: manually in the UI during the evidence flow and capture the creation steps
+ 97: as part of the video.
+ 98: 
+ 99: Sample CSVs for imports live in:
+100: 
+101: `docs/sin-rfp/legacy-data-samples/`
+102: 
+103: ### Import Evidence Requirements (Seeded)
+104: 
+105: - Import template seeded for **Facility Usage Survey** (BC Hockey).
+106: - Working CSV sample: `docs/sin-rfp/legacy-data-samples/import-demo-facility-usage.csv`
+107: - Error XLSX sample: `docs/sin-rfp/legacy-data-samples/import-demo-facility-usage-errors.xlsx`
+108: 
+109: ## Evidence Flows (Step-by-Step)
+110: 
+111: Each section below lists the exact steps to run and capture. Use MCP for all
+112: screenshots and Playwright for the video flows.
+113: 
+114: ---
+115: 
+116: ### 1) RP-AGG-005 - Self-Service Analytics & Data Export
+117: 
+118: **Prereqs**
+119: - At least one organization with data (seeded).
+120: - Analytics permissions for `viasport-staff@example.com`.
+121: - `sin_analytics` feature flag enabled for sin-dev.
+122: - Organization selected (if redirected, choose org at `/dashboard/select-org`).
+123: 
+124: **Steps (Screenshots)**
+125: 1. Login as `viasport-staff@example.com`.
+126: 2. Go to `/dashboard/analytics/explore`.
+127: 3. Select dataset: `Reporting Submissions`.
+128: 4. Add Row: `Organization` (or `Club`), Measure: `Submission Count`.
+129: 5. Run pivot (table view).
+130: 6. Switch chart type to Bar or Line.
+131: 7. Export to CSV (trigger step-up auth).
+132: 8. Confirm download and return to explore view.
+133: 
+134: **Screenshots**
+135: - Explore page with fields selected and pivot table visible.
+136: - Chart view after switching chart type.
+137: - Step-up prompt for export (if not shown, log out/in to force fresh step-up).
+138: - Post-export UI state (toast or success).
+139: 
+140: **Video Flow**
+141: - From explore page → build pivot → switch chart → export with step-up auth.
+142: 
+143: ---
+144: 
+145: ### 2) SEC-AGG-004 - Audit Trail & Data Lineage
+146: 
+147: **Prereqs**
+148: - At least one audit entry (export from Analytics flow creates one).
+149: 
+150: **Steps (Screenshots)**
+151: 1. Go to `/dashboard/admin/sin/audit`.
+152: 2. Filter by `Action category = EXPORT`.
+153: 3. Confirm `BI.EXPORT` entry is visible (PII + Step-up badges when applicable).
+154: 4. Click **Verify hash chain**.
+155: 5. Export audit log CSV.
+156: 
+157: **Screenshots**
+158: - Filtered audit table with BI.EXPORT row.
+159: - Hash chain verification result state.
+160: - Export confirmation (download or toast).
+161: 
+162: **Video Flow**
+163: - Audit page → filter → verify hash chain.
+164: 
+165: ---
+166: 
+167: ### 3) SEC-AGG-001 - Authentication & Access Control
+168: 
+169: **Prereqs**
+170: - MFA enabled user: `viasport-staff@example.com`.
+171: - TOTP secret available in env.
+172: 
+173: **Steps (Screenshots)**
+174: 1. Open `/auth/login`.
+175: 2. Enter email + password, submit.
+176: 3. MFA challenge appears.
+177: 4. Enter TOTP code, submit.
+178: 5. Land on `/dashboard/sin/`.
+179: 6. Open `/dashboard/settings` and confirm MFA status.
+180: 
+181: **Screenshots**
+182: - Login page (email step).
+183: - MFA prompt.
+184: - Post-login dashboard.
+185: - MFA status in settings.
+186: 
+187: **Video Flow**
+188: - Full login with MFA → dashboard.
+189: 
+190: ---
+191: 
+192: ### 4) DM-AGG-001 - Data Collection & Submission (Forms)
+193: 
+194: **Prereqs**
+195: - Admin access to `/dashboard/admin/sin/forms`.
+196: - At least one org exists for assignment.
+197: 
+198: **Steps (Screenshots)**
+199: 1. Go to `/dashboard/admin/sin/forms`.
+200: 2. Create a new form with:
+201:    - Text field (required): "Facility Name"
+202:    - Date field (required): "Usage Date"
+203:    - File field (max 1, PDF): "Usage Report"
+204: 3. Publish the form.
+205: 4. Go to `/dashboard/sin/forms`.
+206: 5. Click the new form to open `/dashboard/sin/forms/$formId`.
+207: 6. Submit the form with a file.
+208: 7. Confirm submission status in the submissions list.
+209: 
+210: **Screenshots**
+211: - Form builder with fields configured.
+212: - Publish confirmation.
+213: - End-user form submission screen.
+214: - Submission success state / list entry.
+215: 
+216: **Video Flow**
+217: - Open form → submit → success state.
+218: 
+219: ---
+220: 
+221: ### 5) DM-AGG-006 - Legacy Data Migration & Bulk Import
+222: 
+223: **Prereqs**
+224: - At least one form with matching fields.
+225: - Import wizard available at `/dashboard/admin/sin/imports?tab=wizard`.
+226: - Sample CSV file prepared (from `docs/sin-rfp/legacy-data-samples/` or custom).
+227: - Import template exists (see DB verification query below).
+228: 
+229: **Steps (Screenshots)**
+230: 1. Go to `/dashboard/admin/sin/imports?tab=wizard`.
+231: 2. Choose organization and target form.
+232: 3. Upload error XLSX: `import-demo-facility-usage-errors.xlsx` (show validation errors).
+233: 4. Review categorized errors and confirm wizard catches them.
+234: 5. Upload working CSV: `import-demo-facility-usage.csv`.
+235: 6. Auto-map fields; adjust mapping if needed.
+236: 7. Run interactive import.
+237: 8. Confirm job status in History tab.
+238: 
+239: **Screenshots**
+240: - Wizard upload step.
+241: - Mapping step with fields mapped.
+242: - Review/errors step from XLSX upload.
+243: - Import completion status.
+244: 
+245: **Video Flow**
+246: - Wizard flow from CSV upload → map → review → import (keep XLSX error capture as screenshots only).
+247: 
+248: ---
+249: 
+250: ### 6) RP-AGG-003 - Reporting Flow & Support
+251: 
+252: **Prereqs**
+253: - Admin access to `/dashboard/admin/sin/reporting`.
+254: - Form available to attach to a reporting task.
+255: - Ensure at least one published form exists (from DM-AGG-001 flow).
+256: 
+257: **Steps (Screenshots)**
+258: 1. Go to `/dashboard/admin/sin/reporting`.
+259: 2. Create a reporting cycle (title: "Quarterly Facility Usage", cadence: Quarterly).
+260: 3. Create a reporting task for an org (assign BC Hockey, due date + reminders).
+261: 4. Go to `/dashboard/sin/reporting`.
+262: 5. Open assigned task and submit/report.
+263: 6. Confirm status updates in reporting dashboard.
+264: 
+265: **Screenshots**
+266: - Reporting cycle creation.
+267: - Task creation with reminder settings.
+268: - User reporting dashboard with task list.
+269: - Submission status after completion.
+270: 
+271: **Video Flow**
+272: - Create task → user completes task → status updates.
+273: 
+274: ---
+275: 
+276: ## Capture Notes
+277: 
+278: - Prefer direct routes for repeatability.
+279: - Keep each video under ~60-90 seconds.
+280: - If a step fails due to missing data, create the data in-app and capture that
+281:   creation in the evidence trail.
+282: 
+283: ## Evidence Review Checklist
+284: 
+285: - [ ] All six requirement flows captured with screenshots.
+286: - [ ] At least 4 hero videos captured (analytics, audit, auth+forms, imports, reporting).
+287: - [ ] Evidence file names match the naming convention.
+288: - [ ] Any data created in-app documented in a short note.
+289: 
+290: ## Worklog
+291: 
+292: Record evidence capture activity as it happens.
+293: 
+294: | Timestamp (local) | Requirement | Action | Notes |
+295: | --- | --- | --- | --- |
+296: | 2026-01-03 00:00 | RP-AGG-005 | Start pivot builder evidence capture | Prep confirmed: import template + sample files seeded. |
+297: | 2026-01-03 00:25 | RP-AGG-005 | Pivot query failed (Server Fn error) | Drizzle error: `SET LOCAL app.org_id = $1` syntax error; toast surfaced in UI. Logged for follow-up. |
+298: | 2026-01-08 17:22 | RP-AGG-005 | Fix applied for SET LOCAL parameterization | Switched to `sql.raw` with escaped values for `app.org_id`, `app.is_global_admin`, `statement_timeout`. |
+299: | 2026-01-08 17:26 | RP-AGG-005 | Pivot query succeeded | Captured table + chart screenshots; export triggered (no step-up prompt due to recent auth). |
+300: | 2026-01-08 18:05 | RP-AGG-005 | Hardened SQL Workbench gate SET LOCAL handling | Replaced parameterized `SET LOCAL` in SQL workbench gate check with escaped `sql.raw` statements. |
+301: | 2026-01-08 18:20 | RP-AGG-005 | Consolidated SET LOCAL formatting helper | Moved `formatSetLocalValue` into shared BI governance helper and reused across BI query + gate paths. |
+302: | 2026-01-08 18:35 | Plan | Tightened evidence steps | Added concrete field names, dataset, and import XLSX/CSV ordering for repeatable capture. |
+303: | 2026-01-08 18:45 | Plan | Set evidence capture date | Set evidence folder to `2026-01-08` for current capture run. |
+304: | 2026-01-08 18:55 | RP-AGG-005 | Recapture attempt blocked | Chrome DevTools MCP transport closed after stale process cleanup; evidence capture paused pending tool restart. |
+</file>
+
+<file path="src/features/bi/governance/set-local.ts">
+ 1: export const escapeSetLocalValue = (value: string): string =>
+ 2:   `'${value.replace(/'/g, "''")}'`;
+ 3: 
+ 4: export const formatSetLocalValue = (value: string | number | boolean): string => {
+ 5:   if (typeof value === "number") {
+ 6:     return Number.isFinite(value) ? String(value) : "0";
+ 7:   }
+ 8:   if (typeof value === "boolean") {
+ 9:     return value ? "'true'" : "'false'";
+10:   }
+11:   return escapeSetLocalValue(value);
+12: };
+</file>
+
+<file path="src/features/bi/docs/sql-workbench-evidence.sql">
+ 1: -- SQL Workbench Evidence Collection
+ 2: -- Use in psql. Replace the UUID placeholders before running, or pass:
+ 3: --   psql -v org_id=<uuid> -f src/features/bi/docs/sql-workbench-evidence.sql
+ 4: 
+ 5: \set ON_ERROR_STOP 0
+ 6: \if :{?org_id}
+ 7: \else
+ 8: \set org_id '00000000-0000-0000-0000-000000000001'
+ 9: \endif
+10: 
+11: \echo '0) Role + grants'
+12: \du bi_readonly
+13: \dp bi_v_*
+14: 
+15: \echo '1) View definitions'
+16: \d+ bi_v_organizations
+17: \d+ bi_v_reporting_submissions
+18: \d+ bi_v_form_submissions
+19: \d+ bi_v_events
+20: 
+21: \echo '2) security_barrier verification'
+22: SELECT relname, reloptions
+23: FROM pg_class
+24: WHERE relname IN (
+25:   'bi_v_organizations',
+26:   'bi_v_reporting_submissions',
+27:   'bi_v_form_submissions',
+28:   'bi_v_events'
+29: );
+30: 
+31: \echo '3) Non-admin scoping (should return only scoped rows)'
+32: BEGIN;
+33:   SET LOCAL app.org_id = :'org_id';
+34:   SET LOCAL app.is_global_admin = 'false';
+35: 
+36:   SELECT COUNT(*) AS org_count FROM bi_v_organizations;
+37:   SELECT COUNT(*) AS reporting_count FROM bi_v_reporting_submissions;
+38:   SELECT COUNT(*) AS form_count FROM bi_v_form_submissions;
+39: 
+40:   SELECT COUNT(*) AS org_cross_check
+41:   FROM bi_v_organizations
+42:   WHERE id <> :'org_id';
+43: 
+44:   SELECT COUNT(*) AS reporting_cross_check
+45:   FROM bi_v_reporting_submissions
+46:   WHERE organization_id <> :'org_id';
+47: 
+48:   SELECT COUNT(*) AS form_cross_check
+49:   FROM bi_v_form_submissions
+50:   WHERE organization_id <> :'org_id';
+51: ROLLBACK;
+52: 
+53: \echo '4) Global admin scoping (should return multiple rows)'
+54: BEGIN;
+55:   SET LOCAL app.org_id = '';
+56:   SET LOCAL app.is_global_admin = 'true';
+57: 
+58:   SELECT COUNT(*) AS org_count FROM bi_v_organizations;
+59:   SELECT COUNT(*) AS reporting_count FROM bi_v_reporting_submissions;
+60:   SELECT COUNT(*) AS form_count FROM bi_v_form_submissions;
+61: ROLLBACK;
+62: 
+63: \echo '5) Missing context (should return zero rows for scoped views)'
+64: BEGIN;
+65:   RESET app.org_id;
+66:   RESET app.is_global_admin;
+67: 
+68:   SELECT COUNT(*) AS org_count FROM bi_v_organizations;
+69:   SELECT COUNT(*) AS reporting_count FROM bi_v_reporting_submissions;
+70:   SELECT COUNT(*) AS form_count FROM bi_v_form_submissions;
+71: ROLLBACK;
+72: 
+73: \echo '6) Read-only role verification (should fail on raw tables)'
+74: BEGIN;
+75:   SET LOCAL ROLE bi_readonly;
+76: 
+77:   SELECT COUNT(*) AS org_count FROM bi_v_organizations;
+78:   SELECT COUNT(*) AS reporting_count FROM bi_v_reporting_submissions;
+79:   SELECT COUNT(*) AS form_count FROM bi_v_form_submissions;
+80:   SELECT COUNT(*) AS events_count FROM bi_v_events;
+81: 
+82:   -- Expected failures
+83:   SAVEPOINT raw_table_check;
+84:   SELECT * FROM organizations LIMIT 1;
+85:   ROLLBACK TO SAVEPOINT raw_table_check;
+86: 
+87:   SAVEPOINT create_table_check;
+88:   CREATE TABLE bi_should_fail(id integer);
+89:   ROLLBACK TO SAVEPOINT create_table_check;
+90: ROLLBACK;
+</file>
+
+<file path="src/features/bi/governance/__tests__/org-scoping.test.ts">
+ 1: import { describe, expect, it } from "vitest";
+ 2: import type { DatasetConfig, QueryContext } from "../../bi.types";
+ 3: import { applyOrgScopingFilter, determineOrgScoping } from "../org-scoping";
+ 4: 
+ 5: const baseDataset: DatasetConfig = {
+ 6:   id: "organizations",
+ 7:   name: "Organizations",
+ 8:   baseTable: "organizations",
+ 9:   fields: [],
+10:   requiresOrgScope: true,
+11:   orgScopeColumn: "organizationId",
+12: };
+13: 
+14: const baseContext: QueryContext = {
+15:   userId: "user-1",
+16:   organizationId: "org-1",
+17:   orgRole: "reporter",
+18:   isGlobalAdmin: false,
+19:   permissions: new Set(),
+20:   hasRecentAuth: false,
+21:   timestamp: new Date(),
+22: };
+23: 
+24: describe("determineOrgScoping", () => {
+25:   it("bypasses for global admin", () => {
+26:     const result = determineOrgScoping(
+27:       { ...baseContext, isGlobalAdmin: true },
+28:       baseDataset,
+29:     );
+30:     expect(result.shouldScope).toBe(false);
+31:   });
+32: 
+33:   it("skips for datasets without org scope", () => {
+34:     const result = determineOrgScoping(baseContext, {
+35:       ...baseDataset,
+36:       requiresOrgScope: false,
+37:     });
+38:     expect(result.shouldScope).toBe(false);
+39:   });
+40: 
+41:   it("scopes to org for regular users", () => {
+42:     const result = determineOrgScoping(baseContext, baseDataset);
+43:     expect(result.shouldScope).toBe(true);
+44:     expect(result.scopeOrgId).toBe("org-1");
+45:     expect(result.scopeColumn).toBe("organizationId");
+46:   });
+47: });
+48: 
+49: describe("applyOrgScopingFilter", () => {
+50:   it("filters rows by org id", () => {
+51:     const scoping = determineOrgScoping(baseContext, baseDataset);
+52:     const rows = [
+53:       { organizationId: "org-1", name: "A" },
+54:       { organizationId: "org-2", name: "B" },
+55:     ];
+56:     const result = applyOrgScopingFilter(rows, scoping);
+57:     expect(result).toEqual([{ organizationId: "org-1", name: "A" }]);
+58:   });
+59: });
+</file>
+
+<file path="src/features/bi/governance/__tests__/sql-workbench-gate.test.ts">
+ 1: import { beforeEach, describe, expect, it, vi } from "vitest";
+ 2: import {
+ 3:   assertSqlWorkbenchReady,
+ 4:   resetSqlWorkbenchGateCache,
+ 5: } from "../sql-workbench-gate";
+ 6: 
+ 7: const getDbMock = vi.fn();
+ 8: 
+ 9: vi.mock("~/db/server-helpers", () => ({
+10:   getDb: (...args: unknown[]) => getDbMock(...args),
+11: }));
+12: 
+13: describe("sql workbench gate", () => {
+14:   beforeEach(() => {
+15:     getDbMock.mockReset();
+16:     resetSqlWorkbenchGateCache();
+17:   });
+18: 
+19:   it("fails when bi_readonly role is missing", async () => {
+20:     const execute = vi
+21:       .fn()
+22:       .mockResolvedValueOnce([])
+23:       .mockResolvedValueOnce([{ table_name: "bi_v_organizations" }])
+24:       .mockResolvedValueOnce([
+25:         {
+26:           relname: "bi_v_organizations",
+27:           reloptions: ["security_barrier=true"],
+28:         },
+29:       ])
+30:       .mockResolvedValueOnce([
+31:         { table_name: "bi_v_organizations", privilege_type: "SELECT" },
+32:       ])
+33:       .mockResolvedValueOnce([]);
+34:     const txExecute = vi.fn().mockResolvedValue([]);
+35:     const transaction = vi.fn(
+36:       async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
+37:         cb({ execute: txExecute }),
+38:     );
+39: 
+40:     getDbMock.mockResolvedValue({ execute, transaction });
+41: 
+42:     await expect(
+43:       assertSqlWorkbenchReady({
+44:         organizationId: "org-1",
+45:         isGlobalAdmin: false,
+46:         datasetIds: ["organizations"],
+47:       }),
+48:     ).rejects.toThrow("missing role bi_readonly");
+49:   });
+50: 
+51:   it("caches successful checks", async () => {
+52:     const execute = vi
+53:       .fn()
+54:       .mockResolvedValueOnce([{ exists: 1 }])
+55:       .mockResolvedValueOnce([{ table_name: "bi_v_organizations" }])
+56:       .mockResolvedValueOnce([
+57:         {
+58:           relname: "bi_v_organizations",
+59:           reloptions: ["security_barrier=true"],
+60:         },
+61:       ])
+62:       .mockResolvedValueOnce([
+63:         { table_name: "bi_v_organizations", privilege_type: "SELECT" },
+64:       ])
+65:       .mockResolvedValueOnce([]);
+66:     const txExecute = vi.fn().mockResolvedValue([]);
+67:     const transaction = vi.fn(
+68:       async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
+69:         cb({ execute: txExecute }),
+70:     );
+71: 
+72:     getDbMock.mockResolvedValue({ execute, transaction });
+73: 
+74:     await assertSqlWorkbenchReady({
+75:       organizationId: "org-1",
+76:       isGlobalAdmin: false,
+77:       datasetIds: ["organizations"],
+78:     });
+79:     await assertSqlWorkbenchReady({
+80:       organizationId: "org-1",
+81:       isGlobalAdmin: false,
+82:       datasetIds: ["organizations"],
+83:     });
+84: 
+85:     expect(getDbMock).toHaveBeenCalledTimes(1);
+86:     expect(execute).toHaveBeenCalledTimes(5);
+87:     expect(transaction).toHaveBeenCalledTimes(1);
+88:   });
+89: });
+</file>
+
+<file path="docs/tickets/ci-security-findings-2026-01-08.md">
+  1: # CI Security & Quality Findings
+  2: 
+  3: **Date**: 2026-01-08
+  4: **Status**: In progress (only dependency follow-up remains)
+  5: **Priority**: High (contains Critical findings)
+  6: 
+  7: ## Summary
+  8: 
+  9: Comprehensive audit of all CI workflow findings across CodeQL, Aikido, ZAP, and
+ 10: ESLint. Total of **54 findings** requiring review.
+ 11: 
+ 12: **Current status**: Core code issues remediated. Remaining items are dependency
+ 13: watch items (xlsx update availability) and expected ZAP dev-mode warnings.
+ 14: 
+ 15: | Workflow     | Critical | High  | Medium  | Low/Info | Total  |
+ 16: | ------------ | -------- | ----- | ------- | -------- | ------ |
+ 17: | Aikido       | 2        | 2     | 4+      | -        | 21     |
+ 18: | CodeQL       | -        | 1     | 10      | 1        | 12     |
+ 19: | ZAP Baseline | -        | -     | -       | 11       | 11     |
+ 20: | ESLint       | -        | -     | -       | 10       | 10     |
+ 21: | **Total**    | **2**    | **3** | **14+** | **22**   | **54** |
+ 22: 
+ 23: ---
+ 24: 
+ 25: ## Critical Priority
+ 26: 
+ 27: ### 1. SQL Injection via String Concatenation (Aikido - Critical)
+ 28: 
+ 29: **Files**:
+ 30: 
+ 31: - `src/features/bi/engine/pivot-sql-compiler.ts`
+ 32: - `src/features/bi/engine/bi.sql-executor.ts`
+ 33: - 1 other file
+ 34: 
+ 35: **Issue**: Potential SQL injection via string-based query concatenation.
+ 36: 
+ 37: **Impact**: Attackers could execute arbitrary SQL queries, leading to data breach or destruction.
+ 38: 
+ 39: **Resolution**:
+ 40: 
+ 41: - Hardened identifier handling + time grain validation in pivot SQL builder
+ 42: - Replaced unsafe SQL string interpolation for `SET LOCAL` statements with
+ 43:   parameterized SQL
+ 44: 
+ 45: **Files updated**:
+ 46: 
+ 47: - `src/features/bi/engine/pivot-sql-compiler.ts`
+ 48: - `src/features/bi/engine/sql-identifiers.ts` (new helper)
+ 49: - `src/features/bi/bi.sql-executor.ts`
+ 50: - `src/features/bi/bi.queries.ts`
+ 51: - `src/features/bi/governance/sql-workbench-gate.ts`
+ 52: 
+ 53: - Use parameterized queries exclusively
+ 54: - Review all string concatenation in SQL building logic
+ 55: - Add input validation/sanitization
+ 56: 
+ 57: **Status**: Resolved
+ 58: 
+ 59: ---
+ 60: 
+ 61: ### 2. Open Redirect (Aikido - Critical)
+ 62: 
+ 63: **File**: `src/tenant/feature-gates.ts`
+ 64: 
+ 65: **Issue**: Open redirect can be used in social engineering attacks.
+ 66: 
+ 67: **Impact**: Attackers can craft URLs that redirect users to malicious sites while
+ 68: appearing to come from your domain.
+ 69: 
+ 70: **Resolution**:
+ 71: 
+ 72: - Added internal-path guard to prevent external scheme redirects
+ 73: 
+ 74: **File updated**: `src/tenant/feature-gates.ts`
+ 75: 
+ 76: **Status**: Resolved
+ 77: 
+ 78: ---
+ 79: 
+ 80: ## High Priority
+ 81: 
+ 82: ### 3. Clear-text Logging of Sensitive Data (CodeQL - Error)
+ 83: 
+ 84: **File**: `e2e/helpers/global-setup.ts:32`
+ 85: 
+ 86: **Issue**: Sensitive data (likely test credentials) logged in plaintext.
+ 87: 
+ 88: **Resolution**:
+ 89: 
+ 90: - Removed account email from worker assignment log line
+ 91: 
+ 92: **File updated**: `e2e/helpers/global-setup.ts`
+ 93: 
+ 94: **Status**: Resolved
+ 95: 
+ 96: ---
+ 97: 
+ 98: ### 4. xlsx Prototype Pollution (Aikido - High)
+ 99: 
+100: **Package**: `xlsx` dependency
+101: 
+102: **Issue**: Abuse of JavaScript's prototype API possible (Prototype Pollution).
+103: 
+104: **Impact**: Could allow attackers to modify object prototypes, leading to denial
+105: of service or remote code execution.
+106: 
+107: **Resolution**:
+108: 
+109: - Added JSON key sanitization on XLSX imports to drop `__proto__` /
+110:   `constructor` / `prototype`
+111: 
+112: **Files updated**:
+113: 
+114: - `src/shared/lib/json.ts`
+115: - `src/lib/imports/file-utils.ts`
+116: - `src/features/imports/imports.utils.ts`
+117: 
+118: **Status**: Mitigated (no patched xlsx version available; monitor for updates)
+119: 
+120: **Estimated Fix Time**: 30 min
+121: 
+122: ---
+123: 
+124: ### 5. File Inclusion Attack (Aikido - High)
+125: 
+126: **File**: `update-code-guide.mjs`
+127: 
+128: **Issue**: Potential file inclusion attack via reading file.
+129: 
+130: **Resolution**:
+131: 
+132: - Added root-path guard + symlink skip for file traversal in
+133:   `scripts/update-code-guide.mjs`
+134: 
+135: **Status**: Resolved
+136: 
+137: **Estimated Fix Time**: 1 hr
+138: 
+139: ---
+140: 
+141: ## Medium Priority
+142: 
+143: ### 6. Shell Command Injection (CodeQL - Warning)
+144: 
+145: **File**: `scripts/generate-erd.js:48, 60, 74`
+146: 
+147: **Issue**: Environment variables passed unsanitized to shell commands.
+148: 
+149: **Resolution**:
+150: 
+151: - Swapped `execSync` calls to `execFileSync` with explicit args
+152: - Removed shell `rm` usage in favor of `unlinkSync`
+153: 
+154: **File updated**: `scripts/generate-erd.js`
+155: 
+156: **Status**: Resolved
+157: 
+158: ---
+159: 
+160: ### 7. File System Race Condition (CodeQL - Warning)
+161: 
+162: **Files**:
+163: 
+164: - `scripts/generate-erd.js:84`
+165: - `scripts/generate-auth-secret.js:64`
+166: 
+167: **Issue**: TOCTOU (time-of-check to time-of-use) race between file existence
+168: check and file operation.
+169: 
+170: **Resolution**:
+171: 
+172: - Removed pre-checks and switched to read/try handling for env files
+173: 
+174: **File updated**: `scripts/generate-auth-secret.js`
+175: 
+176: **Status**: Resolved
+177: 
+178: ---
+179: 
+180: ### 8. Docker Container Root User (Aikido - Medium)
+181: 
+182: **File**: `import-batch.Dockerfile`
+183: 
+184: **Issue**: Docker container runs as default root user.
+185: 
+186: **Resolution**:
+187: 
+188: ```dockerfile
+189: RUN adduser -D appuser
+190: USER appuser
+191: ```
+192: 
+193: **File updated**: `docker/import-batch.Dockerfile`
+194: 
+195: **Status**: Resolved
+196: 
+197: ---
+198: 
+199: ### 9. MCP SDK Session Credential Reuse (Aikido - Medium)
+200: 
+201: **Package**: `@modelcontextprotocol/sdk`
+202: 
+203: **Issue**: Attacker can reuse old session credentials.
+204: 
+205: **Resolution**:
+206: 
+207: - Added pnpm override to force patched SDK version
+208: 
+209: **File updated**: `package.json`
+210: 
+211: **Status**: Resolved
+212: 
+213: **Estimated Fix Time**: 30 min
+214: 
+215: ---
+216: 
+217: ### 10. Rollup XSS Vulnerability (Aikido - Medium)
+218: 
+219: **Package**: `rollup`
+220: 
+221: **Issue**: XSS attack possible.
+222: 
+223: **Resolution**:
+224: 
+225: - Added pnpm override to force latest Rollup version
+226: 
+227: **File updated**: `package.json`
+228: 
+229: **Status**: Resolved
+230: 
+231: **Estimated Fix Time**: 1 hr
+232: 
+233: ---
+234: 
+235: ### 11. Exposed Secret (Aikido - Medium)
+236: 
+237: **Issue**: 1 exposed secret detected.
+238: 
+239: **Resolution**:
+240: 
+241: - Removed plaintext secrets from `.env` / `.env.e2e`
+242: - Moved values to SST secrets for `sin-dev` and documented storage locations
+243: 
+244: **Files updated**:
+245: 
+246: - `.env`
+247: - `.env.e2e`
+248: - `.env.e2e.example`
+249: - `CLAUDE.md`
+250: - `docs/runbooks/new-environment-setup.md`
+251: - `docs/sin-rfp/worklogs/master.md`
+252: - `docs/sin-rfp/archive/streams/stream-a.md`
+253: - `docs/sin-rfp/archive/streams/stream-j-context.md`
+254: - `docs/sin-rfp/evaluator-access-pack.md`
+255: - `docs/sin-rfp/review-plans/ux-review-plan.md`
+256: - `docs/issues/TOTP-VERIFICATION-FAILURE.md`
+257: - `sst.config.ts`
+258: - `scripts/seed-e2e-data.ts`
+259: 
+260: **Status**: Resolved
+261: 
+262: ---
+263: 
+264: ### 12. Missing Regexp Anchor (CodeQL - Warning)
+265: 
+266: **Files**:
+267: 
+268: - `src/nitro/aws-lambda-streaming.mjs:146`
+269: - `src/nitro/aws-lambda-response.mjs:146`
+270: 
+271: **Issue**: Regex without `^`/`$` anchors may match unintended strings.
+272: 
+273: **Note**: These are in generated/vendored Nitro files. May need to be addressed
+274: upstream or ignored.
+275: 
+276: **Status**: Won't fix (vendored)
+277: 
+278: ---
+279: 
+280: ### 13. Incompatible Type Comparison (CodeQL - Warning)
+281: 
+282: **File**: `src/features/forms/forms.utils.ts:307`
+283: 
+284: **Issue**: Comparing values of different types.
+285: 
+286: **Resolution**:
+287: 
+288: - Introduced typed guard helper for file payload parsing
+289: 
+290: **File updated**: `src/features/forms/forms.utils.ts`
+291: 
+292: **Status**: Resolved
+293: 
+294: ---
+295: 
+296: ## Low Priority / Informational
+297: 
+298: ### 14. Useless Variable Assignments (CodeQL - Warning)
+299: 
+300: **Files**:
+301: 
+302: - `src/lib/notifications/send.ts:248`
+303: - `src/lib/imports/batch-runner.ts:121`
+304: 
+305: **Issue**: Variables assigned but never read (dead code).
+306: 
+307: **Resolution**: Removed unused assignments.
+308: 
+309: **Files updated**:
+310: 
+311: - `src/lib/notifications/send.ts`
+312: - `src/lib/imports/batch-runner.ts`
+313: 
+314: **Status**: Resolved
+315: 
+316: ---
+317: 
+318: ### 15. Unused Local Variable (CodeQL - Note)
+319: 
+320: **File**: `src/lib/email/sendgrid.ts:79`
+321: 
+322: **Issue**: Unused variable (dead code).
+323: 
+324: **Resolution**: Removed unused variable.
+325: 
+326: **File updated**: `src/lib/email/sendgrid.ts`
+327: 
+328: **Status**: Resolved
+329: 
+330: ---
+331: 
+332: ### 16. React Best Practice Violations (ESLint - 10 warnings)
+333: 
+334: **Location**: `src/features/bi/components/dashboard/`
+335: 
+336: | File                        | Line | Issue                                       |
+337: | --------------------------- | ---- | ------------------------------------------- |
+338: | `AddWidgetModal.tsx`        | 76   | setState in useEffect (setDatasetId)        |
+339: | `AddWidgetModal.tsx`        | 81   | setState in useEffect (setFilterField)      |
+340: | `DashboardCanvas.tsx`       | 28   | Array as default prop                       |
+341: | `DashboardExportDialog.tsx` | 56   | setState in useEffect (setSelectedWidgetId) |
+342: | `DashboardExportDialog.tsx` | 57   | setState in useEffect (setFormat)           |
+343: | `DashboardFilters.tsx`      | 82   | Array index as key                          |
+344: | `DashboardWidget.tsx`       | 32   | Array as default prop                       |
+345: | `EditWidgetDialog.tsx`      | 97   | Non-lazy useState                           |
+346: | `EditWidgetDialog.tsx`      | 144  | setState in useEffect (setTitle)            |
+347: | `EditWidgetDialog.tsx`      | 145  | setState in useEffect (setWidgetType)       |
+348: 
+349: **Impact**: Performance issues, potential infinite re-renders.
+350: 
+351: **Resolution**:
+352: 
+353: - Removed setState-in-effect patterns by deriving defaults and resetting on
+354:   dialog close
+355: - Added module-level default arrays
+356: - Switched filter keys away from array indices
+357: - Ensured edit dialog resets via `key` prop on open
+358: 
+359: **Files updated**:
+360: 
+361: - `src/features/bi/components/dashboard/AddWidgetModal.tsx`
+362: - `src/features/bi/components/dashboard/DashboardCanvas.tsx`
+363: - `src/features/bi/components/dashboard/DashboardExportDialog.tsx`
+364: - `src/features/bi/components/dashboard/DashboardFilters.tsx`
+365: - `src/features/bi/components/dashboard/DashboardWidget.tsx`
+366: - `src/features/bi/components/dashboard/EditWidgetDialog.tsx`
+367: - `src/routes/dashboard/analytics/dashboards/$dashboardId.tsx`
+368: 
+369: **Status**: Resolved
+370: 
+371: ---
+372: 
+373: ### 17. ZAP Baseline Security Headers (11 warnings)
+374: 
+375: **Note**: These are expected in dev mode. Security headers are applied in
+376: production via middleware.
+377: 
+378: | Warning                          | Count | Status                       |
+379: | -------------------------------- | ----- | ---------------------------- |
+380: | Missing Anti-clickjacking Header | 4     | Expected in dev              |
+381: | X-Content-Type-Options Missing   | 5     | Expected in dev              |
+382: | Sensitive Info in URL            | 5     | ZAP test artifacts           |
+383: | Suspicious Comments              | 1     | Dev comments                 |
+384: | CSP Header Not Set               | 5     | Expected in dev              |
+385: | Storable/Cacheable Content       | 6     | Expected behavior            |
+386: | CSP Directive Missing Fallback   | 2     | 404 pages                    |
+387: | Permissions Policy Not Set       | 5     | Expected in dev              |
+388: | Modern Web Application           | 4     | Informational                |
+389: | Auth Request Identified          | 1     | Informational                |
+390: | Insufficient Spectre Isolation   | 12    | Missing Cross-Origin headers |
+391: 
+392: **Action**: Verify production deployment has proper security headers. No action needed for dev.
+393: 
+394: **Status**: Won't fix (dev-only)
+395: 
+396: ---
+397: 
+398: ## Action Items
+399: 
+400: ### Immediate (Critical)
+401: 
+402: - [x] Fix SQL injection in BI engine files
+403: - [x] Fix open redirect in feature-gates.ts
+404: - [x] Rotate/move exposed secrets to SST
+405: 
+406: ### This Sprint (High)
+407: 
+408: - [x] Remove credential logging from E2E setup
+409: - [x] Mitigate xlsx prototype pollution (sanitize input)
+410: - [ ] Update/replace xlsx dependency if patched version becomes available
+411: - [x] Fix file inclusion in update-code-guide.mjs
+412: 
+413: ### Backlog (Medium/Low)
+414: 
+415: - [x] Shell command injection in scripts
+416: - [x] File system race conditions
+417: - [x] Docker root user
+418: - [x] React best practices in BI dashboard
+419: - [x] Dead code cleanup
+420: 
+421: ### Won't Fix / Ignore
+422: 
+423: - [x] Nitro regex anchors (vendored code)
+424: - [x] ZAP dev-mode warnings (handled in production)
+425: 
+426: ### Follow-ups
+427: 
+428: - [x] Run `pnpm install --lockfile-only` to capture dependency overrides in
+429:       `pnpm-lock.yaml`
+430: - [ ] Re-evaluate xlsx dependency if a patched version is released or replace
+431:       with a safer library
+432: 
+433: ---
+434: 
+435: ## References
+436: 
+437: - Aikido Scan: https://app.aikido.dev/featurebranch/scan/72994184?groupId=58134
+438: - CodeQL Dashboard: https://github.com/austeane/solstice/security/code-scanning
+439: - ZAP Reports: GitHub Actions artifacts from `zap-baseline` workflow
+</file>
+
+<file path="src/features/bi/governance/__tests__/query-guardrails.test.ts">
+ 1: import { describe, expect, it } from "vitest";
+ 2: import {
+ 3:   acquireConcurrencySlot,
+ 4:   buildLimitedQuery,
+ 5:   inlineParameters,
+ 6:   stripTrailingSemicolons,
+ 7: } from "../query-guardrails";
+ 8: 
+ 9: describe("query guardrails", () => {
+10:   it("strips trailing semicolons", () => {
+11:     expect(stripTrailingSemicolons("SELECT 1;  ")).toBe("SELECT 1");
+12:   });
+13: 
+14:   it("wraps queries with limit", () => {
+15:     expect(buildLimitedQuery("SELECT * FROM orgs", 10)).toBe(
+16:       "SELECT * FROM (SELECT * FROM orgs) AS bi_limit_subquery LIMIT 10",
+17:     );
+18:   });
+19: 
+20:   it("inlines SQL parameters safely", () => {
+21:     const result = inlineParameters(
+22:       "SELECT * FROM orgs WHERE id = {{id}} AND active = {{active}}",
+23:       { id: "org-1", active: true },
+24:     );
+25:     expect(result).toBe("SELECT * FROM orgs WHERE id = 'org-1' AND active = TRUE");
+26:   });
+27: 
+28:   it("enforces concurrency limits", async () => {
+29:     const releases: Array<() => Promise<void>> = [];
+30:     try {
+31:       releases.push(await acquireConcurrencySlot("user-1", "org-1"));
+32:       releases.push(await acquireConcurrencySlot("user-1", "org-1"));
+33:       await expect(acquireConcurrencySlot("user-1", "org-1")).rejects.toThrow(
+34:         "Too many concurrent SQL queries for this user",
+35:       );
+36:     } finally {
+37:       await Promise.all(releases.map((release) => release()));
+38:     }
+39:   });
+40: });
+</file>
+
+<file path="src/features/bi/governance/index.ts">
+ 1: /**
+ 2:  * Governance Layer - Public API
+ 3:  *
+ 4:  * Access control, org scoping, and audit logging for BI.
+ 5:  */
+ 6: 
+ 7: export {
+ 8:   applyOrgScopingFilter,
+ 9:   buildOrgScopingClause,
+10:   determineOrgScoping,
+11:   type OrgScopingResult,
+12: } from "./org-scoping";
+13: 
+14: export {
+15:   checkFieldAccess,
+16:   filterAccessibleFields,
+17:   getFieldsToMask,
+18:   maskPiiFields,
+19:   queryIncludesPii,
+20:   type FieldAccessResult,
+21: } from "./field-acl";
+22: 
+23: export {
+24:   computeChecksum,
+25:   computeQueryHash,
+26:   logExport,
+27:   logQuery,
+28:   verifyAuditChain,
+29:   type LogQueryParams,
+30:   type QueryType,
+31: } from "./audit-logger";
+32: 
+33: export {
+34:   QUERY_GUARDRAILS,
+35:   acquireConcurrencySlot,
+36:   buildLimitedQuery,
+37:   inlineParameters,
+38:   stripTrailingSemicolons,
+39: } from "./query-guardrails";
+40: 
+41: export { assertExportAllowed } from "./export-controls";
+</file>
+
+<file path="src/features/bi/governance/org-scoping.ts">
+ 1: /**
+ 2:  * Organization Scoping
+ 3:  *
+ 4:  * Enforces organization-level data isolation for BI queries.
+ 5:  *
+ 6:  * @see src/features/bi/docs/SPEC-bi-platform.md (Governance Model)
+ 7:  */
+ 8: 
+ 9: import type { DatasetConfig, QueryContext } from "../bi.types";
+10: 
+11: export interface OrgScopingResult {
+12:   shouldScope: boolean;
+13:   scopeOrgId: string | null;
+14:   scopeColumn: string | null;
+15:   reason: string;
+16: }
+17: 
+18: export function determineOrgScoping(
+19:   context: QueryContext,
+20:   dataset: DatasetConfig,
+21: ): OrgScopingResult {
+22:   if (context.isGlobalAdmin) {
+23:     return {
+24:       shouldScope: false,
+25:       scopeOrgId: null,
+26:       scopeColumn: null,
+27:       reason: "Global admin - org scoping bypassed",
+28:     };
+29:   }
+30: 
+31:   if (!dataset.requiresOrgScope) {
+32:     return {
+33:       shouldScope: false,
+34:       scopeOrgId: null,
+35:       scopeColumn: null,
+36:       reason: `Dataset '${dataset.id}' does not require org scoping`,
+37:     };
+38:   }
+39: 
+40:   if (!dataset.orgScopeColumn) {
+41:     return {
+42:       shouldScope: true,
+43:       scopeOrgId: context.organizationId,
+44:       scopeColumn: "organizationId",
+45:       reason: `Dataset '${dataset.id}' missing orgScopeColumn - using default`,
+46:     };
+47:   }
+48: 
+49:   return {
+50:     shouldScope: true,
+51:     scopeOrgId: context.organizationId,
+52:     scopeColumn: dataset.orgScopeColumn,
+53:     reason: `Scoped to org ${context.organizationId}`,
+54:   };
+55: }
+56: 
+57: export function applyOrgScopingFilter(
+58:   data: Record<string, unknown>[],
+59:   scoping: OrgScopingResult,
+60: ): Record<string, unknown>[] {
+61:   if (!scoping.shouldScope || !scoping.scopeOrgId || !scoping.scopeColumn) {
+62:     return data;
+63:   }
+64: 
+65:   return data.filter((row) => row[scoping.scopeColumn!] === scoping.scopeOrgId);
+66: }
+67: 
+68: export function buildOrgScopingClause(scoping: OrgScopingResult): string | null {
+69:   if (!scoping.shouldScope || !scoping.scopeOrgId || !scoping.scopeColumn) {
+70:     return null;
+71:   }
+72: 
+73:   return `${scoping.scopeColumn} = :orgId`;
+74: }
+</file>
+
+<file path="src/features/bi/docs/CHECKLIST-sql-workbench-gate.md">
+  1: # SQL Workbench Prerequisites Checklist
+  2: 
+  3: **Status**: ✅ Complete
+  4: **Last Updated**: 2025-12-31
+  5: **Owner**: Technical Architecture
+  6: 
+  7: ---
+  8: 
+  9: > **CRITICAL**: SQL Workbench is **DISABLED BY DEFAULT** and **MUST NOT** be enabled
+ 10: > until ALL prerequisites below are validated. This is a **hard gate**, not a
+ 11: > recommendation.
+ 12: >
+ 13: > **Failure to complete these prerequisites before enabling SQL Workbench will result in:**
+ 14: >
+ 15: > - Direct table access bypassing tenancy -> **data breach**
+ 16: > - PII columns exposed -> **PIPEDA violation**
+ 17: > - No audit trail -> **compliance failure**
+ 18: >
+ 19: > **Do not shortcut this gate.**
+ 20: 
+ 21: ---
+ 22: 
+ 23: ## What "Enabled" Means (so we don't drift)
+ 24: 
+ 25: SQL Workbench is considered "enabled" only when ALL of the following are true:
+ 26: 
+ 27: 1. The route/UI is visible (feature gate on).
+ 28: 2. The backend endpoint accepts SQL requests.
+ 29: 3. SQL executes using **read-only DB privileges** and **DB-level scoping**.
+ 30: 4. Every query is guardrailed + audited.
+ 31: 
+ 32: This checklist gates #2-#4. UI gating is separate but required for rollout.
+ 33: 
+ 34: ---
+ 35: 
+ 36: ## Prerequisites Checklist
+ 37: 
+ 38: ### 0. Feature Gate Exists and Defaults to OFF
+ 39: 
+ 40: | Status | Item                                                    | Validation                                                      | Owner    |
+ 41: | ------ | ------------------------------------------------------- | --------------------------------------------------------------- | -------- |
+ 42: | [x]    | Feature key exists (e.g. `sin_analytics_sql_workbench`) | `src/tenant/tenant.types.ts` contains key                       | Backend  |
+ 43: | [x]    | Feature defaults OFF in QC, ON in viaSport              | `src/tenant/tenants/*.ts` (viaSport enabled for testing)        | Backend  |
+ 44: | [x]    | Route/server/nav gated by feature key                   | `requireFeatureInRoute`/`assertFeatureEnabled` + nav `feature:` | Frontend |
+ 45: 
+ 46: **Notes**
+ 47: 
+ 48: - This repo uses **code-based tenant feature gates**, not a DB `feature_flags` table.
+ 49: - If you later add DB-driven feature flags, update this section accordingly.
+ 50: - viaSport is enabled for SQL workbench (verified 2025-12-31); QC remains disabled.
+ 51: 
+ 52: ---
+ 53: 
+ 54: ### 1. Curated BI Views Created (No PII)
+ 55: 
+ 56: | Status | Item                                      | Validation                                                   | Owner    |
+ 57: | ------ | ----------------------------------------- | ------------------------------------------------------------ | -------- |
+ 58: | [x]    | `bi_v_organizations` view created         | View exists; contains no PII columns                         | DBA      |
+ 59: | [x]    | `bi_v_reporting_submissions` view created | View exists; contains no PII columns                         | DBA      |
+ 60: | [x]    | `bi_v_form_submissions` view created      | View exists; **no raw payload** unless sanitized/allowlisted | DBA      |
+ 61: | [x]    | `bi_v_events` view created                | View exists; contains no PII columns                         | DBA      |
+ 62: | [x]    | Views created as `security_barrier`       | `pg_class.reloptions` includes `security_barrier=true`       | Security |
+ 63: 
+ 64: **Rule**: If a field might contain PII (especially JSON payloads), it must be:
+ 65: 
+ 66: - excluded from SQL Workbench views, **or**
+ 67: - surfaced only through an explicit sanitizer / allowlist mechanism.
+ 68: 
+ 69: DBA setup script: `src/features/bi/docs/sql-workbench-dba-setup.sql`
+ 70: 
+ 71: **SQL Template (Organizations)**
+ 72: 
+ 73: ```sql
+ 74: CREATE OR REPLACE VIEW bi_v_organizations
+ 75: WITH (security_barrier = true) AS
+ 76: SELECT
+ 77:   id,
+ 78:   name,
+ 79:   slug,
+ 80:   type,
+ 81:   status,
+ 82:   parent_org_id,
+ 83:   created_at,
+ 84:   updated_at
+ 85: FROM organizations
+ 86: WHERE
+ 87:   -- org-scoped: default is "only my org"
+ 88:   id = NULLIF(current_setting('app.org_id', true), '')::uuid
+ 89:   OR COALESCE(NULLIF(current_setting('app.is_global_admin', true), ''), 'false')::boolean = true;
+ 90: ```
+ 91: 
+ 92: > **Why `NULLIF/COALESCE`?**
+ 93: > `current_setting(..., true)` returns NULL if unset. Casting NULL directly can error.
+ 94: > This pattern fails closed when app context is missing.
+ 95: 
+ 96: **Evidence**:
+ 97: 
+ 98: - [x] `\d+ bi_v_organizations` output showing columns
+ 99: - [x] `SELECT * FROM bi_v_organizations` as non-admin returns only the scoped org row
+100: - [x] `SELECT reloptions FROM pg_class WHERE relname='bi_v_organizations'` includes `security_barrier=true`
+101: - [x] Evidence captured using `src/features/bi/docs/sql-workbench-evidence.sql`
+102: 
+103: ---
+104: 
+105: ### 2. DB-Level Scoping Proven (Behavioral)
+106: 
+107: > Postgres RLS applies to tables, not regular views. We require behaviorally-proven scoping
+108: > on curated views (RLS on underlying tables is optional defense-in-depth).
+109: > See: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+110: 
+111: | Status | Item                            | Validation                               | Owner    |
+112: | ------ | ------------------------------- | ---------------------------------------- | -------- |
+113: | [x]    | Non-admin scope enforced        | Scoped session returns only allowed rows | DBA      |
+114: | [x]    | Global admin scope works        | Admin session can return all rows        | DBA      |
+115: | [x]    | Missing context returns no rows | Unset context yields zero rows           | Security |
+116: 
+117: **Validation Query**
+118: 
+119: ```sql
+120: -- Simulate regular user
+121: BEGIN;
+122:   SET LOCAL app.org_id = '00000000-0000-0000-0000-000000000001';
+123:   SET LOCAL app.is_global_admin = 'false';
+124: 
+125:   -- Should return only that org row
+126:   SELECT * FROM bi_v_organizations;
+127: 
+128:   -- Attempt cross-org (should return empty)
+129:   SELECT * FROM bi_v_organizations
+130:   WHERE id = '00000000-0000-0000-0000-000000000002';
+131: ROLLBACK;
+132: 
+133: -- Simulate global admin
+134: BEGIN;
+135:   SET LOCAL app.org_id = '';
+136:   SET LOCAL app.is_global_admin = 'true';
+137: 
+138:   -- Should return multiple rows
+139:   SELECT COUNT(*) FROM bi_v_organizations;
+140: ROLLBACK;
+141: 
+142: -- Missing context (non-admin)
+143: BEGIN;
+144:   RESET app.org_id;
+145:   RESET app.is_global_admin;
+146: 
+147:   -- Should return 0 rows (security default)
+148:   SELECT COUNT(*) FROM bi_v_organizations;
+149: ROLLBACK;
+150: ```
+151: 
+152: **Evidence**:
+153: 
+154: - [x] Query outputs captured (copy/paste or screenshots)
+155: 
+156: ---
+157: 
+158: ### 3. Read-Only Execution Role Exists (and is Actually Used)
+159: 
+160: | Status | Item                                     | Validation                                                       | Owner |
+161: | ------ | ---------------------------------------- | ---------------------------------------------------------------- | ----- |
+162: | [x]    | `bi_readonly` role exists                | `SELECT 1 FROM pg_roles WHERE rolname='bi_readonly'`             | DBA   |
+163: | [x]    | Role has SELECT only on `bi_v_*` views   | `\dp bi_v_*` shows SELECT grants                                 | DBA   |
+164: | [x]    | Role has **no** privileges on raw tables | `SELECT * FROM organizations` fails under `SET ROLE bi_readonly` | DBA   |
+165: | [x]    | Role cannot create objects               | `CREATE TABLE ...` fails under `SET ROLE bi_readonly`            | DBA   |
+166: 
+167: **Important Implementation Detail (App Side)**
+168: The application must execute user SQL under **this role** using:
+169: 
+170: - `SET LOCAL ROLE bi_readonly;` (inside a transaction)
+171: 
+172: Do **not** rely on "we just won't query tables." Use the DB to enforce.
+173: 
+174: **SQL to Create Role + Lock Schema**
+175: 
+176: ```sql
+177: -- Group role (no login)
+178: CREATE ROLE bi_readonly NOLOGIN;
+179: 
+180: -- Ensure it can't create objects in public schema
+181: REVOKE CREATE ON SCHEMA public FROM bi_readonly;
+182: REVOKE USAGE ON SCHEMA public FROM bi_readonly;
+183: 
+184: -- Allow usage on schema that contains BI views (public if you keep them there)
+185: GRANT USAGE ON SCHEMA public TO bi_readonly;
+186: 
+187: -- Grant SELECT on curated views only
+188: GRANT SELECT ON bi_v_organizations TO bi_readonly;
+189: GRANT SELECT ON bi_v_members TO bi_readonly;
+190: GRANT SELECT ON bi_v_form_submissions TO bi_readonly;
+191: GRANT SELECT ON bi_v_events TO bi_readonly;
+192: 
+193: -- Defense in depth: explicitly revoke on raw tables
+194: REVOKE ALL ON organizations FROM bi_readonly;
+195: -- Repeat for other raw tables
+196: ```
+197: 
+198: **Evidence**:
+199: 
+200: - [x] `\du bi_readonly` output
+201: - [x] `\dp bi_v_*` output showing grants
+202: - [x] Transcript showing `SET ROLE bi_readonly; SELECT * FROM organizations;` fails
+203: - [x] Evidence captured using `src/features/bi/docs/sql-workbench-evidence.sql`
+204: 
+205: ---
+206: 
+207: ### 4. Session Context Injection Implemented (and Un-bypassable)
+208: 
+209: | Status | Item                                                        | Validation                                      | Owner    |
+210: | ------ | ----------------------------------------------------------- | ----------------------------------------------- | -------- |
+211: | [x]    | `SET LOCAL app.org_id` executed before every query          | Code review                                     | Backend  |
+212: | [x]    | `SET LOCAL app.is_global_admin` executed before every query | Code review                                     | Backend  |
+213: | [x]    | Query runs inside a transaction                             | Unit/integration test                           | Backend  |
+214: | [x]    | User SQL cannot change session/role                         | Parser rejects `SET`, `RESET`, `SET ROLE`, etc. | Security |
+215: 
+216: **Code Pattern**
+217: 
+218: ```ts
+219: async function executeSqlWorkbenchQuery(
+220:   userSqlText: string,
+221:   user: User,
+222:   orgId: string | null,
+223: ): Promise<QueryResult> {
+224:   const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+225: 
+226:   return db.transaction(async (tx) => {
+227:     // 1) Run as read-only role
+228:     await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+229: 
+230:     // 2) Set scope context
+231:     await tx.execute(
+232:       sql.raw(`SET LOCAL app.org_id = ${formatSettingValue(orgId ?? "")}`),
+233:     );
+234:     await tx.execute(
+235:       sql.raw(
+236:         `SET LOCAL app.is_global_admin = ${formatSettingValue(
+237:           String(isGlobalAdmin),
+238:         )}`,
+239:       ),
+240:     );
+241: 
+242:     // 3) Execute prepared SQL (after parsing/rewriting/parameterization)
+243:     return tx.execute(userSqlPrepared);
+244:   });
+245: }
+246: ```
+247: 
+248: > **Note**: Postgres does not accept bind parameters in `SET LOCAL`. Use a
+249: > helper (e.g. `formatSettingValue`) to safely inline literal values.
+250: 
+251: **Evidence**:
+252: 
+253: - [x] Unit test proves `SET LOCAL ROLE` and context are applied
+254: - [x] Parser test proves user cannot include `SET`, `RESET`, `SET ROLE` statements
+255: 
+256: ---
+257: 
+258: ### 5. AST Parser + Rewriter Deployed (SELECT-only)
+259: 
+260: | Status | Item                                | Validation  | Owner    |
+261: | ------ | ----------------------------------- | ----------- | -------- |
+262: | [x]    | Only a single SELECT is allowed     | Unit tests  | Backend  |
+263: | [x]    | Table names rewritten to view names | Unit tests  | Backend  |
+264: | [x]    | Disallowed tables rejected          | Unit tests  | Backend  |
+265: | [x]    | Rewriting is AST-based (not regex)  | Code review | Security |
+266: 
+267: **Rule**: Only a single SELECT statement is allowed (including WITH/CTE). Everything
+268: else is rejected.
+269: 
+270: **Minimum Test Cases**
+271: 
+272: ```ts
+273: // Allow only SELECT
+274: expect(isValid("SELECT 1")).toBe(true);
+275: expect(isValid("WITH x AS (SELECT 1) SELECT * FROM x")).toBe(true);
+276: 
+277: // Reject anything else
+278: expect(isValid("SET app.org_id = 'x'")).toBe(false);
+279: expect(isValid("INSERT INTO x VALUES (1)")).toBe(false);
+280: expect(isValid("SELECT 1; SELECT 2")).toBe(false);
+281: 
+282: // Rewrite tables -> views
+283: expect(rewrite("SELECT * FROM organizations")).toBe("SELECT * FROM bi_v_organizations");
+284: 
+285: // Block disallowed tables (post-rewrite validation)
+286: expect(() => validateDataset("SELECT * FROM users")).toThrow();
+287: ```
+288: 
+289: **Evidence**:
+290: 
+291: - [x] Test output / CI run
+292: - [x] Code review sign-off (SQL injection suite validates parser behavior)
+293: 
+294: ---
+295: 
+296: ### 6. Query Guardrails Enforced (Timeout, Limit, Cost)
+297: 
+298: | Status | Item                                              | Validation            | Owner   |
+299: | ------ | ------------------------------------------------- | --------------------- | ------- |
+300: | [x]    | Timeout applied via `SET LOCAL statement_timeout` | Integration test      | Backend |
+301: | [x]    | UI row limit enforced (e.g. 10,000)               | Integration test      | Backend |
+302: | [x]    | Export row limit enforced (e.g. 100,000)          | Integration test      | Backend |
+303: | [x]    | Cost check via `EXPLAIN (FORMAT JSON)`            | Unit/integration test | Backend |
+304: | [x]    | Concurrency limit enforced (per user/org)         | Integration test      | Backend |
+305: 
+306: **Guardrails Config**
+307: 
+308: ```ts
+309: export const QUERY_GUARDRAILS = {
+310:   statementTimeoutMs: 30000,
+311:   maxRowsUi: 10000,
+312:   maxRowsExport: 100000,
+313:   maxEstimatedCost: 100000,
+314:   maxConcurrentPerUser: 2,
+315:   maxConcurrentPerOrg: 5,
+316: };
+317: ```
+318: 
+319: **Evidence**:
+320: 
+321: - [x] Timeout test
+322: - [x] Limit enforcement test
+323: - [x] Explain cost rejection test
+324: 
+325: ---
+326: 
+327: ### 7. Audit Logging Active (Tamper-Evident Chain)
+328: 
+329: | Status | Item                                                   | Validation                | Owner    |
+330: | ------ | ------------------------------------------------------ | ------------------------- | -------- |
+331: | [x]    | `bi_query_log` table exists                            | Drizzle migration applied | Backend  |
+332: | [x]    | All SQL workbench queries logged                       | Integration test          | Backend  |
+333: | [x]    | Chain fields populated (`previous_log_id`, `checksum`) | Inspection                | Security |
+334: | [x]    | Chain verification script passes                       | Script output             | Security |
+335: 
+336: **Checksum Rule (documented + implemented)**
+337: `checksum = HMAC_SHA256(secret, canonical_json(entry_without_checksum) || prev_checksum)`
+338: 
+339: **Evidence**:
+340: 
+341: - [x] Sample log row
+342: - [x] Verification output
+343: 
+344: ---
+345: 
+346: ### 8. Security Review Complete
+347: 
+348: | Status | Item                        | Validation                     | Owner    |
+349: | ------ | --------------------------- | ------------------------------ | -------- |
+350: | [x]    | SQL injection suite passed  | 44/44 tests passed             | Security |
+351: | [x]    | Query boundary tests passed | No role/session tampering      | Security |
+352: | [x]    | Code review sign-off        | AST parser + rewriter reviewed | Security |
+353: 
+354: **Tested Cases (scripts/test-sql-injection.ts)**
+355: 
+356: - Multi-statement: `SELECT 1; DROP TABLE ...` ✓ Blocked
+357: - Session/role: `SET ROLE ...`, `SET app.is_global_admin = true`, `RESET app.org_id` ✓ Blocked
+358: - Transaction statements: `BEGIN`, `COMMIT`, `ROLLBACK`, `SAVEPOINT` ✓ Blocked
+359: - COPY/DO/CALL/VACUUM/ANALYZE/TRUNCATE/CREATE/ALTER/DROP/GRANT/REVOKE ✓ Blocked
+360: - Comment bypass attempts ✓ Blocked (real injection) or safe (just comments)
+361: - Encoding/escape sequences ✓ Blocked or safe
+362: - Subquery/CTE/UNION to raw tables ✓ Blocked by dataset validator
+363: - Dangerous functions (pg_read_file, pg_ls_dir) ✓ Blocked by DB role
+364: 
+365: ---
+366: 
+367: ## Sign-Off Section
+368: 
+369: SQL Workbench may be enabled only when ALL prerequisites are complete and signed off.
+370: 
+371: | Role             | Name | Date | Signature |
+372: | ---------------- | ---- | ---- | --------- |
+373: | Engineering Lead |      |      |           |
+374: | Security Lead    |      |      |           |
+375: | Product Owner    |      |      |           |
+376: | DBA              |      |      |           |
+377: 
+378: ---
+379: 
+380: ## Enablement Process (Repo-Accurate)
+381: 
+382: Once all sign-offs are obtained:
+383: 
+384: 1. Add a feature key (example): `sin_analytics_sql_workbench` to:
+385:    - `src/tenant/tenant.types.ts`
+386:    - `src/tenant/tenants/qc.ts` (false)
+387:    - `src/tenant/tenants/viasport.ts` (start false)
+388: 2. Gate the route + nav item on that feature key (`requireFeatureInRoute`, nav `feature:`).
+389: 3. Gate SQL workbench server functions with `assertFeatureEnabled` + permission `analytics.sql`.
+390: 4. Enable **viasport** only by flipping it true in `src/tenant/tenants/viasport.ts`.
+391: 5. Rollout to admin users only (timeboxed).
+392: 6. Monitor `bi_query_log` for anomalies.
+393: 7. Expand rollout after soak period.
+394: 
+395: ---
+396: 
+397: ## Rollback Plan
+398: 
+399: For internal-only testing, rollback is simply: flip the feature key to `false` and redeploy.
+400: 
+401: For external/public users:
+402: 
+403: 1. Flip feature key back to `false` in tenant config.
+404: 2. Review `bi_query_log` and export history for suspicious activity.
+405: 3. Incident report if exposure suspected.
+406: 4. Root cause analysis before re-enablement.
+407: 
+408: ---
+409: 
+410: ## Progress Notes (2025-12-31)
+411: 
+412: - App-layer SQL parser/rewriter, guardrails, and audit logging are implemented; integration tests for timeout/cost/chain verification remain.
+413: - DBA setup + evidence scripts executed on sin-dev with org id `a0000000-0000-4000-8001-000000000001`.
+414: - SQL workbench query execution verified in UI; results + history render, and `bi_query_log` populated with checksum chain.
+415: - Guardrails + audit chain verification evidence captured in `src/features/bi/docs/sql-workbench-guardrails-audit-evidence.md`.
+416: - **SQL injection test suite created**: `scripts/test-sql-injection.ts` with 44 test cases covering multi-statement, session/role manipulation, transaction commands, dangerous statements (COPY/DO/CALL/VACUUM/TRUNCATE/DDL/DCL), comment bypass, encoding attacks, table access restrictions, and dangerous functions. **All 44 tests passed** - injection attempts blocked by AST parser + dataset validator.
+417: - BI views (`bi_v_*`) deployed to sin-dev via `sql-workbench-dba-setup.sql`.
+418: - End-to-end verification: logged in as admin, ran `SELECT * FROM organizations LIMIT 1`, confirmed results displayed correctly with no 500 errors.
+419: 
+420: ## Links
+421: 
+422: - [SPEC-bi-platform.md](./SPEC-bi-platform.md) - Platform specification
+423: - [PLAN-bi-implementation.md](./PLAN-bi-implementation.md) - Implementation plan (Slice 4)
+424: - [GUIDE-bi-testing.md](./GUIDE-bi-testing.md) - SQL parser test cases
+425: - [OWASP SQL Injection Prevention](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
+426: - [PostgreSQL Row Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+</file>
+
+<file path="src/features/bi/governance/query-guardrails.ts">
+  1: /**
+  2:  * SQL Workbench Guardrails
+  3:  *
+  4:  * Enforces query limits (timeout, row limits, cost, concurrency) for SQL workbench.
+  5:  */
+  6: 
+  7: import { createServerOnlyFn } from "@tanstack/react-start";
+  8: import { buildRedisKey } from "~/lib/redis/keys";
+  9: 
+ 10: export const QUERY_GUARDRAILS = {
+ 11:   statementTimeoutMs: 30000,
+ 12:   maxRowsUi: 10000,
+ 13:   maxRowsExport: 100000,
+ 14:   maxEstimatedCost: 100000,
+ 15:   maxConcurrentPerUser: 2,
+ 16:   maxConcurrentPerOrg: 5,
+ 17:   maxPivotRows: 500,
+ 18:   maxPivotColumns: 50,
+ 19:   maxPivotCells: 25000,
+ 20: } as const;
+ 21: 
+ 22: const CONCURRENCY_TTL_BUFFER_MS = 10_000;
+ 23: const CONCURRENCY_TTL_MS =
+ 24:   QUERY_GUARDRAILS.statementTimeoutMs + CONCURRENCY_TTL_BUFFER_MS;
+ 25: 
+ 26: const getRedisClient = createServerOnlyFn(async () => {
+ 27:   const { getRedis } = await import("~/lib/redis/client");
+ 28:   return getRedis({ required: false });
+ 29: });
+ 30: 
+ 31: const ACQUIRE_CONCURRENCY_LUA = `
+ 32: local userKey = KEYS[1]
+ 33: local orgKey = KEYS[2]
+ 34: local userLimit = tonumber(ARGV[1])
+ 35: local orgLimit = tonumber(ARGV[2])
+ 36: local ttlMs = tonumber(ARGV[3])
+ 37: 
+ 38: local userCount = redis.call('INCR', userKey)
+ 39: if userCount == 1 then
+ 40:   redis.call('PEXPIRE', userKey, ttlMs)
+ 41: end
+ 42: if userCount > userLimit then
+ 43:   redis.call('DECR', userKey)
+ 44:   return 1
+ 45: end
+ 46: 
+ 47: if orgKey ~= '' then
+ 48:   local orgCount = redis.call('INCR', orgKey)
+ 49:   if orgCount == 1 then
+ 50:     redis.call('PEXPIRE', orgKey, ttlMs)
+ 51:   end
+ 52:   if orgCount > orgLimit then
+ 53:     redis.call('DECR', orgKey)
+ 54:     redis.call('DECR', userKey)
+ 55:     return 2
+ 56:   end
+ 57: end
+ 58: 
+ 59: return 0
+ 60: `;
+ 61: 
+ 62: const RELEASE_CONCURRENCY_LUA = `
+ 63: local userKey = KEYS[1]
+ 64: local orgKey = KEYS[2]
+ 65: 
+ 66: if redis.call('EXISTS', userKey) == 1 then
+ 67:   local userCount = redis.call('DECR', userKey)
+ 68:   if userCount <= 0 then
+ 69:     redis.call('DEL', userKey)
+ 70:   end
+ 71: end
+ 72: 
+ 73: if orgKey ~= '' and redis.call('EXISTS', orgKey) == 1 then
+ 74:   local orgCount = redis.call('DECR', orgKey)
+ 75:   if orgCount <= 0 then
+ 76:     redis.call('DEL', orgKey)
+ 77:   end
+ 78: end
+ 79: 
+ 80: return 0
+ 81: `;
+ 82: 
+ 83: const inflightByUser = new Map<string, number>();
+ 84: const inflightByOrg = new Map<string, number>();
+ 85: 
+ 86: const bump = (map: Map<string, number>, key: string) => {
+ 87:   const next = (map.get(key) ?? 0) + 1;
+ 88:   map.set(key, next);
+ 89:   return next;
+ 90: };
+ 91: 
+ 92: const drop = (map: Map<string, number>, key: string) => {
+ 93:   const next = (map.get(key) ?? 1) - 1;
+ 94:   if (next <= 0) {
+ 95:     map.delete(key);
+ 96:   } else {
+ 97:     map.set(key, next);
+ 98:   }
+ 99: };
+100: 
+101: const acquireWithMemory = (userId: string, organizationId: string | null) => {
+102:   const userCount = bump(inflightByUser, userId);
+103:   if (userCount > QUERY_GUARDRAILS.maxConcurrentPerUser) {
+104:     drop(inflightByUser, userId);
+105:     throw new Error("Too many concurrent SQL queries for this user");
+106:   }
+107: 
+108:   if (organizationId) {
+109:     const orgCount = bump(inflightByOrg, organizationId);
+110:     if (orgCount > QUERY_GUARDRAILS.maxConcurrentPerOrg) {
+111:       drop(inflightByUser, userId);
+112:       drop(inflightByOrg, organizationId);
+113:       throw new Error("Too many concurrent SQL queries for this organization");
+114:     }
+115:   }
+116: 
+117:   return () => {
+118:     drop(inflightByUser, userId);
+119:     if (organizationId) {
+120:       drop(inflightByOrg, organizationId);
+121:     }
+122:   };
+123: };
+124: 
+125: export const acquireConcurrencySlot = async (
+126:   userId: string,
+127:   organizationId: string | null,
+128: ): Promise<() => Promise<void>> => {
+129:   const redis = await getRedisClient();
+130: 
+131:   if (!redis) {
+132:     const release = acquireWithMemory(userId, organizationId);
+133:     return async () => {
+134:       release();
+135:     };
+136:   }
+137: 
+138:   const userKey = await buildRedisKey("bi:concurrency:user", userId);
+139:   const orgKey = organizationId
+140:     ? await buildRedisKey("bi:concurrency:org", organizationId)
+141:     : "";
+142: 
+143:   try {
+144:     const result = (await redis.eval(ACQUIRE_CONCURRENCY_LUA, {
+145:       keys: [userKey, orgKey],
+146:       arguments: [
+147:         String(QUERY_GUARDRAILS.maxConcurrentPerUser),
+148:         String(QUERY_GUARDRAILS.maxConcurrentPerOrg),
+149:         String(CONCURRENCY_TTL_MS),
+150:       ],
+151:     })) as number;
+152: 
+153:     if (result === 1) {
+154:       throw new Error("Too many concurrent SQL queries for this user");
+155:     }
+156:     if (result === 2) {
+157:       throw new Error("Too many concurrent SQL queries for this organization");
+158:     }
+159:   } catch (error) {
+160:     const { getRedisConfig } = await import("~/lib/redis/client");
+161:     const config = await getRedisConfig();
+162:     if (config.required) {
+163:       throw error;
+164:     }
+165: 
+166:     const release = acquireWithMemory(userId, organizationId);
+167:     return async () => {
+168:       release();
+169:     };
+170:   }
+171: 
+172:   return async () => {
+173:     await redis.eval(RELEASE_CONCURRENCY_LUA, {
+174:       keys: [userKey, orgKey],
+175:       arguments: [],
+176:     });
+177:   };
+178: };
+179: 
+180: export const stripTrailingSemicolons = (sqlText: string) => sqlText.replace(/;\s*$/, "");
+181: 
+182: export const buildLimitedQuery = (sqlText: string, maxRows: number) =>
+183:   `SELECT * FROM (${stripTrailingSemicolons(sqlText)}) AS bi_limit_subquery ` +
+184:   `LIMIT ${maxRows}`;
+185: 
+186: export const assertPivotCardinality = (rowCount: number, columnCount: number) => {
+187:   if (rowCount > QUERY_GUARDRAILS.maxPivotRows) {
+188:     throw new Error("Too many row categories; add filters or fewer dimensions.");
+189:   }
+190:   if (columnCount > QUERY_GUARDRAILS.maxPivotColumns) {
+191:     throw new Error("Too many column categories; add filters or fewer dimensions.");
+192:   }
+193:   if (rowCount * columnCount > QUERY_GUARDRAILS.maxPivotCells) {
+194:     throw new Error("Too many categories; add filters or fewer dimensions.");
+195:   }
+196: };
+197: 
+198: const escapeLiteral = (value: string) => `'${value.replace(/'/g, "''")}'`;
+199: 
+200: export const inlineParameters = (
+201:   sqlText: string,
+202:   parameters: Record<string, unknown>,
+203: ): string => {
+204:   return sqlText.replace(/\{\{([a-zA-Z_][\w]*)\}\}/g, (_, name) => {
+205:     if (!(name in parameters)) {
+206:       throw new Error(`Missing SQL parameter: ${name}`);
+207:     }
+208: 
+209:     const value = parameters[name];
+210:     if (value === null || value === undefined) return "NULL";
+211:     if (typeof value === "number" && Number.isFinite(value)) return value.toString();
+212:     if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
+213:     if (value instanceof Date) return escapeLiteral(value.toISOString());
+214:     if (Array.isArray(value)) {
+215:       const values = value.map((entry) =>
+216:         inlineParameters("{{value}}", { value: entry }),
+217:       );
+218:       return `ARRAY[${values.join(", ")}]`;
+219:     }
+220:     return escapeLiteral(String(value));
+221:   });
+222: };
+</file>
+
+<file path="src/features/bi/governance/sql-workbench-gate.ts">
+  1: import { createServerOnlyFn } from "@tanstack/react-start";
+  2: import { sql } from "drizzle-orm";
+  3: import { getDb } from "~/db/server-helpers";
+  4: import { REDIS_TTLS, buildRedisKey, hashString } from "~/lib/redis/keys";
+  5: import { internalError } from "~/lib/server/errors";
+  6: import { DATASETS } from "../semantic";
+  7: import { QUERY_GUARDRAILS } from "./query-guardrails";
+  8: import { assertSafeIdentifier, quoteIdentifier } from "../engine/sql-identifiers";
+  9: import { formatSetLocalValue } from "./set-local";
+ 10: 
+ 11: const CACHE_TTL_MS = REDIS_TTLS.sqlWorkbenchGateSeconds * 1000;
+ 12: 
+ 13: type GateCache = {
+ 14:   ok: boolean;
+ 15:   checkedAt: number;
+ 16:   message?: string;
+ 17:   key?: string;
+ 18: };
+ 19: 
+ 20: let cachedGate: GateCache | null = null;
+ 21: 
+ 22: const getRedisClient = createServerOnlyFn(async () => {
+ 23:   const { getRedis } = await import("~/lib/redis/client");
+ 24:   return getRedis({ required: false });
+ 25: });
+ 26: 
+ 27: const normalizeRows = <T>(result: unknown): T[] => {
+ 28:   if (Array.isArray(result)) return result as T[];
+ 29:   if (result && typeof result === "object") {
+ 30:     const rows = (result as { rows?: T[] }).rows;
+ 31:     if (Array.isArray(rows)) return rows;
+ 32:   }
+ 33:   return [];
+ 34: };
+ 35: 
+ 36: const buildGateCacheKey = (params: {
+ 37:   datasetIds: string[];
+ 38:   organizationId: string | null;
+ 39:   isGlobalAdmin: boolean;
+ 40: }) => {
+ 41:   const datasetKey = hashString(params.datasetIds.join("|"));
+ 42:   const orgKey = params.organizationId ?? "global";
+ 43:   return `bi:sql-gate:${datasetKey}:${orgKey}:${params.isGlobalAdmin ? "admin" : "user"}`;
+ 44: };
+ 45: 
+ 46: export const assertSqlWorkbenchReady = async (params: {
+ 47:   organizationId: string | null;
+ 48:   isGlobalAdmin: boolean;
+ 49:   datasetIds?: string[];
+ 50: }) => {
+ 51:   const now = Date.now();
+ 52:   const datasetIds = (params.datasetIds ?? Object.keys(DATASETS)).slice().sort();
+ 53:   const cacheKey = buildGateCacheKey({
+ 54:     datasetIds,
+ 55:     organizationId: params.organizationId,
+ 56:     isGlobalAdmin: params.isGlobalAdmin,
+ 57:   });
+ 58: 
+ 59:   const redis = await getRedisClient();
+ 60:   if (redis) {
+ 61:     const redisKey = await buildRedisKey(cacheKey);
+ 62:     const cached = await redis.get(redisKey);
+ 63:     if (cached) {
+ 64:       const entry = JSON.parse(cached) as GateCache;
+ 65:       if (entry.ok) return;
+ 66:       throw internalError(
+ 67:         entry.message ?? "SQL Workbench is not configured. Contact support.",
+ 68:       );
+ 69:     }
+ 70:   } else if (
+ 71:     cachedGate &&
+ 72:     cachedGate.key === cacheKey &&
+ 73:     now - cachedGate.checkedAt < CACHE_TTL_MS
+ 74:   ) {
+ 75:     if (cachedGate.ok) return;
+ 76:     throw internalError(
+ 77:       cachedGate.message ?? "SQL Workbench is not configured. Contact support.",
+ 78:     );
+ 79:   }
+ 80: 
+ 81:   const datasets = datasetIds
+ 82:     .map((id) => DATASETS[id])
+ 83:     .filter((dataset): dataset is NonNullable<typeof dataset> => Boolean(dataset));
+ 84:   const viewNames = datasets.map((dataset) => `bi_v_${dataset.id}`);
+ 85:   const baseTables = datasets.map((dataset) => dataset.baseTable);
+ 86:   const issues: string[] = [];
+ 87: 
+ 88:   const db = await getDb();
+ 89: 
+ 90:   const roleRows = normalizeRows<{ exists: number }>(
+ 91:     await db.execute(sql`SELECT 1 as exists FROM pg_roles WHERE rolname = 'bi_readonly'`),
+ 92:   );
+ 93:   if (roleRows.length === 0) {
+ 94:     issues.push("missing role bi_readonly");
+ 95:   }
+ 96: 
+ 97:   if (viewNames.length > 0) {
+ 98:     const viewChunks = viewNames.map((viewName) => sql`${viewName}`);
+ 99:     const viewRows = normalizeRows<{ table_name: string }>(
+100:       await db.execute(sql`
+101:         SELECT table_name
+102:         FROM information_schema.views
+103:         WHERE table_schema = 'public'
+104:           AND table_name IN (${sql.join(viewChunks, sql`, `)})
+105:       `),
+106:     );
+107:     const viewSet = new Set(viewRows.map((row) => row.table_name));
+108:     const missingViews = viewNames.filter((viewName) => !viewSet.has(viewName));
+109:     if (missingViews.length > 0) {
+110:       issues.push(`missing views: ${missingViews.join(", ")}`);
+111:     }
+112: 
+113:     const relRows = normalizeRows<{ relname: string; reloptions: string[] | null }>(
+114:       await db.execute(sql`
+115:         SELECT relname, reloptions
+116:         FROM pg_class
+117:         WHERE relname IN (${sql.join(viewChunks, sql`, `)})
+118:           AND relkind = 'v'
+119:       `),
+120:     );
+121:     const relOptions = new Map(relRows.map((row) => [row.relname, row.reloptions ?? []]));
+122:     const missingBarrier = viewNames.filter((viewName) => {
+123:       const options = relOptions.get(viewName) ?? [];
+124:       return !options.some((entry) => String(entry).includes("security_barrier=true"));
+125:     });
+126:     if (missingBarrier.length > 0) {
+127:       issues.push(`missing security_barrier: ${missingBarrier.join(", ")}`);
+128:     }
+129: 
+130:     const privilegeRows = normalizeRows<{
+131:       table_name: string;
+132:       privilege_type: string;
+133:     }>(
+134:       await db.execute(sql`
+135:         SELECT table_name, privilege_type
+136:         FROM information_schema.table_privileges
+137:         WHERE grantee = 'bi_readonly'
+138:           AND table_schema = 'public'
+139:           AND table_name IN (${sql.join(viewChunks, sql`, `)})
+140:       `),
+141:     );
+142:     const selectGrants = new Set(
+143:       privilegeRows
+144:         .filter((row) => row.privilege_type === "SELECT")
+145:         .map((row) => row.table_name),
+146:     );
+147:     const missingSelect = viewNames.filter((viewName) => !selectGrants.has(viewName));
+148:     if (missingSelect.length > 0) {
+149:       issues.push(`missing SELECT grants: ${missingSelect.join(", ")}`);
+150:     }
+151:   }
+152: 
+153:   if (baseTables.length > 0) {
+154:     const baseChunks = baseTables.map((tableName) => sql`${tableName}`);
+155:     const basePrivilegeRows = normalizeRows<{
+156:       table_name: string;
+157:       privilege_type: string;
+158:     }>(
+159:       await db.execute(sql`
+160:         SELECT table_name, privilege_type
+161:         FROM information_schema.table_privileges
+162:         WHERE grantee = 'bi_readonly'
+163:           AND table_schema = 'public'
+164:           AND table_name IN (${sql.join(baseChunks, sql`, `)})
+165:       `),
+166:     );
+167:     if (basePrivilegeRows.length > 0) {
+168:       const baseTablesGranted = Array.from(
+169:         new Set(basePrivilegeRows.map((row) => row.table_name)),
+170:       );
+171:       issues.push(`unexpected base table grants: ${baseTablesGranted.join(", ")}`);
+172:     }
+173:   }
+174: 
+175:   const sampleView = viewNames[0];
+176:   if (sampleView) {
+177:     try {
+178:       await db.transaction(async (tx) => {
+179:         await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+180:         await tx.execute(
+181:           sql.raw(`SET LOCAL app.org_id = ${formatSetLocalValue(params.organizationId ?? "")}`),
+182:         );
+183:         await tx.execute(
+184:           sql.raw(`SET LOCAL app.is_global_admin = ${formatSetLocalValue(params.isGlobalAdmin)}`),
+185:         );
+186:         await tx.execute(
+187:           sql.raw(
+188:             `SET LOCAL statement_timeout = ${formatSetLocalValue(
+189:               QUERY_GUARDRAILS.statementTimeoutMs,
+190:             )}`,
+191:           ),
+192:         );
+193:         const safeSampleView = quoteIdentifier(assertSafeIdentifier(sampleView, "view"));
+194:         await tx.execute(sql.raw(`SELECT 1 FROM ${safeSampleView} LIMIT 1`));
+195:       });
+196:     } catch (error) {
+197:       const message = error instanceof Error ? error.message : "unknown error";
+198:       issues.push(`bi_readonly role check failed: ${message}`);
+199:     }
+200:   }
+201: 
+202:   const entry: GateCache =
+203:     issues.length > 0
+204:       ? {
+205:           ok: false,
+206:           checkedAt: now,
+207:           message: `SQL Workbench is not configured (${issues.join("; ")}).`,
+208:           key: cacheKey,
+209:         }
+210:       : { ok: true, checkedAt: now, key: cacheKey };
+211: 
+212:   if (redis) {
+213:     const redisKey = await buildRedisKey(cacheKey);
+214:     await redis.set(redisKey, JSON.stringify(entry), {
+215:       EX: REDIS_TTLS.sqlWorkbenchGateSeconds,
+216:     });
+217:   } else {
+218:     cachedGate = entry;
+219:   }
+220: 
+221:   if (!entry.ok) {
+222:     throw internalError(
+223:       entry.message ?? "SQL Workbench is not configured. Contact support.",
+224:     );
+225:   }
+226: };
+227: 
+228: export const resetSqlWorkbenchGateCache = () => {
+229:   cachedGate = null;
+230: };
+</file>
+
+<file path="src/features/bi/__tests__/sql-executor.test.ts">
+  1: import { beforeEach, describe, expect, it, vi } from "vitest";
+  2: import { executeSqlWorkbenchQuery } from "../bi.sql-executor";
+  3: import * as guardrails from "../governance/query-guardrails";
+  4: import { resetSqlWorkbenchGateCache } from "../governance/sql-workbench-gate";
+  5: 
+  6: const getDbMock = vi.fn();
+  7: const logQueryMock = vi.fn();
+  8: 
+  9: vi.mock("~/db/server-helpers", () => ({
+ 10:   getDb: (...args: unknown[]) => getDbMock(...args),
+ 11: }));
+ 12: 
+ 13: vi.mock("../governance", () => ({
+ 14:   logQuery: (...args: unknown[]) => logQueryMock(...args),
+ 15: }));
+ 16: 
+ 17: // Valid UUID for testing
+ 18: const TEST_ORG_ID = "00000000-0000-0000-0000-000000000001";
+ 19: const TEST_USER_ID = "00000000-0000-0000-0000-000000000002";
+ 20: 
+ 21: describe("executeSqlWorkbenchQuery", () => {
+ 22:   beforeEach(() => {
+ 23:     getDbMock.mockReset();
+ 24:     logQueryMock.mockReset();
+ 25:     resetSqlWorkbenchGateCache();
+ 26:   });
+ 27: 
+ 28:   const mockDb = (
+ 29:     txExecute: (query: { queryChunks?: unknown[] }) => Promise<unknown>,
+ 30:   ) => {
+ 31:     const metadataExecute = vi
+ 32:       .fn()
+ 33:       .mockResolvedValueOnce([{ exists: 1 }])
+ 34:       .mockResolvedValueOnce([{ table_name: "bi_v_organizations" }])
+ 35:       .mockResolvedValueOnce([
+ 36:         { relname: "bi_v_organizations", reloptions: ["security_barrier=true"] },
+ 37:       ])
+ 38:       .mockResolvedValueOnce([
+ 39:         { table_name: "bi_v_organizations", privilege_type: "SELECT" },
+ 40:       ])
+ 41:       .mockResolvedValueOnce([]);
+ 42: 
+ 43:     getDbMock.mockResolvedValue({
+ 44:       execute: metadataExecute,
+ 45:       transaction: async (cb: (tx: { execute: typeof txExecute }) => unknown) =>
+ 46:         cb({ execute: txExecute }),
+ 47:     });
+ 48:   };
+ 49: 
+ 50:   it("applies session settings and limits", async () => {
+ 51:     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
+ 52:       const raw = query?.queryChunks?.[0] as { value?: string[] } | undefined;
+ 53:       const sqlText = raw?.value?.[0] ?? "";
+ 54:       if (sqlText.startsWith("EXPLAIN (FORMAT JSON)")) {
+ 55:         return [{ "QUERY PLAN": [{ Plan: { "Total Cost": 1 } }] }];
+ 56:       }
+ 57:       return [];
+ 58:     });
+ 59: 
+ 60:     mockDb(txExecute);
+ 61: 
+ 62:     await executeSqlWorkbenchQuery({
+ 63:       sqlText: "SELECT * FROM organizations",
+ 64:       parameters: {},
+ 65:       datasetId: "organizations",
+ 66:       maxRows: 25,
+ 67:       context: {
+ 68:         userId: TEST_USER_ID,
+ 69:         organizationId: TEST_ORG_ID,
+ 70:         orgRole: "reporter",
+ 71:         isGlobalAdmin: false,
+ 72:         permissions: new Set(["analytics.sql"]),
+ 73:         hasRecentAuth: true,
+ 74:         timestamp: new Date(),
+ 75:       },
+ 76:     });
+ 77: 
+ 78:     const readStatement = (arg: unknown) => {
+ 79:       const query = arg as {
+ 80:         queryChunks?: Array<{ value?: string[]; sql?: string }>;
+ 81:       };
+ 82:       const chunk = query?.queryChunks?.[0];
+ 83:       // sql.raw() stores the SQL in chunk.sql, template literals in chunk.value[0]
+ 84:       return chunk?.sql ?? chunk?.value?.[0] ?? "";
+ 85:     };
+ 86: 
+ 87:     const statements = txExecute.mock.calls
+ 88:       .map((call) => readStatement(call[0]))
+ 89:       .filter((statement) => typeof statement === "string");
+ 90: 
+ 91:     expect(statements).toEqual(
+ 92:       expect.arrayContaining([
+ 93:         "SET LOCAL ROLE bi_readonly",
+ 94:         `SET LOCAL app.org_id = '${TEST_ORG_ID}'`,
+ 95:         "SET LOCAL app.is_global_admin = 'false'",
+ 96:         `SET LOCAL statement_timeout = ${guardrails.QUERY_GUARDRAILS.statementTimeoutMs}`,
+ 97:       ]),
+ 98:     );
+ 99: 
+100:     const explain = statements.find((statement) =>
+101:       statement.startsWith("EXPLAIN (FORMAT JSON)"),
+102:     );
+103:     expect(explain).toContain(`LIMIT 25`);
+104:     expect(logQueryMock).toHaveBeenCalled();
+105:   });
+106: 
+107:   it("rejects queries that exceed cost limits", async () => {
+108:     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
+109:       const chunk = query?.queryChunks?.[0] as
+110:         | { value?: string[]; sql?: string }
+111:         | undefined;
+112:       const sqlText = chunk?.sql ?? chunk?.value?.[0] ?? "";
+113:       if (sqlText.startsWith("EXPLAIN (FORMAT JSON)")) {
+114:         return [
+115:           {
+116:             "QUERY PLAN": [
+117:               {
+118:                 Plan: { "Total Cost": guardrails.QUERY_GUARDRAILS.maxEstimatedCost + 1 },
+119:               },
+120:             ],
+121:           },
+122:         ];
+123:       }
+124:       return [];
+125:     });
+126: 
+127:     mockDb(txExecute);
+128: 
+129:     await expect(
+130:       executeSqlWorkbenchQuery({
+131:         sqlText: "SELECT * FROM organizations",
+132:         parameters: {},
+133:         datasetId: "organizations",
+134:         context: {
+135:           userId: TEST_USER_ID,
+136:           organizationId: TEST_ORG_ID,
+137:           orgRole: "reporter",
+138:           isGlobalAdmin: false,
+139:           permissions: new Set(["analytics.sql"]),
+140:           hasRecentAuth: true,
+141:           timestamp: new Date(),
+142:         },
+143:       }),
+144:     ).rejects.toThrow("SQL query exceeds cost limits");
+145:   });
+146: 
+147:   it("defaults to UI row limits when maxRows is not provided", async () => {
+148:     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
+149:       const raw = query?.queryChunks?.[0] as { value?: string[] } | undefined;
+150:       const sqlText = raw?.value?.[0] ?? "";
+151:       if (sqlText.startsWith("EXPLAIN (FORMAT JSON)")) {
+152:         return [{ "QUERY PLAN": [{ Plan: { "Total Cost": 1 } }] }];
+153:       }
+154:       return [];
+155:     });
+156: 
+157:     mockDb(txExecute);
+158: 
+159:     await executeSqlWorkbenchQuery({
+160:       sqlText: "SELECT * FROM organizations",
+161:       datasetId: "organizations",
+162:       context: {
+163:         userId: TEST_USER_ID,
+164:         organizationId: TEST_ORG_ID,
+165:         orgRole: "reporter",
+166:         isGlobalAdmin: false,
+167:         permissions: new Set(["analytics.sql"]),
+168:         hasRecentAuth: true,
+169:         timestamp: new Date(),
+170:       },
+171:     });
+172: 
+173:     const statements = txExecute.mock.calls
+174:       .map((call) => {
+175:         const query = call[0] as { queryChunks?: Array<{ value?: string[] }> };
+176:         return query?.queryChunks?.[0]?.value?.[0] ?? "";
+177:       })
+178:       .filter((statement) => typeof statement === "string");
+179: 
+180:     const explain = statements.find((statement) =>
+181:       statement.startsWith("EXPLAIN (FORMAT JSON)"),
+182:     );
+183:     expect(explain).toContain(`LIMIT ${guardrails.QUERY_GUARDRAILS.maxRowsUi}`);
+184:   });
+185: 
+186:   it("respects export row limits when provided", async () => {
+187:     const txExecute = vi.fn(async (query: { queryChunks?: unknown[] }) => {
+188:       const raw = query?.queryChunks?.[0] as { value?: string[] } | undefined;
+189:       const sqlText = raw?.value?.[0] ?? "";
+190:       if (sqlText.startsWith("EXPLAIN (FORMAT JSON)")) {
+191:         return [{ "QUERY PLAN": [{ Plan: { "Total Cost": 1 } }] }];
+192:       }
+193:       return [];
+194:     });
+195: 
+196:     mockDb(txExecute);
+197: 
+198:     await executeSqlWorkbenchQuery({
+199:       sqlText: "SELECT * FROM organizations",
+200:       datasetId: "organizations",
+201:       maxRows: guardrails.QUERY_GUARDRAILS.maxRowsExport,
+202:       context: {
+203:         userId: TEST_USER_ID,
+204:         organizationId: TEST_ORG_ID,
+205:         orgRole: "reporter",
+206:         isGlobalAdmin: false,
+207:         permissions: new Set(["analytics.sql"]),
+208:         hasRecentAuth: true,
+209:         timestamp: new Date(),
+210:       },
+211:     });
+212: 
+213:     const statements = txExecute.mock.calls
+214:       .map((call) => {
+215:         const query = call[0] as { queryChunks?: Array<{ value?: string[] }> };
+216:         return query?.queryChunks?.[0]?.value?.[0] ?? "";
+217:       })
+218:       .filter((statement) => typeof statement === "string");
+219: 
+220:     const explain = statements.find((statement) =>
+221:       statement.startsWith("EXPLAIN (FORMAT JSON)"),
+222:     );
+223:     expect(explain).toContain(`LIMIT ${guardrails.QUERY_GUARDRAILS.maxRowsExport}`);
+224:   });
+225: 
+226:   it("propagates concurrency guardrail errors", async () => {
+227:     const acquireSpy = vi
+228:       .spyOn(guardrails, "acquireConcurrencySlot")
+229:       .mockImplementation(async () => {
+230:         throw new Error("Too many concurrent SQL queries for this user");
+231:       });
+232: 
+233:     await expect(
+234:       executeSqlWorkbenchQuery({
+235:         sqlText: "SELECT * FROM organizations",
+236:         datasetId: "organizations",
+237:         context: {
+238:           userId: TEST_USER_ID,
+239:           organizationId: TEST_ORG_ID,
+240:           orgRole: "reporter",
+241:           isGlobalAdmin: false,
+242:           permissions: new Set(["analytics.sql"]),
+243:           hasRecentAuth: true,
+244:           timestamp: new Date(),
+245:         },
+246:       }),
+247:     ).rejects.toThrow("Too many concurrent SQL queries for this user");
+248: 
+249:     acquireSpy.mockRestore();
+250:   });
+251: });
+</file>
+
+<file path="src/features/bi/bi.sql-executor.ts">
+  1: import { sql, type SQLChunk } from "drizzle-orm";
+  2: import type { DatasetConfig } from "./bi.types";
+  3: import type { QueryContext } from "./bi.types";
+  4: import type { JsonRecord, JsonValue } from "~/shared/lib/json";
+  5: import { parseAndValidateSql, validateAgainstDataset } from "./engine/sql-parser";
+  6: import { rewriteSqlTables } from "./engine/sql-rewriter";
+  7: import {
+  8:   QUERY_GUARDRAILS,
+  9:   acquireConcurrencySlot,
+ 10:   buildLimitedQuery,
+ 11:   inlineParameters,
+ 12:   stripTrailingSemicolons,
+ 13: } from "./governance/query-guardrails";
+ 14: import { formatSetLocalValue } from "./governance/set-local";
+ 15: import { DATASETS, getDataset } from "./semantic";
+ 16: import { assertSqlWorkbenchReady } from "./governance/sql-workbench-gate";
+ 17: 
+ 18: const PLACEHOLDER_PATTERN = /\{\{([a-zA-Z_][\w]*)\}\}/g;
+ 19: 
+ 20: // UUID pattern for validating organization IDs
+ 21: const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ 22: 
+ 23: export type SqlExecutionResult = {
+ 24:   rows: JsonRecord[];
+ 25:   truncated: boolean;
+ 26:   executionTimeMs: number;
+ 27:   rowCount: number;
+ 28:   sql: string;
+ 29: };
+ 30: 
+ 31: const getViewName = (datasetId: string) => `bi_v_${datasetId}`;
+ 32: 
+ 33: const buildTableMapping = (datasets: DatasetConfig[]) => {
+ 34:   const map: Record<string, string> = {};
+ 35:   for (const dataset of datasets) {
+ 36:     map[dataset.baseTable] = getViewName(dataset.id);
+ 37:     map[dataset.id] = getViewName(dataset.id);
+ 38:   }
+ 39:   return map;
+ 40: };
+ 41: 
+ 42: const buildAllowedTables = (datasets: DatasetConfig[]) =>
+ 43:   new Set(datasets.map((dataset) => getViewName(dataset.id)));
+ 44: 
+ 45: const buildAllowedColumns = (datasets: DatasetConfig[]) => {
+ 46:   const allowed = new Map<string, Set<string>>();
+ 47:   for (const dataset of datasets) {
+ 48:     const viewName = getViewName(dataset.id);
+ 49:     const columns = new Set<string>();
+ 50:     for (const field of dataset.fields) {
+ 51:       if (field.piiClassification && field.piiClassification !== "none") continue;
+ 52:       columns.add(field.sourceColumn.toLowerCase());
+ 53:     }
+ 54:     allowed.set(viewName, columns);
+ 55:   }
+ 56:   return allowed;
+ 57: };
+ 58: 
+ 59: const buildParameterizedSql = (sqlText: string, parameters: JsonRecord) => {
+ 60:   let lastIndex = 0;
+ 61:   const chunks: SQLChunk[] = [];
+ 62:   let match: RegExpExecArray | null = null;
+ 63: 
+ 64:   while ((match = PLACEHOLDER_PATTERN.exec(sqlText)) !== null) {
+ 65:     const before = sqlText.slice(lastIndex, match.index);
+ 66:     if (before) {
+ 67:       chunks.push(sql.raw(before));
+ 68:     }
+ 69:     const name = match[1];
+ 70:     if (!(name in parameters)) {
+ 71:       throw new Error(`Missing SQL parameter: ${name}`);
+ 72:     }
+ 73:     chunks.push(sql.param(parameters[name]));
+ 74:     lastIndex = match.index + match[0].length;
+ 75:   }
+ 76: 
+ 77:   const tail = sqlText.slice(lastIndex);
+ 78:   if (tail) {
+ 79:     chunks.push(sql.raw(tail));
+ 80:   }
+ 81: 
+ 82:   return sql.join(chunks);
+ 83: };
+ 84: 
+ 85: const extractPlanCost = (explainResult: Array<Record<string, unknown>>) => {
+ 86:   if (!explainResult.length) return null;
+ 87:   const planEntry = explainResult[0] as Record<string, unknown>;
+ 88:   const planValue = planEntry["QUERY PLAN"] ?? planEntry["QUERY_PLAN"];
+ 89:   const plan = Array.isArray(planValue) ? planValue[0] : planValue;
+ 90:   if (!plan || typeof plan !== "object") return null;
+ 91:   const planDetails = (plan as Record<string, unknown>)["Plan"] as
+ 92:     | Record<string, unknown>
+ 93:     | undefined;
+ 94:   const totalCost = planDetails?.["Total Cost"];
+ 95:   return typeof totalCost === "number" ? totalCost : null;
+ 96: };
+ 97: 
+ 98: const normalizeSqlValue = (value: unknown): JsonValue => {
+ 99:   if (value === null || value === undefined) return null;
+100:   if (value instanceof Date) return value.toISOString();
+101:   if (typeof value === "bigint") return value.toString();
+102:   if (Array.isArray(value)) return value.map((entry) => normalizeSqlValue(entry));
+103:   if (typeof value === "object") {
+104:     const nested: JsonRecord = {};
+105:     for (const [key, entry] of Object.entries(value)) {
+106:       nested[key] = normalizeSqlValue(entry);
+107:     }
+108:     return nested;
+109:   }
+110:   if (
+111:     typeof value === "number" ||
+112:     typeof value === "string" ||
+113:     typeof value === "boolean"
+114:   ) {
+115:     return value;
+116:   }
+117:   return String(value);
+118: };
+119: 
+120: const normalizeSqlRow = (row: Record<string, unknown>): JsonRecord => {
+121:   const normalized: JsonRecord = {};
+122:   for (const [key, value] of Object.entries(row)) {
+123:     normalized[key] = normalizeSqlValue(value);
+124:   }
+125:   return normalized;
+126: };
+127: 
+128: export const executeSqlWorkbenchQuery = async (params: {
+129:   sqlText: string;
+130:   parameters?: JsonRecord;
+131:   datasetId?: string;
+132:   context: QueryContext;
+133:   maxRows?: number;
+134:   logQuery?: boolean;
+135: }): Promise<SqlExecutionResult> => {
+136:   const { sqlText, datasetId, context } = params;
+137:   const parameters = params.parameters ?? {};
+138:   const maxRows = params.maxRows ?? QUERY_GUARDRAILS.maxRowsUi;
+139:   const shouldLog = params.logQuery ?? true;
+140: 
+141:   const release = await acquireConcurrencySlot(context.userId, context.organizationId);
+142:   const startedAt = Date.now();
+143: 
+144:   try {
+145:     const parsed = parseAndValidateSql(sqlText);
+146:     if (!parsed.isValid) {
+147:       throw new Error(parsed.errors.join(" "));
+148:     }
+149: 
+150:     const selectedDatasets = (
+151:       datasetId ? [getDataset(datasetId)] : Object.values(DATASETS)
+152:     ).filter((dataset): dataset is DatasetConfig => Boolean(dataset));
+153: 
+154:     if (selectedDatasets.length === 0) {
+155:       throw new Error("No datasets available for SQL workbench");
+156:     }
+157: 
+158:     await assertSqlWorkbenchReady({
+159:       organizationId: context.organizationId ?? null,
+160:       isGlobalAdmin: context.isGlobalAdmin,
+161:       datasetIds: selectedDatasets.map((dataset) => dataset.id),
+162:     });
+163: 
+164:     const tableMapping = buildTableMapping(selectedDatasets);
+165:     const rewritten = rewriteSqlTables(stripTrailingSemicolons(sqlText), tableMapping);
+166: 
+167:     const rewrittenParsed = parseAndValidateSql(rewritten.sql);
+168:     if (!rewrittenParsed.isValid) {
+169:       throw new Error(rewrittenParsed.errors.join(" "));
+170:     }
+171: 
+172:     const allowedTables = buildAllowedTables(selectedDatasets);
+173:     const allowedColumns = buildAllowedColumns(selectedDatasets);
+174:     const validationErrors = validateAgainstDataset(
+175:       rewrittenParsed,
+176:       allowedTables,
+177:       allowedColumns,
+178:     );
+179: 
+180:     if (validationErrors.length > 0) {
+181:       throw new Error(validationErrors.join(" "));
+182:     }
+183: 
+184:     const limitedSqlText = buildLimitedQuery(rewritten.sql, maxRows);
+185:     const query = buildParameterizedSql(limitedSqlText, parameters);
+186: 
+187:     const { getDb } = await import("~/db/server-helpers");
+188:     const db = await getDb();
+189: 
+190:     // Validate organizationId is a UUID to prevent injection
+191:     const orgId = context.organizationId ?? "";
+192:     if (orgId && !UUID_PATTERN.test(orgId)) {
+193:       throw new Error("Invalid organization ID format");
+194:     }
+195: 
+196:     const result = await db.transaction(async (tx) => {
+197:       await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+198:       await tx.execute(sql.raw(`SET LOCAL app.org_id = ${formatSetLocalValue(orgId)}`));
+199:       await tx.execute(
+200:         sql.raw(
+201:           `SET LOCAL app.is_global_admin = ${formatSetLocalValue(context.isGlobalAdmin)}`,
+202:         ),
+203:       );
+204:       await tx.execute(
+205:         sql.raw(
+206:           `SET LOCAL statement_timeout = ${formatSetLocalValue(QUERY_GUARDRAILS.statementTimeoutMs)}`,
+207:         ),
+208:       );
+209: 
+210:       const explainSql = inlineParameters(limitedSqlText, parameters);
+211:       const explainRows = await tx.execute<Record<string, unknown>>(
+212:         sql.raw(`EXPLAIN (FORMAT JSON) ${explainSql}`),
+213:       );
+214:       const planCost = extractPlanCost(explainRows);
+215:       if (typeof planCost === "number" && planCost > QUERY_GUARDRAILS.maxEstimatedCost) {
+216:         throw new Error("SQL query exceeds cost limits");
+217:       }
+218: 
+219:       return tx.execute<Record<string, unknown>>(query);
+220:     });
+221: 
+222:     const rows = Array.isArray(result) ? result : [];
+223:     const normalizedRows = rows.map((row) => normalizeSqlRow(row));
+224:     const executionTimeMs = Date.now() - startedAt;
+225: 
+226:     if (shouldLog) {
+227:       const { logQuery } = await import("./governance");
+228:       const logParams = {
+229:         context,
+230:         queryType: "sql" as const,
+231:         sqlQuery: rewritten.sql,
+232:         parameters,
+233:         rowsReturned: normalizedRows.length,
+234:         executionTimeMs,
+235:         ...(datasetId ? { datasetId } : {}),
+236:       };
+237: 
+238:       await logQuery(logParams);
+239:     }
+240: 
+241:     return {
+242:       rows: normalizedRows,
+243:       truncated: normalizedRows.length >= maxRows,
+244:       executionTimeMs,
+245:       rowCount: normalizedRows.length,
+246:       sql: rewritten.sql,
+247:     };
+248:   } finally {
+249:     await release();
+250:   }
+251: };
+</file>
+
+<file path="src/features/bi/bi.queries.ts">
+   1: /**
+   2:  * BI Module Queries (Server Functions)
+   3:  */
+   4: 
+   5: import { createServerFn } from "@tanstack/react-start";
+   6: import { z } from "zod";
+   7: import type { OrganizationRole } from "~/lib/auth/guards/org-guard";
+   8: import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+   9: import { assertFeatureEnabled } from "~/tenant/feature-gates";
+  10: import {
+  11:   biQueryLogFilterSchema,
+  12:   fieldValueSuggestionsSchema,
+  13:   pivotQuerySchema,
+  14:   sqlQuerySchema,
+  15:   sqlSchemaRequestSchema,
+  16: } from "./bi.schemas";
+  17: import type { FilterConfig, PivotQuery } from "./bi.schemas";
+  18: import type { BiQueryLogEntry, QueryContext } from "./bi.types";
+  19: import { buildAllowedFilters, normalizePivotConfig } from "./bi.utils";
+  20: import { buildPivotCacheKey, getPivotCache, setPivotCache } from "./cache/pivot-cache";
+  21: import { loadDatasetData } from "./bi.data";
+  22: import { buildPivotResult } from "./engine/pivot-aggregator";
+  23: import {
+  24:   buildFieldExpression,
+  25:   buildFilterExpression,
+  26:   buildPivotResultFromSqlRows,
+  27:   buildPivotSqlPlan,
+  28: } from "./engine/pivot-sql-compiler";
+  29: import { assertSafeIdentifier, quoteIdentifier } from "./engine/sql-identifiers";
+  30: import { normalizeFilter, type NormalizedFilter } from "./engine/filters";
+  31: import {
+  32:   acquireConcurrencySlot,
+  33:   filterAccessibleFields,
+  34:   getFieldsToMask,
+  35: } from "./governance";
+  36: import { assertPivotCardinality, QUERY_GUARDRAILS } from "./governance/query-guardrails";
+  37: import { formatSetLocalValue } from "./governance/set-local";
+  38: import { DATASETS, getDataset } from "./semantic";
+  39: import { getMetric } from "./semantic/metrics.config";
+  40: 
+  41: const ANALYTICS_ROLES: OrganizationRole[] = ["owner", "admin", "reporter"];
+  42: 
+  43: const extractPermissionSet = (
+  44:   roleAssignments: Array<{ role?: { permissions?: Record<string, boolean> } }>,
+  45: ) => {
+  46:   const permissions = new Set<string>();
+  47:   for (const assignment of roleAssignments) {
+  48:     const perms = assignment.role?.permissions ?? {};
+  49:     for (const [key, value] of Object.entries(perms)) {
+  50:       if (value) permissions.add(key);
+  51:     }
+  52:   }
+  53:   return permissions;
+  54: };
+  55: 
+  56: const hasAnalyticsPermission = (permissions: Set<string>, permission: string) =>
+  57:   permissions.has(permission) ||
+  58:   permissions.has("analytics.admin") ||
+  59:   permissions.has("*");
+  60: 
+  61: const ensureOrgScope = (params: {
+  62:   datasetOrgField?: string;
+  63:   datasetRequiresOrg: boolean | undefined;
+  64:   isGlobalAdmin: boolean;
+  65:   contextOrganizationId: string | null;
+  66:   requestOrganizationId?: string | null;
+  67:   filters: FilterConfig[];
+  68: }): { scopedOrganizationId: string | null } => {
+  69:   if (params.isGlobalAdmin) {
+  70:     return {
+  71:       scopedOrganizationId:
+  72:         params.requestOrganizationId ?? params.contextOrganizationId ?? null,
+  73:     };
+  74:   }
+  75: 
+  76:   if (!params.datasetRequiresOrg) {
+  77:     return { scopedOrganizationId: null };
+  78:   }
+  79: 
+  80:   if (!params.contextOrganizationId) {
+  81:     throw new Error("Organization context required");
+  82:   }
+  83: 
+  84:   if (
+  85:     params.requestOrganizationId &&
+  86:     params.requestOrganizationId !== params.contextOrganizationId
+  87:   ) {
+  88:     throw new Error("Organization context mismatch");
+  89:   }
+  90: 
+  91:   const orgField = params.datasetOrgField ?? "organizationId";
+  92:   const orgFilter = params.filters.find((filter) => filter.field === orgField);
+  93:   if (orgFilter) {
+  94:     const filterValues =
+  95:       orgFilter.operator === "in" && Array.isArray(orgFilter.value)
+  96:         ? orgFilter.value
+  97:         : [orgFilter.value];
+  98:     const invalid = filterValues.some((value) => value !== params.contextOrganizationId);
+  99:     if (invalid) {
+ 100:       throw new Error("Organization context mismatch");
+ 101:     }
+ 102:   }
+ 103: 
+ 104:   return { scopedOrganizationId: params.contextOrganizationId };
+ 105: };
+ 106: 
+ 107: const parseLogDateFilter = (value: string, boundary: "start" | "end") => {
+ 108:   const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+ 109:   if (!isDateOnly) return new Date(value);
+ 110: 
+ 111:   const base = new Date(`${value}T00:00:00.000Z`);
+ 112:   if (boundary === "end") {
+ 113:     return new Date(base.getTime() + 24 * 60 * 60 * 1000 - 1);
+ 114:   }
+ 115:   return base;
+ 116: };
+ 117: 
+ 118: export const getAvailableDatasets = createServerFn({ method: "GET" })
+ 119:   .middleware(getAuthMiddleware())
+ 120:   .handler(async ({ context }) => {
+ 121:     await assertFeatureEnabled("sin_analytics");
+ 122:     const user = requireUser(context);
+ 123:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 124:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 125:     const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 126:     const permissions = extractPermissionSet(roleAssignments);
+ 127: 
+ 128:     const contextOrganizationId =
+ 129:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 130: 
+ 131:     let orgRole: OrganizationRole | null = null;
+ 132:     if (contextOrganizationId && !isGlobalAdmin) {
+ 133:       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 134:       const access = await requireOrganizationAccess(
+ 135:         { userId: user.id, organizationId: contextOrganizationId },
+ 136:         { roles: ANALYTICS_ROLES },
+ 137:       );
+ 138:       orgRole = access.role as OrganizationRole;
+ 139:     }
+ 140: 
+ 141:     const datasets = Object.values(DATASETS);
+ 142: 
+ 143:     const visible = datasets.filter((dataset) => {
+ 144:       if (isGlobalAdmin) return true;
+ 145:       if (!dataset.allowedRoles || dataset.allowedRoles.length === 0) return true;
+ 146:       if (!orgRole) return false;
+ 147:       return dataset.allowedRoles.includes(orgRole);
+ 148:     });
+ 149: 
+ 150:     return {
+ 151:       datasets: visible.map((dataset) => ({
+ 152:         id: dataset.id,
+ 153:         name: dataset.name,
+ 154:         description: dataset.description ?? "",
+ 155:         fieldCount: dataset.fields.length,
+ 156:         canExport: permissions.has("analytics.export") || permissions.has("*"),
+ 157:         freshness: dataset.freshness ?? null,
+ 158:       })),
+ 159:     };
+ 160:   });
+ 161: 
+ 162: export const getDatasetFields = createServerFn({ method: "GET" })
+ 163:   .middleware(getAuthMiddleware())
+ 164:   .inputValidator(z.object({ datasetId: z.string().min(1) }).parse)
+ 165:   .handler(async ({ data, context }) => {
+ 166:     await assertFeatureEnabled("sin_analytics");
+ 167:     const user = requireUser(context);
+ 168:     const dataset = getDataset(data.datasetId);
+ 169: 
+ 170:     const { badRequest } = await import("~/lib/server/errors");
+ 171:     if (!dataset) {
+ 172:       throw badRequest(`Unknown dataset: ${data.datasetId}`);
+ 173:     }
+ 174: 
+ 175:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 176:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 177:     const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 178:     const permissions = extractPermissionSet(roleAssignments);
+ 179: 
+ 180:     const contextOrganizationId =
+ 181:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 182: 
+ 183:     let orgRole: OrganizationRole | null = null;
+ 184:     if (contextOrganizationId && !isGlobalAdmin) {
+ 185:       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 186:       const access = await requireOrganizationAccess(
+ 187:         { userId: user.id, organizationId: contextOrganizationId },
+ 188:         { roles: ANALYTICS_ROLES },
+ 189:       );
+ 190:       orgRole = access.role as OrganizationRole;
+ 191:     }
+ 192: 
+ 193:     const queryContext: QueryContext = {
+ 194:       userId: user.id,
+ 195:       organizationId: contextOrganizationId,
+ 196:       orgRole,
+ 197:       isGlobalAdmin,
+ 198:       permissions,
+ 199:       hasRecentAuth: false,
+ 200:       timestamp: new Date(),
+ 201:     };
+ 202: 
+ 203:     const fields = filterAccessibleFields(dataset.fields, queryContext);
+ 204: 
+ 205:     return {
+ 206:       datasetId: data.datasetId,
+ 207:       fields: fields.map((field) => ({
+ 208:         ...field,
+ 209:         allowGroupBy: field.allowGroupBy ?? false,
+ 210:         allowAggregate: field.allowAggregate ?? false,
+ 211:         allowFilter: field.allowFilter ?? false,
+ 212:         allowSort: field.allowSort ?? false,
+ 213:         defaultAggregation: field.defaultAggregation ?? null,
+ 214:       })),
+ 215:     };
+ 216:   });
+ 217: 
+ 218: export const getFieldValueSuggestions = createServerFn({ method: "GET" })
+ 219:   .middleware(getAuthMiddleware())
+ 220:   .inputValidator(fieldValueSuggestionsSchema.parse)
+ 221:   .handler(async ({ data, context }) => {
+ 222:     await assertFeatureEnabled("sin_analytics");
+ 223:     const user = requireUser(context);
+ 224:     const dataset = getDataset(data.datasetId);
+ 225:     const { badRequest, forbidden } = await import("~/lib/server/errors");
+ 226: 
+ 227:     if (!dataset) {
+ 228:       throw badRequest(`Unknown dataset: ${data.datasetId}`);
+ 229:     }
+ 230: 
+ 231:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 232:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 233:     const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 234:     const permissions = extractPermissionSet(roleAssignments);
+ 235: 
+ 236:     const contextOrganizationId =
+ 237:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 238: 
+ 239:     let orgRole: OrganizationRole | null = null;
+ 240:     if (contextOrganizationId && !isGlobalAdmin) {
+ 241:       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 242:       const access = await requireOrganizationAccess(
+ 243:         { userId: user.id, organizationId: contextOrganizationId },
+ 244:         { roles: ANALYTICS_ROLES },
+ 245:       );
+ 246:       orgRole = access.role as OrganizationRole;
+ 247:     }
+ 248: 
+ 249:     if (!isGlobalAdmin && dataset.allowedRoles && dataset.allowedRoles.length > 0) {
+ 250:       if (!orgRole || !dataset.allowedRoles.includes(orgRole)) {
+ 251:         throw forbidden("Dataset access denied");
+ 252:       }
+ 253:     }
+ 254: 
+ 255:     const scopedFilters = (data.filters ?? []).filter(
+ 256:       (filter) => !filter.datasetId || filter.datasetId === dataset.id,
+ 257:     );
+ 258:     let scopedOrganizationId: string | null = null;
+ 259:     try {
+ 260:       scopedOrganizationId =
+ 261:         ensureOrgScope({
+ 262:           datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
+ 263:           datasetRequiresOrg: dataset.requiresOrgScope,
+ 264:           isGlobalAdmin,
+ 265:           contextOrganizationId,
+ 266:           requestOrganizationId: data.organizationId ?? null,
+ 267:           filters: scopedFilters,
+ 268:         }).scopedOrganizationId ?? null;
+ 269:     } catch (error) {
+ 270:       throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
+ 271:     }
+ 272: 
+ 273:     const queryContext: QueryContext = {
+ 274:       userId: user.id,
+ 275:       organizationId: scopedOrganizationId,
+ 276:       orgRole,
+ 277:       isGlobalAdmin,
+ 278:       permissions,
+ 279:       hasRecentAuth: false,
+ 280:       timestamp: new Date(),
+ 281:     };
+ 282: 
+ 283:     const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
+ 284:     const targetField = accessibleFields.find((field) => field.id === data.fieldId);
+ 285:     if (!targetField) {
+ 286:       throw forbidden(`Field access denied: ${data.fieldId}`);
+ 287:     }
+ 288: 
+ 289:     if (!targetField.allowFilter || targetField.dataType === "json") {
+ 290:       return { values: [] };
+ 291:     }
+ 292: 
+ 293:     const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
+ 294:     if (fieldsToMask.includes(targetField.id)) {
+ 295:       return { values: [] };
+ 296:     }
+ 297: 
+ 298:     const search = data.search?.trim() ?? "";
+ 299:     const suggestionsConfig = targetField.suggestions;
+ 300:     const strategy =
+ 301:       suggestionsConfig?.strategy ??
+ 302:       (targetField.dataType === "uuid" || targetField.dataType === "number"
+ 303:         ? "require_search"
+ 304:         : "auto");
+ 305:     const minSearchLength = suggestionsConfig?.minSearchLength ?? 2;
+ 306:     const hasSearch = search.length >= minSearchLength;
+ 307: 
+ 308:     const allowedFilters = buildAllowedFilters(dataset);
+ 309:     const normalizedFilters: NormalizedFilter[] = [];
+ 310:     const filtersToApply = scopedFilters.filter((filter) => {
+ 311:       if (filter.field === targetField.id) return false;
+ 312:       return true;
+ 313:     });
+ 314: 
+ 315:     for (const filter of filtersToApply) {
+ 316:       try {
+ 317:         normalizedFilters.push(normalizeFilter(filter, allowedFilters));
+ 318:       } catch {
+ 319:         continue;
+ 320:       }
+ 321:     }
+ 322: 
+ 323:     const hasFilterContext = normalizedFilters.length > 0;
+ 324:     if (strategy === "disabled") return { values: [] };
+ 325:     if (strategy === "require_search" && !hasSearch) return { values: [] };
+ 326:     if (strategy === "require_filters" && !(hasFilterContext || hasSearch)) {
+ 327:       return { values: [] };
+ 328:     }
+ 329: 
+ 330:     if (dataset.requiresOrgScope && scopedOrganizationId) {
+ 331:       normalizedFilters.push({
+ 332:         field: dataset.orgScopeColumn ?? "organizationId",
+ 333:         operator: "eq",
+ 334:         value: scopedOrganizationId,
+ 335:       });
+ 336:     }
+ 337: 
+ 338:     const { sql } = await import("drizzle-orm");
+ 339:     const fieldExpr = buildFieldExpression(dataset, targetField.id);
+ 340:     const whereConditions = normalizedFilters.map((filter) =>
+ 341:       buildFilterExpression(filter, dataset),
+ 342:     );
+ 343:     whereConditions.push(sql`${fieldExpr} IS NOT NULL`);
+ 344: 
+ 345:     if (search) {
+ 346:       whereConditions.push(
+ 347:         sql`CAST(${fieldExpr} AS TEXT) ILIKE ${sql.param(`%${search}%`)}`,
+ 348:       );
+ 349:     }
+ 350: 
+ 351:     const whereClause =
+ 352:       whereConditions.length > 0
+ 353:         ? sql`WHERE ${sql.join(whereConditions, sql` AND `)}`
+ 354:         : sql``;
+ 355: 
+ 356:     const MAX_SUGGESTIONS = 50;
+ 357:     const maxValues = suggestionsConfig?.maxValues ?? MAX_SUGGESTIONS;
+ 358:     const limit = Math.min(data.limit ?? 25, maxValues, MAX_SUGGESTIONS);
+ 359:     const viewName = quoteIdentifier(
+ 360:       `bi_v_${assertSafeIdentifier(dataset.id, "dataset")}`,
+ 361:     );
+ 362:     const baseAlias = quoteIdentifier("base");
+ 363: 
+ 364:     const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
+ 365:     try {
+ 366:       const { getDb } = await import("~/db/server-helpers");
+ 367:       const db = await getDb();
+ 368: 
+ 369:       const result = await db.transaction(async (tx) => {
+ 370:         await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+ 371:         await tx.execute(
+ 372:           sql.raw(
+ 373:             `SET LOCAL app.org_id = ${formatSetLocalValue(scopedOrganizationId ?? "")}`,
+ 374:           ),
+ 375:         );
+ 376:         await tx.execute(
+ 377:           sql.raw(
+ 378:             `SET LOCAL app.is_global_admin = ${formatSetLocalValue(isGlobalAdmin)}`,
+ 379:           ),
+ 380:         );
+ 381:         await tx.execute(
+ 382:           sql.raw(
+ 383:             `SET LOCAL statement_timeout = ${formatSetLocalValue(
+ 384:               QUERY_GUARDRAILS.statementTimeoutMs,
+ 385:             )}`,
+ 386:           ),
+ 387:         );
+ 388: 
+ 389:         return tx.execute<Record<string, unknown>>(sql`
+ 390:           SELECT ${fieldExpr} AS value, COUNT(*) AS count
+ 391:           FROM ${sql.raw(`${viewName} AS ${baseAlias}`)}
+ 392:           ${whereClause}
+ 393:           GROUP BY ${fieldExpr}
+ 394:           ORDER BY count DESC
+ 395:           LIMIT ${sql.param(limit)}
+ 396:         `);
+ 397:       });
+ 398: 
+ 399:       const rows = Array.isArray(result)
+ 400:         ? result
+ 401:         : ((result as { rows?: Array<Record<string, unknown>> }).rows ?? []);
+ 402: 
+ 403:       const values = rows
+ 404:         .map((row) => {
+ 405:           const value = row["value"];
+ 406:           if (value === null || value === undefined) return null;
+ 407:           const count = row["count"];
+ 408:           return {
+ 409:             value,
+ 410:             count: typeof count === "number" ? count : Number(count ?? 0),
+ 411:           };
+ 412:         })
+ 413:         .filter((entry): entry is { value: string | number | boolean; count: number } =>
+ 414:           Boolean(entry),
+ 415:         );
+ 416: 
+ 417:       return { values };
+ 418:     } finally {
+ 419:       await release();
+ 420:     }
+ 421:   });
+ 422: 
+ 423: export const getSqlSchema = createServerFn({ method: "GET" })
+ 424:   .middleware(getAuthMiddleware())
+ 425:   .inputValidator(sqlSchemaRequestSchema.parse)
+ 426:   .handler(async ({ data, context }) => {
+ 427:     await assertFeatureEnabled("sin_analytics_sql_workbench");
+ 428:     const user = requireUser(context);
+ 429:     const { badRequest, forbidden } = await import("~/lib/server/errors");
+ 430:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 431:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 432:     const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 433:     const permissions = extractPermissionSet(roleAssignments);
+ 434: 
+ 435:     const contextOrganizationId =
+ 436:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 437: 
+ 438:     // Check org role BEFORE permission check - org admins/owners get SQL access
+ 439:     let orgRole: OrganizationRole | null = null;
+ 440:     if (contextOrganizationId && !isGlobalAdmin) {
+ 441:       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 442:       const access = await requireOrganizationAccess(
+ 443:         { userId: user.id, organizationId: contextOrganizationId },
+ 444:         { roles: ANALYTICS_ROLES },
+ 445:       );
+ 446:       orgRole = access.role as OrganizationRole;
+ 447:     }
+ 448: 
+ 449:     // Per SPEC-bi-platform.md: org admin/owner get SQL access, reporters need analytics.sql permission
+ 450:     const orgRoleAllowsSql = orgRole === "admin" || orgRole === "owner";
+ 451:     if (
+ 452:       !isGlobalAdmin &&
+ 453:       !orgRoleAllowsSql &&
+ 454:       !hasAnalyticsPermission(permissions, "analytics.sql")
+ 455:     ) {
+ 456:       throw forbidden("Analytics SQL permission required");
+ 457:     }
+ 458: 
+ 459:     const datasets = Object.values(DATASETS);
+ 460:     const visible = datasets.filter((dataset) => {
+ 461:       if (isGlobalAdmin) return true;
+ 462:       if (!dataset.allowedRoles || dataset.allowedRoles.length === 0) return true;
+ 463:       if (!orgRole) return false;
+ 464:       return dataset.allowedRoles.includes(orgRole);
+ 465:     });
+ 466: 
+ 467:     const selected = data.datasetId
+ 468:       ? visible.filter((dataset) => dataset.id === data.datasetId)
+ 469:       : visible;
+ 470: 
+ 471:     if (data.datasetId && selected.length === 0) {
+ 472:       throw badRequest(`Unknown dataset: ${data.datasetId}`);
+ 473:     }
+ 474: 
+ 475:     const { assertSqlWorkbenchReady } = await import("./governance/sql-workbench-gate");
+ 476:     await assertSqlWorkbenchReady({
+ 477:       organizationId: contextOrganizationId,
+ 478:       isGlobalAdmin,
+ 479:       datasetIds: selected.map((dataset) => dataset.id),
+ 480:     });
+ 481: 
+ 482:     type SchemaColumnRow = {
+ 483:       table_name: string;
+ 484:       column_name: string;
+ 485:       data_type: string;
+ 486:       is_nullable: string;
+ 487:       ordinal_position: number;
+ 488:     };
+ 489: 
+ 490:     const viewNames = selected.map((dataset) => `bi_v_${dataset.id}`);
+ 491:     const columnsByTable = new Map<string, SchemaColumnRow[]>();
+ 492: 
+ 493:     if (viewNames.length > 0) {
+ 494:       const { getDb } = await import("~/db/server-helpers");
+ 495:       const { sql } = await import("drizzle-orm");
+ 496:       const db = await getDb();
+ 497:       const viewChunks = viewNames.map((viewName) => sql`${viewName}`);
+ 498: 
+ 499:       const rows = await db.execute<SchemaColumnRow>(sql`
+ 500:         SELECT table_name, column_name, data_type, is_nullable, ordinal_position
+ 501:         FROM information_schema.columns
+ 502:         WHERE table_schema = 'public'
+ 503:           AND table_name IN (${sql.join(viewChunks, sql`, `)})
+ 504:         ORDER BY table_name, ordinal_position
+ 505:       `);
+ 506: 
+ 507:       for (const row of Array.isArray(rows) ? rows : []) {
+ 508:         const existing = columnsByTable.get(row.table_name) ?? [];
+ 509:         existing.push(row);
+ 510:         columnsByTable.set(row.table_name, existing);
+ 511:       }
+ 512:     }
+ 513: 
+ 514:     const tables = selected.map((dataset) => {
+ 515:       const viewName = `bi_v_${dataset.id}`;
+ 516:       const fieldMap = new Map(
+ 517:         dataset.fields.map((field) => [field.sourceColumn.toLowerCase(), field]),
+ 518:       );
+ 519:       const datasetFields = dataset.fields.filter(
+ 520:         (field) => !field.piiClassification || field.piiClassification === "none",
+ 521:       );
+ 522:       const columns = (columnsByTable.get(viewName) ?? []).map((column) => {
+ 523:         const field = fieldMap.get(column.column_name.toLowerCase());
+ 524:         return {
+ 525:           name: column.column_name,
+ 526:           dataType: column.data_type,
+ 527:           isNullable: column.is_nullable === "YES",
+ 528:           label: field?.name ?? null,
+ 529:           description: field?.description ?? null,
+ 530:           piiClassification: field?.piiClassification ?? "none",
+ 531:         };
+ 532:       });
+ 533: 
+ 534:       const fallbackColumns =
+ 535:         columns.length > 0
+ 536:           ? columns
+ 537:           : datasetFields.map((field) => ({
+ 538:               name: field.sourceColumn,
+ 539:               dataType: field.dataType,
+ 540:               isNullable: false,
+ 541:               label: field.name,
+ 542:               description: field.description ?? null,
+ 543:               piiClassification: field.piiClassification ?? "none",
+ 544:             }));
+ 545: 
+ 546:       return {
+ 547:         datasetId: dataset.id,
+ 548:         datasetName: dataset.name,
+ 549:         viewName,
+ 550:         description: dataset.description ?? "",
+ 551:         columns: fallbackColumns,
+ 552:       };
+ 553:     });
+ 554: 
+ 555:     return { tables, isGlobalAdmin };
+ 556:   });
+ 557: 
+ 558: const runPivotQuery = async (params: {
+ 559:   data: PivotQuery;
+ 560:   context: unknown;
+ 561:   user: { id: string };
+ 562: }) => {
+ 563:   await assertFeatureEnabled("sin_analytics");
+ 564:   const { data, context, user } = params;
+ 565:   const dataset = getDataset(data.datasetId);
+ 566:   const { badRequest, forbidden } = await import("~/lib/server/errors");
+ 567: 
+ 568:   if (!dataset) {
+ 569:     throw badRequest(`Unknown dataset: ${data.datasetId}`);
+ 570:   }
+ 571: 
+ 572:   const { PermissionService } = await import("~/features/roles/permission.service");
+ 573:   const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 574:   const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 575:   const permissions = extractPermissionSet(roleAssignments);
+ 576: 
+ 577:   const contextOrganizationId =
+ 578:     (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 579: 
+ 580:   let orgRole: OrganizationRole | null = null;
+ 581:   if (contextOrganizationId && !isGlobalAdmin && dataset.requiresOrgScope) {
+ 582:     const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 583:     const access = await requireOrganizationAccess(
+ 584:       { userId: user.id, organizationId: contextOrganizationId },
+ 585:       { roles: ANALYTICS_ROLES },
+ 586:     );
+ 587:     orgRole = access.role as OrganizationRole;
+ 588:   }
+ 589: 
+ 590:   let scopedOrganizationId: string | null = null;
+ 591:   try {
+ 592:     scopedOrganizationId =
+ 593:       ensureOrgScope({
+ 594:         datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
+ 595:         datasetRequiresOrg: dataset.requiresOrgScope,
+ 596:         isGlobalAdmin,
+ 597:         contextOrganizationId,
+ 598:         requestOrganizationId: data.organizationId ?? null,
+ 599:         filters: data.filters,
+ 600:       }).scopedOrganizationId ?? null;
+ 601:   } catch (error) {
+ 602:     throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
+ 603:   }
+ 604: 
+ 605:   const queryContext: QueryContext = {
+ 606:     userId: user.id,
+ 607:     organizationId: scopedOrganizationId,
+ 608:     orgRole,
+ 609:     isGlobalAdmin,
+ 610:     permissions,
+ 611:     hasRecentAuth: false,
+ 612:     timestamp: new Date(),
+ 613:   };
+ 614: 
+ 615:   const requestedMetricIds = data.measures
+ 616:     .map((measure) => measure.metricId)
+ 617:     .filter((value): value is string => Boolean(value));
+ 618:   const forbiddenMetrics = requestedMetricIds.filter((metricId) => {
+ 619:     const metric = getMetric(metricId);
+ 620:     if (!metric?.requiredPermission) return false;
+ 621:     return (
+ 622:       !permissions.has(metric.requiredPermission) &&
+ 623:       !permissions.has("analytics.admin") &&
+ 624:       !permissions.has("*")
+ 625:     );
+ 626:   });
+ 627: 
+ 628:   if (forbiddenMetrics.length > 0) {
+ 629:     throw forbidden(`Metric access denied: ${forbiddenMetrics.join(", ")}`);
+ 630:   }
+ 631: 
+ 632:   const normalized = normalizePivotConfig({
+ 633:     dataset,
+ 634:     rows: data.rows,
+ 635:     columns: data.columns,
+ 636:     measures: data.measures,
+ 637:     filters: data.filters,
+ 638:   });
+ 639: 
+ 640:   if (!normalized.ok) {
+ 641:     throw badRequest(normalized.errors.join(" "));
+ 642:   }
+ 643: 
+ 644:   const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
+ 645:   const accessibleIds = new Set(accessibleFields.map((field) => field.id));
+ 646:   const requestedFields = new Set([
+ 647:     ...normalized.value.rowFields,
+ 648:     ...normalized.value.columnFields,
+ 649:     ...normalized.value.measures
+ 650:       .map((measure) => measure.field)
+ 651:       .filter((field): field is string => Boolean(field)),
+ 652:   ]);
+ 653: 
+ 654:   const forbiddenFields = Array.from(requestedFields).filter(
+ 655:     (field) => !accessibleIds.has(field),
+ 656:   );
+ 657: 
+ 658:   if (forbiddenFields.length > 0) {
+ 659:     throw forbidden(`Field access denied: ${forbiddenFields.join(", ")}`);
+ 660:   }
+ 661: 
+ 662:   const orgScopeFilters = normalized.value.filters;
+ 663: 
+ 664:   if (dataset.requiresOrgScope && scopedOrganizationId) {
+ 665:     const scopeField = dataset.orgScopeColumn ?? "organizationId";
+ 666:     orgScopeFilters.push({
+ 667:       field: scopeField,
+ 668:       operator: "eq",
+ 669:       value: scopedOrganizationId,
+ 670:     });
+ 671:   }
+ 672: 
+ 673:   const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
+ 674:   const rawLimit = Math.min(
+ 675:     data.limit ?? QUERY_GUARDRAILS.maxRowsUi,
+ 676:     QUERY_GUARDRAILS.maxRowsUi,
+ 677:   );
+ 678:   const pivotLimit = QUERY_GUARDRAILS.maxPivotCells + 1;
+ 679: 
+ 680:   const cacheKey = buildPivotCacheKey({
+ 681:     userId: user.id,
+ 682:     organizationId: scopedOrganizationId,
+ 683:     datasetId: dataset.id,
+ 684:     query: data,
+ 685:   });
+ 686:   const cached = await getPivotCache(cacheKey);
+ 687:   if (cached) {
+ 688:     const { logQuery } = await import("./governance");
+ 689:     await logQuery({
+ 690:       context: queryContext,
+ 691:       queryType: "pivot",
+ 692:       datasetId: dataset.id,
+ 693:       pivotQuery: data,
+ 694:       parameters: { cacheStatus: "hit" },
+ 695:       rowsReturned: cached.rowCount,
+ 696:       executionTimeMs: 0,
+ 697:     });
+ 698:     return {
+ 699:       pivot: cached.pivot,
+ 700:       rowCount: cached.rowCount,
+ 701:     };
+ 702:   }
+ 703: 
+ 704:   const startedAt = Date.now();
+ 705:   let pivotResult: ReturnType<typeof buildPivotResult>;
+ 706:   let rowsReturned = 0;
+ 707: 
+ 708:   const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
+ 709:   try {
+ 710:     const plan = buildPivotSqlPlan({
+ 711:       dataset,
+ 712:       rowFields: normalized.value.rowFields,
+ 713:       columnFields: normalized.value.columnFields,
+ 714:       measures: normalized.value.measures,
+ 715:       filters: orgScopeFilters,
+ 716:       limit: pivotLimit,
+ 717:       maskedFieldIds: new Set(fieldsToMask),
+ 718:     });
+ 719: 
+ 720:     const { getDb } = await import("~/db/server-helpers");
+ 721:     const { sql } = await import("drizzle-orm");
+ 722:     const db = await getDb();
+ 723: 
+ 724:     try {
+ 725:       const result = await db.transaction(async (tx) => {
+ 726:         await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
+ 727:         await tx.execute(
+ 728:           sql.raw(
+ 729:             `SET LOCAL app.org_id = ${formatSetLocalValue(scopedOrganizationId ?? "")}`,
+ 730:           ),
+ 731:         );
+ 732:         await tx.execute(
+ 733:           sql.raw(
+ 734:             `SET LOCAL app.is_global_admin = ${formatSetLocalValue(isGlobalAdmin)}`,
+ 735:           ),
+ 736:         );
+ 737:         await tx.execute(
+ 738:           sql.raw(
+ 739:             `SET LOCAL statement_timeout = ${formatSetLocalValue(
+ 740:               QUERY_GUARDRAILS.statementTimeoutMs,
+ 741:             )}`,
+ 742:           ),
+ 743:         );
+ 744: 
+ 745:         return tx.execute<Record<string, unknown>>(plan.sql);
+ 746:       });
+ 747: 
+ 748:       const rows = Array.isArray(result)
+ 749:         ? result
+ 750:         : ((result as { rows?: Array<Record<string, unknown>> }).rows ?? []);
+ 751: 
+ 752:       if (rows.length > QUERY_GUARDRAILS.maxPivotCells) {
+ 753:         throw new Error("Too many categories; add filters or fewer dimensions.");
+ 754:       }
+ 755: 
+ 756:       rowsReturned = rows.length;
+ 757:       pivotResult = buildPivotResultFromSqlRows({
+ 758:         rows,
+ 759:         rowDimensions: plan.rowDimensions,
+ 760:         columnDimensions: plan.columnDimensions,
+ 761:         measures: normalized.value.measures,
+ 762:         measureAliases: plan.measures,
+ 763:       });
+ 764:     } catch (error) {
+ 765:       const isMissingView =
+ 766:         typeof error === "object" &&
+ 767:         error !== null &&
+ 768:         "code" in error &&
+ 769:         (error as { code?: string }).code === "42P01";
+ 770:       const message = error instanceof Error ? error.message.toLowerCase() : "";
+ 771:       const shouldFallback =
+ 772:         isMissingView ||
+ 773:         message.includes("relation") ||
+ 774:         message.includes("bi_v_") ||
+ 775:         message.includes("does not exist");
+ 776: 
+ 777:       if (!shouldFallback) {
+ 778:         throw error;
+ 779:       }
+ 780: 
+ 781:       const rows = await loadDatasetData({
+ 782:         datasetId: dataset.id,
+ 783:         columns: normalized.value.selectedFields,
+ 784:         filters: orgScopeFilters,
+ 785:         fieldsToMask,
+ 786:         limit: rawLimit + 1,
+ 787:       });
+ 788: 
+ 789:       if (rows.length > rawLimit) {
+ 790:         throw new Error("Query returned too many rows; add filters.");
+ 791:       }
+ 792: 
+ 793:       rowsReturned = rows.length;
+ 794:       pivotResult = buildPivotResult(rows, {
+ 795:         rowFields: normalized.value.rowFields,
+ 796:         columnFields: normalized.value.columnFields,
+ 797:         measures: normalized.value.measures,
+ 798:       });
+ 799:     }
+ 800:   } finally {
+ 801:     await release();
+ 802:   }
+ 803: 
+ 804:   assertPivotCardinality(pivotResult.rows.length, pivotResult.columnKeys.length);
+ 805: 
+ 806:   const executionTimeMs = Date.now() - startedAt;
+ 807:   await setPivotCache(cacheKey, {
+ 808:     datasetId: dataset.id,
+ 809:     pivot: pivotResult,
+ 810:     rowCount: rowsReturned,
+ 811:   });
+ 812: 
+ 813:   const { logQuery } = await import("./governance");
+ 814:   await logQuery({
+ 815:     context: queryContext,
+ 816:     queryType: "pivot",
+ 817:     datasetId: dataset.id,
+ 818:     pivotQuery: data,
+ 819:     parameters: { cacheStatus: "miss" },
+ 820:     rowsReturned,
+ 821:     executionTimeMs,
+ 822:   });
+ 823: 
+ 824:   return {
+ 825:     pivot: pivotResult,
+ 826:     rowCount: rowsReturned,
+ 827:   };
+ 828: };
+ 829: 
+ 830: export const executePivotQuery = createServerFn({ method: "POST" })
+ 831:   .middleware(getAuthMiddleware())
+ 832:   .inputValidator(pivotQuerySchema.parse)
+ 833:   .handler(async ({ data, context }) => {
+ 834:     const user = requireUser(context);
+ 835:     return runPivotQuery({ data, context, user });
+ 836:   });
+ 837: 
+ 838: const pivotBatchSchema = z.object({
+ 839:   queries: z.array(
+ 840:     z.object({
+ 841:       widgetId: z.string().min(1),
+ 842:       query: pivotQuerySchema,
+ 843:     }),
+ 844:   ),
+ 845: });
+ 846: 
+ 847: export const executePivotBatch = createServerFn({ method: "POST" })
+ 848:   .middleware(getAuthMiddleware())
+ 849:   .inputValidator(pivotBatchSchema.parse)
+ 850:   .handler(async ({ data, context }) => {
+ 851:     const user = requireUser(context);
+ 852:     const results: Array<{
+ 853:       widgetId: string;
+ 854:       pivot?: ReturnType<typeof buildPivotResult>;
+ 855:       rowCount?: number;
+ 856:       error?: string;
+ 857:     }> = [];
+ 858: 
+ 859:     for (const entry of data.queries) {
+ 860:       try {
+ 861:         const result = await runPivotQuery({
+ 862:           data: entry.query,
+ 863:           context,
+ 864:           user,
+ 865:         });
+ 866:         results.push({
+ 867:           widgetId: entry.widgetId,
+ 868:           pivot: result.pivot,
+ 869:           rowCount: result.rowCount,
+ 870:         });
+ 871:       } catch (error) {
+ 872:         results.push({
+ 873:           widgetId: entry.widgetId,
+ 874:           error: error instanceof Error ? error.message : "Query failed",
+ 875:         });
+ 876:       }
+ 877:     }
+ 878: 
+ 879:     return { results };
+ 880:   });
+ 881: 
+ 882: export const getDashboards = createServerFn({ method: "GET" })
+ 883:   .middleware(getAuthMiddleware())
+ 884:   .handler(async ({ context }) => {
+ 885:     await assertFeatureEnabled("sin_analytics");
+ 886:     const user = requireUser(context);
+ 887:     const { getDb } = await import("~/db/server-helpers");
+ 888:     const { biDashboards } = await import("~/db/schema");
+ 889:     const { and, eq, isNull, or, sql } = await import("drizzle-orm");
+ 890:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 891: 
+ 892:     const db = await getDb();
+ 893:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 894:     const contextOrganizationId =
+ 895:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 896: 
+ 897:     if (isGlobalAdmin) {
+ 898:       return {
+ 899:         dashboards: await db.select().from(biDashboards),
+ 900:       };
+ 901:     }
+ 902: 
+ 903:     if (!contextOrganizationId) {
+ 904:       return { dashboards: [] };
+ 905:     }
+ 906: 
+ 907:     const personalCondition = and(
+ 908:       isNull(biDashboards.organizationId),
+ 909:       eq(biDashboards.ownerId, user.id),
+ 910:     );
+ 911: 
+ 912:     const sharedWithCondition = sql`${biDashboards.sharedWith} @> ${JSON.stringify([
+ 913:       user.id,
+ 914:     ])}::jsonb`;
+ 915: 
+ 916:     const orgScopedCondition = and(
+ 917:       eq(biDashboards.organizationId, contextOrganizationId),
+ 918:       or(
+ 919:         eq(biDashboards.ownerId, user.id),
+ 920:         sharedWithCondition,
+ 921:         eq(biDashboards.isOrgWide, true),
+ 922:       ),
+ 923:     );
+ 924: 
+ 925:     return {
+ 926:       dashboards: await db
+ 927:         .select()
+ 928:         .from(biDashboards)
+ 929:         .where(or(personalCondition, orgScopedCondition)),
+ 930:     };
+ 931:   });
+ 932: 
+ 933: export const getDashboard = createServerFn({ method: "GET" })
+ 934:   .middleware(getAuthMiddleware())
+ 935:   .inputValidator(z.object({ dashboardId: z.uuid() }).parse)
+ 936:   .handler(async ({ data, context }) => {
+ 937:     await assertFeatureEnabled("sin_analytics");
+ 938:     const user = requireUser(context);
+ 939:     const { getDb } = await import("~/db/server-helpers");
+ 940:     const { biDashboards, biDashboardWidgets } = await import("~/db/schema");
+ 941:     const { eq } = await import("drizzle-orm");
+ 942:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 943: 
+ 944:     const db = await getDb();
+ 945:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 946:     const [dashboard] = await db
+ 947:       .select()
+ 948:       .from(biDashboards)
+ 949:       .where(eq(biDashboards.id, data.dashboardId))
+ 950:       .limit(1);
+ 951: 
+ 952:     if (!dashboard) return null;
+ 953: 
+ 954:     if (!isGlobalAdmin) {
+ 955:       const contextOrganizationId =
+ 956:         (context as { organizationId?: string | null } | undefined)?.organizationId ??
+ 957:         null;
+ 958: 
+ 959:       const canAccess =
+ 960:         dashboard.ownerId === user.id ||
+ 961:         dashboard.isOrgWide ||
+ 962:         (dashboard.sharedWith ?? []).includes(user.id) ||
+ 963:         (contextOrganizationId && dashboard.organizationId === contextOrganizationId);
+ 964: 
+ 965:       if (!canAccess) return null;
+ 966:     }
+ 967: 
+ 968:     const widgets = await db
+ 969:       .select()
+ 970:       .from(biDashboardWidgets)
+ 971:       .where(eq(biDashboardWidgets.dashboardId, dashboard.id));
+ 972: 
+ 973:     return {
+ 974:       ...dashboard,
+ 975:       widgets,
+ 976:     };
+ 977:   });
+ 978: 
+ 979: export const executeSqlQuery = createServerFn({ method: "POST" })
+ 980:   .middleware(getAuthMiddleware())
+ 981:   .inputValidator(sqlQuerySchema.parse)
+ 982:   .handler(async ({ data, context }) => {
+ 983:     await assertFeatureEnabled("sin_analytics_sql_workbench");
+ 984:     const user = requireUser(context);
+ 985:     const { forbidden } = await import("~/lib/server/errors");
+ 986:     const { PermissionService } = await import("~/features/roles/permission.service");
+ 987: 
+ 988:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+ 989:     const roleAssignments = await PermissionService.getUserRoles(user.id);
+ 990:     const permissions = extractPermissionSet(roleAssignments);
+ 991: 
+ 992:     const contextOrganizationId =
+ 993:       (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
+ 994: 
+ 995:     // Check org role BEFORE permission check - org admins/owners get SQL access
+ 996:     let orgRole: OrganizationRole | null = null;
+ 997:     if (contextOrganizationId && !isGlobalAdmin) {
+ 998:       const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
+ 999:       const access = await requireOrganizationAccess(
+1000:         { userId: user.id, organizationId: contextOrganizationId },
+1001:         { roles: ANALYTICS_ROLES },
+1002:       );
+1003:       orgRole = access.role as OrganizationRole;
+1004:     }
+1005: 
+1006:     // Per SPEC-bi-platform.md: org admin/owner get SQL access, reporters need analytics.sql permission
+1007:     const orgRoleAllowsSql = orgRole === "admin" || orgRole === "owner";
+1008:     if (
+1009:       !isGlobalAdmin &&
+1010:       !orgRoleAllowsSql &&
+1011:       !hasAnalyticsPermission(permissions, "analytics.sql")
+1012:     ) {
+1013:       throw forbidden("Analytics SQL permission required");
+1014:     }
+1015: 
+1016:     const queryContext: QueryContext = {
+1017:       userId: user.id,
+1018:       organizationId: contextOrganizationId,
+1019:       orgRole,
+1020:       isGlobalAdmin,
+1021:       permissions,
+1022:       hasRecentAuth: false,
+1023:       timestamp: new Date(),
+1024:     };
+1025: 
+1026:     const { executeSqlWorkbenchQuery } = await import("./bi.sql-executor");
+1027:     const sqlParams = {
+1028:       sqlText: data.sql,
+1029:       parameters: data.parameters ?? {},
+1030:       context: queryContext,
+1031:       ...(data.datasetId ? { datasetId: data.datasetId } : {}),
+1032:     };
+1033: 
+1034:     return executeSqlWorkbenchQuery(sqlParams);
+1035:   });
+1036: 
+1037: export const listBiQueryLogs = createServerFn({ method: "GET" })
+1038:   .middleware(getAuthMiddleware())
+1039:   .inputValidator(biQueryLogFilterSchema.parse)
+1040:   .handler(async ({ data, context }): Promise<BiQueryLogEntry[]> => {
+1041:     await assertFeatureEnabled("sin_admin_audit");
+1042:     const user = requireUser(context);
+1043:     const { forbidden } = await import("~/lib/server/errors");
+1044:     const { PermissionService } = await import("~/features/roles/permission.service");
+1045:     const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
+1046: 
+1047:     const { getDb } = await import("~/db/server-helpers");
+1048:     const { biQueryLog, organizationMembers } = await import("~/db/schema");
+1049:     const { and, desc, eq, gte, inArray, lte } = await import("drizzle-orm");
+1050:     const { ORG_ADMIN_ROLES } = await import("~/lib/auth/guards/org-guard");
+1051: 
+1052:     const db = await getDb();
+1053:     const conditions = [];
+1054: 
+1055:     if (!isGlobalAdmin) {
+1056:       const adminMemberships = await db
+1057:         .select({ organizationId: organizationMembers.organizationId })
+1058:         .from(organizationMembers)
+1059:         .where(
+1060:           and(
+1061:             eq(organizationMembers.userId, user.id),
+1062:             eq(organizationMembers.status, "active"),
+1063:             inArray(organizationMembers.role, ORG_ADMIN_ROLES),
+1064:           ),
+1065:         );
+1066: 
+1067:       const allowedOrgIds = adminMemberships.map((row) => row.organizationId);
+1068:       if (allowedOrgIds.length === 0) {
+1069:         throw forbidden("Admin access required");
+1070:       }
+1071: 
+1072:       if (data.organizationId) {
+1073:         if (!allowedOrgIds.includes(data.organizationId)) {
+1074:           throw forbidden("Insufficient organization role");
+1075:         }
+1076:         conditions.push(eq(biQueryLog.organizationId, data.organizationId));
+1077:       } else {
+1078:         conditions.push(inArray(biQueryLog.organizationId, allowedOrgIds));
+1079:       }
+1080:     } else if (data.organizationId) {
+1081:       conditions.push(eq(biQueryLog.organizationId, data.organizationId));
+1082:     }
+1083: 
+1084:     if (data.userId) {
+1085:       conditions.push(eq(biQueryLog.userId, data.userId));
+1086:     }
+1087: 
+1088:     if (data.queryType) {
+1089:       conditions.push(eq(biQueryLog.queryType, data.queryType));
+1090:     }
+1091: 
+1092:     if (data.datasetId) {
+1093:       conditions.push(eq(biQueryLog.datasetId, data.datasetId));
+1094:     }
+1095: 
+1096:     if (data.from) {
+1097:       conditions.push(gte(biQueryLog.createdAt, parseLogDateFilter(data.from, "start")));
+1098:     }
+1099: 
+1100:     if (data.to) {
+1101:       conditions.push(lte(biQueryLog.createdAt, parseLogDateFilter(data.to, "end")));
+1102:     }
+1103: 
+1104:     const rows = (await db
+1105:       .select()
+1106:       .from(biQueryLog)
+1107:       .where(conditions.length ? and(...conditions) : undefined)
+1108:       .orderBy(desc(biQueryLog.createdAt))
+1109:       .limit(data.limit ?? 100)) as BiQueryLogEntry[];
+1110: 
+1111:     return rows;
+1112:   });
+</file>
+
+</files>

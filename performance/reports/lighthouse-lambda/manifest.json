@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://iphsvnyo27hgi3gn5crn6o4fdm0inizf.lambda-url.ca-central-1.on.aws/auth/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_02_54.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_02_54.report.json",
+    "summary": {
+      "performance": 0.97,
+      "accessibility": 0.95,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://iphsvnyo27hgi3gn5crn6o4fdm0inizf.lambda-url.ca-central-1.on.aws/auth/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_03_23.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_03_23.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 0.95,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://iphsvnyo27hgi3gn5crn6o4fdm0inizf.lambda-url.ca-central-1.on.aws/auth/login",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_03_09.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-lambda/iphsvnyo27hgi3gn5crn6o4fdm0inizf_lambda_url_ca_central_1_on_aws-auth_login-2026_01_08_19_03_09.report.json",
+    "summary": {
+      "performance": 0.97,
+      "accessibility": 0.95,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  }
+]

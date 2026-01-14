@@ -1,6 +1,6 @@
 import type { JsonRecord } from "~/shared/lib/json";
 
-export type AiProvider = "openai" | "anthropic";
+export type AiProvider = "bedrock";
 
 export type AiUsageOperation = "text" | "structured" | "embedding";
 export type AiUsageStatus = "success" | "error";

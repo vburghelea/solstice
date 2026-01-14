@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
+import { Route as BrandTestRouteImport } from "./routes/brand-test";
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
@@ -94,6 +95,11 @@ import { Route as DashboardAdminSinAnalyticsRouteImport } from "./routes/dashboa
 import { Route as ApiPaymentsSquareCallbackRouteImport } from "./routes/api/payments/square/callback";
 import { Route as ApiAuthActionProviderRouteImport } from "./routes/api/auth/$action/$provider";
 
+const BrandTestRoute = BrandTestRouteImport.update({
+  id: "/brand-test",
+  path: "/brand-test",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
   id: "/onboarding",
   path: "/onboarding",
@@ -545,6 +551,7 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/brand-test": typeof BrandTestRoute;
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/dashboard/analytics": typeof DashboardAnalyticsRouteRouteWithChildren;
   "/admin/roles": typeof AdminRolesRoute;
@@ -629,6 +636,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+  "/brand-test": typeof BrandTestRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/api/debug-square": typeof ApiDebugSquareRoute;
   "/api/health": typeof ApiHealthRoute;
@@ -708,6 +716,7 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/brand-test": typeof BrandTestRoute;
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/dashboard/analytics": typeof DashboardAnalyticsRouteRouteWithChildren;
   "/admin/roles": typeof AdminRolesRoute;
@@ -796,6 +805,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/brand-test"
     | "/dashboard/admin"
     | "/dashboard/analytics"
     | "/admin/roles"
@@ -880,6 +890,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+    | "/brand-test"
     | "/admin/roles"
     | "/api/debug-square"
     | "/api/health"
@@ -958,6 +969,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/brand-test"
     | "/dashboard/admin"
     | "/dashboard/analytics"
     | "/admin/roles"
@@ -1045,6 +1057,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  BrandTestRoute: typeof BrandTestRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   ApiDebugSquareRoute: typeof ApiDebugSquareRoute;
   ApiHealthRoute: typeof ApiHealthRoute;
@@ -1060,6 +1073,13 @@ export interface RootRouteChildren {
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/brand-test": {
+      id: "/brand-test";
+      path: "/brand-test";
+      fullPath: "/brand-test";
+      preLoaderRoute: typeof BrandTestRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding": {
       id: "/onboarding";
       path: "/onboarding";
@@ -1914,6 +1934,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  BrandTestRoute: BrandTestRoute,
   AdminRolesRoute: AdminRolesRoute,
   ApiDebugSquareRoute: ApiDebugSquareRoute,
   ApiHealthRoute: ApiHealthRoute,

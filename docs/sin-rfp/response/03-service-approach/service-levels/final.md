@@ -44,6 +44,8 @@ Availability is measured as the percentage of time the production application is
 
 **Business hours:** Monday to Friday, 9:00 AM to 5:00 PM Pacific Time, excluding BC statutory holidays.
 
+**Sev 1 acknowledgement is 24/7; Sev 2–4 response targets apply during business hours.** Monitoring is 24/7 in all cases.
+
 **Note:** Resolution targets depend on issue complexity and may require additional time for root-cause analysis. viaSport will be kept informed of progress and revised estimates.
 
 ### 24/7 Support Option
@@ -76,14 +78,14 @@ viaSport receives monthly support reports covering ticket volume, response times
 
 ## Backup and Recovery
 
-| Parameter                      | Commitment                                    |
-| :----------------------------- | :-------------------------------------------- |
-| Backup frequency               | Continuous (point-in-time recovery enabled)   |
-| Backup retention               | 35 days in production                         |
-| Recovery Point Objective (RPO) | 1 hour                                        |
-| Recovery Time Objective (RTO)  | 4 hours                                       |
-| DR drill frequency             | Quarterly                                     |
-| DR drill reporting             | Results reported to viaSport after each drill |
+| Parameter                      | Commitment                                       |
+| :----------------------------- | :----------------------------------------------- |
+| Backup frequency               | Continuous (point-in-time recovery enabled)      |
+| Backup retention               | 35 days in production                            |
+| Recovery Point Objective (RPO) | 1 hour                                           |
+| Recovery Time Objective (RTO)  | 4 hours                                          |
+| DR exercise frequency          | Quarterly                                        |
+| DR exercise reporting          | Results reported to viaSport after each exercise |
 
 ### High Availability
 
@@ -118,7 +120,7 @@ viaSport will receive regular operational reports:
 | Support summary     | Monthly   | Ticket volume, response times, resolution rates, trends |
 | Availability report | Monthly   | Uptime percentage, incidents, maintenance windows       |
 | Security summary    | Quarterly | Patching status, security reviews, any incidents        |
-| DR drill results    | Quarterly | Drill execution, recovery times achieved, any issues    |
+| DR exercise results | Quarterly | Exercise execution, recovery times achieved, any issues |
 
 ## Service Level Governance
 

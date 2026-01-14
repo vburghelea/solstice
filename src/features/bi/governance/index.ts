@@ -11,6 +11,8 @@ export {
   type OrgScopingResult,
 } from "./org-scoping";
 
+export { buildQueryContext } from "./query-context";
+
 export {
   checkFieldAccess,
   filterAccessibleFields,

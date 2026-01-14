@@ -6,7 +6,7 @@
 
 import { hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import dotenv from "dotenv";
-import { eq, like } from "drizzle-orm";
+import { eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -73,8 +73,8 @@ async function seed() {
       "⚠️  BETTER_AUTH_SECRET not set - MFA backup codes may not decrypt correctly.",
     );
   }
-  const sql = postgres(connectionString, { max: 1 }); // open exactly one connection
-  const db = drizzle(sql);
+  const sqlConnection = postgres(connectionString, { max: 1 }); // open exactly one connection
+  const db = drizzle(sqlConnection);
 
   // Use static CUIDs for predictable test data
   const testUserId = "clxpfz4jn000008l8b3f4e1j2";
@@ -137,6 +137,25 @@ async function seed() {
 
     console.log("Clearing roles...");
     await db.delete(roles);
+
+    // Ensure bi_readonly PostgreSQL role exists (required for Analytics/NL Query)
+    console.log("Ensuring bi_readonly PostgreSQL role exists...");
+    await db.execute(sql`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'bi_readonly') THEN
+          CREATE ROLE bi_readonly NOLOGIN;
+          RAISE NOTICE 'Created bi_readonly role';
+        END IF;
+      END
+      $$;
+    `);
+    await db.execute(sql`GRANT SELECT ON ALL TABLES IN SCHEMA public TO bi_readonly`);
+    await db.execute(sql`GRANT USAGE ON SCHEMA public TO bi_readonly`);
+    await db.execute(sql`GRANT bi_readonly TO postgres`);
+    await db.execute(
+      sql`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO bi_readonly`,
+    );
 
     // Create test users
     const testUsers = [
@@ -828,7 +847,7 @@ async function seed() {
     console.error("❌ Error seeding test data:", error);
     throw error;
   } finally {
-    await sql.end({ timeout: 3 }); // force close idle clients
+    await sqlConnection.end({ timeout: 3 }); // force close idle clients
     process.exit(0); // and make 100% sure node exits
   }
 }

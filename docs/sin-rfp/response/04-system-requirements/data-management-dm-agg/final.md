@@ -2,14 +2,14 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                 | Status  | Built Today                                                        | Remaining Scope                          |
-| :--------- | :------------------------------------ | :------ | :----------------------------------------------------------------- | :--------------------------------------- |
-| DM-AGG-001 | Data Collection and Submission        | Built   | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions |
-| DM-AGG-002 | Data Processing and Integration       | Partial | Import and export, validation, audit logging                       | External integrations and mapping rules  |
-| DM-AGG-003 | Data Governance and Access Control    | Built   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement              |
-| DM-AGG-004 | Data Quality and Integrity            | Built   | Validation rules, quality alerting with thresholds                 | Threshold tuning with viaSport           |
-| DM-AGG-005 | Data Storage and Retention            | Built   | Backups, archiving, retention enforcement                          | Final DR and retention validation (TBD)  |
-| DM-AGG-006 | Legacy Data Migration and Bulk Import | Built   | Smart import with error categorization, autofix, dynamic templates | Legacy extraction (awaiting BCAR/BCSI)   |
+| Req ID     | Title                                 | Status                                       | Evaluation Environment (Jan 2026)                                  | Finalization Scope                           |
+| :--------- | :------------------------------------ | :------------------------------------------- | :----------------------------------------------------------------- | :------------------------------------------- |
+| DM-AGG-001 | Data Collection and Submission        | Implemented; Requires viaSport Configuration | Form builder, file uploads, submission tracking                    | viaSport templates and field definitions     |
+| DM-AGG-002 | Data Processing and Integration       | Optional / Post-Award                        | Import and export, validation, audit logging                       | External integrations (optional, post-award) |
+| DM-AGG-003 | Data Governance and Access Control    | Implemented (Demoable Now)                   | RBAC, org scoping, data catalog                                    | Catalog taxonomy refinement                  |
+| DM-AGG-004 | Data Quality and Integrity            | Implemented (Demoable Now)                   | Validation rules, quality alerting with thresholds                 | Threshold tuning with viaSport               |
+| DM-AGG-005 | Data Storage and Retention            | Implemented; Requires viaSport Configuration | Backups, archiving, retention enforcement                          | Retention durations (viaSport Discovery)     |
+| DM-AGG-006 | Legacy Data Migration and Bulk Import | Requires Production Data Confirmation        | Smart import with error categorization, autofix, dynamic templates | Legacy extraction (awaiting BCAR/BCSI)       |
 
 ## DM-AGG-001: Data Collection and Submission
 
@@ -27,14 +27,14 @@ Users and System Admin can successfully submit, track, and edit data.
 - Submissions support file uploads and status tracking.
 - Users can edit submissions and view version history.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Form builder with 11 field types (text, number, email, phone, date, select, multiselect, checkbox, file, textarea, rich text).
 - Submission statuses with history and audit entries.
 - File uploads validated and stored in S3 with access controls.
 - Import jobs link historical data to form submissions.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - viaSport specific templates and field definitions (TBD).
 
@@ -62,13 +62,13 @@ Incoming data is processed uniformly, logged for traceability, and exchanged wit
 - Transformation and import events are logged in the audit trail.
 - Export formats support CSV, Excel, and JSON.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Import parser with typed validation and row level error logging.
 - Mapping templates and audit logging for import jobs.
 - Export controls enforced through BI and reporting pipelines.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - External API integrations scoped with viaSport and legacy system owners.
 - Standardized mapping rules for cross system integrations.
@@ -97,7 +97,7 @@ Users can only access data based on permission.
 - Field-level access control is applied in analytics and exports.
 - Data catalog indexes forms, templates, and reports for discoverability.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Predefined roles (owner, admin, reporter, viewer) with permission checks.
 - Data catalog and global search for forms, templates, and reports.
@@ -109,7 +109,7 @@ In Solstice, the Data Catalog is a searchable inventory of forms, fields, templa
 
 During discovery, we will confirm the proportion of structured submission data versus document-centric reporting and adjust catalog tagging and search priorities accordingly.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - Catalog taxonomy and tagging refinement with viaSport (TBD).
 
@@ -137,14 +137,14 @@ Submitted data meets validation rules.
 - Forms and imports validate required fields and formats.
 - Automated quality checks identify missing fields and validation errors.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Server-side validation with Zod schemas and form rules.
 - Data quality monitoring job with threshold evaluation and change-only admin notifications.
 - Global alert thresholds with optional org-level overrides via organization settings.
 - Admin dashboard view for data quality metrics with notification link.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - Threshold tuning and alert recipients confirmed with viaSport (TBD).
 
@@ -172,15 +172,15 @@ Data is backed up, archived as scheduled, and securely hosted in the cloud.
 - Retention enforcement and legal hold workflows protect regulated data.
 - Audit logs are immutable and archived to S3 Deep Archive.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Backup retention configured per environment (35 days in production).
 - Retention policy engine with legal holds and audit log archiving.
 - S3 Object Lock enabled for artifacts storage.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
-- Final production DR drill and retention validation before submission (TBD).
+- Retention durations to be confirmed with viaSport during Discovery.
 
 **viaSport Dependencies:**
 
@@ -207,7 +207,7 @@ Administrators can map legacy fields to system fields, preview results, and exec
 - One-click autofix for common issues with confidence scoring.
 - Import jobs are auditable and reversible within the rollback window.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - **Intelligent Error Categorization:** Errors grouped by root cause (structural, data quality, completeness, referential) instead of row-by-row display
 - **Pattern Detection:** 13 pattern detectors (email, date formats, phone, currency, postal codes, UUID, etc.) automatically identify column type mismatches
@@ -216,9 +216,9 @@ Administrators can map legacy fields to system fields, preview results, and exec
 - **Dynamic Templates:** Generate XLSX/CSV templates from any form definition with field descriptions, example values, and Excel data validation dropdowns
 - **Virtualized Preview:** TanStack Virtual for 10k+ row previews without performance degradation
 - **Admin Template Management:** Template CRUD, version tracking, import history with rollback
-- **Batch Processing:** ECS Fargate worker for large file processing (verified deployed in sin-dev)
+- **Batch Processing:** ECS Fargate worker for large file processing (deployed in sin-perf and sin-uat)
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - Legacy extraction and BCAR or BCSI mapping rules.
 - Additional migration pipelines for organization and user records (pending viaSport legacy access).

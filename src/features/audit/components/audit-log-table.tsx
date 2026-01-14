@@ -204,7 +204,7 @@ export function AuditLogTable() {
                     <TableCell>{row.actorUserId ?? "-"}</TableCell>
                     <TableCell>{row.targetType ?? "-"}</TableCell>
                     <TableCell>
-                      {row.action === "BI.EXPORT" ? (
+                      {row.action.toLowerCase() === "bi.export" ? (
                         <div className="flex flex-wrap gap-1">
                           {format ? <Badge variant="outline">{format}</Badge> : null}
                           <Badge variant={includesPii ? "destructive" : "secondary"}>

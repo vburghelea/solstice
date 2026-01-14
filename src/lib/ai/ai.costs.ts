@@ -1,4 +1,5 @@
 import { env } from "~/lib/env.server";
+import { resolveBedrockModelId } from "./adapters/bedrock.types";
 import type { AiProvider } from "./ai.types";
 
 type ModelPricing = {
@@ -10,14 +11,10 @@ type PricingConfig = Record<AiProvider, Record<string, ModelPricing>>;
 type PricingOverrides = Partial<Record<AiProvider, Record<string, ModelPricing>>>;
 
 const DEFAULT_MODEL_PRICING: PricingConfig = {
-  openai: {
-    "gpt-4o": { inputPer1M: 2.5, outputPer1M: 10 },
-    "gpt-4o-mini": { inputPer1M: 0.15, outputPer1M: 0.6 },
-  },
-  anthropic: {
-    "claude-opus-4-5": { inputPer1M: 15, outputPer1M: 75 },
-    "claude-sonnet-4-5": { inputPer1M: 3, outputPer1M: 15 },
-    "claude-haiku-4-5": { inputPer1M: 1, outputPer1M: 5 },
+  bedrock: {
+    "anthropic.claude-3-sonnet-20240229-v1:0": { inputPer1M: 3, outputPer1M: 15 },
+    "anthropic.claude-3-haiku-20240307-v1:0": { inputPer1M: 0.25, outputPer1M: 1.25 },
+    "anthropic.claude-opus-4-5-20251101-v1:0": { inputPer1M: 15, outputPer1M: 75 },
   },
 };
 
@@ -26,16 +23,12 @@ let cachedPricing: PricingConfig | null = null;
 const mergePricingOverrides = (overrides?: PricingOverrides) => {
   if (!overrides) return DEFAULT_MODEL_PRICING;
 
-  return (["openai", "anthropic"] as AiProvider[]).reduce<PricingConfig>(
-    (acc, provider) => {
-      acc[provider] = {
-        ...DEFAULT_MODEL_PRICING[provider],
-        ...overrides[provider],
-      };
-      return acc;
+  return {
+    bedrock: {
+      ...DEFAULT_MODEL_PRICING.bedrock,
+      ...overrides.bedrock,
     },
-    { openai: {}, anthropic: {} },
-  );
+  };
 };
 
 const getPricingConfig = (): PricingConfig => {
@@ -61,6 +54,9 @@ const getPricingConfig = (): PricingConfig => {
   return cachedPricing;
 };
 
+const resolveModelForPricing = (provider: AiProvider, model: string) =>
+  provider === "bedrock" ? resolveBedrockModelId(model) : model;
+
 export const estimateCostUsdMicros = (params: {
   provider: AiProvider;
   model: string;
@@ -70,7 +66,8 @@ export const estimateCostUsdMicros = (params: {
   const { provider, model, inputTokens, outputTokens } = params;
   if (inputTokens == null || outputTokens == null) return null;
 
-  const pricing = getPricingConfig()[provider]?.[model];
+  const resolvedModel = resolveModelForPricing(provider, model);
+  const pricing = getPricingConfig()[provider]?.[resolvedModel];
   if (!pricing) return null;
 
   const costUsd =

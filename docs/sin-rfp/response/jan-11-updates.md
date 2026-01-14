@@ -7,16 +7,24 @@ This doc is the single source for fixes before the next draft. It includes the e
 - Source: `docs/sin-rfp/response/jan-8-updates.md` / `docs/sin-rfp/review-plans/evidence/PERF-WORKLOG-2026-01-08.md`.
 - Environment: sin-perf, 2026-01-08, db.t4g.large, 7.6 GB database.
 - Data volume: 20.0M rows (audit_logs 10.0M, form_submissions 8.0M, notifications 2.0M). Say “20M rows” everywhere.
-- Load test (k6, 25 VUs): p95 163ms, p50 98ms, throughput 12.3 req/s, 0 server errors (429s are expected rate limits).
+- Load test (k6, 25 VUs): p95 162ms, p50 98ms, throughput 12.3 req/s, 0 server errors (429s are expected rate limits).
 - Lighthouse (sin-perf CloudFront): Perf 90/100, FCP 1.0s, LCP 1.0s, TTI 1.1s, CLS 0, A11y 100/100.
 - DR exercise (use “exercise” not “drill”): RTO 16 min, RPO 0 min, 20M records validated.
 - Use these numbers consistently in: Executive Summary “At a Glance”, QA/performance table, case studies, Appendix C narrative + table, System Requirements references, and any other p95/concurrency mentions. Remove all “final run TBD” text.
 
 ## Terminology/Naming Fixes
 
-- Glossary and all expansions: BCAR = “BC Activity Reporter”; BCSI = “BC Sport Information System”.
-- DR wording: use “DR exercise” everywhere (not “drill”).
-- Replace “Built Today” phrasing with “Available in Prototype (Jan 2026)” to avoid ambiguity.
+- Glossary and all expansions: BCAR = "BC Activity Reporter"; BCSI = "BC Sport Information System".
+- DR wording: use "DR exercise" everywhere (not "drill").
+- Replace "Built Today" phrasing with "Available in Prototype (Jan 2026)" to avoid ambiguity.
+- Project Plan UX language audit: Verify these terms are plain-language or defined on first use:
+  - "contextual inquiry" → "in-context observation sessions" or "user observation sessions"
+  - "card sorting" → "user-driven categorization exercises"
+  - "tree testing" → "navigation validation testing"
+  - "IA" → "information architecture (IA)" on first use
+  - "design freeze" → "design finalization" (use consistently)
+  - "AT users" → "assistive technology (AT) users" on first use
+  - "SUS" → "System Usability Scale (SUS)" on first use
 
 ## SLA/Support Consistency
 
@@ -60,8 +68,8 @@ This doc is the single source for fixes before the next draft. It includes the e
 
 ## File/Section-Specific Edits (full-proposal-response-combined.md)
 
-- At a Glance + all performance mentions: replace with the authoritative metrics above; set concurrency to 25 users (k6 VUs), p95 163ms, p50 98ms, throughput 12.3 req/s, 20.0M rows.
-- Case study results (Primary case study): change “≤250ms p95 latency” and “zero server errors under concurrent load” to “p95 163ms (25 concurrent users), zero server errors.”
+- At a Glance + all performance mentions: replace with the authoritative metrics above; set concurrency to 25 users (k6 VUs), p95 162ms, p50 98ms, throughput 12.3 req/s, 20.0M rows.
+- Case study results (Primary case study): change “≤250ms p95 latency” and “zero server errors under concurrent load” to “p95 162ms (25 concurrent users), zero server errors.”
 - Testing/QA tables: replace perf rows with authoritative numbers; remove TBD language; align with Appendix C.
 - Appendix C: replace narrative + tables with the authoritative metrics and DR exercise results; use “exercise.”
 - Glossary: fix BCAR/BCSI expansions.

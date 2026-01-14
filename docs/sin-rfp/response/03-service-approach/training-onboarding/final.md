@@ -76,13 +76,15 @@ Sample training materials will be reviewed with viaSport during Planning (TBD).
 
 ## Help Desk and Ticketing Model
 
+The table below covers help desk inquiries (questions, how-to, bug reports). System incidents (Sev 1-4) follow the SLA response targets in **Service Levels, Support, and Reliability**.
+
 ### Support Tiers
 
-| Tier   | Channel                 | Scope                           | Response                            |
-| :----- | :---------------------- | :------------------------------ | :---------------------------------- |
-| Tier 1 | In-app support requests | General questions, how-to       | 24 hours                            |
-| Tier 2 | Email                   | Technical issues, bug reports   | 24 hours standard, 4 hours critical |
-| Tier 3 | Direct escalation       | Critical issues, system outages | 4 hours                             |
+| Tier   | Channel                 | Scope                         | Response |
+| :----- | :---------------------- | :---------------------------- | :------- |
+| Tier 1 | In-app support requests | General questions, how-to     | 24 hours |
+| Tier 2 | Email                   | Technical issues, bug reports | 24 hours |
+| Tier 3 | Direct escalation       | System incidents              | See SLA  |
 
 ### Support Hours
 
@@ -127,16 +129,15 @@ User can reply or mark resolved
 
 Ticket closed
 
-### Response Commitments
+### Response Commitments (Help Desk Inquiries)
 
 | Priority | First Response | Target Resolution |
 | :------- | :------------- | :---------------- |
-| Critical | 4 hours        | Same business day |
 | High     | 8 hours        | 2 business days   |
 | Standard | 24 hours       | 5 business days   |
 | Low      | 48 hours       | 10 Business Days  |
 
-Priority levels map to Severity 1–4 as defined in **Service Levels, Support, and Reliability**. Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
+System incidents (Sev 1-4) follow the response targets in **Service Levels, Support, and Reliability** (Sev 1: 60-minute acknowledgement, escalation to delivery lead). Resolution targets depend on issue complexity and may require additional time for root-cause analysis.
 
 viaSport receives monthly support reports covering ticket volume, response times, and trends.
 

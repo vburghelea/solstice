@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://d3s9cqktobqrk0.cloudfront.net/auth/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_01_47.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_01_47.report.json",
+    "summary": {
+      "performance": 0.67,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://d3s9cqktobqrk0.cloudfront.net/auth/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_02_10.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_02_10.report.json",
+    "summary": {
+      "performance": 0.67,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  },
+  {
+    "url": "https://d3s9cqktobqrk0.cloudfront.net/auth/login",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_01_58.report.html",
+    "jsonPath": "/Users/austin/dev/solstice/performance/reports/lighthouse-warm/d3s9cqktobqrk0_cloudfront_net-auth_login-2026_01_08_19_01_58.report.json",
+    "summary": {
+      "performance": 0.67,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  }
+]

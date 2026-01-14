@@ -2,15 +2,15 @@
 
 ## Compliance Summary
 
-| Req ID     | Title                                   | Status | Built Today                               | Remaining Scope                 |
-| :--------- | :-------------------------------------- | :----- | :---------------------------------------- | :------------------------------ |
-| UI-AGG-001 | User Access and Account Control         | Built  | Login, MFA, recovery, RBAC                | None                            |
-| UI-AGG-002 | Personalized Dashboard                  | Built  | Role-aware dashboards                     | None                            |
-| UI-AGG-003 | Responsive and Inclusive Design         | Built  | Responsive UI and accessibility           | None                            |
-| UI-AGG-004 | Task and Notification Management        | Built  | Automated reminders and notifications     | None                            |
-| UI-AGG-005 | Content Navigation and Interaction      | Built  | Search, filtering, command palette        | None                            |
-| UI-AGG-006 | User Support and Feedback Mechanism     | Built  | Support with priority, SLA, notifications | None                            |
-| UI-AGG-007 | Consistent Visual Language and Branding | Built  | Design system and tenant branding         | viaSport branding configuration |
+| Req ID     | Title                                   | Status                                       | Evaluation Environment (Jan 2026)         | Finalization Scope              |
+| :--------- | :-------------------------------------- | :------------------------------------------- | :---------------------------------------- | :------------------------------ |
+| UI-AGG-001 | User Access and Account Control         | Implemented (Demoable Now)                   | Login, MFA, recovery, RBAC                | None                            |
+| UI-AGG-002 | Personalized Dashboard                  | Implemented (Demoable Now)                   | Role-aware dashboards                     | None                            |
+| UI-AGG-003 | Responsive and Inclusive Design         | Implemented (Demoable Now)                   | Responsive UI and accessibility           | None                            |
+| UI-AGG-004 | Task and Notification Management        | Implemented (Demoable Now)                   | Automated reminders and notifications     | None                            |
+| UI-AGG-005 | Content Navigation and Interaction      | Implemented (Demoable Now)                   | Search, filtering, command palette        | None                            |
+| UI-AGG-006 | User Support and Feedback Mechanism     | Implemented (Demoable Now)                   | Support with priority, SLA, notifications | None                            |
+| UI-AGG-007 | Consistent Visual Language and Branding | Implemented; Requires viaSport Configuration | Design system and tenant branding         | viaSport branding configuration |
 
 ## UI-AGG-001: User Access and Account Control
 
@@ -28,13 +28,13 @@ Users and system admin can perform account-related tasks securely.
 - Password recovery via time-limited tokens.
 - Admin tools for user management and role assignment.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - MFA enrollment and recovery flows.
 - Organization invite and join request workflows.
 - Admin settings panel for user access management.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -58,13 +58,13 @@ Users can view personalized dashboards based on their roles.
 - Reporting status and tasks surface at the top of the portal.
 - Admin dashboards include cross-org visibility.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Role-aware portal dashboard.
 - Reporting status and overdue indicators.
 - Quick actions for forms, analytics, and imports.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -84,17 +84,30 @@ System is functional on all devices and meets accessibility compliance.
 
 **How We Meet It:**
 
-- Mobile-first layout with responsive breakpoints.
-- Accessible UI primitives with keyboard navigation and ARIA labels.
-- Color contrast and focus indicators baked into the design system.
+- **Mobile-first layout** with responsive breakpoints for desktop, tablet, and mobile.
+- **WCAG 2.1 Level AA compliance** validated through automated Axe-core testing in CI.
+- **Keyboard accessibility throughout:**
+  - Skip navigation links ("Skip to main content", "Skip to navigation")
+  - Focus management on route changes (focus moves to main content for screen reader users)
+  - All interactive elements reachable via Tab navigation
+  - Drag-and-drop alternatives: Pivot builder and dashboard widgets offer button-based manipulation mode for keyboard users
+- **Screen reader support:**
+  - Live region announcements for toasts, form errors, and step changes
+  - Form error summary component auto-focuses and provides clickable links to error fields
+  - "View data table" toggle provides accessible alternative to charts
+  - Semantic HTML with proper heading hierarchy and ARIA landmarks
+- **Visual accessibility:**
+  - High Contrast (WCAG) color scheme option for charts (3:1+ minimum contrast)
+  - Visible focus indicators (ring-3 pattern) on all interactive elements
+  - Reduced motion support via `prefers-reduced-motion` media query
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Responsive portal and admin screens.
 - A11y scan completed and recorded.
 - Keyboard navigation and accessible components across workflows.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -118,13 +131,13 @@ Users receive timely and relevant notifications and reminders.
 - In-app notifications surface updates and status changes.
 - Email delivery uses AWS SES with delivery logging.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Notification scheduler and in-app notification feed.
 - Email delivery with SES logging.
 - Reminder cadence configurable per task.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -148,13 +161,13 @@ Users can retrieve accurate results through search and filter functions.
 - List views include filtering, sorting, and pagination.
 - Data catalog and template hubs provide structured categorization.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Command palette with actions and global search results.
 - List filtering and sorting across forms, templates, and reporting.
 - Data catalog and templates hub.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -178,14 +191,14 @@ Users can submit and receive responses to inquiries within the system.
 - Admin panel manages responses and status updates.
 - Users receive email and in-app updates on responses.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - Support request form with attachments, priority selection (Low/Normal/High/Urgent), and SLA targets.
 - Admin support queue with status tracking and response form.
 - Response and status changes dispatch in-app and email notifications.
 - Audit logging for support actions.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - None. Fully implemented.
 
@@ -209,13 +222,13 @@ All UI components follow a standardized visual style.
 - Tenant branding supports logo and color configuration.
 - Typography, spacing, and iconography are standardized.
 
-**Built Today:**
+**Evaluation Environment (Jan 2026):**
 
 - shadcn/ui component system applied across the portal.
 - Tenant branding configuration available in admin settings.
 - Consistent navigation and layout patterns.
 
-**Remaining Scope:**
+**Finalization Scope:**
 
 - viaSport branding assets and theme configuration (TBD).
 

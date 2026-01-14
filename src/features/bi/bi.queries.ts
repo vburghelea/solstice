@@ -14,18 +14,10 @@ import {
   sqlQuerySchema,
   sqlSchemaRequestSchema,
 } from "./bi.schemas";
-import type { FilterConfig, PivotQuery } from "./bi.schemas";
+import type { FilterConfig, PivotResult } from "./bi.schemas";
 import type { BiQueryLogEntry, QueryContext } from "./bi.types";
-import { buildAllowedFilters, normalizePivotConfig } from "./bi.utils";
-import { buildPivotCacheKey, getPivotCache, setPivotCache } from "./cache/pivot-cache";
-import { loadDatasetData } from "./bi.data";
-import { buildPivotResult } from "./engine/pivot-aggregator";
-import {
-  buildFieldExpression,
-  buildFilterExpression,
-  buildPivotResultFromSqlRows,
-  buildPivotSqlPlan,
-} from "./engine/pivot-sql-compiler";
+import { buildAllowedFilters } from "./bi.utils";
+import { buildFieldExpression, buildFilterExpression } from "./engine/pivot-sql-compiler";
 import { assertSafeIdentifier, quoteIdentifier } from "./engine/sql-identifiers";
 import { normalizeFilter, type NormalizedFilter } from "./engine/filters";
 import {
@@ -33,10 +25,9 @@ import {
   filterAccessibleFields,
   getFieldsToMask,
 } from "./governance";
-import { assertPivotCardinality, QUERY_GUARDRAILS } from "./governance/query-guardrails";
+import { QUERY_GUARDRAILS } from "./governance/query-guardrails";
 import { formatSetLocalValue } from "./governance/set-local";
 import { DATASETS, getDataset } from "./semantic";
-import { getMetric } from "./semantic/metrics.config";
 
 const ANALYTICS_ROLES: OrganizationRole[] = ["owner", "admin", "reporter"];
 
@@ -555,284 +546,18 @@ export const getSqlSchema = createServerFn({ method: "GET" })
     return { tables, isGlobalAdmin };
   });
 
-const runPivotQuery = async (params: {
-  data: PivotQuery;
-  context: unknown;
-  user: { id: string };
-}) => {
-  await assertFeatureEnabled("sin_analytics");
-  const { data, context, user } = params;
-  const dataset = getDataset(data.datasetId);
-  const { badRequest, forbidden } = await import("~/lib/server/errors");
-
-  if (!dataset) {
-    throw badRequest(`Unknown dataset: ${data.datasetId}`);
-  }
-
-  const { PermissionService } = await import("~/features/roles/permission.service");
-  const isGlobalAdmin = await PermissionService.isGlobalAdmin(user.id);
-  const roleAssignments = await PermissionService.getUserRoles(user.id);
-  const permissions = extractPermissionSet(roleAssignments);
-
-  const contextOrganizationId =
-    (context as { organizationId?: string | null } | undefined)?.organizationId ?? null;
-
-  let orgRole: OrganizationRole | null = null;
-  if (contextOrganizationId && !isGlobalAdmin && dataset.requiresOrgScope) {
-    const { requireOrganizationAccess } = await import("~/lib/auth/guards/org-guard");
-    const access = await requireOrganizationAccess(
-      { userId: user.id, organizationId: contextOrganizationId },
-      { roles: ANALYTICS_ROLES },
-    );
-    orgRole = access.role as OrganizationRole;
-  }
-
-  let scopedOrganizationId: string | null = null;
-  try {
-    scopedOrganizationId =
-      ensureOrgScope({
-        datasetOrgField: dataset.orgScopeColumn ?? "organizationId",
-        datasetRequiresOrg: dataset.requiresOrgScope,
-        isGlobalAdmin,
-        contextOrganizationId,
-        requestOrganizationId: data.organizationId ?? null,
-        filters: data.filters,
-      }).scopedOrganizationId ?? null;
-  } catch (error) {
-    throw forbidden(error instanceof Error ? error.message : "Org scoping failed");
-  }
-
-  const queryContext: QueryContext = {
-    userId: user.id,
-    organizationId: scopedOrganizationId,
-    orgRole,
-    isGlobalAdmin,
-    permissions,
-    hasRecentAuth: false,
-    timestamp: new Date(),
-  };
-
-  const requestedMetricIds = data.measures
-    .map((measure) => measure.metricId)
-    .filter((value): value is string => Boolean(value));
-  const forbiddenMetrics = requestedMetricIds.filter((metricId) => {
-    const metric = getMetric(metricId);
-    if (!metric?.requiredPermission) return false;
-    return (
-      !permissions.has(metric.requiredPermission) &&
-      !permissions.has("analytics.admin") &&
-      !permissions.has("*")
-    );
-  });
-
-  if (forbiddenMetrics.length > 0) {
-    throw forbidden(`Metric access denied: ${forbiddenMetrics.join(", ")}`);
-  }
-
-  const normalized = normalizePivotConfig({
-    dataset,
-    rows: data.rows,
-    columns: data.columns,
-    measures: data.measures,
-    filters: data.filters,
-  });
-
-  if (!normalized.ok) {
-    throw badRequest(normalized.errors.join(" "));
-  }
-
-  const accessibleFields = filterAccessibleFields(dataset.fields, queryContext);
-  const accessibleIds = new Set(accessibleFields.map((field) => field.id));
-  const requestedFields = new Set([
-    ...normalized.value.rowFields,
-    ...normalized.value.columnFields,
-    ...normalized.value.measures
-      .map((measure) => measure.field)
-      .filter((field): field is string => Boolean(field)),
-  ]);
-
-  const forbiddenFields = Array.from(requestedFields).filter(
-    (field) => !accessibleIds.has(field),
-  );
-
-  if (forbiddenFields.length > 0) {
-    throw forbidden(`Field access denied: ${forbiddenFields.join(", ")}`);
-  }
-
-  const orgScopeFilters = normalized.value.filters;
-
-  if (dataset.requiresOrgScope && scopedOrganizationId) {
-    const scopeField = dataset.orgScopeColumn ?? "organizationId";
-    orgScopeFilters.push({
-      field: scopeField,
-      operator: "eq",
-      value: scopedOrganizationId,
-    });
-  }
-
-  const fieldsToMask = getFieldsToMask(accessibleFields, queryContext);
-  const rawLimit = Math.min(
-    data.limit ?? QUERY_GUARDRAILS.maxRowsUi,
-    QUERY_GUARDRAILS.maxRowsUi,
-  );
-  const pivotLimit = QUERY_GUARDRAILS.maxPivotCells + 1;
-
-  const cacheKey = buildPivotCacheKey({
-    userId: user.id,
-    organizationId: scopedOrganizationId,
-    datasetId: dataset.id,
-    query: data,
-  });
-  const cached = await getPivotCache(cacheKey);
-  if (cached) {
-    const { logQuery } = await import("./governance");
-    await logQuery({
-      context: queryContext,
-      queryType: "pivot",
-      datasetId: dataset.id,
-      pivotQuery: data,
-      parameters: { cacheStatus: "hit" },
-      rowsReturned: cached.rowCount,
-      executionTimeMs: 0,
-    });
-    return {
-      pivot: cached.pivot,
-      rowCount: cached.rowCount,
-    };
-  }
-
-  const startedAt = Date.now();
-  let pivotResult: ReturnType<typeof buildPivotResult>;
-  let rowsReturned = 0;
-
-  const release = await acquireConcurrencySlot(user.id, scopedOrganizationId);
-  try {
-    const plan = buildPivotSqlPlan({
-      dataset,
-      rowFields: normalized.value.rowFields,
-      columnFields: normalized.value.columnFields,
-      measures: normalized.value.measures,
-      filters: orgScopeFilters,
-      limit: pivotLimit,
-      maskedFieldIds: new Set(fieldsToMask),
-    });
-
-    const { getDb } = await import("~/db/server-helpers");
-    const { sql } = await import("drizzle-orm");
-    const db = await getDb();
-
-    try {
-      const result = await db.transaction(async (tx) => {
-        await tx.execute(sql.raw("SET LOCAL ROLE bi_readonly"));
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL app.org_id = ${formatSetLocalValue(scopedOrganizationId ?? "")}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL app.is_global_admin = ${formatSetLocalValue(isGlobalAdmin)}`,
-          ),
-        );
-        await tx.execute(
-          sql.raw(
-            `SET LOCAL statement_timeout = ${formatSetLocalValue(
-              QUERY_GUARDRAILS.statementTimeoutMs,
-            )}`,
-          ),
-        );
-
-        return tx.execute<Record<string, unknown>>(plan.sql);
-      });
-
-      const rows = Array.isArray(result)
-        ? result
-        : ((result as { rows?: Array<Record<string, unknown>> }).rows ?? []);
-
-      if (rows.length > QUERY_GUARDRAILS.maxPivotCells) {
-        throw new Error("Too many categories; add filters or fewer dimensions.");
-      }
-
-      rowsReturned = rows.length;
-      pivotResult = buildPivotResultFromSqlRows({
-        rows,
-        rowDimensions: plan.rowDimensions,
-        columnDimensions: plan.columnDimensions,
-        measures: normalized.value.measures,
-        measureAliases: plan.measures,
-      });
-    } catch (error) {
-      const isMissingView =
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        (error as { code?: string }).code === "42P01";
-      const message = error instanceof Error ? error.message.toLowerCase() : "";
-      const shouldFallback =
-        isMissingView ||
-        message.includes("relation") ||
-        message.includes("bi_v_") ||
-        message.includes("does not exist");
-
-      if (!shouldFallback) {
-        throw error;
-      }
-
-      const rows = await loadDatasetData({
-        datasetId: dataset.id,
-        columns: normalized.value.selectedFields,
-        filters: orgScopeFilters,
-        fieldsToMask,
-        limit: rawLimit + 1,
-      });
-
-      if (rows.length > rawLimit) {
-        throw new Error("Query returned too many rows; add filters.");
-      }
-
-      rowsReturned = rows.length;
-      pivotResult = buildPivotResult(rows, {
-        rowFields: normalized.value.rowFields,
-        columnFields: normalized.value.columnFields,
-        measures: normalized.value.measures,
-      });
-    }
-  } finally {
-    await release();
-  }
-
-  assertPivotCardinality(pivotResult.rows.length, pivotResult.columnKeys.length);
-
-  const executionTimeMs = Date.now() - startedAt;
-  await setPivotCache(cacheKey, {
-    datasetId: dataset.id,
-    pivot: pivotResult,
-    rowCount: rowsReturned,
-  });
-
-  const { logQuery } = await import("./governance");
-  await logQuery({
-    context: queryContext,
-    queryType: "pivot",
-    datasetId: dataset.id,
-    pivotQuery: data,
-    parameters: { cacheStatus: "miss" },
-    rowsReturned,
-    executionTimeMs,
-  });
-
-  return {
-    pivot: pivotResult,
-    rowCount: rowsReturned,
-  };
-};
-
 export const executePivotQuery = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .inputValidator(pivotQuerySchema.parse)
   .handler(async ({ data, context }) => {
+    await assertFeatureEnabled("sin_analytics");
     const user = requireUser(context);
-    return runPivotQuery({ data, context, user });
+    const { executePivotQueryInternal } = await import("./engine/pivot-runner");
+    return executePivotQueryInternal({
+      query: data,
+      context,
+      userId: user.id,
+    });
   });
 
 const pivotBatchSchema = z.object({
@@ -851,17 +576,21 @@ export const executePivotBatch = createServerFn({ method: "POST" })
     const user = requireUser(context);
     const results: Array<{
       widgetId: string;
-      pivot?: ReturnType<typeof buildPivotResult>;
+      pivot?: PivotResult;
       rowCount?: number;
       error?: string;
     }> = [];
 
+    await assertFeatureEnabled("sin_analytics");
+    const { executePivotQueryInternal } = await import("./engine/pivot-runner");
+
     for (const entry of data.queries) {
       try {
-        const result = await runPivotQuery({
-          data: entry.query,
+        const result = await executePivotQueryInternal({
+          query: entry.query,
           context,
-          user,
+          userId: user.id,
+          source: "batch",
         });
         results.push({
           widgetId: entry.widgetId,

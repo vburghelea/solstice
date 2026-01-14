@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "__Secure-solstice.two_factor",
+      "value": "2fa-dm3JpabrpYQcxnkHWV7C.bh9ljyT5KsG4Yjb3vSPTzBxSvCwEVai2p6%2FjyQvvMPI%3D",
+      "domain": "sinuat.solsticeapp.ca",
+      "path": "/",
+      "expires": 1768222660.729333,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-solstice.session_token",
+      "value": "OlJklbIxmxanGp0qU4Pqk4ab1j2KVXq3.QZoKGejvH%2BM1d33kKjTNrUjnW8yiGk9dMZS4LY9KL%2Bo%3D",
+      "domain": "sinuat.solsticeapp.ca",
+      "path": "/",
+      "expires": 1768251283.246183,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

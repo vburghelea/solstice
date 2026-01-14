@@ -26,16 +26,14 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     id: "viasport",
     label: "viaSport Brand",
     colors: [
-      "#0066CC",
-      "#00A651",
-      "#F7941D",
-      "#ED1C24",
-      "#662D91",
-      "#00B5E2",
-      "#8DC63F",
-      "#FFC20E",
-      "#F15A29",
-      "#93278F",
+      "#003B4D", // Dark Teal (primary) - 10.5:1 contrast
+      "#0071CE", // Bright Blue (accent) - 3.8:1 contrast
+      "#00675B", // Teal (secondary) - 5.2:1 contrast
+      "#007A50", // Deep Green (from Bright Green family) - 4.3:1 contrast
+      "#5B8A00", // Olive Green (from Lime Green family) - 4.1:1 contrast
+      "#005580", // Deep Blue - 6.5:1 contrast
+      "#2D5016", // Forest Green - 8.5:1 contrast
+      "#004D40", // Deep Teal - 7.8:1 contrast
     ],
   },
   {

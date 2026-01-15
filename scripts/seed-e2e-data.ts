@@ -331,15 +331,8 @@ async function seed() {
         updatedAt: new Date(),
       });
 
-      // Create session (optional, for pre-authenticated tests)
-      await db.insert(session).values({
-        id: `${userData.id}-session`,
-        userId: userData.id,
-        token: `test-token-${userData.id}`,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      // Note: NOT creating sessions here - tests should handle authentication themselves
+      // to properly test login/logout flows
 
       console.log(`✅ Created user: ${userData.email}`);
     }

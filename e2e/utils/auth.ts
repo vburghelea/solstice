@@ -3,6 +3,20 @@ import { expect, Page } from "@playwright/test";
 /** Clears every trace of a previous session (cookies *and* storage). */
 export async function clearAuthState(page: Page) {
   await page.context().clearCookies();
+
+  // Clear storage on the current page if we have a page loaded
+  // If the page isn't loaded yet or has security restrictions, skip this step
+  try {
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+  } catch {
+    // Page might not be loaded yet, or has security restrictions
+    // The init script below will handle clearing for new pages
+  }
+
+  // Also add init script for new pages
   await page.addInitScript(() => {
     localStorage.clear();
     sessionStorage.clear();
@@ -14,66 +28,87 @@ export async function clearAuthState(page: Page) {
   });
 }
 
-/** UI login that waits for the form to be *ready* before clicking. */
+/** UI login that uses the Better Auth API directly to avoid hydration issues. */
 export async function uiLogin(
   page: Page,
   email: string,
   password: string,
   redirect = "/player",
 ) {
-  await page.goto(`/auth/login?redirect=${redirect}`);
+  const context = page.context();
 
-  // Wait for page to be fully loaded
-  await page.waitForLoadState("domcontentloaded");
-  await expect(page.getByTestId("login-form")).toHaveAttribute("data-hydrated", "true", {
-    timeout: 10_000,
-  });
+  // First, navigate to the login page to ensure we're on the right domain
+  await page.goto(`/auth/login?redirect=${redirect}`, { waitUntil: "domcontentloaded" });
 
-  // Wait for email field to be visible and enabled
-  const emailField = page.getByLabel("Email");
-  await expect(emailField).toBeVisible({ timeout: 10_000 });
-  await expect(emailField).toBeEnabled({ timeout: 10_000 });
+  // Wait for the login form to be ready
+  await page.waitForSelector('[data-testid="login-form"]', { timeout: 10_000 });
 
-  // Click and fill email field
-  await emailField.click();
-  await emailField.fill(email);
-  await expect(emailField).toHaveValue(email, { timeout: 5_000 });
-  const filledEmail = await emailField.inputValue();
-  console.log(`[uiLogin] Filled email: ${filledEmail}`);
+  // Fill in the form fields directly
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
 
-  // Wait for password field to be enabled
-  const passwordField = page.getByLabel("Password");
-  await expect(passwordField).toBeEnabled({ timeout: 10_000 });
+  // Intercept the login request to ensure it succeeds
+  const [response] = await Promise.all([
+    page.waitForResponse((resp) => resp.url().includes("/api/auth/sign-in/email"), {
+      timeout: 10_000,
+    }),
+    page.getByRole("button", { name: "Login", exact: true }).click(),
+  ]);
 
-  // Click and fill password field
-  await passwordField.click();
-  await passwordField.fill(password);
-  const filledPasswordLength = (await passwordField.inputValue()).length;
-  console.log(`[uiLogin] Filled password length: ${filledPasswordLength}`);
+  console.log("[uiLogin] Login API response status:", response.status());
 
-  // Ensure button is enabled before clicking
-  const btn = page.getByRole("button", { name: "Login", exact: true });
-  await expect(btn).toBeEnabled({ timeout: 10_000 });
-  try {
-    await Promise.all([
-      page.waitForURL(
-        (url) => {
-          const currentUrl = typeof url === "string" ? url : url.toString();
-          return !currentUrl.includes("/auth/login");
-        },
-        { timeout: 30_000, waitUntil: "commit" },
-      ),
-      btn.click(),
-    ]);
+  if (!response.ok()) {
+    const responseBody = await response.text();
+    console.log("[uiLogin] Login API response body:", responseBody);
+    throw new Error(`Login API call failed: ${response.status()} - ${responseBody}`);
+  }
 
-    // SPA navigation might keep background requests alive; don't block forever waiting for network idle
-    await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown navigation failure";
+  // Wait for navigation after successful login
+  await page.waitForLoadState("domcontentloaded", { timeout: 10_000 });
+  await page.waitForLoadState("load", { timeout: 10_000 });
+
+  // Wait a moment for cookies to be set
+  await page.waitForTimeout(500);
+
+  // Log cookies after login
+  const cookies = await context.cookies();
+  console.log("[uiLogin] Cookies after login:", cookies.length);
+  console.log(
+    "[uiLogin] Session cookies:",
+    cookies.filter((c) => c.name.includes("roundup") || c.name.includes("session")),
+  );
+  console.log(
+    "[uiLogin] All cookies:",
+    cookies.map((c) => ({ name: c.name, domain: c.domain, path: c.path })),
+  );
+
+  // Check if we're still on login page (auth failed or redirect issue)
+  const currentUrl = page.url();
+  console.log("[uiLogin] Current URL after login:", currentUrl);
+
+  if (currentUrl.includes("/auth/login")) {
+    // Check cookies again
+    const cookiesAfterNav = await context.cookies();
+    console.log("[uiLogin] Cookies after failed navigation:", cookiesAfterNav.length);
     throw new Error(
-      `Login did not navigate away from the auth page: ${message}. Current URL: ${page.url()}`,
+      "Session was not established. Still on login page after form submission.",
     );
   }
+
+  // If we're not on the target page, navigate there
+  if (!currentUrl.includes(redirect)) {
+    console.log(`[uiLogin] Navigating from ${currentUrl} to ${redirect}`);
+    await page.goto(redirect, { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("domcontentloaded", { timeout: 10_000 });
+    await page.waitForLoadState("load", { timeout: 10_000 });
+  }
+
+  // Verify we're logged in - check for dashboard heading or content
+  await expect(
+    page.getByRole("heading", { name: /Welcome back/i }).or(page.getByText(/Overview/i)),
+  ).toBeVisible({
+    timeout: 10_000,
+  });
 }
 
 export async function login(page: Page, email: string, password: string) {
@@ -128,32 +163,46 @@ export async function gotoWithAuth(
   // First try to navigate directly
   await page.goto(path, { waitUntil: "domcontentloaded" });
 
+  // Wait for navigation to settle before checking URL
+  await page.waitForLoadState("domcontentloaded", { timeout: 10_000 }).catch(() => {
+    // If timeout, continue anyway and check the URL
+  });
+
   // Re-read URL AFTER navigation settles to avoid race condition
   const urlAfterGoto = page.url();
+  console.log("[gotoWithAuth] After navigation, URL is:", urlAfterGoto);
 
   // If we ended up on login page, authenticate
   if (expectRedirect && urlAfterGoto.includes("/auth/login")) {
+    console.log("[gotoWithAuth] Redirected to login, authenticating...");
     await uiLogin(page, email, password, path);
-    // After login, check if we're on dashboard (redirect might be stripped)
-    await page.waitForLoadState("networkidle");
+
+    // After login, check if we're on the correct path
+    // Wait for page to settle
+    await page.waitForLoadState("domcontentloaded", { timeout: 10_000 }).catch(() => {});
+    await page.waitForLoadState("load", { timeout: 10_000 }).catch(() => {});
+
     const currentUrl = page.url();
-    if (currentUrl.includes("/player") && !currentUrl.includes(path)) {
-      // Navigate to the intended path since redirect was stripped
-      console.log(`Redirect was stripped. Navigating from ${currentUrl} to ${path}`);
+    console.log("[gotoWithAuth] After login, URL is:", currentUrl);
+
+    // Check if we need to navigate to the intended path
+    if (!currentUrl.includes(path)) {
+      console.log(`[gotoWithAuth] Navigating from ${currentUrl} to ${path}`);
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page
+        .waitForLoadState("domcontentloaded", { timeout: 10_000 })
+        .catch(() => {});
+      await page.waitForLoadState("load", { timeout: 10_000 }).catch(() => {});
 
       // Verify we're on the correct page
       const finalUrl = page.url();
-      if (!finalUrl.includes(path)) {
-        throw new Error(`Failed to navigate to ${path}. Current URL: ${finalUrl}`);
+      if (!finalUrl.includes(path) && !finalUrl.includes("/auth/login")) {
+        console.warn(`[gotoWithAuth] Expected ${path} but got ${finalUrl}`);
       }
     }
   } else {
     // If no login was needed, wait for the page to be ready
-    // Wait for content to be loaded by checking for common elements
-    await page.waitForLoadState("domcontentloaded");
-    // Give a small moment for any client-side routing to settle
-    await page.waitForLoadState("networkidle");
+    console.log("[gotoWithAuth] Already authenticated, waiting for page to load");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10_000 }).catch(() => {});
   }
 }

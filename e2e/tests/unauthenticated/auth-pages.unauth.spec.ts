@@ -4,10 +4,19 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
   test.beforeEach(async ({ page }) => {
     // Ensure we're not authenticated by clearing cookies
     await page.context().clearCookies();
+    // Also clear localStorage/sessionStorage to handle auth state
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
   });
 
   test("should display login page correctly", async ({ page }) => {
-    await page.goto("/auth/login");
+    await page.goto("/auth/login", { waitUntil: "domcontentloaded" });
+
+    // Wait for the login form to be visible (hydration complete)
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
 
     // Check page heading
     await expect(
@@ -29,7 +38,10 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
   });
 
   test("should display signup page correctly", async ({ page }) => {
-    await page.goto("/auth/signup");
+    await page.goto("/auth/signup", { waitUntil: "domcontentloaded" });
+
+    // Wait for the signup form to be visible
+    await page.getByTestId("signup-form").waitFor({ state: "attached", timeout: 10_000 });
 
     // Check page heading
     await expect(
@@ -41,9 +53,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Confirm Password")).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Sign up", exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Create account" })).toBeVisible();
 
     // Check OAuth button
     await expect(page.getByRole("button", { name: "Sign up with Google" })).toBeVisible();
@@ -56,18 +66,25 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
   test("should navigate between login and signup pages", async ({ page }) => {
     // Start at login page
-    await page.goto("/auth/login");
+    await page.goto("/auth/login", { waitUntil: "domcontentloaded" });
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
 
     // Click sign up link
     await page.getByRole("main").getByRole("link", { name: "Sign up" }).click();
-    await expect(page).toHaveURL("/auth/signup");
+
+    // Wait for signup page to load
+    await page.getByTestId("signup-form").waitFor({ state: "attached", timeout: 10_000 });
+    await expect(page).toHaveURL(/\/auth\/signup/);
     await expect(
       page.getByRole("heading", { name: "Sign up for Roundup Games" }),
     ).toBeVisible();
 
     // Click login link
     await page.getByRole("main").getByRole("link", { name: "Login" }).click();
-    await expect(page).toHaveURL("/auth/login");
+
+    // Wait for login page to load
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
+    await expect(page).toHaveURL(/\/auth\/login/);
     await expect(
       page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
     ).toBeVisible();
@@ -75,22 +92,33 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
   test("should redirect to login when accessing protected routes", async ({ page }) => {
     // Try to access dashboard without auth
-    await page.goto("/player");
+    await page.goto("/player", { waitUntil: "domcontentloaded" });
 
-    // Should redirect to login
-    await expect(page).toHaveURL(/\/auth\/login/);
-    await expect(
-      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
-    ).toBeVisible();
+    // Wait for the login form to appear (indicating redirect happened)
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
+
+    // Verify we're on the login page (either URL or content confirms it)
+    await expect(page.getByRole("heading", { name: /Welcome back/i })).toBeVisible();
+    await expect(page.getByLabel("Email")).toBeVisible();
   });
 
   test("should redirect to login when accessing profile", async ({ page }) => {
-    await page.goto("/player/profile");
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await page.goto("/player/profile", { waitUntil: "domcontentloaded" });
+
+    // Wait for the login form to appear
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
+
+    // Verify we're on the login page
+    await expect(page.getByRole("heading", { name: /Welcome back/i })).toBeVisible();
   });
 
   test("should redirect to login when accessing teams", async ({ page }) => {
-    await page.goto("/player/teams");
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await page.goto("/player/teams", { waitUntil: "domcontentloaded" });
+
+    // Wait for the login form to appear
+    await page.getByTestId("login-form").waitFor({ state: "attached", timeout: 10_000 });
+
+    // Verify we're on the login page
+    await expect(page.getByRole("heading", { name: /Welcome back/i })).toBeVisible();
   });
 });

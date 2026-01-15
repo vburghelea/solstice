@@ -133,6 +133,8 @@ export default function SignupForm() {
   return (
     <div className="flex flex-col gap-6">
       <form
+        data-testid="signup-form"
+        method="dialog"
         onSubmit={async (e) => {
           e.preventDefault();
           e.stopPropagation();

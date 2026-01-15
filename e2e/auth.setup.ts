@@ -20,14 +20,15 @@ setup("authenticate", async ({ page }) => {
     timeout: 10_000,
   });
 
-  // 4. CRITICAL: Wait for network to be idle. This ensures any final
-  //    session/cookie setting requests have completed.
-  await page.waitForLoadState("networkidle", { timeout: 15_000 });
+  // 4. CRITICAL: Wait for the page to be fully loaded. Using domcontentloaded
+  //    instead of networkidle to avoid timeouts from continuous requests
+  //    (analytics, feature flags, etc.)
+  await page.waitForLoadState("domcontentloaded", { timeout: 15_000 });
+  await page.waitForLoadState("load", { timeout: 15_000 });
 
-  // 5. Extra verification: Check for a persistent element that confirms auth,
-  //    like the logout button in the sidebar. This ensures the app's UI has
-  //    fully rendered in its authenticated state.
-  await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
+  // 5. Extra verification: Check for any content that confirms we're logged in
+  //    Just verify we're not on a login page and have dashboard content
+  await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
 
   // 6. Now that we are certain the auth state is stable, save it.
   await page.context().storageState({ path: authFile });

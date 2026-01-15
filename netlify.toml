@@ -2,6 +2,11 @@
   command = "vite build"
   publish = "dist/client"
 
+[dev]
+  command = "vite dev"
+  port = 8888
+  targetPort = 5173
+
 # Increase Node.js heap size for builds (Nitro server build requires more memory)
 [build.environment]
   NODE_OPTIONS = "--max-old-space-size=4096"
